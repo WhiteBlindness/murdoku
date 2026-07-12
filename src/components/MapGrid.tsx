@@ -15,15 +15,17 @@ interface Props {
   onPlaceFurniture?: (row: number, col: number) => void
 }
 
-type Material = 'tile' | 'wood' | 'grass' | 'carpet' | 'stone'
+type Material = 'tile' | 'wood' | 'darkwood' | 'grass' | 'carpet' | 'stone'
 
+// One distinct floor per room type so adjacent rooms never blend together.
 function roomMaterial(name: string): Material {
   const n = name.toLowerCase()
   if (n.includes('bath') || n.includes('kitchen') || n.includes('pantry')) return 'tile'
   if (n.includes('yard') || n.includes('garden') || n.includes('porch')) return 'grass'
-  if (n.includes('bed') || n.includes('living') || n.includes('dining')) return 'carpet'
-  if (n.includes('hall')) return 'stone'
-  return 'wood'
+  if (n.includes('bed')) return 'carpet'
+  if (n.includes('study') || n.includes('office') || n.includes('library')) return 'darkwood'
+  if (n.includes('hall') || n.includes('lobby') || n.includes('foyer') || n.includes('corridor')) return 'stone'
+  return 'wood' // living room, dining room, default — light oak planks
 }
 
 // Board-game floors: large-scale SVG pattern tiles, every shape outlined in
@@ -84,6 +86,35 @@ const LOBBY_TILE = svgTile(48, 48,
   `<circle cx="24" cy="24" r="4" fill="#A08A50" stroke="#000" stroke-width="2"/>`
 )
 
+// Bedroom carpet: solid warm beige with a subtle scattered stipple — no planks.
+const CARPET_TILE = svgTile(44, 44,
+  `<rect width="44" height="44" fill="#D9C8A8"/>` +
+  `<circle cx="7" cy="9" r="1.6" fill="#B5A382"/>` +
+  `<circle cx="24" cy="5" r="1.6" fill="#C2B08E"/>` +
+  `<circle cx="37" cy="14" r="1.6" fill="#B5A382"/>` +
+  `<circle cx="14" cy="22" r="1.6" fill="#C2B08E"/>` +
+  `<circle cx="31" cy="27" r="1.6" fill="#B5A382"/>` +
+  `<circle cx="5" cy="33" r="1.6" fill="#C2B08E"/>` +
+  `<circle cx="21" cy="39" r="1.6" fill="#B5A382"/>` +
+  `<circle cx="39" cy="38" r="1.6" fill="#C2B08E"/>`
+)
+
+// Office/study: narrower, darker mahogany planks — rich contrast to light oak.
+const DARKWOOD_TILE = svgTile(320, 48,
+  `<rect width="320" height="48" fill="#7A4A2E"/>` +
+  // row 1 — seams at 0 / 160
+  `<rect x="0" y="0" width="160" height="16" fill="#7A4A2E" stroke="#000" stroke-width="3"/>` +
+  `<rect x="160" y="0" width="160" height="16" fill="#6E4228" stroke="#000" stroke-width="3"/>` +
+  // row 2 — seams at 104 / 264 (plank wraps the tile edge)
+  `<rect x="104" y="16" width="160" height="16" fill="#82502F" stroke="#000" stroke-width="3"/>` +
+  `<rect x="264" y="16" width="160" height="16" fill="#744629" stroke="#000" stroke-width="3"/>` +
+  `<rect x="-56" y="16" width="160" height="16" fill="#744629" stroke="#000" stroke-width="3"/>` +
+  // row 3 — seams at 56 / 216 (plank wraps the tile edge)
+  `<rect x="56" y="32" width="160" height="16" fill="#6E4228" stroke="#000" stroke-width="3"/>` +
+  `<rect x="216" y="32" width="160" height="16" fill="#7E4C2C" stroke="#000" stroke-width="3"/>` +
+  `<rect x="-104" y="32" width="160" height="16" fill="#7E4C2C" stroke="#000" stroke-width="3"/>`
+)
+
 function floorStyle(hue: number, material: Material): React.CSSProperties {
   if (material === 'grass') {
     return { backgroundColor: '#9CB478', backgroundImage: GRASS_TILE, backgroundSize: '80px 80px' }
@@ -94,7 +125,13 @@ function floorStyle(hue: number, material: Material): React.CSSProperties {
   if (material === 'stone') {
     return { backgroundColor: '#F0E8C8', backgroundImage: LOBBY_TILE, backgroundSize: '48px 48px' }
   }
-  // carpet + wood + default → pale-oak floorboards
+  if (material === 'carpet') {
+    return { backgroundColor: '#D9C8A8', backgroundImage: CARPET_TILE, backgroundSize: '44px 44px' }
+  }
+  if (material === 'darkwood') {
+    return { backgroundColor: '#7A4A2E', backgroundImage: DARKWOOD_TILE, backgroundSize: '320px 48px' }
+  }
+  // wood + default → pale-oak floorboards
   void hue
   return { backgroundColor: '#E0C48E', backgroundImage: WOOD_TILE, backgroundSize: '320px 75px' }
 }
@@ -152,7 +189,7 @@ export default function MapGrid({
           display: 'grid',
           gridTemplateColumns: `repeat(${N}, 1fr)`,
           gridTemplateRows: `repeat(${N}, 1fr)`,
-          border: `3px solid ${WALL}`,
+          border: `6px solid ${WALL}`,
           boxShadow: `0 14px 44px rgba(0,0,0,0.52), 0 0 0 1px rgba(255,255,255,0.04)`,
           background: WALL,
           gap: '0',
@@ -195,12 +232,12 @@ export default function MapGrid({
                 style={{
                   ...floorStyle(hue, material),
                   borderRight: wallR
-                    ? `3px solid ${WALL}`
+                    ? `6px solid ${WALL}`
                     : isOutdoor
                       ? `1px dashed rgba(0,0,0,0.22)`
                       : `1px solid rgba(0,0,0,0.08)`,
                   borderBottom: wallB
-                    ? `3px solid ${WALL}`
+                    ? `6px solid ${WALL}`
                     : isOutdoor
                       ? `1px dashed rgba(0,0,0,0.22)`
                       : `1px solid rgba(0,0,0,0.08)`,
@@ -323,7 +360,7 @@ export default function MapGrid({
 
       {/* label overlay — same grid tracks, anchored corner tags */}
       <div
-        className="absolute inset-0 pointer-events-none p-[3px]"
+        className="absolute inset-0 pointer-events-none p-[6px]"
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${N}, 1fr)`,
