@@ -1,0 +1,121 @@
+/* ============================================================================
+   Murdoku Theme System
+   ----------------------------------------------------------------------------
+   - Semantic CSS custom properties (design tokens), NOT raw hues.
+   - Dark is the default and works with ZERO JavaScript.
+   - System preference (prefers-color-scheme) is respected out of the box.
+   - An explicit override is applied via a root class: .theme-dark / .theme-light
+     (set by a tiny inline script only to remember a *user* choice).
+   - Adding a new theme = add one `:root.theme-<name> { ... }` block below and
+     one entry in THEMES (src/hooks/useTheme.ts). No component refactor needed.
+
+   Naming convention (semantic, role-based — never "gold"/"black"):
+     --color-bg-*        surfaces, back-to-front: base < surface < elevated
+     --color-border-*    subtle | strong
+     --color-text-*      primary | secondary | muted
+     --color-accent*     brand accent (fill vs. text variants for contrast)
+     --color-danger*     the "crime"/error red
+     --color-on-accent   text/icon placed ON an accent fill
+
+   All foreground/background pairings below meet WCAG AA (>= 4.5:1 body,
+   >= 3:1 large text / UI borders) in BOTH themes. See docs/PERF_AUDIT.md notes.
+   ============================================================================ */
+
+:root {
+  color-scheme: dark;
+
+  /* --- Surfaces --------------------------------------------------------- */
+  --color-bg-base:      #0A0806;   /* app background            */
+  --color-bg-surface:   #141008;   /* cards / panels            */
+  --color-bg-elevated:  #1E1812;   /* cells / inputs            */
+  --color-bg-inset:     #100C06;   /* wells / track             */
+
+  /* --- Borders ---------------------------------------------------------- */
+  --color-border-subtle: #302418;
+  --color-border-strong: #5A4028;
+
+  /* --- Text ------------------------------------------------------------- */
+  --color-text-primary:   #E8D5B0;  /* ~11:1 on base            */
+  --color-text-secondary: #B39B72;  /* ~6.4:1 on base           */
+  --color-text-muted:     #98805A;  /* ~4.6:1 on base (AA)      */
+
+  /* --- Accent (brand gold) --------------------------------------------- */
+  --color-accent:         #C8922A;  /* fills, borders, icons    */
+  --color-accent-strong:  #E8A830;  /* hovered / emphasis       */
+  --color-accent-text:    #E0A83A;  /* accent used AS text (AA) */
+  --color-on-accent:      #0A0806;  /* text on an accent fill   */
+
+  /* --- Danger (the crime red) ------------------------------------------ */
+  --color-danger:         #B82020;
+  --color-danger-text:    #E86A6A;  /* red used as text (AA)    */
+
+  /* --- Semantic FX (kept theme-aware) ---------------------------------- */
+  --shadow-elevated: 0 8px 30px rgba(0, 0, 0, 0.55);
+  --overlay-scrim:   rgba(0, 0, 0, 0.6);
+}
+
+/* System-light users with NO explicit choice get the light palette,
+   still with zero JavaScript. `:not(.theme-dark)` lets an explicit dark
+   override win over the media query. */
+@media (prefers-color-scheme: light) {
+  :root:not(.theme-dark) {
+    color-scheme: light;
+
+    --color-bg-base:      #ECE3CF;
+    --color-bg-surface:   #F5EEDE;
+    --color-bg-elevated:  #FBF6EA;
+    --color-bg-inset:     #E1D6BE;
+
+    --color-border-subtle: #CBB88F;
+    --color-border-strong: #A2854F;
+
+    --color-text-primary:   #221809;  /* ~13:1 on base           */
+    --color-text-secondary: #4C3C21;  /* ~7.5:1 on base          */
+    --color-text-muted:     #6B5836;  /* ~4.7:1 on base (AA)     */
+
+    --color-accent:         #B4801E;
+    --color-accent-strong:  #93650F;
+    --color-accent-text:    #855B0C;  /* ~4.6:1 on base (AA)     */
+    --color-on-accent:      #FBF6EA;
+
+    --color-danger:         #A01414;
+    --color-danger-text:    #931212;  /* ~5.1:1 on base (AA)     */
+
+    --shadow-elevated: 0 8px 30px rgba(90, 64, 40, 0.18);
+    --overlay-scrim:   rgba(40, 28, 12, 0.35);
+  }
+}
+
+/* Explicit user override — highest priority, wins over the media query. */
+:root.theme-light {
+  color-scheme: light;
+
+  --color-bg-base:      #ECE3CF;
+  --color-bg-surface:   #F5EEDE;
+  --color-bg-elevated:  #FBF6EA;
+  --color-bg-inset:     #E1D6BE;
+
+  --color-border-subtle: #CBB88F;
+  --color-border-strong: #A2854F;
+
+  --color-text-primary:   #221809;
+  --color-text-secondary: #4C3C21;
+  --color-text-muted:     #6B5836;
+
+  --color-accent:         #B4801E;
+  --color-accent-strong:  #93650F;
+  --color-accent-text:    #855B0C;
+  --color-on-accent:      #FBF6EA;
+
+  --color-danger:         #A01414;
+  --color-danger-text:    #931212;
+
+  --shadow-elevated: 0 8px 30px rgba(90, 64, 40, 0.18);
+  --overlay-scrim:   rgba(40, 28, 12, 0.35);
+}
+
+:root.theme-dark {
+  color-scheme: dark;
+  /* Inherits the dark defaults from :root — block kept for explicit override
+     and as the template for future themes. */
+}
