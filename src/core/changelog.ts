@@ -58,7 +58,7 @@ export const CHANGELOG: ChangeEntry[] = [
     date: '2026-07-07',
     headline: 'Real deduction puzzles',
     detail:
-      'Murdoku is now a true logic-deduction game, not themed Sudoku. Read each suspect’s clue, place everyone on the house map so each sits in one row and one column, and unmask whoever is left alone with the victim. Cases span five difficulties with procedurally generated, uniquely-solvable puzzles.',
+      'Alibi is now a true logic-deduction game, not themed Sudoku. Read each suspect’s clue, place everyone on the house map so each sits in one row and one column, and unmask whoever is left alone with the victim. Cases span five difficulties with procedurally generated, uniquely-solvable puzzles.',
     tag: 'Feature',
   },
   {
@@ -72,7 +72,7 @@ export const CHANGELOG: ChangeEntry[] = [
     date: '2026-07-07',
     headline: 'Light & dark themes',
     detail:
-      'Murdoku now ships a full theming system with a one-tap light/dark toggle in the top corner. It follows your device preference by default and remembers your choice. Every colour meets accessibility contrast standards in both modes.',
+      'Alibi now ships a full theming system with a one-tap light/dark toggle in the top corner. It follows your device preference by default and remembers your choice. Every colour meets accessibility contrast standards in both modes.',
     tag: 'Feature',
   },
   {
@@ -91,7 +91,7 @@ export const CHANGELOG: ChangeEntry[] = [
   },
   {
     date: '2026-07-06',
-    headline: 'Murdoku launches',
+    headline: 'Alibi launches',
     detail:
       'The first release: six hand-built mysteries across three difficulties, a full suspect roster, hints, pencil-note mode, and an animated “Case Closed” reveal. Installable as an app and playable fully offline.',
     tag: 'Feature',

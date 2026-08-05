@@ -25,14 +25,17 @@
   color-scheme: dark;
 
   /* --- Surfaces --------------------------------------------------------- */
+  /* Surfaces step up in luminance base < surface < elevated so cards visibly
+     lift off the background (was near-flat #141008 on #0A0806). */
   --color-bg-base:      #0A0806;   /* app background            */
-  --color-bg-surface:   #141008;   /* cards / panels            */
-  --color-bg-elevated:  #1E1812;   /* cells / inputs            */
+  --color-bg-surface:   #1C150C;   /* cards / panels            */
+  --color-bg-elevated:  #2A2113;   /* cells / inputs            */
   --color-bg-inset:     #100C06;   /* wells / track             */
 
   /* --- Borders ---------------------------------------------------------- */
-  --color-border-subtle: #302418;
-  --color-border-strong: #5A4028;
+  /* subtle meets WCAG 1.4.11 (>=3:1 non-text) against bg-base so card edges read. */
+  --color-border-subtle: #4A3820;
+  --color-border-strong: #6A4C30;
 
   /* --- Text ------------------------------------------------------------- */
   --color-text-primary:   #E8D5B0;  /* ~11:1 on base            */
@@ -48,6 +51,32 @@
   /* --- Danger (the crime red) ------------------------------------------ */
   --color-danger:         #B82020;
   --color-danger-text:    #E86A6A;  /* red used as text (AA)    */
+
+  /* --- Difficulty scale -------------------------------------------------
+     One source of truth for the five difficulties (was duplicated as a
+     hardcoded DIFF_COLOR map in both HomeScreen and GameScreen, tuned for
+     dark only — on light every value but Expert failed AA at 1.6-2.3:1).
+     `-text` is the AA-safe foreground; the base token is the decorative
+     fill used for rails and gradients. Verified >= 4.5:1 in both themes. */
+  --diff-very-easy:      #48C890;
+  --diff-easy:           #7BC848;
+  --diff-medium:         #E0A83A;
+  --diff-hard:           #E8783C;
+  --diff-expert:         #E86A6A;
+
+  --diff-very-easy-text: #48C890;  /* 9.46:1 on base */
+  --diff-easy-text:      #7BC848;  /* 9.71:1 on base */
+  --diff-medium-text:    #E0A83A;  /* 9.36:1 on base */
+  --diff-hard-text:      #E8783C;  /* 6.84:1 on base */
+  --diff-expert-text:    #E86A6A;  /* 6.38:1 on base */
+
+  /* --- Board floors -----------------------------------------------------
+     The board is a physical object lit by the room, so its floors carry
+     their own 1950s palette rather than the UI tokens. These two knobs let
+     dark mode dim the whole board as one unit (see MapGrid) instead of
+     leaving a bright slab floating on a near-black page. */
+  --board-floor-brightness: 0.62;
+  --board-floor-saturate:   0.88;
 
   /* --- Semantic FX (kept theme-aware) ---------------------------------- */
   --shadow-elevated: 0 8px 30px rgba(0, 0, 0, 0.55);
@@ -81,6 +110,24 @@
     --color-danger:         #A01414;
     --color-danger-text:    #931212;  /* ~5.1:1 on base (AA)     */
 
+    /* Difficulty — the dark palette's bright hues sit at 1.6-2.3:1 on the
+       cream page, so light gets its own darkened set. */
+    --diff-very-easy:      #16663E;
+    --diff-easy:           #3D6B14;
+    --diff-medium:         #7A5410;
+    --diff-hard:           #8F3A0A;
+    --diff-expert:         #931212;
+
+    --diff-very-easy-text: #16663E;  /* 5.48:1 on base */
+    --diff-easy-text:      #3D6B14;  /* 4.97:1 on base */
+    --diff-medium-text:    #7A5410;  /* 5.30:1 on base */
+    --diff-hard-text:      #8F3A0A;  /* 5.92:1 on base */
+    --diff-expert-text:    #931212;  /* 7.04:1 on base */
+
+    /* Light page, lit board — no dimming needed. */
+    --board-floor-brightness: 1;
+    --board-floor-saturate:   1;
+
     --shadow-elevated: 0 8px 30px rgba(90, 64, 40, 0.18);
     --overlay-scrim:   rgba(40, 28, 12, 0.35);
   }
@@ -109,6 +156,21 @@
 
   --color-danger:         #A01414;
   --color-danger-text:    #931212;
+
+  --diff-very-easy:      #16663E;
+  --diff-easy:           #3D6B14;
+  --diff-medium:         #7A5410;
+  --diff-hard:           #8F3A0A;
+  --diff-expert:         #931212;
+
+  --diff-very-easy-text: #16663E;
+  --diff-easy-text:      #3D6B14;
+  --diff-medium-text:    #7A5410;
+  --diff-hard-text:      #8F3A0A;
+  --diff-expert-text:    #931212;
+
+  --board-floor-brightness: 1;
+  --board-floor-saturate:   1;
 
   --shadow-elevated: 0 8px 30px rgba(90, 64, 40, 0.18);
   --overlay-scrim:   rgba(40, 28, 12, 0.35);

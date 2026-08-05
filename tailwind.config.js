@@ -67,11 +67,22 @@ export default {
           '0%, 100%': { opacity: '1' },
           '50%':      { opacity: '0.4' },
         },
+        // Rejection gesture for an illegal move. Small amplitude and short —
+        // a physical "no", not a tantrum. Uses translate3d so it composites on
+        // the GPU and never triggers layout. Kept as a CSS animation (not a
+        // Framer spring) so the global prefers-reduced-motion block in
+        // index.css actually neutralises it.
+        shake: {
+          '0%, 100%':      { transform: 'translate3d(0, 0, 0)' },
+          '15%, 45%, 75%': { transform: 'translate3d(-5px, 0, 0)' },
+          '30%, 60%, 90%': { transform: 'translate3d(5px, 0, 0)' },
+        },
       },
       animation: {
         stamp:     'stamp 0.5s cubic-bezier(0.22,1,0.36,1) forwards',
         'cell-pop':'cell-pop 0.25s ease-out',
         pulse:     'pulse 2s ease-in-out infinite',
+        shake:     'shake 0.4s cubic-bezier(0.36,0.07,0.19,0.97) both',
       },
     },
   },

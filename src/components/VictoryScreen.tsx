@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import type { Puzzle } from '../core/types'
 import { roomIdAt } from '../core/engine'
 import { getAllPuzzles } from '../core/catalog'
@@ -24,6 +24,28 @@ export default function VictoryScreen({ puzzle, murderer, timer, hintsLeft, comp
   const hasNext = order.indexOf(puzzle.id) < order.length - 1
   const unsolved = allPuzzles.find(p => !completedIds.includes(p.id) && p.id !== puzzle.id)
   const hasUnsolved = !hasNext && !!unsolved
+  const reduceMotion = useReducedMotion()
+
+  // The stamp is the emotional payoff, so it lands like a real object being
+  // pressed down — spring with overshoot rather than a fixed-duration tween.
+  // Reduced motion gets a plain fade (no scale/rotate, nothing vestibular).
+  const stamp = reduceMotion
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.2 } }
+    : {
+        initial: { scale: 1.45, rotate: -8, opacity: 0 },
+        animate: { scale: 1, rotate: -2, opacity: 1 },
+        transition: { delay: 0.05, type: 'spring' as const, bounce: 0.4, duration: 0.55 },
+      }
+
+  // The killer reveal materialises (blur + scale resolving together) instead of
+  // just fading — the surface reads as arriving, not switching on.
+  const reveal = reduceMotion
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { delay: 0.4, duration: 0.2 } }
+    : {
+        initial: { scale: 0.7, opacity: 0, filter: 'blur(12px)' },
+        animate: { scale: 1, opacity: 1, filter: 'blur(0px)' },
+        transition: { delay: 0.55, type: 'spring' as const, bounce: 0.25, duration: 0.6 },
+      }
 
   return (
     <motion.div
@@ -32,9 +54,7 @@ export default function VictoryScreen({ puzzle, murderer, timer, hintsLeft, comp
       className="flex flex-col min-h-screen bg-bg-deep items-center justify-center px-6"
     >
       <motion.div
-        initial={{ scale: 1.35, rotate: -8, opacity: 0 }}
-        animate={{ scale: 1, rotate: -2, opacity: 1 }}
-        transition={{ delay: 0.05, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        {...stamp}
         className="mb-6"
         style={{ willChange: 'transform, opacity', transformOrigin: 'center' }}
       >
@@ -51,8 +71,7 @@ export default function VictoryScreen({ puzzle, murderer, timer, hintsLeft, comp
       </motion.p>
 
       <motion.div
-        initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.55, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        {...reveal}
         className="rounded-2xl"
         style={{ boxShadow: `0 0 0 3px ${killer.accent}, 0 0 40px ${killer.accent}55` }}
       >

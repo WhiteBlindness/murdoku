@@ -17,6 +17,8 @@ export default function HowToPlay({ mode, onClose }: Props) {
     >
       <motion.div
         initial={{ scale: 0.94, y: 8 }} animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.96, opacity: 0 }}
+        transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
         onClick={e => e.stopPropagation()}
         className="w-full max-w-md rounded-2xl border border-br-box bg-bg-panel p-5 max-h-[85vh] overflow-y-auto"
         style={{ boxShadow: 'var(--shadow-elevated)' }}

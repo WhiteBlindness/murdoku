@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { X, Lock } from 'lucide-react'
 import type { Puzzle, CellMark, Furniture, FurnitureType } from '../core/types'
 import { FURNITURE_ICON, FURNITURE_NAME } from '../core/furniture'
@@ -115,25 +116,40 @@ const DARKWOOD_TILE = svgTile(320, 48,
   `<rect x="-104" y="32" width="160" height="16" fill="#7E4C2C" stroke="#000" stroke-width="3"/>`
 )
 
+// backgroundSize is a percentage of the CELL, not a fixed px size, so every
+// pattern keeps the same visual scale from N=4 down to N=7 (a 48px cell on a
+// phone). Fixed px used to mean the 128px checker tile was larger than a 48px
+// Expert cell, so kitchens rendered as one flat coral block.
+//
+// Scale is chosen for BOLDNESS, not density: the board-game look depends on
+// each shape's 3px black stroke staying visible. Shrink a tile far below one
+// cell and those strokes render sub-pixel — the pattern turns to grey noise.
+// So tiles that already contain their own repeat (checker = 2×2 squares,
+// planks = 3 rows) map to a FULL cell rather than a fraction of one.
 function floorStyle(hue: number, material: Material): React.CSSProperties {
   if (material === 'grass') {
-    return { backgroundColor: '#9CB478', backgroundImage: GRASS_TILE, backgroundSize: '80px 80px' }
+    return { backgroundColor: '#9CB478', backgroundImage: GRASS_TILE, backgroundSize: '100% 100%' }
   }
   if (material === 'tile') {
-    return { backgroundColor: '#DE8B7B', backgroundImage: CHECKER_TILE, backgroundSize: '128px 128px' }
+    // Tile already holds a 2×2 checker → one tile per cell = 2×2 bold squares.
+    return { backgroundColor: '#DE8B7B', backgroundImage: CHECKER_TILE, backgroundSize: '100% 100%' }
   }
   if (material === 'stone') {
-    return { backgroundColor: '#F0E8C8', backgroundImage: LOBBY_TILE, backgroundSize: '48px 48px' }
+    // Single diamond per tile → 50% gives a 2×2 diamond grid per cell.
+    return { backgroundColor: '#F0E8C8', backgroundImage: LOBBY_TILE, backgroundSize: '50% 50%' }
   }
   if (material === 'carpet') {
-    return { backgroundColor: '#D9C8A8', backgroundImage: CARPET_TILE, backgroundSize: '44px 44px' }
+    // carpet stipple fills the cell; dots scatter naturally at any size
+    return { backgroundColor: '#D9C8A8', backgroundImage: CARPET_TILE, backgroundSize: '100% 100%' }
   }
   if (material === 'darkwood') {
-    return { backgroundColor: '#7A4A2E', backgroundImage: DARKWOOD_TILE, backgroundSize: '320px 48px' }
+    // Tile is 3 plank rows, each plank half the tile wide. 200% wide × 100%
+    // tall ⇒ a plank spans a full cell across 3 rows — boards, not pinstripes.
+    return { backgroundColor: '#7A4A2E', backgroundImage: DARKWOOD_TILE, backgroundSize: '200% 100%' }
   }
   // wood + default → pale-oak floorboards
   void hue
-  return { backgroundColor: '#E0C48E', backgroundImage: WOOD_TILE, backgroundSize: '320px 75px' }
+  return { backgroundColor: '#E0C48E', backgroundImage: WOOD_TILE, backgroundSize: '200% 100%' }
 }
 
 function handleCellKey(e: React.KeyboardEvent, r: number, c: number, N: number) {
@@ -161,6 +177,19 @@ export default function MapGrid({
   const room = (id: string) => puzzle.rooms.find(r => r.id === id)
   const personById = (id: string) => puzzle.people.find(p => p.id === id)
   const [hoverCell, setHoverCell] = useState<string | null>(null)
+  const reduceMotion = useReducedMotion()
+
+  // Placing a suspect is a committing, physical action, so the token lands with
+  // a little overshoot (bounce) rather than a flat fade. The global
+  // prefers-reduced-motion CSS only covers CSS animations, never Framer's
+  // JS-driven springs — so opt out here explicitly.
+  const snapIn = reduceMotion
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.15 } }
+    : {
+        initial: { scale: 0.55, opacity: 0 },
+        animate: { scale: 1, opacity: 1 },
+        transition: { type: 'spring' as const, bounce: 0.35, duration: 0.42 },
+      }
 
   const allFurniture: Furniture[] = [...puzzle.furniture, ...extraFurniture]
   const furnByCell: Record<string, Furniture[]> = {}
@@ -174,7 +203,12 @@ export default function MapGrid({
     while (span < N
       && rm.cells.some(c => c.row === anchor.row && c.col === anchor.col + span)
       && !furnitureCells.has(`${anchor.row},${anchor.col + span}`)) span++
-    return { name: rm.name, row: anchor.row, col: anchor.col, span }
+    // Abbreviation: multi-word → initials (FRONT YARD → FY), single-word → first 3 chars (KITCHEN → KIT)
+    const words = rm.name.trim().toUpperCase().split(/\s+/)
+    const abbr = words.length > 1
+      ? words.map(w => w[0]).join('')
+      : words[0].slice(0, 3)
+    return { name: rm.name, abbr, row: anchor.row, col: anchor.col, span }
   })
 
   const isPlacing = !!placingFurniture && !!onPlaceFurniture
@@ -230,7 +264,8 @@ export default function MapGrid({
                 aria-label={`Row ${r + 1}, column ${c + 1}${person ? `, ${person.name}` : draftNames ? `, drafts: ${draftNames}` : furnNames ? `, ${furnNames}` : ''}`}
                 className="relative flex items-center justify-center focus:outline-none focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] transition-transform active:scale-[0.97]"
                 style={{
-                  ...floorStyle(hue, material),
+                  // Floor colours/pattern live on the dedicated child span below so
+                  // the theme dim-filter only touches the floor, not avatars/marks.
                   borderRight: wallR
                     ? `6px solid ${WALL}`
                     : isOutdoor
@@ -243,12 +278,27 @@ export default function MapGrid({
                       : `1px solid rgba(0,0,0,0.08)`,
                   cursor: isPlacing ? 'crosshair' : 'pointer',
                   ...(showPreview ? {
-                    filter: 'brightness(1.14)',
                     outline: '2px dashed rgba(255,255,255,0.65)',
                     outlineOffset: '-4px',
                   } : {}),
                 }}
               >
+                {/* floor layer — filtered as a unit for dark-theme dimming.
+                    Rendered first so it sits behind all marks/avatars without
+                    z-index fiddling.  The preview brightness lives here only
+                    when placing furniture so it affects the floor, not tokens. */}
+                <span
+                  aria-hidden
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    ...floorStyle(hue, material),
+                    filter: [
+                      'brightness(var(--board-floor-brightness, 1))',
+                      'saturate(var(--board-floor-saturate, 1))',
+                      showPreview ? 'brightness(1.14)' : '',
+                    ].filter(Boolean).join(' '),
+                  }}
+                />
                 {/* furniture layer — SVGs fill the cell flush, outline defines the object */}
                 {furn.length > 0 && !person && (
                   <span
@@ -324,7 +374,9 @@ export default function MapGrid({
 
                 {/* mark: person */}
                 {person && (
-                  <span
+                  <motion.span
+                    key={person.id}
+                    {...snapIn}
                     className={`relative rounded-xl ${conflicted ? 'animate-pulse' : ''}`}
                     style={{
                       boxShadow: conflicted
@@ -350,7 +402,7 @@ export default function MapGrid({
                         <Lock size={9} strokeWidth={3} />
                       </span>
                     )}
-                  </span>
+                  </motion.span>
                 )}
               </button>
             )
@@ -358,7 +410,11 @@ export default function MapGrid({
         )}
       </div>
 
-      {/* label overlay — same grid tracks, anchored corner tags */}
+      {/* label overlay — same grid tracks, anchored corner tags.
+          At N≥6 (≤48px cells) the full name is too wide to fit without
+          occluding playable area, so we render initials/short-code instead.
+          The full name is always present via `title` (DOM attribute) and via
+          a visually-hidden <span> so screen readers announce it in full. */}
       <div
         className="absolute inset-0 pointer-events-none p-[6px]"
         style={{
@@ -367,27 +423,45 @@ export default function MapGrid({
           gridTemplateRows: `repeat(${N}, 1fr)`,
         }}
       >
-        {labelAnchors.map((l, i) => (
-          <span
-            key={i}
-            className="font-sans font-black uppercase whitespace-nowrap self-start justify-self-start"
-            style={{
-              gridColumnStart: l.col + 1,
-              gridColumnEnd: `span ${l.span}`,
-              gridRowStart: l.row + 1,
-              color: '#fff',
-              fontSize: `clamp(7px, ${Math.round(110 / N)}px, 11px)`,
-              background: '#000',
-              boxShadow: '0 0 0 2px #fff, 0 0 0 3.5px #000',
-              borderRadius: 9999,
-              padding: '2px 7px',
-              letterSpacing: '0.11em',
-              margin: '4px',
-            }}
-          >
-            {l.name}
-          </span>
-        ))}
+        {labelAnchors.map((l, i) => {
+          const compact = N >= 6
+          return (
+            <span
+              key={i}
+              title={l.name}
+              // Pill sits flush against the top-left wall junction (margin: 2px)
+              // so it overlaps the 6px black wall line rather than cell interior.
+              className="font-sans font-black uppercase self-start justify-self-start"
+              style={{
+                gridColumnStart: l.col + 1,
+                // Compact mode spans only 1 column — the abbreviated label fits
+                // in a single cell corner without spreading into neighbours.
+                gridColumnEnd: compact ? 'span 1' : `span ${l.span}`,
+                gridRowStart: l.row + 1,
+                color: '#fff',
+                // min 9px floor; compact path doesn't need to scale up
+                fontSize: compact ? '9px' : `clamp(9px, ${Math.round(110 / N)}px, 11px)`,
+                background: '#000',
+                boxShadow: '0 0 0 2px #fff, 0 0 0 3.5px #000',
+                borderRadius: 9999,
+                padding: compact ? '1px 4px' : '2px 7px',
+                letterSpacing: compact ? '0.04em' : '0.11em',
+                // Hug the wall corner: 2px margin so the pill rides the 6px wall
+                margin: compact ? '2px' : '4px',
+                maxWidth: '100%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                display: 'block',
+              }}
+            >
+              {/* Visible text: abbreviation in compact mode, full name otherwise */}
+              <span aria-hidden={compact || undefined}>{compact ? l.abbr : l.name}</span>
+              {/* SR-only full name in compact mode so screen readers hear it */}
+              {compact && <span className="sr-only">{l.name}</span>}
+            </span>
+          )
+        })}
       </div>
     </div>
   )

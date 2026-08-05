@@ -18,9 +18,15 @@ interface Props {
 
 function fmt(s: number) { return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}` }
 
-const DIFF_COLOR: Record<string, string> = {
-  'Very Easy': '#48C890', 'Easy': '#7BC848', 'Medium': '#C8922A', 'Hard': '#E8783C', 'Expert': '#B82020',
+// Map each difficulty label to its CSS token slug.
+// Two variants are available in theme.css for each slug:
+//   --diff-<slug>       decorative fill (rails, card spine, CSS custom property fed to color-mix hover rules)
+//   --diff-<slug>-text  AA-safe foreground text (>= 4.5:1 contrast in both light and dark themes)
+const DIFF_TOKEN: Record<string, string> = {
+  'Very Easy': 'very-easy', Easy: 'easy', Medium: 'medium', Hard: 'hard', Expert: 'expert',
 }
+const diffFill = (d: string) => `var(--diff-${DIFF_TOKEN[d]})`
+const diffText = (d: string) => `var(--diff-${DIFF_TOKEN[d]}-text)`
 
 const DIFF_ORDER = ['Very Easy', 'Easy', 'Medium', 'Hard', 'Expert'] as const
 
@@ -32,16 +38,36 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="flex flex-col min-h-screen bg-bg-deep"
+      className="relative flex flex-col min-h-screen bg-bg-deep"
     >
-      <div className="pt-safe flex items-center justify-between px-4 pt-3">
+      {/* Atmosphere: a warm pool of light behind the crest falling off into the
+          corners, plus fine grain. Flat near-black read as "unfinished dark
+          theme" rather than "noir". Both layers are inert and theme-aware. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          background:
+            'radial-gradient(ellipse 90% 55% at 50% 0%, color-mix(in srgb, var(--color-accent) 13%, transparent), transparent 70%)',
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0 opacity-[0.035] mix-blend-overlay"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3"/></filter><rect width="140" height="140" filter="url(#n)"/></svg>'
+          )}")`,
+        }}
+      />
+      <div className="relative z-10 pt-safe flex items-center justify-between px-4 pt-3">
         <button onClick={onOpenReleases} className="focus-ring text-paper-muted text-xs font-sans tracking-wide hover:text-accent-text transition-colors px-1 py-1">
           What&rsquo;s new
         </button>
         <ThemeToggle resolved={resolvedTheme} onToggle={onToggleTheme} />
       </div>
 
-      <header className="flex flex-col items-center pt-5 pb-7 px-6 relative">
+      <header className="z-10 flex flex-col items-center pt-5 pb-7 px-6 relative">
         {/* Detective badge / seal */}
         <div className="relative mb-3">
           <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -73,7 +99,7 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
             textShadow: '0 2px 24px color-mix(in srgb, var(--color-accent) 40%, transparent)',
           }}
         >
-          MURDOKU
+          ALIBI
         </h1>
 
         {/* ornamental divider */}
@@ -87,7 +113,7 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
       </header>
 
       {/* Mode selector */}
-      <div className="px-4 mb-4 w-full max-w-md mx-auto">
+      <div className="relative z-10 px-4 mb-4 w-full max-w-md mx-auto">
         <div className="flex rounded-xl border border-br-thin bg-bg-panel p-1 gap-1">
           <ModeBtn active={mode === 'classic'} onClick={() => onSetMode('classic')}
             icon={<Sparkles size={14} />} title="Classic"
@@ -98,7 +124,7 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
         </div>
       </div>
 
-      <main className="flex-1 overflow-y-auto px-4 pb-8 w-full max-w-3xl mx-auto">
+      <main className="relative z-10 flex-1 overflow-y-auto px-4 pb-8 w-full max-w-3xl mx-auto">
         {DIFF_ORDER.map(diff => {
           const group = puzzles.filter(p => p.difficulty === diff)
           if (!group.length) return null
@@ -107,15 +133,15 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
             <section key={diff} className="mb-6">
               {/* Difficulty divider */}
               <div className="flex items-center gap-3 mb-3">
-                <div className="h-px flex-1" style={{ background: `linear-gradient(to right, transparent, ${DIFF_COLOR[diff]})` }} />
+                <div className="h-px flex-1" style={{ background: `linear-gradient(to right, transparent, ${diffFill(diff)})` }} />
                 <h2
                   className="font-display font-bold text-sm uppercase tracking-[0.18em]"
-                  style={{ color: DIFF_COLOR[diff] }}
+                  style={{ color: diffText(diff) }}
                 >
                   {diff}
                 </h2>
                 <span className="text-paper-muted text-[10px] font-sans">{solvedInGroup}/{group.length}</span>
-                <div className="h-px flex-1" style={{ background: `linear-gradient(to left, transparent, ${DIFF_COLOR[diff]})` }} />
+                <div className="h-px flex-1" style={{ background: `linear-gradient(to left, transparent, ${diffFill(diff)})` }} />
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -127,20 +153,64 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
                     <button
                       key={p.id}
                       onClick={() => onSelect(p.id)}
-                      className="focus-ring text-left rounded-xl border border-br-thin bg-bg-panel overflow-hidden hover:border-br-box transition-transform active:scale-[0.98]"
+                      className="case-card focus-ring group relative text-left rounded-xl border border-br-thin bg-bg-panel overflow-hidden"
+                      style={{ ['--diff' as string]: diffFill(p.difficulty) }}
                     >
-                      <div className="h-1.5 w-full" style={{ backgroundColor: DIFF_COLOR[p.difficulty] }} />
-                      <div className="p-3.5">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-paper-muted text-[10px] tracking-[0.15em] uppercase font-sans">{p.caseNumber}</span>
-                          {solved && <span className="text-[10px] text-accent-text border border-br-thin rounded px-1.5 py-0.5 font-sans">Solved</span>}
+                      {/* Difficulty reads as a spine down the edge of a file,
+                          not a stripe pinned to the top of a web card. */}
+                      <span aria-hidden className="absolute left-0 top-0 bottom-0 w-[3px]" style={{ backgroundColor: diffFill(p.difficulty) }} />
+
+                      <div className="pl-4 pr-3.5 py-3.5">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span
+                            className="text-[9px] tracking-[0.22em] uppercase font-sans font-semibold"
+                            style={{ color: diffText(p.difficulty) }}
+                          >
+                            {p.caseNumber}
+                          </span>
+                          {solved && (
+                            <span
+                              className="text-[9px] font-display font-bold uppercase tracking-[0.14em] rounded-sm px-1.5 py-[3px] leading-none"
+                              style={{
+                                color: 'var(--color-accent-text)',
+                                border: '1px solid color-mix(in srgb, var(--color-accent) 55%, transparent)',
+                                background: 'color-mix(in srgb, var(--color-accent) 12%, transparent)',
+                              }}
+                            >
+                              Closed
+                            </span>
+                          )}
                         </div>
-                        <h2 className="font-display text-paper text-base font-bold leading-tight">{p.title}</h2>
-                        <div className="flex items-center gap-3 mt-2 text-paper-dim text-[11px] font-sans">
+
+                        <h2 className="font-display text-paper text-[17px] font-bold leading-[1.15] tracking-[-0.01em] mb-2.5">
+                          {p.title}
+                        </h2>
+
+                        <div className="flex items-center gap-3 text-paper-muted text-[11px] font-sans">
                           <span className="flex items-center gap-1"><LayoutGrid size={12} />{p.size}×{p.size}</span>
-                          <span className="flex items-center gap-1"><Users size={12} />{p.people.length}</span>
+
+                          {/* The cast, as accent chips. Real portraits would be
+                              ~150 DiceBear API requests across the catalog —
+                              these carry the same "who's in this case" signal
+                              for free. */}
+                          <span className="flex items-center gap-[3px]" title={`${p.people.length} people`}>
+                            <Users size={12} className="mr-0.5" />
+                            {p.people.map(person => (
+                              <span
+                                key={person.id}
+                                className="rounded-full"
+                                style={{
+                                  width: 6, height: 6,
+                                  backgroundColor: person.accent,
+                                  opacity: person.isVictim ? 0.35 : 1,
+                                  boxShadow: person.isVictim ? 'none' : `0 0 4px ${person.accent}66`,
+                                }}
+                              />
+                            ))}
+                          </span>
+
                           {records[p.id] && (
-                            <span className="flex items-center gap-1 text-accent-text ml-auto"><Timer size={12} />{fmt(records[p.id].bestSeconds)}</span>
+                            <span className="flex items-center gap-1 text-accent-text ml-auto tabular-nums"><Timer size={12} />{fmt(records[p.id].bestSeconds)}</span>
                           )}
                         </div>
                       </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Undo2, Redo2, Trash2, Lightbulb, X as XIcon, MousePointerClick, Pencil,
@@ -42,7 +42,7 @@ interface Props {
 }
 
 const DIFF_COLOR: Record<string, string> = {
-  'Very Easy': '#48C890', 'Easy': '#7BC848', 'Medium': '#C8922A', 'Hard': '#E8783C', 'Expert': '#B82020',
+  'Very Easy': 'var(--diff-very-easy-text)', 'Easy': 'var(--diff-easy-text)', 'Medium': 'var(--diff-medium-text)', 'Hard': 'var(--diff-hard-text)', 'Expert': 'var(--diff-expert-text)',
 }
 const HELP_KEY = 'murdoku_seen_help'
 
@@ -78,6 +78,35 @@ export default function GameScreen(props: Props) {
     setPlacingRotation(prev => ((prev + 90) % 360) as 0 | 90 | 180 | 270)
   }
 
+  // Every Accuse press bumps this, whether or not `feedback` changes value —
+  // two identical rejections in a row must still re-announce themselves.
+  const [submitNonce, setSubmitNonce] = useState(0)
+  function handleSubmit() {
+    setSubmitNonce(n => n + 1)
+    props.onSubmit()
+  }
+
+  // A miss or an illegal placement is a real rejection and earns the shake.
+  // "You haven't finished yet" is guidance, not a mistake, so it only surfaces
+  // the message — shaking there would scold the player for doing nothing wrong.
+  const hardReject = feedback === 'wrong' || feedback === 'blocked'
+
+  // Replay the shake by restarting the animation IN PLACE rather than by
+  // remounting via `key`. Remounting destroys the focused node, so a keyboard
+  // user who presses Enter to accuse loses focus to <body> and has to tab back
+  // to the CTA — on the game's primary action. Removing the class, forcing a
+  // reflow, then re-adding it restarts a CSS animation while keeping the same
+  // element (and therefore the focus ring and the screen-reader cursor).
+  const ctaRef = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (submitNonce === 0 || !hardReject) return
+    const el = ctaRef.current
+    if (!el) return
+    el.classList.remove('animate-shake')
+    void el.offsetWidth // forced reflow — without it the re-add is coalesced
+    el.classList.add('animate-shake')
+  }, [submitNonce, hardReject])
+
   const hasProgress = marks.some(row => row.some(c => c.kind !== 'empty'))
 
   useEffect(() => {
@@ -93,13 +122,13 @@ export default function GameScreen(props: Props) {
       <AnimatePresence>{help && <HowToPlay mode={mode} onClose={() => setHelp(false)} />}</AnimatePresence>
 
       <header className="pt-safe flex items-center justify-between px-4 pt-3 pb-2 border-b border-br-thin flex-shrink-0">
-        <button onClick={() => hasProgress ? setConfirmLeave(true) : props.onBack()} className="focus-ring text-paper-muted text-sm font-sans px-2 min-h-[44px] flex items-center">← Cases</button>
-        <div className="text-center">
-          <h1 className="font-display text-paper text-base font-bold leading-tight">{puzzle.title}</h1>
+        <button onClick={() => hasProgress ? setConfirmLeave(true) : props.onBack()} className="focus-ring text-paper-muted text-sm font-sans px-2 min-h-[44px] flex items-center whitespace-nowrap flex-shrink-0">← Cases</button>
+        <div className="text-center min-w-0 px-2 flex-1">
+          <h1 className="font-display text-paper text-base font-bold leading-tight truncate">{puzzle.title}</h1>
           <div className="flex items-center justify-center gap-2 mt-0.5">
-            <span className="text-[10px] font-sans tracking-wider" style={{ color: DIFF_COLOR[puzzle.difficulty] }}>{puzzle.difficulty.toUpperCase()}</span>
-            <span className="text-paper-muted text-[10px] font-sans">{puzzle.size}×{puzzle.size}</span>
-            <span className="text-[10px] font-sans tracking-wider px-1.5 rounded" style={{ color: detective ? 'var(--color-accent-text)' : 'var(--color-text-muted)', background: detective ? 'color-mix(in srgb, var(--color-accent) 14%, transparent)' : 'transparent' }}>
+            <span className="text-[10px] font-sans tracking-wider whitespace-nowrap" style={{ color: DIFF_COLOR[puzzle.difficulty] }}>{puzzle.difficulty.toUpperCase()}</span>
+            <span className="text-paper-muted text-[10px] font-sans whitespace-nowrap">{puzzle.size}×{puzzle.size}</span>
+            <span className="text-[10px] font-sans tracking-wider px-1.5 rounded whitespace-nowrap" style={{ color: detective ? 'var(--color-accent-text)' : 'var(--color-text-muted)', background: detective ? 'color-mix(in srgb, var(--color-accent) 14%, transparent)' : 'transparent' }}>
               {detective ? 'DETECTIVE' : 'CLASSIC'}
             </span>
           </div>
@@ -119,8 +148,16 @@ export default function GameScreen(props: Props) {
           : 'Each person is in exactly one row and one column. Read the clues, place everyone, then submit.'}
       </p>
 
-      <div className="flex-1 w-full max-w-6xl mx-auto px-3 pb-safe pb-4 grid gap-4 lg:grid-cols-[1fr_minmax(320px,420px)] items-start">
-        <div className="flex flex-col gap-3 order-1">
+      {/*
+        Four-section grid. Mobile (1-col): board → suspects → toolbar → accuse.
+        Desktop lg (2-col): left col = board+toolbar (rows 1-2), right col = suspects+accuse (rows 1-2).
+        This lets suspects stay close to the board on mobile (clues visible without deep scroll)
+        and fills the right column height on desktop so both columns end near the same baseline.
+      */}
+      <div className="flex-1 w-full max-w-6xl mx-auto px-3 pb-safe pb-4 grid gap-4 lg:grid-cols-[1fr_minmax(320px,420px)] lg:grid-rows-[auto_auto]">
+
+        {/* Section A — Board + Legend (mobile: order 1, desktop: left col row 1) */}
+        <div className="flex flex-col gap-3 order-1 lg:col-start-1 lg:row-start-1">
           <MapGrid
             puzzle={puzzle}
             marks={marks}
@@ -151,54 +188,10 @@ export default function GameScreen(props: Props) {
               )}
             </AnimatePresence>
           </div>
-
-          {/* Toolbar */}
-          <div className="flex items-center gap-2 justify-center flex-wrap">
-            <ToolBtn active={tool === 'place'} onClick={() => props.onSetTool('place')} icon={<MousePointerClick size={16} />} label="Place"
-              title={detective ? 'Place a suspect — crosses out their row & column' : 'Place a suspect'} />
-            {detective && <ToolBtn active={tool === 'draft'} onClick={() => props.onSetTool('draft')} icon={<Pencil size={16} />} label="Draft" title="Pencil in candidates (no elimination)" />}
-            <ToolBtn active={tool === 'x'} onClick={() => props.onSetTool('x')} icon={<XIcon size={16} />} label="Mark ✕" />
-            <ToolBtn onClick={props.onUndo} disabled={!props.canUndo} icon={<Undo2 size={16} />} label="Undo" />
-            <ToolBtn onClick={props.onRedo} disabled={!props.canRedo} icon={<Redo2 size={16} />} label="Redo" />
-            {/* grouped so Clear+Hint always wrap together, never orphan Hint */}
-            <span className="flex items-center gap-2">
-              <ToolBtn onClick={() => setConfirmClear(true)} icon={<Trash2 size={16} />} label="Clear" />
-              <ToolBtn onClick={props.onHint} disabled={hintsLeft <= 0} icon={<Lightbulb size={16} />} label={`Hint ×${hintsLeft}`} />
-            </span>
-            <ToolBtn
-              toggled={showDecor}
-              onClick={() => { setShowDecor(v => !v); if (showDecor) setPlacingFurniture(null) }}
-              icon={<Palette size={16} />}
-              label="Decorar"
-              title="Colocar móveis decorativos"
-            />
-          </div>
-
-          <div className="flex flex-col items-center gap-2">
-            <motion.button whileTap={{ scale: 0.98 }} onClick={props.onSubmit}
-              className="focus-ring w-full max-w-[580px] py-3.5 rounded-xl font-display font-semibold tracking-wide uppercase text-sm"
-              style={{ background: 'linear-gradient(135deg, var(--color-accent), var(--color-accent-strong))', color: 'var(--color-on-accent)' }}>
-              Accuse — Submit Solution ({placedCount}/{puzzle.size})
-            </motion.button>
-            <AnimatePresence>
-              {feedback !== 'none' && (
-                <motion.button onClick={props.onDismissFeedback}
-                  initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                  className="text-[12px] font-sans px-3 py-1.5 rounded-lg text-center"
-                  style={{ color: 'var(--color-danger-text)', backgroundColor: 'color-mix(in srgb, var(--color-danger) 14%, transparent)' }}>
-                  {feedback === 'incomplete'
-                    ? 'Place every person first.'
-                    : feedback === 'blocked'
-                    ? 'That row or column is already taken by another suspect.'
-                    : `Not quite — ${correctCount} of ${puzzle.people.length} are in the right spot. Keep deducing.`}
-                </motion.button>
-              )}
-            </AnimatePresence>
-          </div>
         </div>
 
-        {/* Suspects + Furniture Picker */}
-        <div className="order-2 flex flex-col gap-3">
+        {/* Section B — Suspects + Furniture Picker (mobile: order 2, desktop: right col row 1) */}
+        <div className="order-2 lg:col-start-2 lg:row-start-1 flex flex-col gap-3">
           <AnimatePresence>
             {showDecor && (
               <motion.div
@@ -217,25 +210,93 @@ export default function GameScreen(props: Props) {
             )}
           </AnimatePresence>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
-          <p className="col-span-full text-[10px] text-paper-muted font-sans uppercase tracking-[0.2em] mb-0.5">
-            Suspects · tap to select{detective ? ' · check off solved clues' : ''}
-          </p>
-          {puzzle.people.map(person => (
-            <SuspectCard
-              key={person.id}
-              person={person}
-              clues={cluesOf[person.id] ?? []}
-              selected={selectedPerson === person.id}
-              placed={!!placedOf[person.id]}
-              locked={!!placedOf[person.id]?.locked}
-              conflicted={conflicts.has(person.id)}
-              resolved={resolvedClues.includes(person.id)}
-              showCheck={detective}
-              onSelect={() => props.onSelectPerson(person.id)}
-              onToggleResolved={() => props.onToggleClue(person.id)}
-            />
-          ))}
+            <p className="col-span-full text-[10px] text-paper-muted font-sans uppercase tracking-[0.2em] mb-0.5">
+              Suspects · tap to select{detective ? ' · check off solved clues' : ''}
+            </p>
+            {puzzle.people.map(person => (
+              <SuspectCard
+                key={person.id}
+                person={person}
+                clues={cluesOf[person.id] ?? []}
+                selected={selectedPerson === person.id}
+                placed={!!placedOf[person.id]}
+                locked={!!placedOf[person.id]?.locked}
+                conflicted={conflicts.has(person.id)}
+                resolved={resolvedClues.includes(person.id)}
+                showCheck={detective}
+                onSelect={() => props.onSelectPerson(person.id)}
+                onToggleResolved={() => props.onToggleClue(person.id)}
+              />
+            ))}
           </div>
+        </div>
+
+        {/* Section C — Toolbar (mobile: order 3, desktop: left col row 2) */}
+        {/*
+          Split by MEANING, not by count: modes (what a tap does) sit apart from
+          actions (one-shot commands). That reads better and removes the orphan
+          for free — a single 4-column grid stranded the last button on its own
+          row at 390px, and the button count changes with detective mode.
+          Modes are 2-3 items on one line; actions are 5 in a 3-col grid → 3+2,
+          which cannot leave a lone button in either mode. On sm+ both revert to
+          auto-width flex so "Undo" isn't a 175px slab, capped to the board
+          width so the controls stay visually attached to the board.
+        */}
+        <div className="order-3 lg:col-start-1 lg:row-start-2 mx-auto w-full max-w-[580px] flex flex-col gap-2">
+          <div className="flex gap-2 justify-center [&>button]:flex-1 sm:[&>button]:flex-none">
+            <ToolBtn active={tool === 'place'} onClick={() => props.onSetTool('place')} icon={<MousePointerClick size={16} />} label="Place"
+              title={detective ? 'Place a suspect — crosses out their row & column' : 'Place a suspect'} />
+            {detective && <ToolBtn active={tool === 'draft'} onClick={() => props.onSetTool('draft')} icon={<Pencil size={16} />} label="Draft" title="Pencil in candidates (no elimination)" />}
+            <ToolBtn active={tool === 'x'} onClick={() => props.onSetTool('x')} icon={<XIcon size={16} />} label="Mark ✕" />
+          </div>
+          <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:justify-center">
+            <ToolBtn onClick={props.onUndo} disabled={!props.canUndo} icon={<Undo2 size={16} />} label="Undo" />
+            <ToolBtn onClick={props.onRedo} disabled={!props.canRedo} icon={<Redo2 size={16} />} label="Redo" />
+            <ToolBtn onClick={() => setConfirmClear(true)} icon={<Trash2 size={16} />} label="Clear" />
+            <ToolBtn onClick={props.onHint} disabled={hintsLeft <= 0} icon={<Lightbulb size={16} />} label={`Hint ×${hintsLeft}`} />
+            <ToolBtn
+              toggled={showDecor}
+              onClick={() => { setShowDecor(v => !v); if (showDecor) setPlacingFurniture(null) }}
+              icon={<Palette size={16} />}
+              label="Decorate"
+              title="Place decorative furniture"
+            />
+          </div>
+        </div>
+
+        {/* Section D — Accuse CTA + feedback (mobile: order 4, desktop: right col row 2) */}
+        {/* Aligned to the row start (not `justify-end`): the grid's row 1 is as
+            tall as the board, so pushing this to the row's bottom stranded the
+            CTA ~90px below the toolbar. Starting it aligns both columns' row 2. */}
+        <div className="order-4 lg:col-start-2 lg:row-start-2 flex flex-col items-center gap-2">
+          <motion.button
+            /* No `key` here on purpose — see the effect above. The class is
+               added imperatively so the element (and its focus) survives. */
+            ref={ctaRef}
+            whileTap={{ scale: 0.98 }} onClick={handleSubmit}
+            className="focus-ring w-full py-3.5 rounded-xl font-display font-semibold tracking-wide uppercase text-sm"
+            style={{ background: 'linear-gradient(135deg, var(--color-accent), var(--color-accent-strong))', color: 'var(--color-on-accent)' }}>
+            Accuse — Submit Solution ({placedCount}/{puzzle.size})
+          </motion.button>
+          <AnimatePresence>
+            {feedback !== 'none' && (
+              <motion.button onClick={props.onDismissFeedback}
+                /* Framer owns this node's transform (the y entry offset), so it
+                   must NOT also carry animate-shake — two systems writing one
+                   composited property fight during the 400ms overlap. The CTA
+                   above carries the shake; this only re-plays its entry. */
+                key={`feedback-${submitNonce}`}
+                initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                className="text-[12px] font-sans px-3 py-1.5 rounded-lg text-center w-full"
+                style={{ color: 'var(--color-danger-text)', backgroundColor: 'color-mix(in srgb, var(--color-danger) 14%, transparent)' }}>
+                {feedback === 'incomplete'
+                  ? 'Place every person first.'
+                  : feedback === 'blocked'
+                  ? 'That row or column is already taken by another suspect.'
+                  : `Not quite — ${correctCount} of ${puzzle.people.length} are in the right spot. Keep deducing.`}
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
@@ -245,7 +306,8 @@ export default function GameScreen(props: Props) {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm" style={{ background: 'color-mix(in srgb, var(--color-bg-base) 55%, transparent)' }}
             onClick={() => setConfirmLeave(false)}>
-            <motion.div initial={{ scale: 0.94 }} animate={{ scale: 1 }} onClick={e => e.stopPropagation()}
+            <motion.div initial={{ scale: 0.94 }} animate={{ scale: 1 }} exit={{ scale: 0.96, opacity: 0 }}
+              transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }} onClick={e => e.stopPropagation()}
               className="w-full max-w-xs rounded-2xl border border-br-box bg-bg-panel p-5 text-center" style={{ boxShadow: 'var(--shadow-elevated)' }}>
               <p className="font-display font-bold text-paper mb-1">Leave this case?</p>
               <p className="text-paper-dim text-[13px] font-sans mb-4">Progress is saved — you can pick up where you left off.</p>
@@ -264,7 +326,8 @@ export default function GameScreen(props: Props) {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'var(--overlay-scrim)' }}
             onClick={() => setConfirmClear(false)}>
-            <motion.div initial={{ scale: 0.94 }} animate={{ scale: 1 }} onClick={e => e.stopPropagation()}
+            <motion.div initial={{ scale: 0.94 }} animate={{ scale: 1 }} exit={{ scale: 0.96, opacity: 0 }}
+              transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }} onClick={e => e.stopPropagation()}
               className="w-full max-w-xs rounded-2xl border border-br-box bg-bg-panel p-5 text-center" style={{ boxShadow: 'var(--shadow-elevated)' }}>
               <p className="font-display font-bold text-paper mb-1">Clear the board?</p>
               <p className="text-paper-dim text-[13px] font-sans mb-4">This removes every placement, ✕ and draft. You can undo it once.</p>
@@ -288,7 +351,7 @@ function ToolBtn({ active, toggled, disabled, cta, onClick, icon, label, title }
   // distinct from a tool mode so it never reads as "you switched tools").
   return (
     <button onClick={onClick} disabled={disabled} title={title} aria-pressed={active || toggled}
-      className="focus-ring flex items-center justify-center gap-1.5 px-3.5 min-h-[44px] rounded-lg border text-[13px] font-sans font-medium transition-colors"
+      className="focus-ring flex items-center justify-center gap-1.5 px-3.5 min-h-[44px] rounded-lg border text-[13px] font-sans font-medium transition-colors whitespace-nowrap"
       style={{
         // Only the current TOOL gets the strong filled highlight. `cta` (an
         // available action) is a subtle coloured border; `toggled` (engaged

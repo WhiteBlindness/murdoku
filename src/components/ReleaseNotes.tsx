@@ -44,7 +44,7 @@ export default function ReleaseNotes({ onBack }: Props) {
             Release Notes
           </h1>
           <p className="text-paper-dim text-sm mt-1 font-sans">
-            Every update to Murdoku, newest first.
+            Every update to Alibi, newest first.
           </p>
         </header>
 

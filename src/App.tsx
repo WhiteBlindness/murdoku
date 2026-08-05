@@ -1,4 +1,5 @@
 import { Suspense, lazy, useState, useEffect } from 'react'
+import { MotionConfig } from 'framer-motion'
 import { useGame } from './hooks/useGame'
 import { useTheme } from './hooks/useTheme'
 import HomeScreen from './components/HomeScreen'
@@ -18,6 +19,18 @@ function Fallback() {
 }
 
 export default function App() {
+  // `reducedMotion="user"` makes EVERY Framer animation below respect the OS
+  // setting. The global CSS block in index.css only silences CSS animations —
+  // it never touched Framer's JS-driven springs, so without this the whole app
+  // ignored prefers-reduced-motion.
+  return (
+    <MotionConfig reducedMotion="user">
+      <AppInner />
+    </MotionConfig>
+  )
+}
+
+function AppInner() {
   const game = useGame()
   const theme = useTheme()
   const [aux, setAux] = useState<'none' | 'releases'>('none')

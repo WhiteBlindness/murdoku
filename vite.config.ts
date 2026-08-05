@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg'],
       manifest: {
-        name: 'Murdoku',
-        short_name: 'Murdoku',
+        name: 'Alibi',
+        short_name: 'Alibi',
         description: 'A murder mystery logic puzzle',
         theme_color: '#0A0806',
         background_color: '#0A0806',
