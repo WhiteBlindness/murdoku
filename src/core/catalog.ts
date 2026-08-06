@@ -15,7 +15,10 @@ const SPEC: { difficulty: Difficulty; count: number }[] = [
   { difficulty: 'Expert', count: 4 },
 ]
 
-const KEY = 'murdoku_catalog_v11'
+// v12: the L.A. Noire redesign muted the per-suspect ACCENTS palette in
+// generate.ts. Cached catalogs embed the generated colours, so without this
+// bump every returning player would keep the old candy palette from cache.
+const KEY = 'murdoku_catalog_v12'
 let puzzles: Puzzle[] = []
 
 function slug(s: string) { return s.toLowerCase().replace(/\s+/g, '-') }

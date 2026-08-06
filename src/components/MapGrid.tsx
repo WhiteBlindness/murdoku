@@ -16,141 +16,12 @@ interface Props {
   onPlaceFurniture?: (row: number, col: number) => void
 }
 
-type Material = 'tile' | 'wood' | 'darkwood' | 'grass' | 'carpet' | 'stone'
-
-// One distinct floor per room type so adjacent rooms never blend together.
-function roomMaterial(name: string): Material {
-  const n = name.toLowerCase()
-  if (n.includes('bath') || n.includes('kitchen') || n.includes('pantry')) return 'tile'
-  if (n.includes('yard') || n.includes('garden') || n.includes('porch')) return 'grass'
-  if (n.includes('bed')) return 'carpet'
-  if (n.includes('study') || n.includes('office') || n.includes('library')) return 'darkwood'
-  if (n.includes('hall') || n.includes('lobby') || n.includes('foyer') || n.includes('corridor')) return 'stone'
-  return 'wood' // living room, dining room, default — light oak planks
-}
-
-// Board-game floors: large-scale SVG pattern tiles, every shape outlined in
-// thick solid black — comic-book / Cluedo board look.
-const svgTile = (w: number, h: number, body: string) =>
-  `url("data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${body}</svg>`
-  )}")`
-
-// Long, narrow floorboards (plank ≈ 160×25 — 6.4:1), pale oak, irregular
-// seam offsets per row. Wrapped planks are drawn as two edge-clipped rects
-// so no false seam appears at the tile border.
-const WOOD_TILE = svgTile(320, 75,
-  `<rect width="320" height="75" fill="#E0C48E"/>` +
-  // row 1 — seams at 0 / 160
-  `<rect x="0" y="0" width="160" height="25" fill="#E0C48E" stroke="#000" stroke-width="3"/>` +
-  `<rect x="160" y="0" width="160" height="25" fill="#D6B87E" stroke="#000" stroke-width="3"/>` +
-  // row 2 — seams at 96 / 256 (plank wraps the tile edge)
-  `<rect x="96" y="25" width="160" height="25" fill="#DABC84" stroke="#000" stroke-width="3"/>` +
-  `<rect x="256" y="25" width="170" height="25" fill="#E4C892" stroke="#000" stroke-width="3"/>` +
-  `<rect x="-74" y="25" width="170" height="25" fill="#E4C892" stroke="#000" stroke-width="3"/>` +
-  // row 3 — seams at 48 / 208 (plank wraps the tile edge)
-  `<rect x="48" y="50" width="160" height="25" fill="#DCC088" stroke="#000" stroke-width="3"/>` +
-  `<rect x="208" y="50" width="170" height="25" fill="#D2B478" stroke="#000" stroke-width="3"/>` +
-  `<rect x="-62" y="50" width="110" height="25" fill="#D2B478" stroke="#000" stroke-width="3"/>`
-)
-
-// Big two-tone checkerboard, muted coral + pale blush, thick black dividers.
-const CHECKER_TILE = svgTile(128, 128,
-  `<rect x="0" y="0" width="64" height="64" fill="#DE8B7B" stroke="#000" stroke-width="3"/>` +
-  `<rect x="64" y="0" width="64" height="64" fill="#F2D5CC" stroke="#000" stroke-width="3"/>` +
-  `<rect x="0" y="64" width="64" height="64" fill="#F2D5CC" stroke="#000" stroke-width="3"/>` +
-  `<rect x="64" y="64" width="64" height="64" fill="#DE8B7B" stroke="#000" stroke-width="3"/>`
-)
-
-// Sage lawn with scattered organic blade clusters — curved stroke-only paths
-// in darker green, positions deliberately off-grid.
-const GRASS_TILE = svgTile(80, 80,
-  `<rect width="80" height="80" fill="#9CB478"/>` +
-  // cluster 1 (left, mid-height)
-  `<path d="M10 34 Q8 26 12 19" fill="none" stroke="#4E6E38" stroke-width="3" stroke-linecap="round"/>` +
-  `<path d="M15 35 Q16 27 14 21" fill="none" stroke="#5C7C42" stroke-width="3" stroke-linecap="round"/>` +
-  `<path d="M20 34 Q23 28 21 22" fill="none" stroke="#4E6E38" stroke-width="3" stroke-linecap="round"/>` +
-  // cluster 2 (upper right)
-  `<path d="M52 22 Q50 14 54 8" fill="none" stroke="#5C7C42" stroke-width="3" stroke-linecap="round"/>` +
-  `<path d="M57 23 Q58 15 56 9" fill="none" stroke="#4E6E38" stroke-width="3" stroke-linecap="round"/>` +
-  `<path d="M62 22 Q65 16 63 10" fill="none" stroke="#5C7C42" stroke-width="3" stroke-linecap="round"/>` +
-  // cluster 3 (lower right, offset)
-  `<path d="M44 70 Q42 62 46 55" fill="none" stroke="#4E6E38" stroke-width="3" stroke-linecap="round"/>` +
-  `<path d="M49 71 Q50 63 48 57" fill="none" stroke="#5C7C42" stroke-width="3" stroke-linecap="round"/>` +
-  `<path d="M54 70 Q57 64 55 58" fill="none" stroke="#4E6E38" stroke-width="3" stroke-linecap="round"/>`
-)
-
-// Lobby: off-white/yellow tiles, diamond intersections, central accent dots.
-const LOBBY_TILE = svgTile(48, 48,
-  `<rect width="48" height="48" fill="#F0E8C8"/>` +
-  `<path d="M24 2 L46 24 L24 46 L2 24 Z" fill="none" stroke="#000" stroke-width="3"/>` +
-  `<circle cx="24" cy="24" r="4" fill="#A08A50" stroke="#000" stroke-width="2"/>`
-)
-
-// Bedroom carpet: solid warm beige with a subtle scattered stipple — no planks.
-const CARPET_TILE = svgTile(44, 44,
-  `<rect width="44" height="44" fill="#D9C8A8"/>` +
-  `<circle cx="7" cy="9" r="1.6" fill="#B5A382"/>` +
-  `<circle cx="24" cy="5" r="1.6" fill="#C2B08E"/>` +
-  `<circle cx="37" cy="14" r="1.6" fill="#B5A382"/>` +
-  `<circle cx="14" cy="22" r="1.6" fill="#C2B08E"/>` +
-  `<circle cx="31" cy="27" r="1.6" fill="#B5A382"/>` +
-  `<circle cx="5" cy="33" r="1.6" fill="#C2B08E"/>` +
-  `<circle cx="21" cy="39" r="1.6" fill="#B5A382"/>` +
-  `<circle cx="39" cy="38" r="1.6" fill="#C2B08E"/>`
-)
-
-// Office/study: narrower, darker mahogany planks — rich contrast to light oak.
-const DARKWOOD_TILE = svgTile(320, 48,
-  `<rect width="320" height="48" fill="#7A4A2E"/>` +
-  // row 1 — seams at 0 / 160
-  `<rect x="0" y="0" width="160" height="16" fill="#7A4A2E" stroke="#000" stroke-width="3"/>` +
-  `<rect x="160" y="0" width="160" height="16" fill="#6E4228" stroke="#000" stroke-width="3"/>` +
-  // row 2 — seams at 104 / 264 (plank wraps the tile edge)
-  `<rect x="104" y="16" width="160" height="16" fill="#82502F" stroke="#000" stroke-width="3"/>` +
-  `<rect x="264" y="16" width="160" height="16" fill="#744629" stroke="#000" stroke-width="3"/>` +
-  `<rect x="-56" y="16" width="160" height="16" fill="#744629" stroke="#000" stroke-width="3"/>` +
-  // row 3 — seams at 56 / 216 (plank wraps the tile edge)
-  `<rect x="56" y="32" width="160" height="16" fill="#6E4228" stroke="#000" stroke-width="3"/>` +
-  `<rect x="216" y="32" width="160" height="16" fill="#7E4C2C" stroke="#000" stroke-width="3"/>` +
-  `<rect x="-104" y="32" width="160" height="16" fill="#7E4C2C" stroke="#000" stroke-width="3"/>`
-)
-
-// backgroundSize is a percentage of the CELL, not a fixed px size, so every
-// pattern keeps the same visual scale from N=4 down to N=7 (a 48px cell on a
-// phone). Fixed px used to mean the 128px checker tile was larger than a 48px
-// Expert cell, so kitchens rendered as one flat coral block.
-//
-// Scale is chosen for BOLDNESS, not density: the board-game look depends on
-// each shape's 3px black stroke staying visible. Shrink a tile far below one
-// cell and those strokes render sub-pixel — the pattern turns to grey noise.
-// So tiles that already contain their own repeat (checker = 2×2 squares,
-// planks = 3 rows) map to a FULL cell rather than a fraction of one.
-function floorStyle(hue: number, material: Material): React.CSSProperties {
-  if (material === 'grass') {
-    return { backgroundColor: '#9CB478', backgroundImage: GRASS_TILE, backgroundSize: '100% 100%' }
-  }
-  if (material === 'tile') {
-    // Tile already holds a 2×2 checker → one tile per cell = 2×2 bold squares.
-    return { backgroundColor: '#DE8B7B', backgroundImage: CHECKER_TILE, backgroundSize: '100% 100%' }
-  }
-  if (material === 'stone') {
-    // Single diamond per tile → 50% gives a 2×2 diamond grid per cell.
-    return { backgroundColor: '#F0E8C8', backgroundImage: LOBBY_TILE, backgroundSize: '50% 50%' }
-  }
-  if (material === 'carpet') {
-    // carpet stipple fills the cell; dots scatter naturally at any size
-    return { backgroundColor: '#D9C8A8', backgroundImage: CARPET_TILE, backgroundSize: '100% 100%' }
-  }
-  if (material === 'darkwood') {
-    // Tile is 3 plank rows, each plank half the tile wide. 200% wide × 100%
-    // tall ⇒ a plank spans a full cell across 3 rows — boards, not pinstripes.
-    return { backgroundColor: '#7A4A2E', backgroundImage: DARKWOOD_TILE, backgroundSize: '200% 100%' }
-  }
-  // wood + default → pale-oak floorboards
-  void hue
-  return { backgroundColor: '#E0C48E', backgroundImage: WOOD_TILE, backgroundSize: '200% 100%' }
-}
+// ─── Deleted: Cluedo art direction ───────────────────────────────────────────
+// Removed: WOOD_TILE, CHECKER_TILE, GRASS_TILE, LOBBY_TILE, CARPET_TILE,
+// DARKWOOD_TILE — six SVG data-URI floor tiles with 1950s fills and thick
+// black outlines. Removed: svgTile() helper, floorStyle() image approach,
+// Material type, roomMaterial() mapping. Rooms no longer use painted textures.
+// ─────────────────────────────────────────────────────────────────────────────
 
 function handleCellKey(e: React.KeyboardEvent, r: number, c: number, N: number) {
   const dirs: Record<string, [number, number]> = {
@@ -166,15 +37,15 @@ function handleCellKey(e: React.KeyboardEvent, r: number, c: number, N: number) 
   ;(grid?.querySelector(`[data-cell="${nr}-${nc}"]`) as HTMLElement)?.focus()
 }
 
-const WALL = '#000000'
-
 export default function MapGrid({
   puzzle, marks, conflicts, onCellClick,
   extraFurniture = [], placingFurniture, placingRotation = 0, onPlaceFurniture,
 }: Props) {
   const N = puzzle.size
   const roomOf = puzzle.roomOf
-  const room = (id: string) => puzzle.rooms.find(r => r.id === id)
+  // (the old `room()` lookup existed only to read a room's `hue` for the
+  // painted-floor materials — the blueprint derives room tint from index
+  // parity instead, so the lookup is dead)
   const personById = (id: string) => puzzle.people.find(p => p.id === id)
   const [hoverCell, setHoverCell] = useState<string | null>(null)
   const reduceMotion = useReducedMotion()
@@ -211,6 +82,35 @@ export default function MapGrid({
     return { name: rm.name, abbr, row: anchor.row, col: anchor.col, span }
   })
 
+  // Each room TYPE owns a tone, so a Pantry never looks like a Study. The
+  // previous A/B parity alternation gave every room one of two near-identical
+  // darks and the whole board read as a single slab — you could not tell which
+  // room you were looking at, which the clues ("In the Pantry") require.
+  // Tones differ in hue rather than brightness, so the noir mood survives.
+  const roomTone = (name: string) => {
+    const n = name.toLowerCase()
+    if (n.includes('bed')) return 'var(--room-bedroom)'
+    if (n.includes('kitchen')) return 'var(--room-kitchen)'
+    if (n.includes('pantry')) return 'var(--room-pantry)'
+    if (n.includes('bath')) return 'var(--room-bath)'
+    if (n.includes('dining')) return 'var(--room-dining)'
+    if (n.includes('living')) return 'var(--room-living)'
+    if (n.includes('yard') || n.includes('garden') || n.includes('porch')) return 'var(--room-outdoor)'
+    if (n.includes('study') || n.includes('office') || n.includes('library')) return 'var(--room-study)'
+    if (n.includes('hall') || n.includes('lobby') || n.includes('foyer') || n.includes('corridor')) return 'var(--room-hall)'
+    return 'var(--board-room-tint)'
+  }
+  // Two rooms of the SAME type in one house would otherwise be indistinguishable
+  // neighbours, so a repeat of a tone falls back to the alternate tint.
+  const roomBgOf: Record<string, string> = {}
+  const usedTones = new Set<string>()
+  for (const rm of puzzle.rooms) {
+    let tone = roomTone(rm.name)
+    if (usedTones.has(tone)) tone = 'var(--board-room-tint-2)'
+    usedTones.add(tone)
+    roomBgOf[rm.id] = tone
+  }
+
   const isPlacing = !!placingFurniture && !!onPlaceFurniture
 
   return (
@@ -218,21 +118,21 @@ export default function MapGrid({
       {/* interactive cell grid */}
       <div
         data-grid=""
-        className="w-full h-full rounded-xl overflow-hidden"
+        className="w-full h-full overflow-hidden"
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${N}, 1fr)`,
           gridTemplateRows: `repeat(${N}, 1fr)`,
-          border: `6px solid ${WALL}`,
-          boxShadow: `0 14px 44px rgba(0,0,0,0.52), 0 0 0 1px rgba(255,255,255,0.04)`,
-          background: WALL,
+          // Blueprint outer frame: 2px drawn line in board-wall, no rounding.
+          border: `2px solid var(--board-wall)`,
+          boxShadow: `0 0 0 1px var(--board-ink), var(--shadow-elevated)`,
+          background: 'var(--board-ground)',
           gap: '0',
         }}
       >
         {Array.from({ length: N }, (_, r) =>
           Array.from({ length: N }, (_, c) => {
             const id = roomOf[r][c]
-            const hue = room(id)?.hue ?? 35
             const mark = marks[r][c]
             const furn = furnByCell[`${r},${c}`] ?? []
             const wallR = c < N - 1 && roomOf[r][c + 1] !== id
@@ -242,8 +142,6 @@ export default function MapGrid({
             const locked = mark.kind === 'person' && mark.locked
             const isAutoX = mark.kind === 'x' && mark.auto
             const tokenSize = Math.max(26, 340 / N)
-            const material = roomMaterial(room(id)?.name ?? '')
-            const isOutdoor = material === 'grass'
             const draftNames = mark.kind === 'draft'
               ? mark.persons.map(pid => personById(pid)?.name).filter(Boolean).join(', ')
               : ''
@@ -251,6 +149,7 @@ export default function MapGrid({
             const cellKey = `${r},${c}`
             const isHovered = hoverCell === cellKey
             const showPreview = isPlacing && isHovered && !!placingFurniture
+            const roomBg = roomBgOf[id] ?? 'var(--board-room-tint)'
 
             return (
               <button
@@ -262,48 +161,48 @@ export default function MapGrid({
                 onKeyDown={(e) => handleCellKey(e, r, c, N)}
                 title={draftNames ? `Maybe: ${draftNames}` : furnNames || undefined}
                 aria-label={`Row ${r + 1}, column ${c + 1}${person ? `, ${person.name}` : draftNames ? `, drafts: ${draftNames}` : furnNames ? `, ${furnNames}` : ''}`}
-                className="relative flex items-center justify-center focus:outline-none focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] transition-transform active:scale-[0.97]"
+                /* Focus ring uses the SOLID accent, not --board-glow: that glow
+                   is a 50%-alpha brass which composites to ~1.8:1 over the
+                   light-theme room tint, failing WCAG 2.4.11 — and this is the
+                   only focus indicator on every cell of the main game surface. */
+                className="relative flex items-center justify-center focus:outline-none focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-[var(--color-accent-strong)] transition-transform active:scale-[0.97]"
                 style={{
-                  // Floor colours/pattern live on the dedicated child span below so
-                  // the theme dim-filter only touches the floor, not avatars/marks.
+                  // Room fill comes from a floor child span (below), keeping marks
+                  // unaffected by any future filter on the floor layer.
+                  // Room boundaries: 2px solid board-wall (the drawn line).
+                  // Interior cell divisions: 1px dashed board-ink (drafting hairlines).
                   borderRight: wallR
-                    ? `6px solid ${WALL}`
-                    : isOutdoor
-                      ? `1px dashed rgba(0,0,0,0.22)`
-                      : `1px solid rgba(0,0,0,0.08)`,
+                    ? `2px solid var(--board-wall)`
+                    : `1px dashed var(--board-ink)`,
                   borderBottom: wallB
-                    ? `6px solid ${WALL}`
-                    : isOutdoor
-                      ? `1px dashed rgba(0,0,0,0.22)`
-                      : `1px solid rgba(0,0,0,0.08)`,
+                    ? `2px solid var(--board-wall)`
+                    : `1px dashed var(--board-ink)`,
                   cursor: isPlacing ? 'crosshair' : 'pointer',
                   ...(showPreview ? {
-                    outline: '2px dashed rgba(255,255,255,0.65)',
+                    outline: '2px dashed var(--board-chalk)',
                     outlineOffset: '-4px',
                   } : {}),
                 }}
               >
-                {/* floor layer — filtered as a unit for dark-theme dimming.
-                    Rendered first so it sits behind all marks/avatars without
-                    z-index fiddling.  The preview brightness lives here only
-                    when placing furniture so it affects the floor, not tokens. */}
+                {/* floor layer — room tint, behind all marks and tokens.
+                    No texture, no image: a barely-lifted tint over the ground.
+                    Rendered first so it sits behind all marks/avatars. */}
                 <span
                   aria-hidden
                   className="absolute inset-0 pointer-events-none"
                   style={{
-                    ...floorStyle(hue, material),
-                    filter: [
-                      'brightness(var(--board-floor-brightness, 1))',
-                      'saturate(var(--board-floor-saturate, 1))',
-                      showPreview ? 'brightness(1.14)' : '',
-                    ].filter(Boolean).join(' '),
+                    background: roomBg,
+                    opacity: showPreview ? 0.7 : 1,
                   }}
                 />
-                {/* furniture layer — SVGs fill the cell flush, outline defines the object */}
+                {/* furniture layer — blueprint evidence icons, fill the cell flush */}
                 {furn.length > 0 && !person && (
                   <span
                     className="absolute inset-0 flex items-stretch"
-                    style={{ opacity: mark.kind === 'x' ? 0.18 : 1 }}
+                    style={{
+                      opacity: mark.kind === 'x' ? 0.18 : 0.82,
+                      color: 'var(--board-chalk)',
+                    }}
                   >
                     {furn.slice(0, 2).map((f, i) => {
                       const Icon = FURNITURE_ICON[f.type]
@@ -329,7 +228,8 @@ export default function MapGrid({
                       className="absolute inset-0 pointer-events-none"
                       style={{
                         transform: placingRotation ? `rotate(${placingRotation}deg)` : undefined,
-                        opacity: 0.65,
+                        opacity: 0.55,
+                        color: 'var(--board-chalk)',
                       }}
                     >
                       <Icon />
@@ -337,18 +237,21 @@ export default function MapGrid({
                   )
                 })()}
 
-                {/* mark: x */}
+                {/* mark: x — chalk scratch mark */}
                 {mark.kind === 'x' && (
-                  <span className="relative flex items-center justify-center" style={{ color: 'var(--color-text-muted)' }}>
+                  <span
+                    className="relative flex items-center justify-center"
+                    style={{ color: 'var(--board-chalk)' }}
+                  >
                     <X
                       size={Math.max(16, 150 / N)}
-                      strokeWidth={isAutoX ? 2.4 : 2.8}
-                      style={{ opacity: isAutoX ? 0.55 : 0.85 }}
+                      strokeWidth={isAutoX ? 2.0 : 2.5}
+                      style={{ opacity: isAutoX ? 0.50 : 0.80 }}
                     />
                   </span>
                 )}
 
-                {/* mark: draft */}
+                {/* mark: draft — dossier initial chips */}
                 {mark.kind === 'draft' && (
                   <span className="absolute inset-[8%] flex flex-wrap items-center justify-center gap-1 content-center">
                     {mark.persons.slice(0, 4).map(pid => {
@@ -358,13 +261,15 @@ export default function MapGrid({
                         <span
                           key={pid}
                           title={p.name}
-                          className="flex items-center justify-center rounded-md font-display font-bold leading-none"
+                          className="flex items-center justify-center font-display font-bold leading-none"
                           style={{
                             width: sz, height: sz,
                             fontSize: Math.max(10, sz * 0.55),
-                            border: `2px dashed ${p.accent}`,
+                            // Sharp corners: dossier chip, not bubble
+                            borderRadius: 2,
+                            border: `1.5px solid ${p.accent}`,
                             color: p.accent,
-                            background: `color-mix(in srgb, ${p.accent} 22%, var(--color-bg-elevated))`,
+                            background: `color-mix(in srgb, ${p.accent} 18%, var(--board-room-tint))`,
                           }}
                         >{p.name[0]}</span>
                       )
@@ -372,32 +277,40 @@ export default function MapGrid({
                   </span>
                 )}
 
-                {/* mark: person */}
+                {/* mark: person — suspect token with brass or danger ring */}
                 {person && (
                   <motion.span
                     key={person.id}
                     {...snapIn}
-                    className={`relative rounded-xl ${conflicted ? 'animate-pulse' : ''}`}
+                    className={`relative ${conflicted ? 'animate-pulse' : ''}`}
                     style={{
                       boxShadow: conflicted
-                        ? '0 0 0 2px var(--color-bg-elevated), 0 0 0 4px var(--color-danger), 0 0 12px var(--color-danger)'
-                        : `0 0 0 2px ${person.accent}`,
-                      borderRadius: 12,
-                      filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))',
+                        ? '0 0 0 2px var(--board-ground), 0 0 0 4px var(--color-danger), 0 0 10px var(--color-danger)'
+                        : `0 0 0 2px ${person.accent}, 0 0 6px var(--board-glow)`,
+                      borderRadius: 6,
+                      filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.55))',
                     }}
                   >
                     <Avatar seed={person.avatarSeed} accent={person.accent} size={tokenSize} dead={person.isVictim} />
                     {conflicted && (
                       <span
-                        className="absolute -top-1.5 -left-1.5 w-4 h-4 rounded-full flex items-center justify-center font-bold text-[11px] leading-none"
+                        className="absolute -top-1.5 -left-1.5 w-4 h-4 flex items-center justify-center font-bold text-[11px] leading-none"
                         title="Two suspects share this row or column"
-                        style={{ background: 'var(--color-danger)', color: 'var(--color-on-accent)' }}
+                        style={{
+                          background: 'var(--color-danger)',
+                          color: 'var(--color-on-accent)',
+                          borderRadius: 2,
+                        }}
                       >!</span>
                     )}
                     {locked && !conflicted && (
                       <span
-                        className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center"
-                        style={{ background: 'var(--color-accent)', color: 'var(--color-on-accent)' }}
+                        className="absolute -top-1.5 -right-1.5 w-4 h-4 flex items-center justify-center"
+                        style={{
+                          background: 'var(--color-accent)',
+                          color: 'var(--color-on-accent)',
+                          borderRadius: 2,
+                        }}
                       >
                         <Lock size={9} strokeWidth={3} />
                       </span>
@@ -410,13 +323,16 @@ export default function MapGrid({
         )}
       </div>
 
-      {/* label overlay — same grid tracks, anchored corner tags.
+      {/* label overlay — same grid tracks, anchored corner stamps.
           At N≥6 (≤48px cells) the full name is too wide to fit without
           occluding playable area, so we render initials/short-code instead.
           The full name is always present via `title` (DOM attribute) and via
-          a visually-hidden <span> so screen readers announce it in full. */}
+          a visually-hidden <span> so screen readers announce it in full.
+
+          Design: stamped/stencilled dossier label — square corners, letter-
+          spaced uppercase, board-ink text. No rounded pill. No white-on-black. */}
       <div
-        className="absolute inset-0 pointer-events-none p-[6px]"
+        className="absolute inset-0 pointer-events-none p-[2px]"
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${N}, 1fr)`,
@@ -424,35 +340,40 @@ export default function MapGrid({
         }}
       >
         {labelAnchors.map((l, i) => {
-          const compact = N >= 6
+          // Abbreviate only when the room is genuinely too narrow to hold its
+          // name. Keying this off N alone hid every label behind "KIT"/"STU"
+          // on a 7x7 even where the room spanned three cells and had room to
+          // spare — the board should name its rooms wherever it can, the way a
+          // floor plan does. A 2-cell span is enough for a short name; long
+          // names still need three.
+          const compact = l.span < 2 || (l.name.length > 9 && l.span < 3)
           return (
             <span
               key={i}
               title={l.name}
-              // Pill sits flush against the top-left wall junction (margin: 2px)
-              // so it overlaps the 6px black wall line rather than cell interior.
-              className="font-sans font-black uppercase self-start justify-self-start"
+              // Stamp hugs the top-left corner of the room's anchor cell.
+              className="font-mono uppercase self-start justify-self-start"
               style={{
                 gridColumnStart: l.col + 1,
-                // Compact mode spans only 1 column — the abbreviated label fits
-                // in a single cell corner without spreading into neighbours.
                 gridColumnEnd: compact ? 'span 1' : `span ${l.span}`,
                 gridRowStart: l.row + 1,
-                color: '#fff',
-                // min 9px floor; compact path doesn't need to scale up
+                // Ink-coloured text on the room tint — readable in both themes.
+                color: 'var(--board-wall)',
+                // min 9px floor per the hard requirement
                 fontSize: compact ? '9px' : `clamp(9px, ${Math.round(110 / N)}px, 11px)`,
-                background: '#000',
-                boxShadow: '0 0 0 2px #fff, 0 0 0 3.5px #000',
-                borderRadius: 9999,
-                padding: compact ? '1px 4px' : '2px 7px',
-                letterSpacing: compact ? '0.04em' : '0.11em',
-                // Hug the wall corner: 2px margin so the pill rides the 6px wall
+                // Squared stamp border — blueprint annotation style, not a pill.
+                background: 'var(--board-room-tint)',
+                border: '1px solid var(--board-ink)',
+                borderRadius: 1,
+                padding: compact ? '1px 3px' : '2px 6px',
+                letterSpacing: compact ? '0.06em' : '0.14em',
                 margin: compact ? '2px' : '4px',
                 maxWidth: '100%',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 display: 'block',
+                fontWeight: 700,
               }}
             >
               {/* Visible text: abbreviation in compact mode, full name otherwise */}

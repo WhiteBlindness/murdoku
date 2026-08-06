@@ -114,7 +114,7 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
 
       {/* Mode selector */}
       <div className="relative z-10 px-4 mb-4 w-full max-w-md mx-auto">
-        <div className="flex rounded-xl border border-br-thin bg-bg-panel p-1 gap-1">
+        <div className="flex rounded-none border border-border-strong bg-bg-surface p-1 gap-1">
           <ModeBtn active={mode === 'classic'} onClick={() => onSetMode('classic')}
             icon={<Sparkles size={14} />} title="Classic"
             desc="Place & submit" />
@@ -150,67 +150,81 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
                   return (
                     // Plain buttons (no per-card entry animation) so toggling Classic ↔
                     // Detective never re-triggers a staggered fade/flicker.
+                    // border-border-strong: the card edge IS the interactive affordance
+                    // (bg-surface vs bg-base is near-zero contrast), so it must meet
+                    // WCAG 1.4.11 at 3.5:1 — that's border-strong, not border-subtle.
                     <button
                       key={p.id}
                       onClick={() => onSelect(p.id)}
-                      className="case-card focus-ring group relative text-left rounded-xl border border-br-thin bg-bg-panel overflow-hidden"
+                      className="case-card focus-ring group relative text-left rounded-none border border-border-strong bg-bg-surface overflow-hidden"
                       style={{ ['--diff' as string]: diffFill(p.difficulty) }}
                     >
-                      {/* Difficulty reads as a spine down the edge of a file,
-                          not a stripe pinned to the top of a web card. */}
-                      <span aria-hidden className="absolute left-0 top-0 bottom-0 w-[3px]" style={{ backgroundColor: diffFill(p.difficulty) }} />
+                      {/* Difficulty spine: file-folder tab colour running the
+                          full height of the left edge, like a coloured folder tab
+                          in a physical evidence cabinet. */}
+                      <span aria-hidden className="absolute left-0 top-0 bottom-0 w-[4px]" style={{ backgroundColor: diffFill(p.difficulty) }} />
 
-                      <div className="pl-4 pr-3.5 py-3.5">
+                      <div className="pl-5 pr-3.5 py-3.5">
                         <div className="flex items-center justify-between mb-1.5">
+                          {/* Case number: typed evidence reference, font-mono */}
                           <span
-                            className="text-[9px] tracking-[0.22em] uppercase font-sans font-semibold"
+                            className="text-[10px] tracking-[0.18em] uppercase font-mono"
                             style={{ color: diffText(p.difficulty) }}
                           >
                             {p.caseNumber}
                           </span>
                           {solved && (
+                            /* Stamped-ink "CLOSED" — rectangular, no rounding,
+                               slightly rotated to evoke a rubber-stamp over a
+                               case file. Uses accent tokens, not a bright pill. */
                             <span
-                              className="text-[9px] font-display font-bold uppercase tracking-[0.14em] rounded-sm px-1.5 py-[3px] leading-none"
+                              className="text-[9px] font-display font-bold uppercase tracking-[0.22em] px-1.5 py-[3px] leading-none"
                               style={{
                                 color: 'var(--color-accent-text)',
-                                border: '1px solid color-mix(in srgb, var(--color-accent) 55%, transparent)',
-                                background: 'color-mix(in srgb, var(--color-accent) 12%, transparent)',
+                                border: '1px solid color-mix(in srgb, var(--color-accent) 60%, transparent)',
+                                background: 'color-mix(in srgb, var(--color-accent) 10%, transparent)',
+                                transform: 'rotate(-1.5deg)',
+                                display: 'inline-block',
                               }}
                             >
-                              Closed
+                              CLOSED
                             </span>
                           )}
                         </div>
 
-                        <h2 className="font-display text-paper text-[17px] font-bold leading-[1.15] tracking-[-0.01em] mb-2.5">
+                        <h2 className="font-display text-paper text-[17px] font-bold leading-[1.15] tracking-[0.01em] mb-2.5 uppercase">
                           {p.title}
                         </h2>
 
                         <div className="flex items-center gap-3 text-paper-muted text-[11px] font-sans">
                           <span className="flex items-center gap-1"><LayoutGrid size={12} />{p.size}×{p.size}</span>
 
-                          {/* The cast, as accent chips. Real portraits would be
+                          {/* The cast, as accent dots. Real portraits would be
                               ~150 DiceBear API requests across the catalog —
                               these carry the same "who's in this case" signal
-                              for free. */}
+                              for free. Victim dots are desaturated to mark
+                              their role without a separate label. */}
                           <span className="flex items-center gap-[3px]" title={`${p.people.length} people`}>
                             <Users size={12} className="mr-0.5" />
                             {p.people.map(person => (
                               <span
                                 key={person.id}
-                                className="rounded-full"
+                                className="rounded-none"
                                 style={{
                                   width: 6, height: 6,
                                   backgroundColor: person.accent,
-                                  opacity: person.isVictim ? 0.35 : 1,
-                                  boxShadow: person.isVictim ? 'none' : `0 0 4px ${person.accent}66`,
+                                  opacity: person.isVictim ? 0.30 : 1,
+                                  boxShadow: person.isVictim ? 'none' : `0 0 3px ${person.accent}55`,
                                 }}
                               />
                             ))}
                           </span>
 
                           {records[p.id] && (
-                            <span className="flex items-center gap-1 text-accent-text ml-auto tabular-nums"><Timer size={12} />{fmt(records[p.id].bestSeconds)}</span>
+                            /* Best time: typewriter readout — case-file data lives in mono */
+                            <span className="flex items-center gap-1 text-accent-text ml-auto tabular-nums font-mono text-[10px]">
+                              <Timer size={11} />{fmt(records[p.id].bestSeconds)}
+                            </span>
                           )}
                         </div>
                       </div>
@@ -242,16 +256,18 @@ function ModeBtn({ active, onClick, icon, title, desc }: {
 }) {
   return (
     <button onClick={onClick}
-      className="focus-ring flex-1 rounded-lg px-3 py-2 flex items-center gap-2 transition-colors"
+      className="focus-ring flex-1 rounded-none px-3 py-2 flex items-center gap-2 transition-colors"
       style={{
-        background: active ? 'color-mix(in srgb, var(--color-accent) 16%, transparent)' : 'transparent',
+        background: active ? 'color-mix(in srgb, var(--color-accent) 14%, transparent)' : 'transparent',
         color: active ? 'var(--color-accent-text)' : 'var(--color-text-secondary)',
-        boxShadow: active ? 'inset 0 0 0 1px var(--color-accent)' : undefined,
+        /* border-strong: this is an unfilled button outline = the border IS the affordance */
+        boxShadow: active ? 'inset 0 0 0 1px var(--color-border-strong)' : undefined,
+        borderLeft: active ? '2px solid var(--color-accent)' : '2px solid transparent',
       }}>
       {icon}
       <span className="text-left">
-        <span className="block font-display font-semibold text-xs leading-tight">{title}</span>
-        <span className="block text-[10px] font-sans opacity-80 leading-tight">{desc}</span>
+        <span className="block font-display font-bold text-xs leading-tight tracking-wide uppercase">{title}</span>
+        <span className="block text-[10px] font-mono opacity-70 leading-tight">{desc}</span>
       </span>
     </button>
   )

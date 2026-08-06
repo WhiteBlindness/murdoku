@@ -117,32 +117,81 @@ export default function GameScreen(props: Props) {
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      className="min-h-screen bg-bg-deep flex flex-col"
+      className="min-h-screen bg-bg-base flex flex-col"
     >
       <AnimatePresence>{help && <HowToPlay mode={mode} onClose={() => setHelp(false)} />}</AnimatePresence>
 
-      <header className="pt-safe flex items-center justify-between px-4 pt-3 pb-2 border-b border-br-thin flex-shrink-0">
-        <button onClick={() => hasProgress ? setConfirmLeave(true) : props.onBack()} className="focus-ring text-paper-muted text-sm font-sans px-2 min-h-[44px] flex items-center whitespace-nowrap flex-shrink-0">← Cases</button>
+      {/* ── Header ── case file dossier top edge ─────────────────────────── */}
+      <header
+        className="pt-safe flex items-center justify-between px-4 pt-3 pb-2 flex-shrink-0"
+        style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
+      >
+        {/* Back — stencil label, text affordance (no border needed) */}
+        <button
+          onClick={() => hasProgress ? setConfirmLeave(true) : props.onBack()}
+          className="focus-ring text-text-muted font-mono text-xs px-2 min-h-[44px] flex items-center whitespace-nowrap flex-shrink-0 tracking-widest uppercase hover:text-text-secondary transition-colors"
+        >
+          ← Cases
+        </button>
+
+        {/* Case title + metadata */}
         <div className="text-center min-w-0 px-2 flex-1">
-          <h1 className="font-display text-paper text-base font-bold leading-tight truncate">{puzzle.title}</h1>
+          <h1 className="font-display text-text-primary text-base font-bold leading-tight truncate uppercase tracking-wide">
+            {puzzle.title}
+          </h1>
           <div className="flex items-center justify-center gap-2 mt-0.5">
-            <span className="text-[10px] font-sans tracking-wider whitespace-nowrap" style={{ color: DIFF_COLOR[puzzle.difficulty] }}>{puzzle.difficulty.toUpperCase()}</span>
-            <span className="text-paper-muted text-[10px] font-sans whitespace-nowrap">{puzzle.size}×{puzzle.size}</span>
-            <span className="text-[10px] font-sans tracking-wider px-1.5 rounded whitespace-nowrap" style={{ color: detective ? 'var(--color-accent-text)' : 'var(--color-text-muted)', background: detective ? 'color-mix(in srgb, var(--color-accent) 14%, transparent)' : 'transparent' }}>
+            {/* Difficulty: typed mark, noir scale colour */}
+            <span
+              className="text-[10px] font-mono tracking-[0.18em] whitespace-nowrap"
+              style={{ color: DIFF_COLOR[puzzle.difficulty] }}
+            >
+              {puzzle.difficulty.toUpperCase()}
+            </span>
+            {/* Grid size: typewriter metadata */}
+            <span className="text-text-muted text-[10px] font-mono whitespace-nowrap tracking-wider">
+              {puzzle.size}×{puzzle.size}
+            </span>
+            {/* Mode chip: stencilled */}
+            <span
+              className="text-[10px] font-mono tracking-[0.15em] px-1.5 whitespace-nowrap"
+              style={{
+                color: detective ? 'var(--color-accent-text)' : 'var(--color-text-muted)',
+                background: detective ? 'color-mix(in srgb, var(--color-accent) 14%, transparent)' : 'transparent',
+              }}
+            >
               {detective ? 'DETECTIVE' : 'CLASSIC'}
             </span>
           </div>
         </div>
+
+        {/* Timer + icon controls */}
         <div className="flex items-center gap-1.5">
-          {!hideTimer && <span className="font-display text-accent-text text-sm tabular-nums">{timer}</span>}
-          <button onClick={props.onToggleTimer} aria-label={hideTimer ? 'Show timer' : 'Hide timer'} title={hideTimer ? 'Show timer' : 'Hide timer (relaxed)'} className="focus-ring text-paper-muted w-11 h-11 flex items-center justify-center rounded-lg">
+          {!hideTimer && (
+            <span className="font-mono text-accent-text text-sm tabular-nums tracking-widest">
+              {timer}
+            </span>
+          )}
+          <button
+            onClick={props.onToggleTimer}
+            aria-label={hideTimer ? 'Show timer' : 'Hide timer'}
+            title={hideTimer ? 'Show timer' : 'Hide timer (relaxed)'}
+            className="focus-ring text-text-muted w-11 h-11 flex items-center justify-center hover:text-text-secondary transition-colors"
+          >
             {hideTimer ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
-          <button onClick={() => setHelp(true)} aria-label="How to play" title="How to play" className="focus-ring text-paper-muted w-11 h-11 flex items-center justify-center rounded-lg"><HelpCircle size={19} /></button>
+          <button
+            onClick={() => setHelp(true)}
+            aria-label="How to play"
+            title="How to play"
+            className="focus-ring text-text-muted w-11 h-11 flex items-center justify-center hover:text-text-secondary transition-colors"
+          >
+            <HelpCircle size={19} />
+          </button>
         </div>
       </header>
 
-      <p className="px-5 py-2 text-center text-paper-dim text-[12px] font-sans max-w-2xl mx-auto flex-shrink-0">
+      {/* ── Instruction line ── typed log entry ──────────────────────────── */}
+      <p className="px-5 py-2 text-center text-text-muted text-[12px] font-mono max-w-2xl mx-auto flex-shrink-0 tracking-wide">
         {detective
           ? 'Place a suspect to cross out their row & column automatically. Use Draft to pencil in candidates. Each person = one row, one column.'
           : 'Each person is in exactly one row and one column. Read the clues, place everyone, then submit.'}
@@ -169,19 +218,29 @@ export default function GameScreen(props: Props) {
             onPlaceFurniture={showDecor ? handlePlaceFurniture : undefined}
           />
 
-          {/* Legend */}
+          {/* Legend — case file annotation */}
           <div className="mx-auto w-full max-w-[580px]">
-            <button onClick={() => setLegend(v => !v)} className="focus-ring flex items-center gap-1.5 text-[11px] text-paper-muted font-sans mx-auto">
-              <Info size={13} /> {legend ? 'Hide' : 'What am I looking at?'}
+            <button
+              onClick={() => setLegend(v => !v)}
+              className="focus-ring flex items-center gap-1.5 text-[11px] text-text-muted font-mono mx-auto tracking-widest uppercase hover:text-text-secondary transition-colors"
+            >
+              <Info size={13} /> {legend ? '— Hide' : '+ What am I looking at?'}
             </button>
             <AnimatePresence>
               {legend && (
-                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-                  className="overflow-hidden">
-                  <div className="mt-2 rounded-lg border border-br-thin bg-bg-panel p-3 text-[11px] font-sans text-paper-dim grid gap-1.5">
-                    <p>• <b className="text-paper">Coloured areas</b> are rooms (labelled). Different tint & floor = different room.</p>
-                    <p>• <b className="text-paper">Furniture icons</b> are scene decoration that clues refer to (a chair, a rug, a plant…).</p>
-                    <p>• <b className="text-paper">✕</b> marks a cell where nobody is; faint ✕ is auto-added when you lock a row/column.</p>
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div
+                    className="mt-2 border bg-bg-surface p-3 text-[11px] font-mono text-text-secondary grid gap-1.5"
+                    style={{ borderColor: 'var(--color-border-subtle)', boxShadow: 'var(--shadow-cut)' }}
+                  >
+                    <p>• <b className="text-text-primary">Coloured areas</b> are rooms (labelled). Different tint & floor = different room.</p>
+                    <p>• <b className="text-text-primary">Furniture icons</b> are scene decoration that clues refer to (a chair, a rug, a plant…).</p>
+                    <p>• <b className="text-text-primary">✕</b> marks a cell where nobody is; faint ✕ is auto-added when you lock a row/column.</p>
                     <p>• A glowing ring = a placed suspect; a red ring means two suspects share a row or column.</p>
                   </div>
                 </motion.div>
@@ -210,7 +269,8 @@ export default function GameScreen(props: Props) {
             )}
           </AnimatePresence>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
-            <p className="col-span-full text-[10px] text-paper-muted font-sans uppercase tracking-[0.2em] mb-0.5">
+            {/* Section label — stencilled field header */}
+            <p className="col-span-full text-[10px] text-text-muted font-mono uppercase tracking-[0.2em] mb-0.5">
               Suspects · tap to select{detective ? ' · check off solved clues' : ''}
             </p>
             {puzzle.people.map(person => (
@@ -243,12 +303,32 @@ export default function GameScreen(props: Props) {
           width so the controls stay visually attached to the board.
         */}
         <div className="order-3 lg:col-start-1 lg:row-start-2 mx-auto w-full max-w-[580px] flex flex-col gap-2">
+          {/* Mode row — Place / Draft / Mark */}
           <div className="flex gap-2 justify-center [&>button]:flex-1 sm:[&>button]:flex-none">
-            <ToolBtn active={tool === 'place'} onClick={() => props.onSetTool('place')} icon={<MousePointerClick size={16} />} label="Place"
-              title={detective ? 'Place a suspect — crosses out their row & column' : 'Place a suspect'} />
-            {detective && <ToolBtn active={tool === 'draft'} onClick={() => props.onSetTool('draft')} icon={<Pencil size={16} />} label="Draft" title="Pencil in candidates (no elimination)" />}
-            <ToolBtn active={tool === 'x'} onClick={() => props.onSetTool('x')} icon={<XIcon size={16} />} label="Mark ✕" />
+            <ToolBtn
+              active={tool === 'place'}
+              onClick={() => props.onSetTool('place')}
+              icon={<MousePointerClick size={16} />}
+              label="Place"
+              title={detective ? 'Place a suspect — crosses out their row & column' : 'Place a suspect'}
+            />
+            {detective && (
+              <ToolBtn
+                active={tool === 'draft'}
+                onClick={() => props.onSetTool('draft')}
+                icon={<Pencil size={16} />}
+                label="Draft"
+                title="Pencil in candidates (no elimination)"
+              />
+            )}
+            <ToolBtn
+              active={tool === 'x'}
+              onClick={() => props.onSetTool('x')}
+              icon={<XIcon size={16} />}
+              label="Mark ✕"
+            />
           </div>
+          {/* Actions grid — Undo / Redo / Clear / Hint / Decorate */}
           <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:justify-center">
             <ToolBtn onClick={props.onUndo} disabled={!props.canUndo} icon={<Undo2 size={16} />} label="Undo" />
             <ToolBtn onClick={props.onRedo} disabled={!props.canRedo} icon={<Redo2 size={16} />} label="Redo" />
@@ -269,26 +349,47 @@ export default function GameScreen(props: Props) {
             tall as the board, so pushing this to the row's bottom stranded the
             CTA ~90px below the toolbar. Starting it aligns both columns' row 2. */}
         <div className="order-4 lg:col-start-2 lg:row-start-2 flex flex-col items-center gap-2">
+
+          {/* ── Accuse — the dramatic beat. Slam a file on the desk. ─────── */}
           <motion.button
             /* No `key` here on purpose — see the effect above. The class is
                added imperatively so the element (and its focus) survives. */
             ref={ctaRef}
-            whileTap={{ scale: 0.98 }} onClick={handleSubmit}
-            className="focus-ring w-full py-3.5 rounded-xl font-display font-semibold tracking-wide uppercase text-sm"
-            style={{ background: 'linear-gradient(135deg, var(--color-accent), var(--color-accent-strong))', color: 'var(--color-on-accent)' }}>
+            whileTap={{ scale: 0.97 }}
+            onClick={handleSubmit}
+            className="focus-ring w-full py-4 font-display font-bold tracking-[0.15em] uppercase text-sm transition-colors"
+            style={{
+              // Noir: stark brass block, ink text — not a gradient pill.
+              // Sharp corners: no border-radius. Shadow punches it off the desk.
+              background: 'var(--color-accent)',
+              color: 'var(--color-on-accent)',
+              boxShadow: '0 4px 0 0 color-mix(in srgb, var(--color-accent) 45%, #000), var(--shadow-cut)',
+              letterSpacing: '0.15em',
+            }}
+          >
             Accuse — Submit Solution ({placedCount}/{puzzle.size})
           </motion.button>
+
+          {/* ── Feedback message — typed log entry ───────────────────────── */}
           <AnimatePresence>
             {feedback !== 'none' && (
-              <motion.button onClick={props.onDismissFeedback}
+              <motion.button
+                onClick={props.onDismissFeedback}
                 /* Framer owns this node's transform (the y entry offset), so it
                    must NOT also carry animate-shake — two systems writing one
                    composited property fight during the 400ms overlap. The CTA
                    above carries the shake; this only re-plays its entry. */
                 key={`feedback-${submitNonce}`}
-                initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                className="text-[12px] font-sans px-3 py-1.5 rounded-lg text-center w-full"
-                style={{ color: 'var(--color-danger-text)', backgroundColor: 'color-mix(in srgb, var(--color-danger) 14%, transparent)' }}>
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="text-[12px] font-mono px-3 py-2 text-center w-full tracking-wide"
+                style={{
+                  color: 'var(--color-danger-text)',
+                  backgroundColor: 'color-mix(in srgb, var(--color-danger) 14%, transparent)',
+                  borderLeft: '2px solid var(--color-danger)',
+                }}
+              >
                 {feedback === 'incomplete'
                   ? 'Place every person first.'
                   : feedback === 'blocked'
@@ -300,40 +401,105 @@ export default function GameScreen(props: Props) {
         </div>
       </div>
 
-      {/* Leave confirmation */}
+      {/* ── Leave confirmation ── classified dossier dialog ─────────────── */}
       <AnimatePresence>
         {confirmLeave && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm" style={{ background: 'color-mix(in srgb, var(--color-bg-base) 55%, transparent)' }}
-            onClick={() => setConfirmLeave(false)}>
-            <motion.div initial={{ scale: 0.94 }} animate={{ scale: 1 }} exit={{ scale: 0.96, opacity: 0 }}
-              transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }} onClick={e => e.stopPropagation()}
-              className="w-full max-w-xs rounded-2xl border border-br-box bg-bg-panel p-5 text-center" style={{ boxShadow: 'var(--shadow-elevated)' }}>
-              <p className="font-display font-bold text-paper mb-1">Leave this case?</p>
-              <p className="text-paper-dim text-[13px] font-sans mb-4">Progress is saved — you can pick up where you left off.</p>
-              <div className="flex gap-2">
-                <button onClick={() => setConfirmLeave(false)} className="focus-ring flex-1 py-2.5 rounded-xl border border-br-thin text-paper-dim font-display text-sm uppercase tracking-wide">Stay</button>
-                <button onClick={props.onBack} className="focus-ring flex-1 py-2.5 rounded-xl font-display text-sm uppercase tracking-wide" style={{ background: 'var(--color-accent)', color: 'var(--color-on-accent)' }}>Leave</button>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: 'var(--overlay-scrim)' }}
+            onClick={() => setConfirmLeave(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.94, y: 8 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.96, opacity: 0 }}
+              transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+              onClick={e => e.stopPropagation()}
+              className="w-full max-w-xs border bg-bg-surface p-6 text-center"
+              style={{
+                borderColor: 'var(--color-border-strong)',
+                boxShadow: 'var(--shadow-elevated)',
+              }}
+            >
+              {/* Case stamp heading */}
+              <p className="font-display font-bold text-text-primary text-lg mb-1 uppercase tracking-[0.12em]">
+                Leave this case?
+              </p>
+              <p className="text-text-secondary text-[13px] font-mono mb-5 tracking-wide">
+                Progress is saved — you can pick up where you left off.
+              </p>
+              <div className="flex gap-3">
+                {/* Stay — outline, strong border tier (border IS the affordance) */}
+                <button
+                  onClick={() => setConfirmLeave(false)}
+                  className="focus-ring flex-1 py-2.5 border font-display text-sm uppercase tracking-[0.1em] text-text-secondary hover:text-text-primary transition-colors"
+                  style={{ borderColor: 'var(--color-border-strong)' }}
+                >
+                  Stay
+                </button>
+                {/* Leave — filled, accent */}
+                <button
+                  onClick={props.onBack}
+                  className="focus-ring flex-1 py-2.5 font-display text-sm uppercase tracking-[0.1em]"
+                  style={{ background: 'var(--color-accent)', color: 'var(--color-on-accent)' }}
+                >
+                  Leave
+                </button>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Clear confirmation */}
+      {/* ── Clear confirmation ── classified dossier dialog ──────────────── */}
       <AnimatePresence>
         {confirmClear && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'var(--overlay-scrim)' }}
-            onClick={() => setConfirmClear(false)}>
-            <motion.div initial={{ scale: 0.94 }} animate={{ scale: 1 }} exit={{ scale: 0.96, opacity: 0 }}
-              transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }} onClick={e => e.stopPropagation()}
-              className="w-full max-w-xs rounded-2xl border border-br-box bg-bg-panel p-5 text-center" style={{ boxShadow: 'var(--shadow-elevated)' }}>
-              <p className="font-display font-bold text-paper mb-1">Clear the board?</p>
-              <p className="text-paper-dim text-[13px] font-sans mb-4">This removes every placement, ✕ and draft. You can undo it once.</p>
-              <div className="flex gap-2">
-                <button onClick={() => setConfirmClear(false)} className="focus-ring flex-1 py-2.5 rounded-xl border border-br-thin text-paper-dim font-display text-sm uppercase tracking-wide">Cancel</button>
-                <button onClick={() => { props.onClear(); setConfirmClear(false) }} className="focus-ring flex-1 py-2.5 rounded-xl font-display text-sm uppercase tracking-wide" style={{ background: 'var(--color-danger)', color: 'var(--color-on-accent)' }}>Clear</button>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: 'var(--overlay-scrim)' }}
+            onClick={() => setConfirmClear(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.94, y: 8 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.96, opacity: 0 }}
+              transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+              onClick={e => e.stopPropagation()}
+              className="w-full max-w-xs border bg-bg-surface p-6 text-center"
+              style={{
+                borderColor: 'var(--color-border-strong)',
+                boxShadow: 'var(--shadow-elevated)',
+              }}
+            >
+              <p className="font-display font-bold text-text-primary text-lg mb-1 uppercase tracking-[0.12em]">
+                Clear the board?
+              </p>
+              <p className="text-text-secondary text-[13px] font-mono mb-5 tracking-wide">
+                This removes every placement, ✕ and draft. You can undo it once.
+              </p>
+              <div className="flex gap-3">
+                {/* Cancel — outline, strong border tier */}
+                <button
+                  onClick={() => setConfirmClear(false)}
+                  className="focus-ring flex-1 py-2.5 border font-display text-sm uppercase tracking-[0.1em] text-text-secondary hover:text-text-primary transition-colors"
+                  style={{ borderColor: 'var(--color-border-strong)' }}
+                >
+                  Cancel
+                </button>
+                {/* Clear — filled, danger */}
+                <button
+                  onClick={() => { props.onClear(); setConfirmClear(false) }}
+                  className="focus-ring flex-1 py-2.5 font-display text-sm uppercase tracking-[0.1em]"
+                  style={{ background: 'var(--color-danger)', color: 'var(--color-on-accent)' }}
+                >
+                  Clear
+                </button>
               </div>
             </motion.div>
           </motion.div>
@@ -349,20 +515,41 @@ function ToolBtn({ active, toggled, disabled, cta, onClick, icon, label, title }
   // `active` = the current TOOL mode (strong fill). `toggled` = an action that
   // is currently engaged, e.g. a locked suspect (outline only — visually
   // distinct from a tool mode so it never reads as "you switched tools").
+  // Border tier: resting outline buttons use --color-border-strong because the
+  // border IS the affordance; active/toggled/cta still use accent variants.
   return (
-    <button onClick={onClick} disabled={disabled} title={title} aria-pressed={active || toggled}
-      className="focus-ring flex items-center justify-center gap-1.5 px-3.5 min-h-[44px] rounded-lg border text-[13px] font-sans font-medium transition-colors whitespace-nowrap"
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
+      aria-pressed={active || toggled}
+      className="focus-ring flex items-center justify-center gap-1.5 px-3.5 min-h-[44px] border text-[13px] font-display font-medium transition-colors whitespace-nowrap uppercase tracking-[0.08em]"
       style={{
         // Only the current TOOL gets the strong filled highlight. `cta` (an
         // available action) is a subtle coloured border; `toggled` (engaged
         // action, e.g. locked) is a dashed coloured border. Neither is filled,
         // so they never look like "the mode you're in".
-        borderColor: active ? 'var(--color-accent)' : (toggled || cta) ? 'color-mix(in srgb, var(--color-accent) 65%, transparent)' : 'var(--color-border-subtle)',
-        backgroundColor: active ? 'color-mix(in srgb, var(--color-accent) 20%, transparent)' : 'var(--color-bg-surface)',
-        color: active ? 'var(--color-accent-text)' : (toggled || cta) ? 'var(--color-accent-text)' : 'var(--color-text-secondary)',
+        // Resting state uses --color-border-strong (not subtle) because the
+        // border alone marks the interactive boundary — WCAG 1.4.11 requires
+        // the strong tier (3.5:1) whenever a border is the only affordance.
+        borderColor: active
+          ? 'var(--color-accent)'
+          : (toggled || cta)
+          ? 'color-mix(in srgb, var(--color-accent) 65%, transparent)'
+          : 'var(--color-border-strong)',
+        backgroundColor: active
+          ? 'color-mix(in srgb, var(--color-accent) 22%, transparent)'
+          : 'var(--color-bg-surface)',
+        color: active
+          ? 'var(--color-accent-text)'
+          : (toggled || cta)
+          ? 'var(--color-accent-text)'
+          : 'var(--color-text-secondary)',
         borderStyle: toggled && !active ? 'dashed' : 'solid',
         opacity: disabled ? 0.35 : 1,
-      }}>
+        boxShadow: active ? 'var(--shadow-cut)' : 'none',
+      }}
+    >
       {icon}{label}
     </button>
   )

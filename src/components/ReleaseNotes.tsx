@@ -5,11 +5,13 @@ interface Props {
   onBack: () => void
 }
 
-const TAG_COLOR: Record<ChangeTag, string> = {
-  Feature: '#48C890',
-  Improvement: '#C8922A',
-  Fix: '#5888C8',
-  Content: '#A870C8',
+// Token-mapped tag styles. No hardcoded hex — background is a translucent tint
+// of the foreground token via color-mix so it scales across both themes.
+const TAG_STYLE: Record<ChangeTag, { color: string; label: string }> = {
+  Feature:     { color: 'var(--color-accent-text)',      label: 'FEATURE' },
+  Improvement: { color: 'var(--color-text-secondary)',   label: 'UPDATE' },
+  Fix:         { color: 'var(--color-danger-text)',      label: 'FIX' },
+  Content:     { color: 'var(--color-text-muted)',       label: 'CONTENT' },
 }
 
 export default function ReleaseNotes({ onBack }: Props) {
@@ -27,71 +29,82 @@ export default function ReleaseNotes({ onBack }: Props) {
       <div className="pt-safe flex items-center justify-between px-4 pt-4 pb-2">
         <button
           onClick={onBack}
-          className="focus-ring text-paper-muted text-sm font-typewriter tracking-wider flex items-center gap-1 px-1 py-1"
+          className="focus-ring text-paper-muted text-sm font-mono tracking-wider flex items-center gap-1 px-1 py-2"
+          style={{ minHeight: 44 }}
         >
-          ← Back
+          ← BACK
         </button>
-        <span className="text-paper-muted text-[10px] tracking-[0.2em] uppercase font-typewriter">
-          Case Files
+        <span className="font-mono text-paper-muted text-[9px] tracking-[0.3em] uppercase">
+          FIELD REPORTS
         </span>
       </div>
 
-      <div className="mx-6 h-px bg-gradient-to-r from-transparent via-br-box to-transparent" />
+      {/* Divider — drawn line, not a soft gradient */}
+      <div className="mx-6 h-px bg-border-strong" />
 
       <main className="flex-1 overflow-y-auto px-6 py-6 w-full max-w-2xl mx-auto">
         <header className="mb-8">
-          <h1 className="font-display text-2xl font-bold text-paper tracking-wide">
+          <p className="font-mono text-[9px] tracking-[0.3em] uppercase text-paper-muted mb-1">
+            CASE FILE — REVISION HISTORY
+          </p>
+          <h1 className="font-display text-3xl font-bold text-text-primary tracking-wide uppercase">
             Release Notes
           </h1>
-          <p className="text-paper-dim text-sm mt-1 font-sans">
+          <p className="font-mono text-text-secondary text-[12px] mt-1">
             Every update to Alibi, newest first.
           </p>
         </header>
 
         {groups.map((group, gi) => (
           <section key={group.key} className="mb-8" aria-labelledby={`m-${group.key}`}>
-            {/* Sticky month header for easy scanning */}
+            {/* Sticky month header — stamped section divider */}
             <h2
               id={`m-${group.key}`}
-              className="sticky top-0 z-10 bg-bg-deep/95 backdrop-blur-sm py-2 mb-2 font-typewriter text-[11px] tracking-[0.25em] uppercase text-gold border-b border-br-thin"
+              className="sticky top-0 z-10 py-2 mb-3 font-mono text-[10px] tracking-[0.3em] uppercase text-accent-text border-b border-border-strong"
+              style={{ background: 'var(--color-bg-base)', backdropFilter: 'blur(4px)' }}
             >
               {group.label}
             </h2>
 
-            <ol className="flex flex-col gap-4 list-none pl-0">
+            <ol className="flex flex-col gap-3 list-none pl-0">
               {group.entries.map((entry, i) => (
                 <motion.li
                   key={`${entry.date}-${entry.headline}`}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: Math.min(gi * 3 + i, 8) * 0.04, duration: 0.3 }}
-                  className="rounded-xl border border-br-thin bg-bg-panel px-4 py-3.5"
+                  className="border border-border-strong bg-bg-panel px-4 py-3.5"
+                  style={{ boxShadow: 'var(--shadow-cut)' }}
                 >
                   <div className="flex items-center justify-between gap-3 mb-1.5">
                     <div className="flex items-center gap-2 min-w-0">
-                      {entry.tag && (
-                        <span
-                          className="text-[9px] font-typewriter uppercase tracking-wider px-1.5 py-0.5 rounded flex-shrink-0"
-                          style={{
-                            color: TAG_COLOR[entry.tag],
-                            backgroundColor: TAG_COLOR[entry.tag] + '1E',
-                          }}
-                        >
-                          {entry.tag}
-                        </span>
-                      )}
-                      <h3 className="font-display text-paper text-sm font-semibold leading-tight truncate">
+                      {entry.tag && (() => {
+                        const ts = TAG_STYLE[entry.tag]
+                        return (
+                          <span
+                            className="font-mono text-[9px] uppercase tracking-[0.2em] px-1.5 py-0.5 flex-shrink-0 border"
+                            style={{
+                              color: ts.color,
+                              borderColor: ts.color,
+                              background: `color-mix(in srgb, ${ts.color} 10%, transparent)`,
+                            }}
+                          >
+                            {ts.label}
+                          </span>
+                        )
+                      })()}
+                      <h3 className="font-display text-text-primary text-sm font-semibold leading-tight tracking-wide truncate">
                         {entry.headline}
                       </h3>
                     </div>
                     <time
                       dateTime={entry.date}
-                      className="text-paper-muted text-[10px] font-typewriter tracking-wider flex-shrink-0"
+                      className="font-mono text-paper-muted text-[10px] tracking-wider flex-shrink-0"
                     >
                       {formatDay(entry.date)}
                     </time>
                   </div>
-                  <p className="text-paper-dim text-[13px] leading-relaxed font-sans">
+                  <p className="font-mono text-text-secondary text-[12px] leading-relaxed">
                     {entry.detail}
                   </p>
                 </motion.li>
@@ -100,8 +113,8 @@ export default function ReleaseNotes({ onBack }: Props) {
           </section>
         ))}
 
-        <p className="text-center text-paper-muted text-[10px] font-typewriter tracking-wider opacity-60 mt-4">
-          — The case is never truly closed —
+        <p className="text-center font-mono text-paper-muted text-[10px] tracking-wider opacity-60 mt-4">
+          — THE CASE IS NEVER TRULY CLOSED —
         </p>
       </main>
     </motion.div>

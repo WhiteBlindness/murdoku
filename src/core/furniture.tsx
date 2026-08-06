@@ -1,9 +1,14 @@
 import React from 'react'
 import type { FurnitureType } from './types'
 
-// Board-game furniture: top-down, 100×100 viewBox, muted vintage fills,
-// every shape carries a bold black outline (strokeWidth 3–4).
-// With no `size`, icons stretch to fill their grid cell (width/height 100%).
+// Blueprint / evidence-diagram furniture: top-down, 100×100 viewBox.
+// Deleted: thick black outlines, 1950s Cluedo fills (wood browns, terracotta,
+// burgundy, coral, slate blue). All strokes now use currentColor so the parent
+// wrapper in MapGrid can set color: var(--board-chalk) and icons adapt to both
+// themes automatically. Thin drafting weight (strokeWidth 1.5–2).
+// Fills are either "none" or a very faint tint at low opacity — just enough to
+// read depth on complex objects. Every icon preserves its identifying geometry
+// so clue text ("on the box", "the only person on a rug") still resolves.
 
 export interface FurnitureIconProps { size?: number }
 type FIcon = (props: FurnitureIconProps) => React.ReactElement
@@ -11,259 +16,281 @@ type FIcon = (props: FurnitureIconProps) => React.ReactElement
 const S = (size?: number) =>
   size ? { width: size, height: size } : { width: '100%', height: '100%' }
 
-const O = { stroke: 'black', strokeWidth: 3, strokeLinejoin: 'round' as const }
-const O4 = { stroke: 'black', strokeWidth: 4, strokeLinejoin: 'round' as const }
+// Furniture must read as a SOLID OBJECT at a glance, not as a wireframe. Pure
+// outlines (fill: none) left every piece looking like a technical diagram, so at
+// cell size a bed and a table were hard to tell apart. Filling with translucent
+// currentColor keeps the drafting lines but gives each piece a silhouette, and
+// because it is currentColor the pieces still adapt to both themes from the
+// parent's `color`.
+//   D  = interior detail (cushions, seams) — lighter fill
+//   D2 = the defining outline of the piece — heavier fill
+const D = {
+  stroke: 'currentColor', strokeWidth: 1.5, strokeLinejoin: 'round' as const,
+  fill: 'currentColor', fillOpacity: 0.16,
+}
+const D2 = {
+  stroke: 'currentColor', strokeWidth: 2, strokeLinejoin: 'round' as const,
+  fill: 'currentColor', fillOpacity: 0.34,
+}
 
+// Sofa — top-down plan: backrest bar, two armrests, seat area, front rail.
 const SofaIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     {/* backrest */}
-    <rect x="6" y="6" width="88" height="24" rx="12" fill="#C4838E" {...O4} />
+    <rect x="8" y="8" width="84" height="20" rx="2" {...D2} />
     {/* armrests */}
-    <rect x="4" y="24" width="18" height="62" rx="9" fill="#D49AA4" {...O4} />
-    <rect x="78" y="24" width="18" height="62" rx="9" fill="#D49AA4" {...O4} />
-    {/* seat cushions */}
-    <rect x="22" y="28" width="56" height="52" rx="8" fill="#E4B8BE" {...O4} />
-    <line x1="50" y1="30" x2="50" y2="78" stroke="black" strokeWidth="3" />
-    {/* front edge */}
-    <rect x="22" y="80" width="56" height="14" rx="6" fill="#C4838E" {...O4} />
+    <rect x="6" y="26" width="14" height="56" rx="2" {...D2} />
+    <rect x="80" y="26" width="14" height="56" rx="2" {...D2} />
+    {/* seat — two cushions divided by centre seam */}
+    <rect x="20" y="26" width="60" height="50" rx="1" {...D} />
+    <line x1="50" y1="28" x2="50" y2="74" {...D} />
+    {/* front rail */}
+    <rect x="20" y="76" width="60" height="10" rx="1" {...D} />
   </svg>
 )
 
-// Rounded seat, thick curved backrest, rounded armrests hugging the sides.
+// Armchair — plan: U-shaped frame wrapping seat cushion.
 const ArmchairIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    {/* one-piece curved backrest + arms wrapping the seat */}
+  <svg {...S(size)} viewBox="0 0 100 100">
+    {/* U-frame: back + two sides */}
     <path
-      d="M12 88 L12 38 Q12 10 40 10 L60 10 Q88 10 88 38 L88 88
-         L72 88 L72 42 Q72 30 60 30 L40 30 Q28 30 28 42 L28 88 Z"
-      fill="#8FA9BE" {...O4}
+      d="M14 88 L14 36 Q14 12 50 12 Q86 12 86 36 L86 88"
+      {...D2}
     />
-    {/* seat cushion */}
-    <rect x="28" y="34" width="44" height="56" rx="12" fill="#BCCFDD" {...O4} />
-    <line x1="30" y1="68" x2="70" y2="68" stroke="black" strokeWidth="3" />
+    {/* inner seat inset */}
+    <rect x="30" y="32" width="40" height="56" rx="2" {...D} />
+    {/* seat crease */}
+    <line x1="32" y1="68" x2="68" y2="68" {...D} />
   </svg>
 )
 
+// Bed — plan: frame, headboard, two pillows, blanket fold line.
 const BedIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     {/* frame */}
-    <rect x="8" y="4" width="84" height="92" rx="6" fill="#B49468" {...O4} />
+    <rect x="10" y="6" width="80" height="88" rx="2" {...D2} />
     {/* headboard */}
-    <rect x="8" y="4" width="84" height="18" rx="6" fill="#8A6C44" {...O4} />
-    {/* mattress */}
-    <rect x="14" y="22" width="72" height="68" rx="4" fill="#F2EDDF" {...O} />
+    <rect x="10" y="6" width="80" height="16" rx="2" {...D2} />
+    {/* mattress inset */}
+    <rect x="16" y="22" width="68" height="66" rx="1" {...D} />
     {/* pillows */}
-    <rect x="18" y="26" width="28" height="18" rx="7" fill="#FBF8F0" {...O} />
-    <rect x="54" y="26" width="28" height="18" rx="7" fill="#FBF8F0" {...O} />
-    {/* blanket */}
-    <rect x="14" y="48" width="72" height="42" rx="4" fill="#7D98B4" {...O4} />
-    <line x1="14" y1="58" x2="86" y2="58" stroke="black" strokeWidth="3" />
+    <rect x="20" y="26" width="26" height="16" rx="3" {...D} />
+    <rect x="54" y="26" width="26" height="16" rx="3" {...D} />
+    {/* blanket fold line */}
+    <line x1="16" y1="50" x2="84" y2="50" {...D} />
   </svg>
 )
 
+// Table — plan: top surface, inner inset, two horizontal dividers.
 const TableIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    <rect x="6" y="14" width="88" height="72" rx="8" fill="#BC9A66" {...O4} />
-    <rect x="16" y="24" width="68" height="52" rx="5" fill="#CCAC78" {...O} />
-    <line x1="16" y1="40" x2="84" y2="40" stroke="black" strokeWidth="3" />
-    <line x1="16" y1="58" x2="84" y2="58" stroke="black" strokeWidth="3" />
+  <svg {...S(size)} viewBox="0 0 100 100">
+    <rect x="8" y="16" width="84" height="68" rx="2" {...D2} />
+    <rect x="18" y="26" width="64" height="48" rx="1" {...D} />
+    <line x1="18" y1="40" x2="82" y2="40" {...D} />
+    <line x1="18" y1="58" x2="82" y2="58" {...D} />
   </svg>
 )
 
-// Cardboard box seen from above: folded flaps make a corner-to-corner X.
+// Box — plan: square crate with folded-flap X (identifying geometry preserved).
 const BoxIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    <rect x="14" y="14" width="72" height="72" rx="4" fill="#D2B384" {...O4} />
-    <line x1="14" y1="14" x2="86" y2="86" stroke="black" strokeWidth="4" />
-    <line x1="86" y1="14" x2="14" y2="86" stroke="black" strokeWidth="4" />
+  <svg {...S(size)} viewBox="0 0 100 100">
+    <rect x="14" y="14" width="72" height="72" rx="2" {...D2} />
+    {/* flap cross — the detail that makes "on the box" legible */}
+    <line x1="14" y1="14" x2="86" y2="86" {...D} />
+    <line x1="86" y1="14" x2="14" y2="86" {...D} />
   </svg>
 )
 
-// Burgundy area rug: nested border pattern, dashed fringe on top/bottom edges.
+// Rug — plan: nested border pattern + fringe dashes (identifying geometry).
 const RugIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    <rect x="10" y="10" width="80" height="80" rx="5" fill="#8E3A3A" {...O4} />
-    <rect x="20" y="20" width="60" height="60" rx="3" fill="#A85555" {...O} />
-    {/* fringe */}
-    <line x1="14" y1="5" x2="86" y2="5" stroke="black" strokeWidth="4" strokeDasharray="4 6" strokeLinecap="round" />
-    <line x1="14" y1="95" x2="86" y2="95" stroke="black" strokeWidth="4" strokeDasharray="4 6" strokeLinecap="round" />
+  <svg {...S(size)} viewBox="0 0 100 100">
+    <rect x="12" y="12" width="76" height="76" rx="1" {...D2} />
+    <rect x="22" y="22" width="56" height="56" rx="1" {...D} />
+    {/* fringe — top and bottom edge */}
+    <line x1="16" y1="6"  x2="84" y2="6"  {...D} strokeDasharray="4 5" strokeLinecap="round" />
+    <line x1="16" y1="94" x2="84" y2="94" {...D} strokeDasharray="4 5" strokeLinecap="round" />
   </svg>
 )
 
-// Terracotta pot centered, sharp leaf polygons radiating outward over the rim.
+// Plant — plan: pot circle + radiating leaf spikes.
 const PlantIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     {/* pot */}
-    <circle cx="50" cy="50" r="26" fill="#BE7050" {...O4} />
-    <circle cx="50" cy="50" r="16" fill="#A85C40" {...O} />
-    {/* leaves — sharp spikes pointing outward, overlapping the pot */}
-    <path d="M50 50 L36 6 L54 22 Z" fill="#5C8C3C" {...O} />
-    <path d="M50 50 L78 12 L74 36 Z" fill="#4E7C34" {...O} />
-    <path d="M50 50 L96 40 L74 54 Z" fill="#6C9C48" {...O} />
-    <path d="M50 50 L90 78 L64 74 Z" fill="#5C8C3C" {...O} />
-    <path d="M50 50 L56 96 L40 76 Z" fill="#4E7C34" {...O} />
-    <path d="M50 50 L14 88 L26 62 Z" fill="#6C9C48" {...O} />
-    <path d="M50 50 L4 54 L24 38 Z" fill="#5C8C3C" {...O} />
-    <path d="M50 50 L14 16 L36 26 Z" fill="#4E7C34" {...O} />
-    {/* center crown */}
-    <circle cx="50" cy="50" r="9" fill="#7CAC54" {...O} />
+    <circle cx="50" cy="52" r="22" {...D2} />
+    <circle cx="50" cy="52" r="13" {...D} />
+    {/* radiating leaves — angular spikes identify a plant from above */}
+    <path d="M50 52 L38 8 L52 24 Z"  {...D} />
+    <path d="M50 52 L76 14 L72 36 Z" {...D} />
+    <path d="M50 52 L94 42 L72 54 Z" {...D} />
+    <path d="M50 52 L88 76 L64 72 Z" {...D} />
+    <path d="M50 52 L56 94 L40 76 Z" {...D} />
+    <path d="M50 52 L16 86 L28 64 Z" {...D} />
+    <path d="M50 52 L6 56 L26 40 Z"  {...D} />
+    <path d="M50 52 L16 18 L38 28 Z" {...D} />
   </svg>
 )
 
+// Shrub — plan: overlapping circles forming a shrub canopy.
 const ShrubIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    <circle cx="50" cy="52" r="40" fill="#4E7434" {...O4} />
-    <circle cx="30" cy="42" r="20" fill="#5C8440" {...O} />
-    <circle cx="70" cy="42" r="20" fill="#5C8440" {...O} />
-    <circle cx="50" cy="30" r="18" fill="#6C944C" {...O} />
-    <circle cx="36" cy="62" r="16" fill="#6C944C" {...O} />
-    <circle cx="66" cy="64" r="15" fill="#5C8440" {...O} />
-    <circle cx="50" cy="50" r="12" fill="#7CA458" {...O} />
+  <svg {...S(size)} viewBox="0 0 100 100">
+    <circle cx="50" cy="52" r="36" {...D2} />
+    <circle cx="32" cy="44" r="18" {...D} />
+    <circle cx="68" cy="44" r="18" {...D} />
+    <circle cx="50" cy="34" r="16" {...D} />
+    <circle cx="38" cy="62" r="14" {...D} />
+    <circle cx="64" cy="64" r="13" {...D} />
+    <circle cx="50" cy="52" r="10" {...D} />
   </svg>
 )
 
-// Top-down floor lamp: big glowing shade circle.
+// Lamp — plan: concentric rings indicating shade and base.
 const LampIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    <circle cx="50" cy="50" r="38" fill="#D8B860" {...O4} />
-    <circle cx="50" cy="50" r="26" fill="#E8D492" {...O} />
-    <circle cx="50" cy="50" r="12" fill="#F6ECC2" {...O} />
-    <circle cx="50" cy="50" r="4" fill="#6A5030" {...O} />
+  <svg {...S(size)} viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="36" {...D2} />
+    <circle cx="50" cy="50" r="24" {...D} />
+    <circle cx="50" cy="50" r="10" {...D} />
+    <circle cx="50" cy="50" r="3"  stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.6" />
   </svg>
 )
 
+// Counter — plan: work surface with sink basin and chopping board inset.
 const CounterIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    <rect x="4" y="10" width="92" height="80" rx="6" fill="#E6E0D2" {...O4} />
-    <line x1="50" y1="10" x2="50" y2="90" stroke="black" strokeWidth="3" />
-    {/* sink */}
-    <rect x="58" y="22" width="30" height="34" rx="7" fill="#A4C2D2" {...O} />
-    <circle cx="73" cy="39" r="5" fill="#68828E" {...O} />
-    {/* faucet */}
-    <rect x="68" y="14" width="10" height="8" rx="3" fill="#ACACA8" {...O} />
+  <svg {...S(size)} viewBox="0 0 100 100">
+    <rect x="6" y="12" width="88" height="76" rx="2" {...D2} />
+    <line x1="50" y1="12" x2="50" y2="88" {...D} />
+    {/* sink: rounded rectangle + drain dot */}
+    <rect x="58" y="24" width="28" height="32" rx="5" {...D} />
+    <circle cx="72" cy="40" r="4" {...D} />
+    {/* faucet stub */}
+    <rect x="68" y="16" width="8" height="8" rx="2" {...D} />
     {/* chopping board */}
-    <rect x="12" y="26" width="28" height="40" rx="5" fill="#C4A470" {...O} />
-    <circle cx="26" cy="34" r="3" fill="#8A6C44" {...O} />
+    <rect x="14" y="28" width="26" height="36" rx="3" {...D} />
   </svg>
 )
 
-// Media console from above: wooden TV stand, flat-screen TV as a thin black bar.
+// TV — plan: media console top-down; stand shelf, screen edge-on.
 const TvIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    {/* wooden stand */}
-    <rect x="10" y="10" width="80" height="25" rx="3" fill="#AE8656" {...O4} />
+  <svg {...S(size)} viewBox="0 0 100 100">
+    {/* console stand */}
+    <rect x="12" y="12" width="76" height="24" rx="2" {...D2} />
     {/* flat-screen seen edge-on from above */}
-    <rect x="20" y="15" width="60" height="10" rx="2" fill="#1A1A1A" {...O} />
+    <rect x="22" y="16" width="56" height="8" rx="1" {...D} />
   </svg>
 )
 
+// Bathtub — plan: outer shell, inner basin, two taps, drain.
 const BathtubIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    <rect x="6" y="8" width="88" height="84" rx="20" fill="#F0ECE2" {...O4} />
-    <rect x="16" y="18" width="68" height="64" rx="14" fill="#A8CCDE" {...O4} />
+  <svg {...S(size)} viewBox="0 0 100 100">
+    <rect x="8" y="10" width="84" height="80" rx="16" {...D2} />
+    <rect x="18" y="20" width="64" height="60" rx="10" {...D} />
     {/* taps */}
-    <circle cx="34" cy="22" r="7" fill="#B8B8B4" {...O} />
-    <circle cx="66" cy="22" r="7" fill="#B8B8B4" {...O} />
+    <circle cx="34" cy="24" r="5" {...D} />
+    <circle cx="66" cy="24" r="5" {...D} />
     {/* drain */}
-    <circle cx="50" cy="70" r="7" fill="#7A94A0" {...O} />
-    <circle cx="50" cy="70" r="3" fill="#586870" {...O} />
+    <circle cx="50" cy="68" r="5" {...D} />
+    <circle cx="50" cy="68" r="2" stroke="currentColor" strokeWidth="1" fill="currentColor" fillOpacity="0.5" />
   </svg>
 )
 
-// Shelf pushed against a wall: thin brown frame, books packed edge to edge.
+// Bookshelf — plan: shelf outline + packed book spines (varying widths, no fills).
 const BookshelfIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    <rect x="10" y="10" width="80" height="35" rx="3" fill="#96744A" {...O4} />
-    {/* books packed tightly, varying widths, no gaps */}
-    <rect x="14" y="14" width="9" height="27" fill="#8E3A3A" {...O} />
-    <rect x="23" y="14" width="7" height="27" fill="#34506E" {...O} />
-    <rect x="30" y="14" width="10" height="27" fill="#3E6648" {...O} />
-    <rect x="40" y="14" width="6" height="27" fill="#A08434" {...O} />
-    <rect x="46" y="14" width="9" height="27" fill="#6E4468" {...O} />
-    <rect x="55" y="14" width="7" height="27" fill="#3E7070" {...O} />
-    <rect x="62" y="14" width="10" height="27" fill="#8E3A3A" {...O} />
-    <rect x="72" y="14" width="6" height="27" fill="#34506E" {...O} />
-    <rect x="78" y="14" width="8" height="27" fill="#3E6648" {...O} />
+  <svg {...S(size)} viewBox="0 0 100 100">
+    <rect x="10" y="12" width="80" height="32" rx="2" {...D2} />
+    {/* book spines — vertical dividers at irregular widths */}
+    {[23, 31, 42, 49, 57, 65, 74].map(x => (
+      <line key={x} x1={x} y1="14" x2={x} y2="42" {...D} />
+    ))}
   </svg>
 )
 
+// Stove — plan: four burners (identifying geometry preserved).
 const StoveIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    <rect x="8" y="8" width="84" height="84" rx="7" fill="#5A5C62" {...O4} />
-    <circle cx="32" cy="32" r="14" fill="#3A3C42" {...O4} />
-    <circle cx="32" cy="32" r="6" fill="#C06848" {...O} />
-    <circle cx="68" cy="32" r="14" fill="#3A3C42" {...O4} />
-    <circle cx="68" cy="32" r="6" fill="#C06848" {...O} />
-    <circle cx="32" cy="68" r="14" fill="#3A3C42" {...O4} />
-    <circle cx="32" cy="68" r="6" fill="#C06848" {...O} />
-    <circle cx="68" cy="68" r="14" fill="#3A3C42" {...O4} />
-    <circle cx="68" cy="68" r="6" fill="#C06848" {...O} />
+  <svg {...S(size)} viewBox="0 0 100 100">
+    <rect x="10" y="10" width="80" height="80" rx="2" {...D2} />
+    {/* four burner rings */}
+    <circle cx="33" cy="33" r="13" {...D} />
+    <circle cx="33" cy="33" r="5"  {...D} />
+    <circle cx="67" cy="33" r="13" {...D} />
+    <circle cx="67" cy="33" r="5"  {...D} />
+    <circle cx="33" cy="67" r="13" {...D} />
+    <circle cx="33" cy="67" r="5"  {...D} />
+    <circle cx="67" cy="67" r="13" {...D} />
+    <circle cx="67" cy="67" r="5"  {...D} />
   </svg>
 )
 
+// Fridge — plan: rectangular appliance, freezer line, handle.
 const FridgeIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    <rect x="18" y="6" width="64" height="88" rx="9" fill="#DCE0E2" {...O4} />
-    <line x1="18" y1="38" x2="82" y2="38" stroke="black" strokeWidth="4" />
-    <rect x="68" y="14" width="8" height="16" rx="4" fill="#98A0A8" {...O} />
-    <rect x="68" y="46" width="8" height="28" rx="4" fill="#98A0A8" {...O} />
+  <svg {...S(size)} viewBox="0 0 100 100">
+    <rect x="20" y="8" width="60" height="84" rx="2" {...D2} />
+    {/* freezer compartment line */}
+    <line x1="20" y1="38" x2="80" y2="38" {...D2} />
+    {/* door handles */}
+    <rect x="68" y="14" width="6" height="14" rx="2" {...D} />
+    <rect x="68" y="46" width="6" height="24" rx="2" {...D} />
   </svg>
 )
 
+// Clock — plan: face, four cardinal tick marks, two hands.
 const ClockIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    <circle cx="50" cy="50" r="42" fill="#7A5C34" {...O4} />
-    <circle cx="50" cy="50" r="34" fill="#F6F2E4" {...O} />
+  <svg {...S(size)} viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="40" {...D2} />
+    <circle cx="50" cy="50" r="32" {...D} />
+    {/* tick marks at cardinal positions */}
     {[0, 90, 180, 270].map(deg => {
       const rad = deg * Math.PI / 180
       return <line key={deg}
         x1={50 + Math.sin(rad) * 24} y1={50 - Math.cos(rad) * 24}
         x2={50 + Math.sin(rad) * 30} y2={50 - Math.cos(rad) * 30}
-        stroke="black" strokeWidth="4" strokeLinecap="round" />
+        {...D2} strokeLinecap="round" />
     })}
-    <line x1="50" y1="50" x2="50" y2="26" stroke="black" strokeWidth="4" strokeLinecap="round" />
-    <line x1="50" y1="50" x2="66" y2="58" stroke="black" strokeWidth="4" strokeLinecap="round" />
-    <circle cx="50" cy="50" r="5" fill="#A84848" {...O} />
+    {/* hands */}
+    <line x1="50" y1="50" x2="50" y2="28" {...D2} strokeLinecap="round" />
+    <line x1="50" y1="50" x2="64" y2="58" {...D}  strokeLinecap="round" />
+    <circle cx="50" cy="50" r="3" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.7" />
   </svg>
 )
 
-// Classic wooden desk from above; office chair tucked under the front edge.
+// Desk — plan: surface + chair tucked underneath.
 const DeskIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     {/* office chair (drawn first — desk edge overlaps it) */}
-    <rect x="35" y="45" width="30" height="35" rx="10" fill="#5E666E" {...O4} />
-    {/* backrest */}
-    <rect x="31" y="74" width="38" height="12" rx="6" fill="#464E56" {...O4} />
+    <rect x="36" y="46" width="28" height="32" rx="8" {...D} />
+    {/* backrest bar */}
+    <rect x="32" y="72" width="36" height="10" rx="4" {...D} />
     {/* desk surface */}
-    <rect x="10" y="10" width="80" height="40" rx="2" fill="#AE8656" {...O4} />
-    {/* laptop */}
-    <rect x="40" y="20" width="20" height="15" rx="2" fill="#7A828C" {...O} />
+    <rect x="12" y="12" width="76" height="38" rx="2" {...D2} />
+    {/* laptop outline */}
+    <rect x="42" y="20" width="18" height="14" rx="2" {...D} />
   </svg>
 )
 
+// Toilet — plan: cistern + oval bowl.
 const ToiletIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    {/* tank */}
-    <rect x="22" y="6" width="56" height="26" rx="8" fill="#F0ECE2" {...O4} />
-    <circle cx="50" cy="19" r="5" fill="#B8B8B4" {...O} />
+  <svg {...S(size)} viewBox="0 0 100 100">
+    {/* cistern */}
+    <rect x="24" y="8" width="52" height="24" rx="6" {...D2} />
+    <circle cx="50" cy="20" r="4" {...D} />
     {/* bowl */}
-    <ellipse cx="50" cy="62" rx="34" ry="30" fill="#F0ECE2" {...O4} />
-    <ellipse cx="50" cy="64" rx="24" ry="21" fill="#B4D0E0" {...O} />
+    <ellipse cx="50" cy="64" rx="32" ry="28" {...D2} />
+    <ellipse cx="50" cy="66" rx="22" ry="19" {...D} />
   </svg>
 )
 
+// Shower — plan: tray outline + shower head concentric rings + four corner drops.
 const ShowerIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    <rect x="8" y="8" width="84" height="84" rx="9" fill="#F0ECE4" {...O4} />
+  <svg {...S(size)} viewBox="0 0 100 100">
+    <rect x="10" y="10" width="80" height="80" rx="6" {...D2} />
     {/* shower head */}
-    <circle cx="50" cy="50" r="20" fill="#B8B8B4" {...O4} />
-    <circle cx="50" cy="50" r="12" fill="#D8D8D4" {...O} />
-    {[[42, 44], [58, 44], [42, 56], [58, 56], [50, 50]].map(([x, y], i) => (
-      <circle key={i} cx={x} cy={y} r="3" fill="#586870" {...O} />
+    <circle cx="50" cy="50" r="18" {...D2} />
+    <circle cx="50" cy="50" r="10" {...D} />
+    {/* nozzle dots */}
+    {[[43, 44], [57, 44], [43, 56], [57, 56], [50, 50]].map(([x, y], i) => (
+      <circle key={i} cx={x} cy={y} r="2" stroke="currentColor" strokeWidth="1" fill="currentColor" fillOpacity="0.6" />
     ))}
-    {/* water drops */}
-    {[[22, 24], [78, 24], [22, 76], [78, 76]].map(([x, y], i) => (
-      <circle key={i} cx={x} cy={y} r="5" fill="#A8CCE0" {...O} />
+    {/* corner water drops */}
+    {[[22, 22], [78, 22], [22, 78], [78, 78]].map(([x, y], i) => (
+      <circle key={i} cx={x} cy={y} r="4" {...D} />
     ))}
   </svg>
 )

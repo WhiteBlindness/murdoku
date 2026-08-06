@@ -1,203 +1,195 @@
 # DESIGN.md — Alibi
 
-Derived from the shipped artifact, not from intentions. Everything here is in the
-code today; where a rule exists because of a specific failure, the failure is named
-so the rule doesn't get "simplified" back out.
+Derived from the shipped artifact, not from intentions. Where a rule exists
+because of a specific failure, the failure is named so the rule doesn't get
+"simplified" back out.
 
-**Product:** a noir murder-mystery deduction puzzle PWA. Read each suspect's clue,
-place everyone on the house map so each person occupies exactly one row and one
+**Product:** a noir murder-mystery deduction puzzle PWA. Read each suspect's
+clue, place everyone on the house map so each occupies exactly one row and one
 column, and unmask whoever is left alone with the victim.
 
 **Naming:** the app says *Alibi*. The GitHub repo, the deploy URL
 (`murdoku-seven.vercel.app`) and every `murdoku_*` localStorage key still say
-*murdoku* — deliberate, so no player loses progress. Not drift; do not "fix" it.
+*murdoku* — deliberate, so no player loses progress. Not drift.
 
 **Stack:** React 18 · Vite · TypeScript · Tailwind · Framer Motion · vite-plugin-pwa.
 
 ---
 
-## 1. Token layer — `src/styles/theme.css`
+## 0. Art direction — L.A. Noire
 
-The single source of visual truth. Semantic, role-based custom properties only —
-never raw hue names (`--color-accent`, never `--gold`). Adding a theme is one
-`:root.theme-<name> { … }` block plus one entry in `THEMES`
-(`src/hooks/useTheme.ts`); no component changes.
+A 1940s LAPD case file on a detective's desk at night. Chiaroscuro: deep
+obsidian ground, parchment documents, brass highlights, blood red for danger.
+Stamped ink, stencilled labels, stark directional shadows. Sharp corners.
 
-| Group | Tokens |
-|---|---|
-| Surfaces | `--color-bg-base` · `-surface` · `-elevated` · `-inset` |
-| Borders | `--color-border-subtle` · `-strong` |
-| Text | `--color-text-primary` · `-secondary` · `-muted` |
-| Accent | `--color-accent` · `-strong` · `-text` · `--color-on-accent` |
-| Danger | `--color-danger` · `-text` |
-| FX | `--shadow-elevated` · `--overlay-scrim` |
+**This REPLACED a Cluedo board-game world** (painted SVG floor tiles — oak
+planks, coral checkerboard, sage grass — 1950s pastels, thick black outlines,
+rounded white-on-black pill labels). That world is deleted. If you find wood
+grain, grass blades, a checkerboard, or a bubbly pill, it is a regression.
 
-Surfaces step up in luminance `base < surface < elevated` so cards visibly lift.
-They were once near-flat (`#141008` on `#0A0806`) and cards were invisible in dark
-mode; the current spacing is the fix, not an accident.
+Two things the old world got RIGHT and the replacement must keep, because the
+first noir pass lost them and the board stopped being playable:
 
-**Dark is the default and renders correctly with zero JavaScript.**
-`prefers-color-scheme: light` is honoured out of the box via
-`:root:not(.theme-dark)`, so a system-light user gets the light palette with no JS.
-An explicit user choice is applied as `.theme-light` / `.theme-dark` on `<html>` by
-a tiny inline script in `index.html`, and that class wins over the media query.
-
-### Contrast is a documented property, not a hope
-
-Every foreground/background pairing carries its measured ratio in a comment and
-meets WCAG AA (≥ 4.5:1 body, ≥ 3:1 large text and non-text UI) in **both** themes.
-Treat those annotations as tests: change a value, re-measure, update the comment.
-
-### Difficulty scale
-
-`--diff-{very-easy,easy,medium,hard,expert}` and a `-text` variant of each.
-
-- **base token** = decorative fill — section rails, gradients, the card spine.
-- **`-text` variant** = AA-safe foreground. Use this any time the colour renders text.
-
-These replaced a hardcoded hex map that was duplicated in `HomeScreen.tsx` and
-`GameScreen.tsx` and was tuned for dark only. On the light page (`#ECE3CF`) four of
-its five colours failed AA outright — Very Easy 1.66:1, Easy 1.61:1, Medium 2.16:1,
-Hard 2.29:1 — and Expert `#B82020` was only 3.11:1 on dark, failing as text there.
-All ten current pairings are verified ≥ 4.5:1. Do not reintroduce a local colour map.
-
-### Board floor filter
-
-`--board-floor-brightness` / `--board-floor-saturate` (dark: `0.62` / `0.88`,
-light: `1` / `1`). The board carries its own 1950s palette rather than the UI tokens,
-because it is a physical object; these two knobs let dark mode dim the whole board
-**as one unit** so it doesn't glare as a bright slab on a near-black page.
-
-They are applied as a CSS `filter` on a dedicated floor `<span>` inside each cell —
-a *sibling* of the token/mark/label layers, never an ancestor. That placement is
-load-bearing twice over: avatars, ✕ marks, conflict rings and room labels must stay
-at full legibility, and `filter` on an ancestor would create a containing block.
+1. **Rooms must be individually identifiable at a glance.** Clues say "In the
+   Pantry" — this is a gameplay requirement, not decoration.
+2. **Furniture must read as solid objects.** Clues say "On the box", "the only
+   person on a rug".
 
 ---
 
-## 2. Tailwind — `tailwind.config.js`
+## 1. Token layer — `src/styles/theme.css`
 
-Maps every token to a Tailwind colour so `bg-bg-surface`, `text-accent-text` etc.
-resolve to the custom properties. Legacy aliases (`paper`, `paper-dim`, `gold`,
-`crimson`, `bg-deep`, `br-thin`…) are **repointed at the same vars**, so old markup
-themes correctly and no refactor is owed. `darkMode: ['class', '.theme-dark']`.
+Single source of visual truth. Semantic role-based custom properties, never raw
+hue names. Adding a theme = one `:root.theme-<name>` block + one entry in
+`THEMES` (`src/hooks/useTheme.ts`).
 
-**Type:** Bricolage Grotesque for display/headings (`font-display`), Hanken Grotesk
-for body and UI (`font-sans`). Characterful but legible — not a noir pastiche.
+Groups: `--color-bg-{base,surface,elevated,inset}` ·
+`--color-border-{subtle,strong}` · `--color-text-{primary,secondary,muted}` ·
+`--color-accent{,-strong,-text}` · `--color-on-accent` ·
+`--color-danger{,-text}` · `--shadow-{elevated,cut}` · `--overlay-scrim`.
 
-**Keyframes:** `stamp` (victory reveal), `cell-pop`, `pulse` (conflict), `shake`
-(rejection). See §5.
+**Dark is the default and renders correctly with ZERO JavaScript.**
+`prefers-color-scheme: light` is honoured via `:root:not(.theme-dark)`. An
+explicit choice is a `.theme-light` / `.theme-dark` root class set by the inline
+script in `index.html`, which wins over the media query.
+
+Light is **not** "noir with the lights on" — it is the same case file read in
+daylight: parchment dossier, ink, brass. Same roles, same hierarchy.
+
+### Contrast is a documented property, not a hope
+Every text pairing carries its measured ratio in a comment and meets WCAG AA
+(>= 4.5:1). Treat those numbers as tests.
+
+### The two border tiers have DIFFERENT obligations — never collapse them
+- `--color-border-subtle` — decorative hairline (~1.9:1). **May never be the
+  only thing marking an interactive boundary.**
+- `--color-border-strong` — 3.5:1, meets WCAG 1.4.11. Use wherever a border *is*
+  the affordance (unfilled buttons, selectable cards).
+
+This matters because `bg-surface` vs `bg-base` is near-zero contrast, so a card
+edge genuinely is the only affordance.
+
+### Difficulty scale
+`--diff-{very-easy,easy,medium,hard,expert}` + `-text` variants. Deliberately
+**not** a traffic light — noir has no bright green. Runs cold grey → sand →
+brass → rust → blood, so severity reads as heat, not as a colour category.
+Base token = decorative fill; `-text` = AA-safe foreground. All ten pairings
+verified >= 4.5:1 in both themes. A previous hardcoded map, duplicated across
+two components, failed AA on light at 1.6–2.3:1. Do not reintroduce a local map.
+
+### Board tokens
+`--board-ground` · `--board-ink` (drafting hairlines) · `--board-wall` (the
+drawn room boundary) · `--board-glow` · `--board-chalk` ·
+`--board-room-tint{,-2}` (fallbacks).
+
+**Per-room-type tones:** `--room-{bedroom,kitchen,dining,living,bath,outdoor,
+study,hall,pantry}`. Each room type owns a **hue**, not a brightness — the mood
+stays dark while the rooms separate. An earlier pass alternated two
+near-identical darks by room index parity; the board read as one flat slab and
+you could not tell a Pantry from a Study. `MapGrid`'s `roomTone()` maps name →
+token, and a repeated tone in one house falls back to the alternate tint so
+same-type neighbours never merge.
+
+---
+
+## 2. Typography — `tailwind.config.js` + `index.html`
+
+Three voices, one job each:
+- `font-display` → **Oswald**. Stark condensed newspaper headline. Titles, button labels.
+- `font-mono` (alias `font-typewriter`) → **Courier Prime**. The case file:
+  clues, evidence, timer, case numbers, log lines. The signature move — clues
+  must read as typed evidence.
+- `font-sans` → **Hanken Grotesk**. Dense UI chrome only. Condensed display type
+  is unreadable at 10–11px, so small labels get a neutral grotesk rather than
+  being forced into the theme.
+
+Legacy Tailwind colour aliases (`paper`, `gold`, `bg-deep`, `br-thin`…) are
+repointed at the current vars, so older markup still themes correctly.
 
 ---
 
 ## 3. The board — `src/components/MapGrid.tsx`
 
-**User-mandated art direction. Preserve it.** Classic Cluedo board-game look:
+A police blueprint / dossier floor plan. Dark ground, luminous drafting ink,
+rooms defined by drawn lines plus a per-type tone. No painted materials.
 
-- Every SVG shape stroked black at **3–4px**. This is the defining trait.
-- Muted 1950s palette.
-- **6px solid black** room walls; 1px hairlines between cells within a room
-  (dashed for outdoor rooms).
-- Pill room labels: white text, black fill, white ring, uppercase, letter-spaced.
-- Top-down furniture (`src/core/furniture.tsx`, viewBox `0 0 100 100`, fills the cell).
-- One distinct floor material per room type, so adjacent rooms never blend:
-  bedroom carpet stipple · office/study dark mahogany · living/dining pale oak
-  planks · kitchen/bath checker · hallway diamonds · outdoor sage grass.
-
-### Pattern scale is cell-relative — never fixed px
-
-Floors are SVG data-URI tiles built by `svgTile()`. Their `backgroundSize` is a
-**percentage of the cell**, not an absolute size.
-
-This is the rule most likely to be broken by someone "tidying up", so: the tiles
-were originally sized in px (checker 128px, grass 80px, planks 320px). At Expert
-(7×7) on a 390px phone a cell is ~48px — smaller than the checker tile — so every
-kitchen cell rendered as one flat coral block and room differentiation died exactly
-where the puzzle is hardest.
-
-Scale is chosen for **boldness, not density**. The board-game look depends on those
-3px strokes staying visible; shrink a tile far below one cell and the strokes render
-sub-pixel and the pattern turns to grey noise. So tiles that already contain their
-own repeat (checker = 2×2 squares, planks = 3 rows) map to a **full** cell, and no
-tile goes below 50% of one.
-
-### Room labels
-
-Full pill at N ≤ 5. At N ≥ 6 the label abbreviates to a corner tab riding the wall
-junction (`FRONT YARD` → `FY`, `KITCHEN` → `KIT`), because full-width pills covered
-1–2 playable cells at Expert size. Font never renders below **9px**.
-
-The full room name is always preserved — in `title` and in an `sr-only` span, with
-the visible abbreviation `aria-hidden`. Abbreviating visually must never abbreviate
-for assistive tech.
-
-The label overlay is `pointer-events-none`; clicks always reach the cells beneath.
+- Room boundaries: solid `--board-wall`. Interior cell divisions: dashed
+  `--board-ink` hairlines.
+- **Furniture is filled, not wireframe.** `src/core/furniture.tsx` draws top-down
+  pieces in `currentColor` with a translucent fill (`D` = 0.16 detail, `D2` =
+  0.34 outline). Pure outlines made a bed and a table indistinguishable at cell
+  size. Icons keep their identifying geometry because clue text depends on it.
+- **Room labels** name the room wherever it fits: `compact` is decided by the
+  room's own cell `span`, not by N. Keying it off N alone hid every label behind
+  "KIT"/"STU" even where a room spanned three cells. When abbreviated, the full
+  name is still exposed via `title` **and** an `sr-only` span, with the visible
+  abbreviation `aria-hidden`. Overlay is `pointer-events-none`.
+- Cells stay real `<button>`s with `aria-label`, `data-cell`/`data-grid`,
+  arrow-key nav (`handleCellKey`) and a visible focus ring. The cell focus ring
+  uses the **solid** `--color-accent-strong`, never the semi-transparent
+  `--board-glow`, which composites to ~1.8:1 on the light room tint and fails
+  WCAG 2.4.11 — and it is the only focus indicator on the main game surface.
 
 ---
 
-## 4. Interaction and layout conventions
+## 4. Components and conventions
 
-- **Cells are real `<button>`s** with `aria-label` ("Row 3, column 2, Greta"),
-  arrow-key navigation (`handleCellKey`) and a visible `focus-visible` ring.
-  Never regress these to `<div>`s.
+- **Suspects are polaroid evidence prints** — parchment frame with a deeper
+  bottom margin, pinned at an alternating tilt, hard directional shadow. Clue
+  text in `font-mono`.
 - **44px minimum touch target** on every control.
-- **`.focus-ring`** (`src/index.css`) is the shared keyboard affordance.
-- **Toolbar groups by meaning, not by count:** modes (what a tap does) sit apart
-  from actions (one-shot commands). A single N-column grid stranded a lone button
-  at 390px, and the count changes between Classic and Detective mode; the semantic
-  split makes an orphan impossible in either.
+- **Toolbar groups by meaning, not by count**: modes (what a tap does) apart from
+  actions (one-shot commands). A single N-column grid stranded a lone button at
+  390px, and the count changes between Classic and Detective mode.
 - **Mobile order:** board → suspects/clues → toolbar → accuse. Clues must be
-  reachable without scrolling past the whole toolbar, because reading clues *is*
-  the core loop.
-- `pt-safe` / `pb-safe` for device insets.
-- **Avatars are remote images** (DiceBear). Never render them in a list or grid over
-  the catalog — 27 cards × N people ≈ 150 HTTP requests. The home screen uses
-  `person.accent` colour dots to signal the cast for free.
+  reachable without scrolling past the toolbar; reading clues is the core loop.
+- **Per-suspect `accent`** (`src/core/generate.ts` `ACCENTS`) is an identity
+  function. Muted, low-saturation, hues far apart, and **never red/pink** — red
+  is reserved for the conflict/danger signal.
+- **Avatars are remote images** (DiceBear). Never render them in a list or grid
+  over the catalog — 27 cards × N people ≈ 150 HTTP requests. The home screen
+  uses accent dots instead.
 
 ---
 
 ## 5. Motion
 
 **Default to CSS, not Framer.** The global `prefers-reduced-motion` block in
-`src/index.css` zeroes animation and transition durations — but it can only reach
-CSS. It cannot touch Framer's JS-driven springs. Anything that must be Framer is
-covered by `<MotionConfig reducedMotion="user">` in `App.tsx`; hover, press and
-feedback affordances should be plain CSS so the block covers them directly.
+`src/index.css` zeroes animation and transition durations, but it can only reach
+CSS — it cannot touch Framer's JS springs. Anything that must be Framer is
+covered by `<MotionConfig reducedMotion="user">` in `App.tsx`.
 
-Hover treatments are gated behind `@media (hover: hover) and (pointer: fine)` so a
-tap never leaves a stuck hover state.
+Hover is gated behind `@media (hover: hover) and (pointer: fine)` so a tap never
+leaves a stuck hover state.
 
 ### `shake` — the rejection gesture
+400ms, `translate3d`, GPU-composited. Fires only on a genuine rejection
+(`feedback === 'wrong' | 'blocked'`). `incomplete` is guidance, not a mistake, so
+it surfaces the message without shaking.
 
-Small amplitude, 400ms, `translate3d` so it composites on the GPU and never triggers
-layout. It fires only on a genuine rejection (`feedback === 'wrong' | 'blocked'`).
-`incomplete` is *guidance, not a mistake* — it surfaces the message without shaking,
-because shaking there scolds the player for doing nothing wrong.
+**Restarted imperatively — remove class → force reflow (`void el.offsetWidth`) →
+re-add — via a ref, never by remounting with a React `key`.** Two reasons, both
+load-bearing:
+1. A conditional class cannot re-fire when the *same* failure repeats, because
+   `feedback` never changes value and React skips the DOM write.
+2. Remounting via `key` restarts it but destroys the focused node — a keyboard
+   user pressing Enter loses focus to `<body>` on the game's primary action.
 
-**It is restarted imperatively — remove class → force reflow (`void el.offsetWidth`)
-→ re-add — via a ref, never by remounting with a React `key`.** Two reasons, both
-learned the hard way:
-
-1. A plain conditional class cannot re-fire when the *same* failure repeats, because
-   `feedback` never changes value between two identical rejections and React skips
-   the DOM write.
-2. Remounting via `key` does restart it, but destroys the focused node — a keyboard
-   user pressing Enter to accuse loses focus to `<body>` on the game's primary
-   action.
-
-An element may not carry both `animate-shake` and a Framer `transform` (e.g. an
-entry `y` offset): two systems writing one composited property fight during the
-overlap. Give each its own element.
+An element may not carry both `animate-shake` and a Framer `transform`: two
+systems writing one composited property fight during the overlap.
 
 ---
 
 ## 6. Working on this project
 
-- Verify visuals with real screenshots at **390px and 1440px, in both themes**,
-  before declaring anything done. Screenshots over claims.
-- After editing `tailwind.config.js`, **restart the dev server.** The running Vite
-  instance keeps serving the old CSS: the class appears in the DOM but
+- Verify at **390px and 1440px, in BOTH themes**, with real screenshots.
+  Screenshots over claims.
+- After editing `tailwind.config.js`, **restart the dev server.** Vite keeps
+  serving the old CSS: the class is in the DOM but
   `getComputedStyle(el).animationName` is `"none"` — which reads exactly like a
-  broken component and will send you debugging the wrong file.
-- `docs/UX_REVIEW.md` is **stale** — it predates the redesign from themed-Sudoku to
-  true deduction game. All three of its P0s are already implemented.
+  broken component and sends you debugging the wrong file.
+- **Changing `ACCENTS` or anything else in `generate.ts` changes generated puzzle
+  data.** Catalogs are cached in localStorage, so bump `KEY` in
+  `src/core/catalog.ts` (currently `murdoku_catalog_v12`) or returning players
+  keep the old data forever.
+- `docs/UX_REVIEW.md` is **stale** — it predates the deduction-game redesign.
