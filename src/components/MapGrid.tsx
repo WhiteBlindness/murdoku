@@ -16,12 +16,245 @@ interface Props {
   onPlaceFurniture?: (row: number, col: number) => void
 }
 
-// ─── Deleted: Cluedo art direction ───────────────────────────────────────────
-// Removed: WOOD_TILE, CHECKER_TILE, GRASS_TILE, LOBBY_TILE, CARPET_TILE,
-// DARKWOOD_TILE — six SVG data-URI floor tiles with 1950s fills and thick
-// black outlines. Removed: svgTile() helper, floorStyle() image approach,
-// Material type, roomMaterial() mapping. Rooms no longer use painted textures.
+// ─── Illustrated floor materials — Cluedo board-game art direction ────────────
+// Six distinct SVG-tile textures, one per room type. Each tile is repeated as
+// a percentage of the CELL, so it scales from N=4 (large cells) to N=7 (small)
+// without losing its 3px black outlines to sub-pixel blur.
 // ─────────────────────────────────────────────────────────────────────────────
+
+// 12 distinct materials — one per room type in ROOM_NAMES.
+// No two materials may share a visual signature so any two rooms
+// placed in the same house are distinguishable by floor alone.
+type Material =
+  | 'tile'      // Kitchen  — coral/blush checkerboard
+  | 'bathtile'  // Bathroom — small blue/white grid
+  | 'terracotta'// Pantry   — warm terracotta herringbone
+  | 'wood'      // Living Room — pale oak planks
+  | 'parquet'   // Dining Room — darker herringbone parquet
+  | 'darkwood'  // Study    — mahogany planks
+  | 'office'    // Office   — grey slate tiles
+  | 'carpet'    // Bedroom  — warm beige carpet
+  | 'stone'     // Hallway  — diamond lobby tiles
+  | 'grass'     // Front Yard — sage lawn
+  | 'garden'    // Garden   — planted/soil patches
+  | 'deck'      // Porch    — grey deck planks
+
+// One distinct floor per room type so adjacent rooms never share a material.
+// Every name in ROOM_NAMES is mapped to a unique material.
+function roomMaterial(name: string): Material {
+  const n = name.toLowerCase()
+  if (n === 'kitchen') return 'tile'
+  if (n === 'bathroom') return 'bathtile'
+  if (n === 'pantry') return 'terracotta'
+  if (n === 'living room') return 'wood'
+  if (n === 'dining room') return 'parquet'
+  if (n === 'study') return 'darkwood'
+  if (n === 'office') return 'office'
+  if (n === 'bedroom') return 'carpet'
+  if (n === 'hallway') return 'stone'
+  if (n.includes('yard')) return 'grass'
+  if (n === 'garden') return 'garden'
+  if (n === 'porch') return 'deck'
+  // fallback — living room oak
+  return 'wood'
+}
+
+// Board-game floors: large-scale SVG pattern tiles, every shape outlined in
+// thick solid black — comic-book / Cluedo board look.
+// backgroundSize is expressed as a percentage of the CELL so the pattern
+// scales correctly from N=4 (large cells) to N=7 (~48px cells on a phone)
+// without the 3px strokes going sub-pixel and turning to grey mush.
+const svgTile = (w: number, h: number, body: string) =>
+  `url("data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${body}</svg>`
+  )}")`
+
+// Kitchen — coral/blush 2×2 checkerboard. One tile = one full cell (2×2 squares).
+const CHECKER_TILE = svgTile(128, 128,
+  `<rect x="0" y="0" width="64" height="64" fill="#DE8B7B" stroke="#000" stroke-width="3"/>` +
+  `<rect x="64" y="0" width="64" height="64" fill="#F2D5CC" stroke="#000" stroke-width="3"/>` +
+  `<rect x="0" y="64" width="64" height="64" fill="#F2D5CC" stroke="#000" stroke-width="3"/>` +
+  `<rect x="64" y="64" width="64" height="64" fill="#DE8B7B" stroke="#000" stroke-width="3"/>`
+)
+
+// Bathroom — small blue/white square tiles (4×4 grid per cell tile).
+// At 50% backgroundSize one tile = one cell → 4×4 grid of crisp bold squares.
+const BATHTILE_TILE = svgTile(64, 64,
+  `<rect width="64" height="64" fill="#C8E0F0"/>` +
+  `<rect x="0"  y="0"  width="30" height="30" fill="#D8EEF8" stroke="#000" stroke-width="2.5"/>` +
+  `<rect x="34" y="0"  width="30" height="30" fill="#BDD8EE" stroke="#000" stroke-width="2.5"/>` +
+  `<rect x="0"  y="34" width="30" height="30" fill="#BDD8EE" stroke="#000" stroke-width="2.5"/>` +
+  `<rect x="34" y="34" width="30" height="30" fill="#D8EEF8" stroke="#000" stroke-width="2.5"/>`
+)
+
+// Pantry — terracotta herringbone. Each tile = 2 bricks at 45° in a 2×1 grid.
+// Two bricks per tile, tile repeated at 100% = one fat herringbone pair per cell.
+const TERRACOTTA_TILE = svgTile(80, 40,
+  `<rect width="80" height="40" fill="#C2714A"/>` +
+  `<rect x="2"  y="2"  width="36" height="16" rx="2" fill="#CC7A52" stroke="#000" stroke-width="2.5" transform="rotate(0 20 10)"/>` +
+  `<rect x="42" y="2"  width="36" height="16" rx="2" fill="#BA6B44" stroke="#000" stroke-width="2.5"/>` +
+  `<rect x="22" y="22" width="36" height="16" rx="2" fill="#CC7A52" stroke="#000" stroke-width="2.5"/>` +
+  `<rect x="-18" y="22" width="36" height="16" rx="2" fill="#BA6B44" stroke="#000" stroke-width="2.5"/>` +
+  `<rect x="62" y="22" width="36" height="16" rx="2" fill="#BA6B44" stroke="#000" stroke-width="2.5"/>`
+)
+
+// Living Room — pale oak planks. 3-row tile, seams staggered.
+const WOOD_TILE = svgTile(320, 75,
+  `<rect width="320" height="75" fill="#E0C48E"/>` +
+  `<rect x="0"   y="0"  width="160" height="25" fill="#E0C48E" stroke="#000" stroke-width="3"/>` +
+  `<rect x="160" y="0"  width="160" height="25" fill="#D6B87E" stroke="#000" stroke-width="3"/>` +
+  `<rect x="96"  y="25" width="160" height="25" fill="#DABC84" stroke="#000" stroke-width="3"/>` +
+  `<rect x="256" y="25" width="170" height="25" fill="#E4C892" stroke="#000" stroke-width="3"/>` +
+  `<rect x="-74" y="25" width="170" height="25" fill="#E4C892" stroke="#000" stroke-width="3"/>` +
+  `<rect x="48"  y="50" width="160" height="25" fill="#DCC088" stroke="#000" stroke-width="3"/>` +
+  `<rect x="208" y="50" width="170" height="25" fill="#D2B478" stroke="#000" stroke-width="3"/>` +
+  `<rect x="-62" y="50" width="110" height="25" fill="#D2B478" stroke="#000" stroke-width="3"/>`
+)
+
+// Dining Room — darker herringbone parquet (warm amber, diagonal bricks).
+// Tile is 80×80; at 100% per cell the two-brick herringbone is bold and clear.
+const PARQUET_TILE = svgTile(80, 80,
+  `<rect width="80" height="80" fill="#A8762A"/>` +
+  // top-left brick (NW→SE diagonal)
+  `<rect x="2" y="2" width="36" height="16" rx="2" fill="#B8843A" stroke="#000" stroke-width="2.5" transform="rotate(45 20 10)"/>` +
+  // top-right brick (NE→SW diagonal)
+  `<rect x="42" y="2" width="36" height="16" rx="2" fill="#9C6A22" stroke="#000" stroke-width="2.5" transform="rotate(-45 60 10)"/>` +
+  // bottom-left brick
+  `<rect x="2" y="42" width="36" height="16" rx="2" fill="#9C6A22" stroke="#000" stroke-width="2.5" transform="rotate(-45 20 50)"/>` +
+  // bottom-right brick
+  `<rect x="42" y="42" width="36" height="16" rx="2" fill="#B8843A" stroke="#000" stroke-width="2.5" transform="rotate(45 60 50)"/>`
+)
+
+// Study — mahogany planks. 3 narrow rows, rich dark fill.
+const DARKWOOD_TILE = svgTile(320, 48,
+  `<rect width="320" height="48" fill="#7A4A2E"/>` +
+  `<rect x="0"    y="0"  width="160" height="16" fill="#7A4A2E" stroke="#000" stroke-width="3"/>` +
+  `<rect x="160"  y="0"  width="160" height="16" fill="#6E4228" stroke="#000" stroke-width="3"/>` +
+  `<rect x="104"  y="16" width="160" height="16" fill="#82502F" stroke="#000" stroke-width="3"/>` +
+  `<rect x="264"  y="16" width="160" height="16" fill="#744629" stroke="#000" stroke-width="3"/>` +
+  `<rect x="-56"  y="16" width="160" height="16" fill="#744629" stroke="#000" stroke-width="3"/>` +
+  `<rect x="56"   y="32" width="160" height="16" fill="#6E4228" stroke="#000" stroke-width="3"/>` +
+  `<rect x="216"  y="32" width="160" height="16" fill="#7E4C2C" stroke="#000" stroke-width="3"/>` +
+  `<rect x="-104" y="32" width="160" height="16" fill="#7E4C2C" stroke="#000" stroke-width="3"/>`
+)
+
+// Office — cool grey slate squares. 2×2 grid per cell, blue-grey, distinct from mahogany.
+// At 50% backgroundSize one tile gives a 2×2 grid per cell.
+const OFFICE_TILE = svgTile(64, 64,
+  `<rect width="64" height="64" fill="#8A96A0"/>` +
+  `<rect x="0"  y="0"  width="30" height="30" fill="#96A2AE" stroke="#000" stroke-width="2.5"/>` +
+  `<rect x="34" y="0"  width="30" height="30" fill="#808C96" stroke="#000" stroke-width="2.5"/>` +
+  `<rect x="0"  y="34" width="30" height="30" fill="#808C96" stroke="#000" stroke-width="2.5"/>` +
+  `<rect x="34" y="34" width="30" height="30" fill="#96A2AE" stroke="#000" stroke-width="2.5"/>`
+)
+
+// Bedroom — warm beige carpet with scattered stipple dots.
+const CARPET_TILE = svgTile(44, 44,
+  `<rect width="44" height="44" fill="#D9C8A8"/>` +
+  `<circle cx="7"  cy="9"  r="1.6" fill="#B5A382"/>` +
+  `<circle cx="24" cy="5"  r="1.6" fill="#C2B08E"/>` +
+  `<circle cx="37" cy="14" r="1.6" fill="#B5A382"/>` +
+  `<circle cx="14" cy="22" r="1.6" fill="#C2B08E"/>` +
+  `<circle cx="31" cy="27" r="1.6" fill="#B5A382"/>` +
+  `<circle cx="5"  cy="33" r="1.6" fill="#C2B08E"/>` +
+  `<circle cx="21" cy="39" r="1.6" fill="#B5A382"/>` +
+  `<circle cx="39" cy="38" r="1.6" fill="#C2B08E"/>`
+)
+
+// Hallway — cream diamond / lobby tiles.
+// At 50% backgroundSize one tile gives a 2×2 diamond grid per cell.
+const LOBBY_TILE = svgTile(48, 48,
+  `<rect width="48" height="48" fill="#F0E8C8"/>` +
+  `<path d="M24 2 L46 24 L24 46 L2 24 Z" fill="none" stroke="#000" stroke-width="3"/>` +
+  `<circle cx="24" cy="24" r="4" fill="#A08A50" stroke="#000" stroke-width="2"/>`
+)
+
+// Front Yard — sage lawn with grass blade clusters.
+const GRASS_TILE = svgTile(80, 80,
+  `<rect width="80" height="80" fill="#9CB478"/>` +
+  `<path d="M10 34 Q8 26 12 19"  fill="none" stroke="#4E6E38" stroke-width="3" stroke-linecap="round"/>` +
+  `<path d="M15 35 Q16 27 14 21" fill="none" stroke="#5C7C42" stroke-width="3" stroke-linecap="round"/>` +
+  `<path d="M20 34 Q23 28 21 22" fill="none" stroke="#4E6E38" stroke-width="3" stroke-linecap="round"/>` +
+  `<path d="M52 22 Q50 14 54 8"  fill="none" stroke="#5C7C42" stroke-width="3" stroke-linecap="round"/>` +
+  `<path d="M57 23 Q58 15 56 9"  fill="none" stroke="#4E6E38" stroke-width="3" stroke-linecap="round"/>` +
+  `<path d="M62 22 Q65 16 63 10" fill="none" stroke="#5C7C42" stroke-width="3" stroke-linecap="round"/>` +
+  `<path d="M44 70 Q42 62 46 55" fill="none" stroke="#4E6E38" stroke-width="3" stroke-linecap="round"/>` +
+  `<path d="M49 71 Q50 63 48 57" fill="none" stroke="#5C7C42" stroke-width="3" stroke-linecap="round"/>` +
+  `<path d="M54 70 Q57 64 55 58" fill="none" stroke="#4E6E38" stroke-width="3" stroke-linecap="round"/>`
+)
+
+// Garden — darker olive green with soil patches (filled brown circles).
+// Visually distinct from sage Front Yard: darker base, earth patches vs. blades.
+const GARDEN_TILE = svgTile(80, 80,
+  `<rect width="80" height="80" fill="#5C7840"/>` +
+  // soil patch top-left
+  `<ellipse cx="18" cy="20" rx="10" ry="7" fill="#6B4828" stroke="#000" stroke-width="2.5"/>` +
+  // soil patch bottom-right
+  `<ellipse cx="60" cy="58" rx="12" ry="8" fill="#7A5230" stroke="#000" stroke-width="2.5"/>` +
+  // small soil patch mid
+  `<ellipse cx="44" cy="34" rx="7" ry="5" fill="#6B4828" stroke="#000" stroke-width="2"/>` +
+  // grass tufts
+  `<path d="M32 60 Q30 52 34 46" fill="none" stroke="#3A5428" stroke-width="3" stroke-linecap="round"/>` +
+  `<path d="M37 61 Q38 53 36 48" fill="none" stroke="#4A6434" stroke-width="3" stroke-linecap="round"/>` +
+  `<path d="M6 44 Q4 36 8 30"   fill="none" stroke="#3A5428" stroke-width="3" stroke-linecap="round"/>` +
+  `<path d="M66 14 Q64 6 68 0"  fill="none" stroke="#4A6434" stroke-width="3" stroke-linecap="round"/>`
+)
+
+// Porch — grey weathered deck planks, cooler than oak.
+// 3-row tile at 200% wide × 100% tall = full-cell planks, not pinstripes.
+const DECK_TILE = svgTile(320, 75,
+  `<rect width="320" height="75" fill="#9EA89A"/>` +
+  `<rect x="0"   y="0"  width="160" height="25" fill="#A4AEA0" stroke="#000" stroke-width="3"/>` +
+  `<rect x="160" y="0"  width="160" height="25" fill="#98A294" stroke="#000" stroke-width="3"/>` +
+  `<rect x="80"  y="25" width="160" height="25" fill="#9CA6A2" stroke="#000" stroke-width="3"/>` +
+  `<rect x="240" y="25" width="160" height="25" fill="#A2AC9E" stroke="#000" stroke-width="3"/>` +
+  `<rect x="-80" y="25" width="160" height="25" fill="#A2AC9E" stroke="#000" stroke-width="3"/>` +
+  `<rect x="40"  y="50" width="160" height="25" fill="#98A296" stroke="#000" stroke-width="3"/>` +
+  `<rect x="200" y="50" width="160" height="25" fill="#A0AA9C" stroke="#000" stroke-width="3"/>` +
+  `<rect x="-120" y="50" width="160" height="25" fill="#A0AA9C" stroke="#000" stroke-width="3"/>`
+)
+
+// backgroundSize as % of cell — see header comment.
+// Each tile's internal repeat count determines the divisor:
+//   - 2×2 repeat tiles (checker, bathtile, office) → 100% = one full tile per cell (crisp 2×2)
+//   - plank tiles (3 rows) → 200% wide × 100% tall = full-width planks per cell
+//   - diamond lobby → 50% = 2×2 diamond grid per cell
+//   - single-cell tiles (grass, garden, carpet, terracotta, parquet) → 100%
+function floorStyle(material: Material): React.CSSProperties {
+  switch (material) {
+    case 'tile':
+      return { backgroundColor: '#DE8B7B', backgroundImage: CHECKER_TILE, backgroundSize: '100% 100%' }
+    case 'bathtile':
+      return { backgroundColor: '#C8E0F0', backgroundImage: BATHTILE_TILE, backgroundSize: '100% 100%' }
+    case 'terracotta':
+      return { backgroundColor: '#C2714A', backgroundImage: TERRACOTTA_TILE, backgroundSize: '100% 100%' }
+    case 'wood':
+      return { backgroundColor: '#E0C48E', backgroundImage: WOOD_TILE, backgroundSize: '200% 100%' }
+    case 'parquet':
+      return { backgroundColor: '#A8762A', backgroundImage: PARQUET_TILE, backgroundSize: '100% 100%' }
+    case 'darkwood':
+      return { backgroundColor: '#7A4A2E', backgroundImage: DARKWOOD_TILE, backgroundSize: '200% 100%' }
+    case 'office':
+      return { backgroundColor: '#8A96A0', backgroundImage: OFFICE_TILE, backgroundSize: '100% 100%' }
+    case 'carpet':
+      return { backgroundColor: '#D9C8A8', backgroundImage: CARPET_TILE, backgroundSize: '100% 100%' }
+    case 'stone':
+      return { backgroundColor: '#F0E8C8', backgroundImage: LOBBY_TILE, backgroundSize: '50% 50%' }
+    case 'grass':
+      return { backgroundColor: '#9CB478', backgroundImage: GRASS_TILE, backgroundSize: '100% 100%' }
+    case 'garden':
+      return { backgroundColor: '#5C7840', backgroundImage: GARDEN_TILE, backgroundSize: '100% 100%' }
+    case 'deck':
+      return { backgroundColor: '#9EA89A', backgroundImage: DECK_TILE, backgroundSize: '200% 100%' }
+  }
+}
+
+// Dark/saturated floors where X-marks and draft chips need LIGHT styling.
+// All others get DARK styling (dark ink reads on light floors).
+// Includes: mahogany study, both green outdoor floors, grey office slate.
+function isDarkFloor(material: Material): boolean {
+  return material === 'darkwood' || material === 'grass' || material === 'garden' || material === 'office'
+}
 
 function handleCellKey(e: React.KeyboardEvent, r: number, c: number, N: number) {
   const dirs: Record<string, [number, number]> = {
@@ -37,15 +270,15 @@ function handleCellKey(e: React.KeyboardEvent, r: number, c: number, N: number) 
   ;(grid?.querySelector(`[data-cell="${nr}-${nc}"]`) as HTMLElement)?.focus()
 }
 
+const WALL = '#000000'
+
 export default function MapGrid({
   puzzle, marks, conflicts, onCellClick,
   extraFurniture = [], placingFurniture, placingRotation = 0, onPlaceFurniture,
 }: Props) {
   const N = puzzle.size
   const roomOf = puzzle.roomOf
-  // (the old `room()` lookup existed only to read a room's `hue` for the
-  // painted-floor materials — the blueprint derives room tint from index
-  // parity instead, so the lookup is dead)
+  const room = (id: string) => puzzle.rooms.find(r => r.id === id)
   const personById = (id: string) => puzzle.people.find(p => p.id === id)
   const [hoverCell, setHoverCell] = useState<string | null>(null)
   const reduceMotion = useReducedMotion()
@@ -82,61 +315,34 @@ export default function MapGrid({
     return { name: rm.name, abbr, row: anchor.row, col: anchor.col, span }
   })
 
-  // Each room TYPE owns a tone, so a Pantry never looks like a Study. The
-  // previous A/B parity alternation gave every room one of two near-identical
-  // darks and the whole board read as a single slab — you could not tell which
-  // room you were looking at, which the clues ("In the Pantry") require.
-  // Tones differ in hue rather than brightness, so the noir mood survives.
-  const roomTone = (name: string) => {
-    const n = name.toLowerCase()
-    if (n.includes('bed')) return 'var(--room-bedroom)'
-    if (n.includes('kitchen')) return 'var(--room-kitchen)'
-    if (n.includes('pantry')) return 'var(--room-pantry)'
-    if (n.includes('bath')) return 'var(--room-bath)'
-    if (n.includes('dining')) return 'var(--room-dining)'
-    if (n.includes('living')) return 'var(--room-living)'
-    if (n.includes('yard') || n.includes('garden') || n.includes('porch')) return 'var(--room-outdoor)'
-    if (n.includes('study') || n.includes('office') || n.includes('library')) return 'var(--room-study)'
-    if (n.includes('hall') || n.includes('lobby') || n.includes('foyer') || n.includes('corridor')) return 'var(--room-hall)'
-    return 'var(--board-room-tint)'
-  }
-  // Two rooms of the SAME type in one house would otherwise be indistinguishable
-  // neighbours, so a repeat of a tone falls back to the alternate tint.
-  const roomBgOf: Record<string, string> = {}
-  const usedTones = new Set<string>()
-  for (const rm of puzzle.rooms) {
-    let tone = roomTone(rm.name)
-    if (usedTones.has(tone)) tone = 'var(--board-room-tint-2)'
-    usedTones.add(tone)
-    roomBgOf[rm.id] = tone
-  }
-
   const isPlacing = !!placingFurniture && !!onPlaceFurniture
 
   return (
     /*
       The board fills whatever box the layout gives it. The old
-      `max-w-[580px] mx-auto` pinned it to 580px on any monitor, which is what
-      made a 2560px desktop look like a phone.
-      `aspect-ratio: 1/1` STAYS: this is an N×N grid of square cells, so a
-      non-square board would render rectangular cells. The fix was never to
-      drop the ratio — it was to stop capping the size. Sizing is now the
-      parent's job (GameScreen's centre column), the only place that knows how
-      much room is actually available.
+      `max-w-[580px] mx-auto` pinned it to 580px on any monitor.
+      `aspect-ratio: 1/1` STAYS: this is an N×N grid of square cells.
+      Sizing is the parent's job (GameScreen's centre column).
     */
     <div className="relative w-full h-full select-none" style={{ aspectRatio: '1 / 1' }}>
       {/* interactive cell grid */}
       <div
         data-grid=""
-        className="w-full h-full overflow-hidden"
+        className="w-full h-full rounded-xl overflow-hidden"
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${N}, 1fr)`,
           gridTemplateRows: `repeat(${N}, 1fr)`,
-          // Blueprint outer frame: 2px drawn line in board-wall, no rounding.
-          border: `2px solid var(--board-wall)`,
-          boxShadow: `0 0 0 1px var(--board-ink), var(--shadow-elevated)`,
-          background: 'var(--board-ground)',
+          // Bold black board-game frame — physical object sitting on the desk.
+          border: `6px solid ${WALL}`,
+          // Directional shadow: lifts the board off the dark desk like a physical object.
+          boxShadow: `
+            0 20px 60px rgba(0,0,0,0.70),
+            0 8px 24px rgba(0,0,0,0.50),
+            0 2px 0 0 rgba(255,255,255,0.06),
+            inset 0 0 0 2px rgba(255,255,255,0.08)
+          `,
+          background: WALL,
           gap: '0',
         }}
       >
@@ -152,6 +358,9 @@ export default function MapGrid({
             const locked = mark.kind === 'person' && mark.locked
             const isAutoX = mark.kind === 'x' && mark.auto
             const tokenSize = Math.max(26, 340 / N)
+            const material = roomMaterial(room(id)?.name ?? '')
+            const isOutdoor = material === 'grass'
+            const darkFloor = isDarkFloor(material)
             const draftNames = mark.kind === 'draft'
               ? mark.persons.map(pid => personById(pid)?.name).filter(Boolean).join(', ')
               : ''
@@ -159,7 +368,13 @@ export default function MapGrid({
             const cellKey = `${r},${c}`
             const isHovered = hoverCell === cellKey
             const showPreview = isPlacing && isHovered && !!placingFurniture
-            const roomBg = roomBgOf[id] ?? 'var(--board-room-tint)'
+
+            // X mark colour: dark on light floors, white on dark floors.
+            // Plus a contrasting text-shadow so neither extreme washes it out.
+            const xColor = darkFloor ? '#FFFFFF' : '#1A1008'
+            const xShadow = darkFloor
+              ? '0 0 3px rgba(0,0,0,0.9), 0 1px 4px rgba(0,0,0,0.7)'
+              : '0 0 3px rgba(255,255,255,0.9), 0 1px 3px rgba(255,255,255,0.6)'
 
             return (
               <button
@@ -171,48 +386,52 @@ export default function MapGrid({
                 onKeyDown={(e) => handleCellKey(e, r, c, N)}
                 title={draftNames ? `Maybe: ${draftNames}` : furnNames || undefined}
                 aria-label={`Row ${r + 1}, column ${c + 1}${person ? `, ${person.name}` : draftNames ? `, drafts: ${draftNames}` : furnNames ? `, ${furnNames}` : ''}`}
-                /* Focus ring uses the SOLID accent, not --board-glow: that glow
-                   is a 50%-alpha brass which composites to ~1.8:1 over the
-                   light-theme room tint, failing WCAG 2.4.11 — and this is the
-                   only focus indicator on every cell of the main game surface. */
+                /* Focus ring: SOLID var(--color-accent-strong), never --board-glow.
+                   The glow variant is 50% alpha and composites to ~1.8:1 on light
+                   floors — fails WCAG 2.4.11. This is the only focus indicator. */
                 className="relative flex items-center justify-center focus:outline-none focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-[var(--color-accent-strong)] transition-transform active:scale-[0.97]"
                 style={{
-                  // Room fill comes from a floor child span (below), keeping marks
-                  // unaffected by any future filter on the floor layer.
-                  // Room boundaries: 2px solid board-wall (the drawn line).
-                  // Interior cell divisions: 1px dashed board-ink (drafting hairlines).
+                  // Floor pattern lives on a dedicated child span so marks/tokens
+                  // are unaffected by any filter applied to the floor layer.
                   borderRight: wallR
-                    ? `2px solid var(--board-wall)`
-                    : `1px dashed var(--board-ink)`,
+                    ? `6px solid ${WALL}`
+                    : isOutdoor
+                      ? `1px dashed rgba(0,0,0,0.22)`
+                      : `1px solid rgba(0,0,0,0.10)`,
                   borderBottom: wallB
-                    ? `2px solid var(--board-wall)`
-                    : `1px dashed var(--board-ink)`,
+                    ? `6px solid ${WALL}`
+                    : isOutdoor
+                      ? `1px dashed rgba(0,0,0,0.22)`
+                      : `1px solid rgba(0,0,0,0.10)`,
                   cursor: isPlacing ? 'crosshair' : 'pointer',
                   ...(showPreview ? {
-                    outline: '2px dashed var(--board-chalk)',
+                    outline: '2px dashed rgba(255,255,255,0.65)',
                     outlineOffset: '-4px',
                   } : {}),
                 }}
               >
-                {/* floor layer — room tint, behind all marks and tokens.
-                    No texture, no image: a barely-lifted tint over the ground.
-                    Rendered first so it sits behind all marks/avatars. */}
+                {/* floor layer — SVG material tile, behind all marks and avatars.
+                    Rendered first so it sits behind everything without z-index tricks.
+                    The preview brightness boost only touches the floor, not tokens. */}
                 <span
                   aria-hidden
                   className="absolute inset-0 pointer-events-none"
                   style={{
-                    background: roomBg,
-                    opacity: showPreview ? 0.7 : 1,
+                    ...floorStyle(material),
+                    filter: [
+                      'brightness(var(--board-floor-brightness, 1))',
+                      'saturate(var(--board-floor-saturate, 1))',
+                      showPreview ? 'brightness(1.12)' : '',
+                    ].filter(Boolean).join(' '),
                   }}
                 />
-                {/* furniture layer — blueprint evidence icons, fill the cell flush */}
+
+                {/* furniture layer — illustrated SVGs fill the cell flush.
+                    Full opacity so furniture.tsx's 92 colour fills show clearly. */}
                 {furn.length > 0 && !person && (
                   <span
                     className="absolute inset-0 flex items-stretch"
-                    style={{
-                      opacity: mark.kind === 'x' ? 0.18 : 0.82,
-                      color: 'var(--board-chalk)',
-                    }}
+                    style={{ opacity: mark.kind === 'x' ? 0.18 : 1 }}
                   >
                     {furn.slice(0, 2).map((f, i) => {
                       const Icon = FURNITURE_ICON[f.type]
@@ -238,8 +457,7 @@ export default function MapGrid({
                       className="absolute inset-0 pointer-events-none"
                       style={{
                         transform: placingRotation ? `rotate(${placingRotation}deg)` : undefined,
-                        opacity: 0.55,
-                        color: 'var(--board-chalk)',
+                        opacity: 0.65,
                       }}
                     >
                       <Icon />
@@ -247,21 +465,21 @@ export default function MapGrid({
                   )
                 })()}
 
-                {/* mark: x — chalk scratch mark */}
+                {/* mark: x — reads on both light and dark floors via dual-tone treatment */}
                 {mark.kind === 'x' && (
                   <span
                     className="relative flex items-center justify-center"
-                    style={{ color: 'var(--board-chalk)' }}
+                    style={{ color: xColor, filter: `drop-shadow(${xShadow})` }}
                   >
                     <X
                       size={Math.max(16, 150 / N)}
                       strokeWidth={isAutoX ? 2.0 : 2.5}
-                      style={{ opacity: isAutoX ? 0.50 : 0.80 }}
+                      style={{ opacity: isAutoX ? 0.55 : 0.88 }}
                     />
                   </span>
                 )}
 
-                {/* mark: draft — dossier initial chips */}
+                {/* mark: draft — dossier initial chips with opaque plates */}
                 {mark.kind === 'draft' && (
                   <span className="absolute inset-[8%] flex flex-wrap items-center justify-center gap-1 content-center">
                     {mark.persons.slice(0, 4).map(pid => {
@@ -275,11 +493,12 @@ export default function MapGrid({
                           style={{
                             width: sz, height: sz,
                             fontSize: Math.max(10, sz * 0.55),
-                            // Sharp corners: dossier chip, not bubble
                             borderRadius: 2,
                             border: `1.5px solid ${p.accent}`,
                             color: p.accent,
-                            background: `color-mix(in srgb, ${p.accent} 18%, var(--board-room-tint))`,
+                            // Opaque cream plate so chips are legible on any floor
+                            background: '#F5EED8',
+                            boxShadow: '0 1px 4px rgba(0,0,0,0.35)',
                           }}
                         >{p.name[0]}</span>
                       )
@@ -287,7 +506,7 @@ export default function MapGrid({
                   </span>
                 )}
 
-                {/* mark: person — suspect token with brass or danger ring */}
+                {/* mark: person — suspect token with accent or danger ring */}
                 {person && (
                   <motion.span
                     key={person.id}
@@ -295,10 +514,11 @@ export default function MapGrid({
                     className={`relative ${conflicted ? 'animate-pulse' : ''}`}
                     style={{
                       boxShadow: conflicted
-                        ? '0 0 0 2px var(--board-ground), 0 0 0 4px var(--color-danger), 0 0 10px var(--color-danger)'
-                        : `0 0 0 2px ${person.accent}, 0 0 6px var(--board-glow)`,
+                        ? '0 0 0 2px #fff, 0 0 0 4px var(--color-danger), 0 0 10px var(--color-danger)'
+                        : `0 0 0 2px ${person.accent}, 0 0 0 3px rgba(0,0,0,0.5)`,
                       borderRadius: 6,
-                      filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.55))',
+                      // Two-layer drop-shadow so token reads on light AND dark floors
+                      filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.7)) drop-shadow(0 0 2px rgba(0,0,0,0.5))',
                     }}
                   >
                     <Avatar seed={person.avatarSeed} accent={person.accent} size={tokenSize} dead={person.isVictim} />
@@ -308,8 +528,10 @@ export default function MapGrid({
                         title="Two suspects share this row or column"
                         style={{
                           background: 'var(--color-danger)',
-                          color: 'var(--color-on-accent)',
+                          color: '#fff',
                           borderRadius: 2,
+                          // White halo so the badge reads on the mahogany floor too
+                          boxShadow: '0 0 0 1.5px #fff',
                         }}
                       >!</span>
                     )}
@@ -320,6 +542,8 @@ export default function MapGrid({
                           background: 'var(--color-accent)',
                           color: 'var(--color-on-accent)',
                           borderRadius: 2,
+                          // Same halo treatment for lock badge
+                          boxShadow: '0 0 0 1.5px rgba(0,0,0,0.6)',
                         }}
                       >
                         <Lock size={9} strokeWidth={3} />
@@ -339,8 +563,8 @@ export default function MapGrid({
           The full name is always present via `title` (DOM attribute) and via
           a visually-hidden <span> so screen readers announce it in full.
 
-          Design: stamped/stencilled dossier label — square corners, letter-
-          spaced uppercase, board-ink text. No rounded pill. No white-on-black. */}
+          Design: Cluedo-style room labels — black plate, white text, bold.
+          Hugs the top-left corner of the anchor cell over the black wall line. */}
       <div
         className="absolute inset-0 pointer-events-none p-[2px]"
         style={{
@@ -350,31 +574,24 @@ export default function MapGrid({
         }}
       >
         {labelAnchors.map((l, i) => {
-          // Abbreviate only when the room is genuinely too narrow to hold its
-          // name. Keying this off N alone hid every label behind "KIT"/"STU"
-          // on a 7x7 even where the room spanned three cells and had room to
-          // spare — the board should name its rooms wherever it can, the way a
-          // floor plan does. A 2-cell span is enough for a short name; long
-          // names still need three.
+          // Abbreviate only when the room is genuinely too narrow to hold its name.
+          // Keying off span (not N) means a 3-cell Pantry gets its full name at N=7.
           const compact = l.span < 2 || (l.name.length > 9 && l.span < 3)
           return (
             <span
               key={i}
               title={l.name}
-              // Stamp hugs the top-left corner of the room's anchor cell.
               className="font-mono uppercase self-start justify-self-start"
               style={{
                 gridColumnStart: l.col + 1,
                 gridColumnEnd: compact ? 'span 1' : `span ${l.span}`,
                 gridRowStart: l.row + 1,
-                // Ink-coloured text on the room tint — readable in both themes.
-                color: 'var(--board-wall)',
+                color: '#FFFFFF',
                 // min 9px floor per the hard requirement
                 fontSize: compact ? '9px' : `clamp(9px, ${Math.round(110 / N)}px, 11px)`,
-                // Squared stamp border — blueprint annotation style, not a pill.
-                background: 'var(--board-room-tint)',
-                border: '1px solid var(--board-ink)',
-                borderRadius: 1,
+                // Black opaque plate — reads on every floor material including mahogany
+                background: 'rgba(0,0,0,0.82)',
+                borderRadius: 2,
                 padding: compact ? '1px 3px' : '2px 6px',
                 letterSpacing: compact ? '0.06em' : '0.14em',
                 margin: compact ? '2px' : '4px',

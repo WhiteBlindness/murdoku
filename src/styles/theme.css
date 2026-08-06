@@ -70,37 +70,21 @@
   --diff-hard-text:      #D2803F;  /*  6.46:1 on base */
   --diff-expert-text:    #DE5F5F;  /*  5.53:1 on base */
 
-  /* --- The board: police blueprint, not a painted floor -----------------
-     The old world drew six illustrated floor materials as SVG tiles. The new
-     board is a drafted document: dark ground, luminous drafting ink, rooms
-     divided by drawn lines rather than by material. These tokens are the whole
-     board vocabulary — a component should never hardcode a board colour. */
-  --board-ground:      #101215;  /* the paper                            */
-  --board-ink:         #4A5560;  /* faint cell grid, drafting hairlines   */
-  --board-wall:        #C3D2DE;  /* room boundary — the drawn line        */
-  /* The two room tints must stay FAR ENOUGH APART to be told apart at a
-     glance. Clues say "In the Pantry", so identifying a room is a gameplay
-     requirement, not decoration. A first pass set these ~5 luminance points
-     apart and the whole board read as one flat slab. */
-  --board-room-tint:   #151A20;  /* fallback room fill                    */
-  --board-room-tint-2: #232B34;  /* alternate, for unknown room names     */
-
-  /* Per-room-TYPE tones. A binary A/B alternation made every room one of two
-     near-identical darks, so the board read as one slab and you could not tell
-     a Pantry from a Study — which the clues require you to do. Each room type
-     now owns a hue. All are dark enough to stay noir; they differ in HUE, not
-     brightness, so the mood survives while the rooms separate. */
-  --room-bedroom:  #2A2331;  /* dusty plum      */
-  --room-kitchen:  #1C2A2E;  /* cold steel      */
-  --room-dining:   #302820;  /* sepia           */
-  --room-living:   #2B2119;  /* warm brown      */
-  --room-bath:     #1F2B31;  /* pale steel      */
-  --room-outdoor:  #232B21;  /* olive           */
-  --room-study:    #2E211F;  /* oxblood         */
-  --room-hall:     #23262C;  /* gunmetal        */
-  --room-pantry:   #2B2A1D;  /* mustard         */
-  --board-glow:        rgba(201, 162, 39, 0.55);  /* brass focus/selection */
-  --board-chalk:       #C8D0D8;  /* chalk-outline marks (x, annotations)  */
+  /* --- The board: illustrated Cluedo surface sitting on the noir desk ----
+     Floor materials are hardcoded hex in MapGrid.tsx (six SVG tiles — oak,
+     checker, grass, stone, carpet, mahogany). The board tokens here cover
+     the frame, wall dividers, and UI elements that overlay the board.
+     --board-room-tint is still referenced by draft-chip backgrounds (via
+     color-mix in older paths) so it survives as a light cream fallback.
+     --board-room-tint-2, --room-*, --board-ink are now unused by MapGrid
+     and removed. --board-glow is kept only as a named value for any
+     component that references it, but MUST NOT be used as a focus ring
+     (fails WCAG 2.4.11 on light floors — use --color-accent-strong). */
+  --board-ground:      #000000;  /* outer frame / wall gap fill           */
+  --board-wall:        #000000;  /* room boundary — bold black divider    */
+  --board-room-tint:   #F5EED8;  /* cream fallback, draft-chip plates     */
+  --board-glow:        rgba(201, 162, 39, 0.55);  /* brass accent (non-focus use only) */
+  --board-chalk:       #1A1008;  /* dark ink annotations on light floors  */
 
   /* --- Semantic FX ------------------------------------------------------
      Chiaroscuro: shadows are deep and directional, not soft ambient haze. */
@@ -150,25 +134,12 @@
     --diff-hard-text:      #8A4413;  /* 5.52:1 on base */
     --diff-expert-text:    #8E1B1B;  /* 6.94:1 on base */
 
-    /* Blueprint inverts to a drafting table: ink on paper. */
-    --board-ground:      #EFE8D6;
-    --board-ink:         #A99C80;
-    --board-wall:        #33302A;
-    --board-room-tint:   #EDE6D2;
-    --board-room-tint-2: #D8CDB2;
-
-    /* Same hue separation, inverted for the daylight drafting table. */
-    --room-bedroom:  #E8DCEA;
-    --room-kitchen:  #D6E6EA;
-    --room-dining:   #EFE2C8;
-    --room-living:   #F0E1CE;
-    --room-bath:     #DAE8F0;
-    --room-outdoor:  #DCE9D2;
-    --room-study:    #F0DBD4;
-    --room-hall:     #E2E5EA;
-    --room-pantry:   #EFEBC8;
+    /* Board sits on the daylight desk — illustrated surface, same bold black walls. */
+    --board-ground:      #000000;
+    --board-wall:        #000000;
+    --board-room-tint:   #F5EED8;
     --board-glow:        rgba(138, 106, 18, 0.5);
-    --board-chalk:       #3A362E;
+    --board-chalk:       #1A1008;
 
     --shadow-elevated: 0 18px 44px -14px rgba(70, 58, 34, 0.42),
                        0 2px 0 0 rgba(255, 255, 255, 0.5);
@@ -216,23 +187,11 @@
   --diff-hard-text:      #8A4413;
   --diff-expert-text:    #8E1B1B;
 
-  --board-ground:      #EFE8D6;
-  --board-ink:         #A99C80;
-  --board-wall:        #33302A;
-  --board-room-tint:   #EDE6D2;
-  --board-room-tint-2: #D8CDB2;
-
-  --room-bedroom:  #E8DCEA;
-  --room-kitchen:  #D6E6EA;
-  --room-dining:   #EFE2C8;
-  --room-living:   #F0E1CE;
-  --room-bath:     #DAE8F0;
-  --room-outdoor:  #DCE9D2;
-  --room-study:    #F0DBD4;
-  --room-hall:     #E2E5EA;
-  --room-pantry:   #EFEBC8;
+  --board-ground:      #000000;
+  --board-wall:        #000000;
+  --board-room-tint:   #F5EED8;
   --board-glow:        rgba(138, 106, 18, 0.5);
-  --board-chalk:       #3A362E;
+  --board-chalk:       #1A1008;
 
   --shadow-elevated: 0 18px 44px -14px rgba(70, 58, 34, 0.42),
                      0 2px 0 0 rgba(255, 255, 255, 0.5);

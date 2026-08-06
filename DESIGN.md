@@ -22,18 +22,28 @@ A 1940s LAPD case file on a detective's desk at night. Chiaroscuro: deep
 obsidian ground, parchment documents, brass highlights, blood red for danger.
 Stamped ink, stencilled labels, stark directional shadows. Sharp corners.
 
-**This REPLACED a Cluedo board-game world** (painted SVG floor tiles — oak
-planks, coral checkerboard, sage grass — 1950s pastels, thick black outlines,
-rounded white-on-black pill labels). That world is deleted. If you find wood
-grain, grass blades, a checkerboard, or a bubbly pill, it is a regression.
+**The split is deliberate: noir CHROME, illustrated BOARD.**
 
-Two things the old world got RIGHT and the replacement must keep, because the
-first noir pass lost them and the board stopped being playable:
+Everything around the board — header, case-file rail, suspect dossier, polaroid
+prints, buttons, typography — is L.A. Noire. The board itself is a colourful,
+illustrated Cluedo-style game surface (painted SVG floor tiles, thick black
+outlines, 1950s palette) sitting on the dark desk like a physical board under a
+lamp. Do NOT "unify" these two into one aesthetic; the split IS the design.
+
+A fully-noir board was built and then reverted, because it broke the game:
 
 1. **Rooms must be individually identifiable at a glance.** Clues say "In the
-   Pantry" — this is a gameplay requirement, not decoration.
-2. **Furniture must read as solid objects.** Clues say "On the box", "the only
-   person on a rug".
+   Pantry". The blueprint board rendered every room as near-identical dark
+   slabs; later, a single `'tile'` material was shared by Kitchen, Bathroom AND
+   Pantry, so the clue still could not be resolved by looking. Every room type
+   in `ROOM_NAMES` now owns its own material, and two rooms that can appear in
+   the same house must never collide.
+2. **Furniture must be NAMEABLE, not merely visible.** Clues say "the only
+   person on the lamp", "beside the bookshelf". Wireframe outlines failed this
+   — but so did pure top-down projection: an overhead lamp is three concentric
+   rings and reads as a target or a round rug. Objects are drawn in elevation
+   or 3/4 view wherever that is what makes them recognisable. Projection
+   accuracy loses to recognisability every time.
 
 ---
 

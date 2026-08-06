@@ -165,7 +165,7 @@ export default function GameScreen(props: Props) {
 
       {/* ── Header — spans all columns at lg+, full-width at mobile ────────── */}
       <header
-        className="pt-safe flex items-center justify-between px-4 pt-3 pb-2 flex-shrink-0 lg:col-span-full"
+        className="pt-safe flex items-center justify-between px-4 min-h-[56px] flex-shrink-0 lg:col-span-full"
         style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
         {/* Back — stencil label */}
@@ -352,8 +352,8 @@ export default function GameScreen(props: Props) {
           <p
             className={[
               'px-5 py-2 text-center text-text-muted text-[12px] font-mono tracking-wide flex-shrink-0',
-              // on desktop, show only in the scene column (hide at top-level flow)
-              'order-0 lg:block',
+              // hide on mobile — board is reachable sooner; HowToPlay overlay + ? button cover it
+              'hidden lg:block order-0',
             ].join(' ')}
           >
             {detective
@@ -376,7 +376,7 @@ export default function GameScreen(props: Props) {
           */}
           <div className="order-1 lg:flex-1 lg:min-h-0 lg:relative">
             {/* Absolute fill at desktop only; on mobile this is just a normal div */}
-            <div className="lg:absolute lg:inset-0 flex items-center justify-center p-2 lg:p-3">
+            <div className="lg:absolute lg:inset-0 flex items-center justify-center p-3 lg:p-3">
               {/* Square that fits the shorter of available width / height.
                   Mobile: w-full drives size; aspect-square derives the height
                     (parent has no fixed height so height:100% would be 0).
@@ -407,7 +407,7 @@ export default function GameScreen(props: Props) {
               onClick={() => setLegend(v => !v)}
               className="focus-ring flex items-center gap-1.5 text-[11px] text-text-muted font-mono mx-auto tracking-widest uppercase hover:text-text-secondary transition-colors"
             >
-              <Info size={13} /> {legend ? '— Hide' : '+ What am I looking at?'}
+              <Info size={13} /> {legend ? '— Hide' : 'What am I looking at?'}
             </button>
             <AnimatePresence>
               {legend && (
