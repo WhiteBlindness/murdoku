@@ -26,6 +26,14 @@ export default {
         'danger':         'var(--color-danger)',
         'danger-text':    'var(--color-danger-text)',
 
+        // --- board (police blueprint) ---
+        'board-ground':      'var(--board-ground)',
+        'board-ink':         'var(--board-ink)',
+        'board-wall':        'var(--board-wall)',
+        'board-room':        'var(--board-room-tint)',
+        'board-room-alt':    'var(--board-room-tint-2)',
+        'board-chalk':       'var(--board-chalk)',
+
         // --- legacy aliases (kept so old class names stay valid & themed) ---
         'bg-deep':   'var(--color-bg-base)',
         'bg-panel':  'var(--color-bg-surface)',
@@ -42,14 +50,22 @@ export default {
         'paper-muted':'var(--color-text-muted)',
       },
       fontFamily: {
-        // Clean-modern type system with personality:
-        //   display / headings -> Bricolage Grotesque (characterful, modern)
-        //   body / UI / clues  -> Hanken Grotesk (legible, distinctive)
-        cinzel:      ['"Bricolage Grotesque"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        typewriter:  ['"Hanken Grotesk"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        display:     ['"Bricolage Grotesque"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        // L.A. Noire type system — three voices, each with one job:
+        //   display -> Oswald. Stark condensed newspaper headline. Titles only.
+        //   mono    -> Courier Prime. The case file: clues, evidence, timer,
+        //              case numbers. A screenplay typewriter, so it stays
+        //              legible at body size where a distressed novelty face
+        //              (Special Elite et al) would not.
+        //   sans    -> Hanken Grotesk. Dense UI chrome. Condensed display type
+        //              is unreadable at 10-11px, so small labels get a neutral
+        //              grotesk rather than being forced into the theme.
+        display:     ['Oswald', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono:        ['"Courier Prime"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        typewriter:  ['"Courier Prime"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
         sans:        ['"Hanken Grotesk"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        serif:       ['"Bricolage Grotesque"', 'ui-sans-serif', 'sans-serif'],
+        // Legacy alias kept so any straggler `font-cinzel` still resolves to a
+        // real family instead of falling back to Times.
+        cinzel:      ['Oswald', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         stamp: {

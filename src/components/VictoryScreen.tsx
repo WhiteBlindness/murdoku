@@ -2,7 +2,6 @@ import { motion, useReducedMotion } from 'framer-motion'
 import type { Puzzle } from '../core/types'
 import { roomIdAt } from '../core/engine'
 import { getAllPuzzles } from '../core/catalog'
-import Avatar from './Avatar'
 
 interface Props {
   puzzle: Puzzle
@@ -26,9 +25,9 @@ export default function VictoryScreen({ puzzle, murderer, timer, hintsLeft, comp
   const hasUnsolved = !hasNext && !!unsolved
   const reduceMotion = useReducedMotion()
 
-  // The stamp is the emotional payoff, so it lands like a real object being
-  // pressed down — spring with overshoot rather than a fixed-duration tween.
-  // Reduced motion gets a plain fade (no scale/rotate, nothing vestibular).
+  // The stamp is the emotional payoff — a rubber verdict being pressed onto the
+  // dossier. Spring with overshoot so it physically thuds. Reduced motion: plain
+  // fade, no vestibular movement.
   const stamp = reduceMotion
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.2 } }
     : {
@@ -37,14 +36,13 @@ export default function VictoryScreen({ puzzle, murderer, timer, hintsLeft, comp
         transition: { delay: 0.05, type: 'spring' as const, bounce: 0.4, duration: 0.55 },
       }
 
-  // The killer reveal materialises (blur + scale resolving together) instead of
-  // just fading — the surface reads as arriving, not switching on.
+  // The killer name materialises out of blur — evidence arriving, not switching on.
   const reveal = reduceMotion
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { delay: 0.4, duration: 0.2 } }
     : {
-        initial: { scale: 0.7, opacity: 0, filter: 'blur(12px)' },
+        initial: { scale: 0.85, opacity: 0, filter: 'blur(8px)' },
         animate: { scale: 1, opacity: 1, filter: 'blur(0px)' },
-        transition: { delay: 0.55, type: 'spring' as const, bounce: 0.25, duration: 0.6 },
+        transition: { delay: 0.55, type: 'spring' as const, bounce: 0.2, duration: 0.55 },
       }
 
   return (
@@ -53,41 +51,55 @@ export default function VictoryScreen({ puzzle, murderer, timer, hintsLeft, comp
       transition={{ duration: 0.3 }}
       className="flex flex-col min-h-screen bg-bg-deep items-center justify-center px-6"
     >
+      {/* CASE CLOSED stamp — the payoff */}
       <motion.div
         {...stamp}
-        className="mb-6"
+        className="mb-8"
         style={{ willChange: 'transform, opacity', transformOrigin: 'center' }}
       >
-        <div className="border-4 border-danger rounded-lg px-7 py-2.5" style={{ boxShadow: '0 0 0 2px color-mix(in srgb, var(--color-danger) 27%, transparent)' }}>
-          <p className="font-display font-bold tracking-[0.25em] text-danger-text" style={{ fontSize: '1.5rem' }}>CASE SOLVED</p>
+        <div
+          className="border-4 border-danger px-8 py-3"
+          style={{
+            boxShadow: '0 0 0 2px color-mix(in srgb, var(--color-danger) 30%, transparent), var(--shadow-cut)',
+          }}
+        >
+          <p
+            className="font-display font-bold tracking-[0.35em] text-danger-text uppercase"
+            style={{ fontSize: '1.6rem' }}
+          >
+            Case Closed
+          </p>
         </div>
       </motion.div>
 
+      {/* Evidence header label */}
       <motion.p
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
-        className="text-paper-muted text-xs font-sans tracking-widest uppercase mb-4"
+        className="font-mono text-paper-muted text-xs tracking-[0.3em] uppercase mb-6"
       >
-        The killer was
+        PERPETRATOR IDENTIFIED
       </motion.p>
 
+      {/* Killer name — presented like a name plate on a case file */}
       <motion.div
         {...reveal}
-        className="rounded-2xl"
-        style={{ boxShadow: `0 0 0 3px ${killer.accent}, 0 0 40px ${killer.accent}55` }}
+        className="w-full max-w-xs border-2 border-danger px-6 py-5 text-center"
+        style={{
+          boxShadow: '0 0 32px color-mix(in srgb, var(--color-danger) 18%, transparent), var(--shadow-elevated)',
+          background: 'color-mix(in srgb, var(--color-danger) 6%, var(--color-bg-surface))',
+        }}
       >
-        <Avatar seed={killer.avatarSeed} accent={killer.accent} size={96} />
+        <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-paper-muted mb-2">SUBJECT</p>
+        <h2 className="font-display text-3xl font-bold text-text-primary tracking-wide">
+          {killer.name}
+        </h2>
       </motion.div>
 
-      <motion.h2
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.75 }}
-        className="font-display text-2xl font-bold text-paper mt-3"
-      >
-        {killer.name}
-      </motion.h2>
-
+      {/* Case file stats grid */}
       <motion.div
         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
-        className="w-full max-w-xs rounded-xl border border-br-thin bg-bg-panel px-5 py-4 my-6 grid grid-cols-2 gap-3 text-center"
+        className="w-full max-w-xs border border-border-strong bg-bg-panel px-5 py-4 my-6 grid grid-cols-2 gap-3 text-center"
+        style={{ boxShadow: 'var(--shadow-cut)' }}
       >
         <Stat label="Victim" value={victim.name} />
         <Stat label="Scene" value={room?.name ?? '—'} />
@@ -95,27 +107,46 @@ export default function VictoryScreen({ puzzle, murderer, timer, hintsLeft, comp
         <Stat label="Hints used" value={`${3 - hintsLeft} / 3`} />
       </motion.div>
 
+      {/* Action buttons */}
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.05 }}
         className="w-full max-w-xs flex flex-col gap-3"
       >
         {hasNext && (
-          <motion.button whileTap={{ scale: 0.97 }} onClick={onNext}
-            className="focus-ring w-full py-3.5 rounded-xl font-display font-semibold tracking-wide uppercase text-sm"
-            style={{ background: 'linear-gradient(135deg, var(--color-accent), var(--color-accent-strong))', color: 'var(--color-on-accent)' }}>
-            Next Case →
+          <motion.button
+            whileTap={{ scale: 0.97 }}
+            onClick={onNext}
+            className="focus-ring w-full py-3.5 font-display font-semibold tracking-widest uppercase text-sm border-2 border-accent"
+            style={{
+              background: 'linear-gradient(135deg, var(--color-accent), var(--color-accent-strong))',
+              color: 'var(--color-on-accent)',
+              boxShadow: 'var(--shadow-cut)',
+            }}
+          >
+            NEXT CASE →
           </motion.button>
         )}
         {hasUnsolved && (
-          <motion.button whileTap={{ scale: 0.97 }} onClick={() => onPlayUnsolved(unsolved!.id)}
-            className="focus-ring w-full py-3.5 rounded-xl font-display font-semibold tracking-wide uppercase text-sm"
-            style={{ background: 'linear-gradient(135deg, var(--color-accent), var(--color-accent-strong))', color: 'var(--color-on-accent)' }}>
-            Play Another →
+          <motion.button
+            whileTap={{ scale: 0.97 }}
+            onClick={() => onPlayUnsolved(unsolved!.id)}
+            className="focus-ring w-full py-3.5 font-display font-semibold tracking-widest uppercase text-sm border-2 border-accent"
+            style={{
+              background: 'linear-gradient(135deg, var(--color-accent), var(--color-accent-strong))',
+              color: 'var(--color-on-accent)',
+              boxShadow: 'var(--shadow-cut)',
+            }}
+          >
+            ANOTHER CASE →
           </motion.button>
         )}
-        <motion.button whileTap={{ scale: 0.97 }} onClick={onHome}
-          className="focus-ring w-full py-3 rounded-xl border border-br-thin text-paper-dim font-display text-sm tracking-wide uppercase">
-          All Cases
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={onHome}
+          className="focus-ring w-full py-3 border border-border-strong text-paper-dim font-display text-sm tracking-widest uppercase"
+          style={{ background: 'var(--color-bg-surface)', boxShadow: 'var(--shadow-cut)' }}
+        >
+          ALL CASES
         </motion.button>
       </motion.div>
     </motion.div>
@@ -125,8 +156,8 @@ export default function VictoryScreen({ puzzle, murderer, timer, hintsLeft, comp
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-paper-muted text-[10px] font-sans uppercase tracking-wider mb-0.5">{label}</p>
-      <p className="text-paper text-xs font-sans">{value}</p>
+      <p className="font-mono text-paper-muted text-[9px] uppercase tracking-[0.25em] mb-1">{label}</p>
+      <p className="font-display text-paper text-sm font-semibold tracking-wide">{value}</p>
     </div>
   )
 }

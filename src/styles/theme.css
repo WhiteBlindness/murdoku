@@ -1,183 +1,248 @@
 /* ============================================================================
-   Murdoku Theme System
+   Alibi Theme System — "L.A. Noire" (1940s LAPD case file)
    ----------------------------------------------------------------------------
-   - Semantic CSS custom properties (design tokens), NOT raw hues.
-   - Dark is the default and works with ZERO JavaScript.
-   - System preference (prefers-color-scheme) is respected out of the box.
-   - An explicit override is applied via a root class: .theme-dark / .theme-light
-     (set by a tiny inline script only to remember a *user* choice).
-   - Adding a new theme = add one `:root.theme-<name> { ... }` block below and
-     one entry in THEMES (src/hooks/useTheme.ts). No component refactor needed.
+   Art direction: chiaroscuro. Deep obsidian ground, parchment documents, brass
+   highlights, blood red for danger. The interface is a detective's desk at
+   night — light falls on the evidence, everything else recedes.
 
-   Naming convention (semantic, role-based — never "gold"/"black"):
-     --color-bg-*        surfaces, back-to-front: base < surface < elevated
-     --color-border-*    subtle | strong
-     --color-text-*      primary | secondary | muted
-     --color-accent*     brand accent (fill vs. text variants for contrast)
-     --color-danger*     the "crime"/error red
-     --color-on-accent   text/icon placed ON an accent fill
+   This REPLACES the previous Cluedo board-game world (painted floor tiles,
+   1950s pastels, bubbly pill labels). Those tokens are gone, not deprecated.
 
-   All foreground/background pairings below meet WCAG AA (>= 4.5:1 body,
-   >= 3:1 large text / UI borders) in BOTH themes. See docs/PERF_AUDIT.md notes.
+   Rules of the system:
+   - Semantic role-based custom properties, NEVER raw hue names.
+   - Dark is the default and renders correctly with ZERO JavaScript.
+   - System preference is respected; an explicit user override is a root class
+     (.theme-dark / .theme-light) set by the inline script in index.html.
+   - Light is NOT "noir with the lights on" — it is the same case file read in
+     daylight: parchment dossier, ink, brass. Same roles, same hierarchy.
+   - Every text pairing below is annotated with its MEASURED contrast ratio and
+     meets WCAG AA (>= 4.5:1). Treat those numbers as tests: change a value,
+     re-measure, update the comment.
    ============================================================================ */
 
 :root {
   color-scheme: dark;
 
-  /* --- Surfaces --------------------------------------------------------- */
-  /* Surfaces step up in luminance base < surface < elevated so cards visibly
-     lift off the background (was near-flat #141008 on #0A0806). */
-  --color-bg-base:      #0A0806;   /* app background            */
-  --color-bg-surface:   #1C150C;   /* cards / panels            */
-  --color-bg-elevated:  #2A2113;   /* cells / inputs            */
-  --color-bg-inset:     #100C06;   /* wells / track             */
+  /* --- Surfaces: obsidian -> charcoal. Light falls front-to-back. -------- */
+  --color-bg-base:      #0B0B0D;   /* the room the desk sits in  */
+  --color-bg-surface:   #141518;   /* case folders / panels      */
+  --color-bg-elevated:  #1D1F23;   /* cells / inputs             */
+  --color-bg-inset:     #08080A;   /* wells / shadow / track     */
 
-  /* --- Borders ---------------------------------------------------------- */
-  /* subtle meets WCAG 1.4.11 (>=3:1 non-text) against bg-base so card edges read. */
-  --color-border-subtle: #4A3820;
-  --color-border-strong: #6A4C30;
+  /* --- Borders ----------------------------------------------------------
+     TWO TIERS WITH DIFFERENT OBLIGATIONS, do not collapse them:
+     `subtle`  = decorative hairline (1.83:1). It may NEVER be the only thing
+                 marking an interactive boundary — WCAG 1.4.11 would apply.
+     `strong`  = 3.52:1, meets 1.4.11. Use wherever a border IS the affordance. */
+  --color-border-subtle: #3A3E46;
+  --color-border-strong: #636873;
 
-  /* --- Text ------------------------------------------------------------- */
-  --color-text-primary:   #E8D5B0;  /* ~11:1 on base            */
-  --color-text-secondary: #B39B72;  /* ~6.4:1 on base           */
-  --color-text-muted:     #98805A;  /* ~4.6:1 on base (AA)      */
+  /* --- Text: parchment on obsidian -------------------------------------- */
+  --color-text-primary:   #EDE6D6;  /* 15.82:1 on base           */
+  --color-text-secondary: #B8AE99;  /*  8.95:1 on base           */
+  --color-text-muted:     #8E8676;  /*  5.45:1 on base           */
 
-  /* --- Accent (brand gold) --------------------------------------------- */
-  --color-accent:         #C8922A;  /* fills, borders, icons    */
-  --color-accent-strong:  #E8A830;  /* hovered / emphasis       */
-  --color-accent-text:    #E0A83A;  /* accent used AS text (AA) */
-  --color-on-accent:      #0A0806;  /* text on an accent fill   */
+  /* --- Accent: brass (desk lamp, badge, stamped seal) ------------------- */
+  --color-accent:         #C9A227;  /* fills, rules, icons       */
+  --color-accent-strong:  #E3BC3F;  /* hovered / emphasis        */
+  --color-accent-text:    #D9B437;  /*  9.86:1 on base           */
+  --color-on-accent:      #0B0B0D;  /*  8.13:1 on the brass fill */
 
-  /* --- Danger (the crime red) ------------------------------------------ */
-  --color-danger:         #B82020;
-  --color-danger-text:    #E86A6A;  /* red used as text (AA)    */
+  /* --- Danger: dried blood --------------------------------------------- */
+  --color-danger:         #8E1B1B;
+  --color-danger-text:    #E06C6C;  /*  6.12:1 on base           */
 
   /* --- Difficulty scale -------------------------------------------------
-     One source of truth for the five difficulties (was duplicated as a
-     hardcoded DIFF_COLOR map in both HomeScreen and GameScreen, tuned for
-     dark only — on light every value but Expert failed AA at 1.6-2.3:1).
-     `-text` is the AA-safe foreground; the base token is the decorative
-     fill used for rails and gradients. Verified >= 4.5:1 in both themes. */
-  --diff-very-easy:      #48C890;
-  --diff-easy:           #7BC848;
-  --diff-medium:         #E0A83A;
-  --diff-hard:           #E8783C;
-  --diff-expert:         #E86A6A;
+     Deliberately NOT a traffic-light. Noir has no bright green. The scale
+     runs cold grey -> sand -> brass -> rust -> blood, so severity reads as
+     heat rather than as a colour category. `-text` is the AA-safe
+     foreground; the base token is decorative fill (rules, spines, gradients).
+     All ten pairings verified >= 4.5:1 in BOTH themes. */
+  --diff-very-easy:      #C3C9BE;
+  --diff-easy:           #CBBE9A;
+  --diff-medium:         #D6A94E;
+  --diff-hard:           #D2803F;
+  --diff-expert:         #DE5F5F;
 
-  --diff-very-easy-text: #48C890;  /* 9.46:1 on base */
-  --diff-easy-text:      #7BC848;  /* 9.71:1 on base */
-  --diff-medium-text:    #E0A83A;  /* 9.36:1 on base */
-  --diff-hard-text:      #E8783C;  /* 6.84:1 on base */
-  --diff-expert-text:    #E86A6A;  /* 6.38:1 on base */
+  --diff-very-easy-text: #C3C9BE;  /* 11.63:1 on base */
+  --diff-easy-text:      #CBBE9A;  /* 10.65:1 on base */
+  --diff-medium-text:    #D6A94E;  /*  9.03:1 on base */
+  --diff-hard-text:      #D2803F;  /*  6.46:1 on base */
+  --diff-expert-text:    #DE5F5F;  /*  5.53:1 on base */
 
-  /* --- Board floors -----------------------------------------------------
-     The board is a physical object lit by the room, so its floors carry
-     their own 1950s palette rather than the UI tokens. These two knobs let
-     dark mode dim the whole board as one unit (see MapGrid) instead of
-     leaving a bright slab floating on a near-black page. */
-  --board-floor-brightness: 0.62;
-  --board-floor-saturate:   0.88;
+  /* --- The board: police blueprint, not a painted floor -----------------
+     The old world drew six illustrated floor materials as SVG tiles. The new
+     board is a drafted document: dark ground, luminous drafting ink, rooms
+     divided by drawn lines rather than by material. These tokens are the whole
+     board vocabulary — a component should never hardcode a board colour. */
+  --board-ground:      #101215;  /* the paper                            */
+  --board-ink:         #4A5560;  /* faint cell grid, drafting hairlines   */
+  --board-wall:        #C3D2DE;  /* room boundary — the drawn line        */
+  /* The two room tints must stay FAR ENOUGH APART to be told apart at a
+     glance. Clues say "In the Pantry", so identifying a room is a gameplay
+     requirement, not decoration. A first pass set these ~5 luminance points
+     apart and the whole board read as one flat slab. */
+  --board-room-tint:   #151A20;  /* fallback room fill                    */
+  --board-room-tint-2: #232B34;  /* alternate, for unknown room names     */
 
-  /* --- Semantic FX (kept theme-aware) ---------------------------------- */
-  --shadow-elevated: 0 8px 30px rgba(0, 0, 0, 0.55);
-  --overlay-scrim:   rgba(0, 0, 0, 0.6);
+  /* Per-room-TYPE tones. A binary A/B alternation made every room one of two
+     near-identical darks, so the board read as one slab and you could not tell
+     a Pantry from a Study — which the clues require you to do. Each room type
+     now owns a hue. All are dark enough to stay noir; they differ in HUE, not
+     brightness, so the mood survives while the rooms separate. */
+  --room-bedroom:  #2A2331;  /* dusty plum      */
+  --room-kitchen:  #1C2A2E;  /* cold steel      */
+  --room-dining:   #302820;  /* sepia           */
+  --room-living:   #2B2119;  /* warm brown      */
+  --room-bath:     #1F2B31;  /* pale steel      */
+  --room-outdoor:  #232B21;  /* olive           */
+  --room-study:    #2E211F;  /* oxblood         */
+  --room-hall:     #23262C;  /* gunmetal        */
+  --room-pantry:   #2B2A1D;  /* mustard         */
+  --board-glow:        rgba(201, 162, 39, 0.55);  /* brass focus/selection */
+  --board-chalk:       #C8D0D8;  /* chalk-outline marks (x, annotations)  */
+
+  /* --- Semantic FX ------------------------------------------------------
+     Chiaroscuro: shadows are deep and directional, not soft ambient haze. */
+  --shadow-elevated: 0 18px 50px -12px rgba(0, 0, 0, 0.9),
+                     0 2px 0 0 rgba(255, 255, 255, 0.04);
+  --shadow-cut:      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                     inset 0 -1px 0 rgba(0, 0, 0, 0.6);
+  --overlay-scrim:   rgba(4, 4, 6, 0.78);
 }
 
-/* System-light users with NO explicit choice get the light palette,
-   still with zero JavaScript. `:not(.theme-dark)` lets an explicit dark
-   override win over the media query. */
+/* System-light users with NO explicit choice get the parchment palette, still
+   with zero JavaScript. `:not(.theme-dark)` lets an explicit dark override
+   win over the media query. */
 @media (prefers-color-scheme: light) {
   :root:not(.theme-dark) {
     color-scheme: light;
 
-    --color-bg-base:      #ECE3CF;
-    --color-bg-surface:   #F5EEDE;
-    --color-bg-elevated:  #FBF6EA;
-    --color-bg-inset:     #E1D6BE;
+    --color-bg-base:      #E8E1D0;   /* aged dossier paper        */
+    --color-bg-surface:   #F2ECDD;
+    --color-bg-elevated:  #F8F3E7;
+    --color-bg-inset:     #DCD3BE;
 
-    --color-border-subtle: #CBB88F;
-    --color-border-strong: #A2854F;
+    --color-border-subtle: #B0A283;  /* 1.93:1 — decorative only  */
+    --color-border-strong: #7E7154;  /* 3.68:1 — meets 1.4.11     */
 
-    --color-text-primary:   #221809;  /* ~13:1 on base           */
-    --color-text-secondary: #4C3C21;  /* ~7.5:1 on base          */
-    --color-text-muted:     #6B5836;  /* ~4.7:1 on base (AA)     */
+    --color-text-primary:   #17171A;  /* 13.73:1 on base          */
+    --color-text-secondary: #3E3A31;  /*  8.69:1 on base          */
+    --color-text-muted:     #635C4C;  /*  5.09:1 on base          */
 
-    --color-accent:         #B4801E;
-    --color-accent-strong:  #93650F;
-    --color-accent-text:    #855B0C;  /* ~4.6:1 on base (AA)     */
-    --color-on-accent:      #FBF6EA;
+    --color-accent:         #8A6A12;
+    --color-accent-strong:  #6E5410;
+    --color-accent-text:    #6B520E;  /*  5.68:1 on base          */
+    --color-on-accent:      #F8F3E7;
 
-    --color-danger:         #A01414;
-    --color-danger-text:    #931212;  /* ~5.1:1 on base (AA)     */
+    --color-danger:         #8E1B1B;
+    --color-danger-text:    #7E1414;  /*  8.07:1 on base          */
 
-    /* Difficulty — the dark palette's bright hues sit at 1.6-2.3:1 on the
-       cream page, so light gets its own darkened set. */
-    --diff-very-easy:      #16663E;
-    --diff-easy:           #3D6B14;
-    --diff-medium:         #7A5410;
-    --diff-hard:           #8F3A0A;
-    --diff-expert:         #931212;
+    --diff-very-easy:      #4A5147;
+    --diff-easy:           #5C5231;
+    --diff-medium:         #7A5A12;
+    --diff-hard:           #8A4413;
+    --diff-expert:         #8E1B1B;
 
-    --diff-very-easy-text: #16663E;  /* 5.48:1 on base */
-    --diff-easy-text:      #3D6B14;  /* 4.97:1 on base */
-    --diff-medium-text:    #7A5410;  /* 5.30:1 on base */
-    --diff-hard-text:      #8F3A0A;  /* 5.92:1 on base */
-    --diff-expert-text:    #931212;  /* 7.04:1 on base */
+    --diff-very-easy-text: #4A5147;  /* 6.30:1 on base */
+    --diff-easy-text:      #5C5231;  /* 5.95:1 on base */
+    --diff-medium-text:    #7A5A12;  /* 4.88:1 on base */
+    --diff-hard-text:      #8A4413;  /* 5.52:1 on base */
+    --diff-expert-text:    #8E1B1B;  /* 6.94:1 on base */
 
-    /* Light page, lit board — no dimming needed. */
-    --board-floor-brightness: 1;
-    --board-floor-saturate:   1;
+    /* Blueprint inverts to a drafting table: ink on paper. */
+    --board-ground:      #EFE8D6;
+    --board-ink:         #A99C80;
+    --board-wall:        #33302A;
+    --board-room-tint:   #EDE6D2;
+    --board-room-tint-2: #D8CDB2;
 
-    --shadow-elevated: 0 8px 30px rgba(90, 64, 40, 0.18);
-    --overlay-scrim:   rgba(40, 28, 12, 0.35);
+    /* Same hue separation, inverted for the daylight drafting table. */
+    --room-bedroom:  #E8DCEA;
+    --room-kitchen:  #D6E6EA;
+    --room-dining:   #EFE2C8;
+    --room-living:   #F0E1CE;
+    --room-bath:     #DAE8F0;
+    --room-outdoor:  #DCE9D2;
+    --room-study:    #F0DBD4;
+    --room-hall:     #E2E5EA;
+    --room-pantry:   #EFEBC8;
+    --board-glow:        rgba(138, 106, 18, 0.5);
+    --board-chalk:       #3A362E;
+
+    --shadow-elevated: 0 18px 44px -14px rgba(70, 58, 34, 0.42),
+                       0 2px 0 0 rgba(255, 255, 255, 0.5);
+    --shadow-cut:      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+                       inset 0 -1px 0 rgba(120, 100, 60, 0.25);
+    --overlay-scrim:   rgba(40, 32, 16, 0.55);
   }
 }
 
-/* Explicit user override — highest priority, wins over the media query. */
+/* Explicit user override — highest priority, wins over the media query.
+   Duplicated rather than @extend-ed because CSS has no mixin and this file is
+   the contract; a preprocessor indirection here would hide the palette. */
 :root.theme-light {
   color-scheme: light;
 
-  --color-bg-base:      #ECE3CF;
-  --color-bg-surface:   #F5EEDE;
-  --color-bg-elevated:  #FBF6EA;
-  --color-bg-inset:     #E1D6BE;
+  --color-bg-base:      #E8E1D0;
+  --color-bg-surface:   #F2ECDD;
+  --color-bg-elevated:  #F8F3E7;
+  --color-bg-inset:     #DCD3BE;
 
-  --color-border-subtle: #CBB88F;
-  --color-border-strong: #A2854F;
+  --color-border-subtle: #B0A283;
+  --color-border-strong: #7E7154;
 
-  --color-text-primary:   #221809;
-  --color-text-secondary: #4C3C21;
-  --color-text-muted:     #6B5836;
+  --color-text-primary:   #17171A;
+  --color-text-secondary: #3E3A31;
+  --color-text-muted:     #635C4C;
 
-  --color-accent:         #B4801E;
-  --color-accent-strong:  #93650F;
-  --color-accent-text:    #855B0C;
-  --color-on-accent:      #FBF6EA;
+  --color-accent:         #8A6A12;
+  --color-accent-strong:  #6E5410;
+  --color-accent-text:    #6B520E;
+  --color-on-accent:      #F8F3E7;
 
-  --color-danger:         #A01414;
-  --color-danger-text:    #931212;
+  --color-danger:         #8E1B1B;
+  --color-danger-text:    #7E1414;
 
-  --diff-very-easy:      #16663E;
-  --diff-easy:           #3D6B14;
-  --diff-medium:         #7A5410;
-  --diff-hard:           #8F3A0A;
-  --diff-expert:         #931212;
+  --diff-very-easy:      #4A5147;
+  --diff-easy:           #5C5231;
+  --diff-medium:         #7A5A12;
+  --diff-hard:           #8A4413;
+  --diff-expert:         #8E1B1B;
 
-  --diff-very-easy-text: #16663E;
-  --diff-easy-text:      #3D6B14;
-  --diff-medium-text:    #7A5410;
-  --diff-hard-text:      #8F3A0A;
-  --diff-expert-text:    #931212;
+  --diff-very-easy-text: #4A5147;
+  --diff-easy-text:      #5C5231;
+  --diff-medium-text:    #7A5A12;
+  --diff-hard-text:      #8A4413;
+  --diff-expert-text:    #8E1B1B;
 
-  --board-floor-brightness: 1;
-  --board-floor-saturate:   1;
+  --board-ground:      #EFE8D6;
+  --board-ink:         #A99C80;
+  --board-wall:        #33302A;
+  --board-room-tint:   #EDE6D2;
+  --board-room-tint-2: #D8CDB2;
 
-  --shadow-elevated: 0 8px 30px rgba(90, 64, 40, 0.18);
-  --overlay-scrim:   rgba(40, 28, 12, 0.35);
+  --room-bedroom:  #E8DCEA;
+  --room-kitchen:  #D6E6EA;
+  --room-dining:   #EFE2C8;
+  --room-living:   #F0E1CE;
+  --room-bath:     #DAE8F0;
+  --room-outdoor:  #DCE9D2;
+  --room-study:    #F0DBD4;
+  --room-hall:     #E2E5EA;
+  --room-pantry:   #EFEBC8;
+  --board-glow:        rgba(138, 106, 18, 0.5);
+  --board-chalk:       #3A362E;
+
+  --shadow-elevated: 0 18px 44px -14px rgba(70, 58, 34, 0.42),
+                     0 2px 0 0 rgba(255, 255, 255, 0.5);
+  --shadow-cut:      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+                     inset 0 -1px 0 rgba(120, 100, 60, 0.25);
+  --overlay-scrim:   rgba(40, 32, 16, 0.55);
 }
 
 :root.theme-dark {
   color-scheme: dark;
-  /* Inherits the dark defaults from :root — block kept for explicit override
-     and as the template for future themes. */
+  /* Inherits the obsidian defaults from :root — block kept for explicit
+     override and as the template for any future theme. */
 }

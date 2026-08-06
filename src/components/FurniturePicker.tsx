@@ -20,31 +20,32 @@ interface Props {
 export default function FurniturePicker({ selected, rotation, onSelect, onRotate }: Props) {
   return (
     <div
-      className="rounded-xl border bg-bg-panel p-3 flex flex-col gap-2.5"
-      style={{ borderColor: 'var(--color-border-subtle)' }}
+      className="border border-border-strong bg-bg-panel p-3 flex flex-col gap-2.5"
+      style={{ boxShadow: 'var(--shadow-cut)' }}
     >
-      {/* header */}
+      {/* Header — evidence-marker tray label */}
       <div className="flex items-center justify-between">
-        <span className="text-[11px] font-sans font-semibold uppercase tracking-wider text-paper-muted">
-          Decoração
+        <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-paper-muted">
+          SCENE PROPS
         </span>
         <button
           onClick={() => onSelect(null)}
           title="Desselecionar peça"
-          className="focus-ring flex items-center gap-1 px-2 py-1 rounded-md border text-[11px] font-sans transition-colors"
+          className="focus-ring flex items-center gap-1 px-2 py-1 border text-[11px] font-sans transition-colors"
           style={{
-            borderColor: !selected ? 'var(--color-accent)' : 'var(--color-border-subtle)',
+            minHeight: 44,
+            borderColor: !selected ? 'var(--color-accent-text)' : 'var(--color-border-strong)',
             color: !selected ? 'var(--color-accent-text)' : 'var(--color-text-muted)',
             background: !selected
               ? 'color-mix(in srgb, var(--color-accent) 14%, var(--color-bg-surface))'
               : 'var(--color-bg-surface)',
           }}
         >
-          <Eraser size={11} /> Nenhuma
+          <Eraser size={11} aria-hidden="true" /> Nenhuma
         </button>
       </div>
 
-      {/* piece buttons */}
+      {/* Stencil palette — sharp evidence markers, no rounded pills */}
       <div className="grid grid-cols-4 gap-1.5">
         {PIECES.map(type => {
           const Icon = FURNITURE_ICON[type]
@@ -54,13 +55,15 @@ export default function FurniturePicker({ selected, rotation, onSelect, onRotate
               key={type}
               onClick={() => onSelect(active ? null : type)}
               title={LABELS[type]}
-              className="focus-ring flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-lg border transition-colors"
+              className="focus-ring flex flex-col items-center justify-center gap-1 py-2 px-1 border transition-colors"
               style={{
-                borderColor: active ? 'var(--color-accent)' : 'var(--color-border-subtle)',
+                minHeight: 44,
+                borderColor: active ? 'var(--color-accent-text)' : 'var(--color-border-strong)',
                 background: active
                   ? 'color-mix(in srgb, var(--color-accent) 18%, var(--color-bg-surface))'
                   : 'var(--color-bg-surface)',
                 color: active ? 'var(--color-accent-text)' : 'var(--color-text-muted)',
+                boxShadow: active ? 'var(--shadow-cut)' : undefined,
               }}
             >
               <span
@@ -72,7 +75,7 @@ export default function FurniturePicker({ selected, rotation, onSelect, onRotate
               >
                 <Icon size={22} />
               </span>
-              <span className="text-[9px] font-sans leading-none tracking-tight text-center">
+              <span className="font-mono text-[9px] leading-none tracking-tight text-center">
                 {LABELS[type]}
               </span>
             </button>
@@ -80,22 +83,26 @@ export default function FurniturePicker({ selected, rotation, onSelect, onRotate
         })}
       </div>
 
-      {/* rotation */}
+      {/* Rotation control */}
       <button
         onClick={onRotate}
         disabled={!selected}
-        className="focus-ring flex items-center justify-center gap-1.5 py-2 rounded-lg border text-[12px] font-sans transition-colors disabled:opacity-30"
+        className="focus-ring flex items-center justify-center gap-1.5 py-2 border text-[12px] font-sans transition-colors disabled:opacity-30"
         style={{
-          borderColor: 'var(--color-border-subtle)',
+          minHeight: 44,
+          borderColor: 'var(--color-border-strong)',
           background: 'var(--color-bg-surface)',
           color: 'var(--color-text-secondary)',
         }}
       >
-        <RotateCw size={13} />
+        <RotateCw size={13} aria-hidden="true" />
         Rodar 90°
         <span
-          className="tabular-nums text-[10px] rounded px-1"
-          style={{ background: 'var(--color-bg-elevated)', color: 'var(--color-text-muted)' }}
+          className="tabular-nums font-mono text-[10px] px-1"
+          style={{
+            background: 'var(--color-bg-elevated)',
+            color: 'var(--color-text-muted)',
+          }}
         >
           {rotation}°
         </span>

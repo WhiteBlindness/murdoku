@@ -25,11 +25,26 @@ const NAMES = [
   'Alexander', 'Bella', 'Carol', 'Dalia', 'Evangeline', 'Viraj', 'Marco',
   'Priya', 'Nadia', 'Tomas', 'Greta', 'Idris', 'Lena', 'Oscar', 'Yuki',
 ]
-// Deliberately no red/pink hues: red is reserved for the "conflict/danger"
-// signal, so accents must never be confusable with it.
+// Per-suspect identity colours. Two constraints, both load-bearing:
+//   1. No red/pink hues — red is reserved for the conflict/danger signal, so an
+//      accent must never be confusable with it.
+//   2. Muted, low-saturation only. These are the L.A. Noire cast; the previous
+//      candy palette (#3CC98A, #C86AC8, #3CA0E8 …) was the loudest surviving
+//      trace of the old board-game look, because it tints both the selection
+//      ring and the avatar plate.
+// Hues stay far apart so eight suspects remain mutually distinguishable at a
+// glance — this is an identity function, not decoration.
+// NOTE: changing these changes generated puzzle data. Bump the catalog cache
+// key in catalog.ts or returning players keep the old palette from localStorage.
 const ACCENTS = [
-  '#E8923C', '#3CA0E8', '#8B5CE8', '#3CC98A', '#E8B84B',
-  '#5AB0A8', '#C86AC8', '#6A8BE8',
+  '#B08D57', // aged brass
+  '#6E8CA0', // steel blue
+  '#8A7CA8', // dusty violet
+  '#7FA083', // sage
+  '#6FA0A0', // dusty teal
+  '#A89A6A', // olive sand
+  '#8E9BB0', // gunmetal slate
+  '#9C7F6E', // warm sepia brown
 ]
 
 const ROOM_NAMES = [
