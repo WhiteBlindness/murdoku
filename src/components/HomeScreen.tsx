@@ -38,11 +38,12 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="relative flex flex-col min-h-screen bg-bg-deep"
+      className="desk-surface relative flex flex-col min-h-screen"
     >
       {/* Atmosphere: a warm pool of light behind the crest falling off into the
           corners, plus fine grain. Flat near-black read as "unfinished dark
-          theme" rather than "noir". Both layers are inert and theme-aware. */}
+          theme" rather than "noir". Both layers are inert and theme-aware.
+          These stay full-bleed — they ARE the desk surface behind the files. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 z-0"
@@ -60,14 +61,20 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
           )}")`,
         }}
       />
-      <div className="relative z-10 pt-safe flex items-center justify-between px-4 pt-3">
-        <button onClick={onOpenReleases} className="focus-ring text-paper-muted text-xs font-sans tracking-wide hover:text-accent-text transition-colors px-1 py-1">
-          What&rsquo;s new
-        </button>
-        <ThemeToggle resolved={resolvedTheme} onToggle={onToggleTheme} />
-      </div>
 
-      <header className="z-10 flex flex-col items-center pt-5 pb-7 px-6 relative">
+      {/* ── Content column: bounded measure so wide screens stay purposeful ── */}
+      {/* max-w-[1600px] is generous enough for a 5-col card grid at 1920px     */}
+      {/* while keeping the hero text from floating in space. The atmosphere    */}
+      {/* layers above live outside this container so they stay full-bleed.     */}
+      <div className="relative z-10 w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 flex flex-col min-h-screen">
+        <div className="pt-safe flex items-center justify-between pt-3">
+          <button onClick={onOpenReleases} className="focus-ring text-paper-muted text-xs font-sans tracking-wide hover:text-accent-text transition-colors px-1 py-1">
+            What&rsquo;s new
+          </button>
+          <ThemeToggle resolved={resolvedTheme} onToggle={onToggleTheme} />
+        </div>
+
+      <header className="flex flex-col items-center pt-5 pb-7 px-6 relative">
         {/* Detective badge / seal */}
         <div className="relative mb-3">
           <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -112,8 +119,8 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
         </div>
       </header>
 
-      {/* Mode selector */}
-      <div className="relative z-10 px-4 mb-4 w-full max-w-md mx-auto">
+      {/* Mode selector — bounded to readable width, centred within the column */}
+      <div className="mb-4 w-full max-w-md mx-auto">
         <div className="flex rounded-none border border-border-strong bg-bg-surface p-1 gap-1">
           <ModeBtn active={mode === 'classic'} onClick={() => onSetMode('classic')}
             icon={<Sparkles size={14} />} title="Classic"
@@ -124,7 +131,10 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
         </div>
       </div>
 
-      <main className="relative z-10 flex-1 overflow-y-auto px-4 pb-8 w-full max-w-3xl mx-auto">
+      {/* Case index — uses the full column width purposefully: 3 cols on md,
+          4 on xl, 5 on 2xl. On a 1920 monitor that's ~5 files spread across
+          the desk rather than a thin strip in the centre. */}
+      <main className="flex-1 overflow-y-auto pb-8">
         {DIFF_ORDER.map(diff => {
           const group = puzzles.filter(p => p.difficulty === diff)
           if (!group.length) return null
@@ -144,7 +154,12 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
                 <div className="h-px flex-1" style={{ background: `linear-gradient(to left, transparent, ${diffFill(diff)})` }} />
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {/* Column counts chosen against the DATA, not by eyeballing the
+                  gap: difficulty groups hold 6 cases (Very Easy / Easy /
+                  Medium), then 5 and 4. A 4- or 5-column grid strands a single
+                  orphan card on its own row in every 6-case section. 3 divides
+                  6 cleanly (3+3), and 6 lays a whole section out in one row. */}
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
                 {group.map((p) => {
                   const solved = completedIds.includes(p.id)
                   return (
@@ -247,6 +262,8 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
           </span>
         )}
       </footer>
+
+      </div>{/* /content column */}
     </motion.div>
   )
 }

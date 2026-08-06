@@ -90,8 +90,17 @@ function AppInner() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-inset text-paper font-sans flex justify-center">
-      <div className="relative w-full max-w-[560px] lg:max-w-4xl min-h-screen bg-bg-deep overflow-hidden shadow-[var(--shadow-elevated)]">
+    <div className="min-h-screen bg-bg-inset text-paper font-sans">
+      {/*
+        The app shell is FULL-BLEED. It used to be `max-w-[560px] lg:max-w-4xl`
+        inside a centring flex, which capped the ENTIRE application at 896px on
+        any monitor — a simulated phone frame. Every downstream `max-w-*` was
+        effectively dead code because this ceiling bound first.
+        Screens now own their own measure: a reading-width column where that
+        helps (HomeScreen, ReleaseNotes), and the full viewport where the work
+        happens (GameScreen). Do not reintroduce a width cap here.
+      */}
+      <div className="relative w-full min-h-screen bg-bg-deep">
         <Suspense fallback={<Fallback />}>
           {aux === 'releases' && <ReleaseNotes onBack={() => setAux('none')} />}
 

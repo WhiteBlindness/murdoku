@@ -23,26 +23,34 @@ export default function ReleaseNotes({ onBack }: Props) {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 40 }}
       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-      className="flex flex-col min-h-screen bg-bg-deep"
+      className="desk-surface flex flex-col min-h-screen"
     >
-      {/* Top bar */}
-      <div className="pt-safe flex items-center justify-between px-4 pt-4 pb-2">
-        <button
-          onClick={onBack}
-          className="focus-ring text-paper-muted text-sm font-mono tracking-wider flex items-center gap-1 px-1 py-2"
-          style={{ minHeight: 44 }}
-        >
-          ← BACK
-        </button>
-        <span className="font-mono text-paper-muted text-[9px] tracking-[0.3em] uppercase">
-          FIELD REPORTS
-        </span>
+      {/* Reading column — prose must stay at a comfortable measure.
+          max-w-3xl (~768px) keeps changelog lines from running to 2000px on
+          a wide monitor. The top bar and ruled divider share this measure so
+          nothing floats to the viewport edge. */}
+      <div className="w-full max-w-3xl mx-auto px-4 sm:px-6">
+
+        {/* Top bar */}
+        <div className="pt-safe flex items-center justify-between pt-4 pb-2">
+          <button
+            onClick={onBack}
+            className="focus-ring text-paper-muted text-sm font-mono tracking-wider flex items-center gap-1 px-1 py-2"
+            style={{ minHeight: 44 }}
+          >
+            ← BACK
+          </button>
+          <span className="font-mono text-paper-muted text-[9px] tracking-[0.3em] uppercase">
+            FIELD REPORTS
+          </span>
+        </div>
+
+        {/* Divider — drawn line, not a soft gradient */}
+        <div className="h-px bg-border-strong" />
+
       </div>
 
-      {/* Divider — drawn line, not a soft gradient */}
-      <div className="mx-6 h-px bg-border-strong" />
-
-      <main className="flex-1 overflow-y-auto px-6 py-6 w-full max-w-2xl mx-auto">
+      <main className="flex-1 overflow-y-auto py-6 w-full max-w-3xl mx-auto px-4 sm:px-6">
         <header className="mb-8">
           <p className="font-mono text-[9px] tracking-[0.3em] uppercase text-paper-muted mb-1">
             CASE FILE — REVISION HISTORY
@@ -73,8 +81,7 @@ export default function ReleaseNotes({ onBack }: Props) {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: Math.min(gi * 3 + i, 8) * 0.04, duration: 0.3 }}
-                  className="border border-border-strong bg-bg-panel px-4 py-3.5"
-                  style={{ boxShadow: 'var(--shadow-cut)' }}
+                  className="case-panel px-4 py-3.5"
                 >
                   <div className="flex items-center justify-between gap-3 mb-1.5">
                     <div className="flex items-center gap-2 min-w-0">

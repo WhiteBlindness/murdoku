@@ -114,7 +114,17 @@ export default function MapGrid({
   const isPlacing = !!placingFurniture && !!onPlaceFurniture
 
   return (
-    <div className="relative w-full max-w-[580px] mx-auto select-none" style={{ aspectRatio: '1 / 1' }}>
+    /*
+      The board fills whatever box the layout gives it. The old
+      `max-w-[580px] mx-auto` pinned it to 580px on any monitor, which is what
+      made a 2560px desktop look like a phone.
+      `aspect-ratio: 1/1` STAYS: this is an N×N grid of square cells, so a
+      non-square board would render rectangular cells. The fix was never to
+      drop the ratio — it was to stop capping the size. Sizing is now the
+      parent's job (GameScreen's centre column), the only place that knows how
+      much room is actually available.
+    */
+    <div className="relative w-full h-full select-none" style={{ aspectRatio: '1 / 1' }}>
       {/* interactive cell grid */}
       <div
         data-grid=""

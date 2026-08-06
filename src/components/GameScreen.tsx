@@ -46,6 +46,22 @@ const DIFF_COLOR: Record<string, string> = {
 }
 const HELP_KEY = 'murdoku_seen_help'
 
+// ── Legend content — shared by the desktop Case File rail (always expanded)
+//    and the mobile/narrow disclosure. One source, no drift.
+function LegendContent() {
+  return (
+    <div
+      className="border bg-bg-surface p-3 text-[11px] font-mono text-text-secondary grid gap-1.5"
+      style={{ borderColor: 'var(--color-border-subtle)', boxShadow: 'var(--shadow-cut)' }}
+    >
+      <p>• <b className="text-text-primary">Coloured areas</b> are rooms (labelled). Different tint &amp; floor = different room.</p>
+      <p>• <b className="text-text-primary">Furniture icons</b> are scene decoration that clues refer to (a chair, a rug, a plant…).</p>
+      <p>• <b className="text-text-primary">✕</b> marks a cell where nobody is; faint ✕ is auto-added when you lock a row/column.</p>
+      <p>• A glowing ring = a placed suspect; a red ring means two suspects share a row or column.</p>
+    </div>
+  )
+}
+
 export default function GameScreen(props: Props) {
   const { puzzle, mode, marks, conflicts, placedOf, selectedPerson, tool, hintsLeft, timer, hideTimer, feedback, correctCount, resolvedClues } = props
   const cluesOf: Record<string, string[]> = {}
@@ -117,16 +133,42 @@ export default function GameScreen(props: Props) {
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      className="min-h-screen bg-bg-base flex flex-col"
+      className="bg-bg-base flex flex-col min-h-[100dvh] lg:h-[100dvh] lg:overflow-hidden"
     >
       <AnimatePresence>{help && <HowToPlay mode={mode} onClose={() => setHelp(false)} />}</AnimatePresence>
 
-      {/* ── Header ── case file dossier top edge ─────────────────────────── */}
+      {/*
+        ── THREE-COLUMN DETECTIVE'S DESK ─────────────────────────────────────
+
+        Architecture: CSS grid with `display:contents` wrapper trick.
+
+        At mobile: the three wrapper divs (case-file-col, scene-col, dossier-col)
+        are `contents` — they dissolve into the flow and the four sections
+        (board, suspects, toolbar, accuse) sequence via `order-*` as if they were
+        direct children of this flex column. DOM order preserved; no markup fork.
+
+        At lg+: wrappers become `flex flex-col` grid cells — each column scrolls
+        (or not) independently. The SCENE column is non-scrolling by design.
+
+        Three-column grid starts at xl (1280px+):
+          col 1: Case File rail  — minmax(260px,320px)
+          col 2: The Scene       — minmax(0,1fr)
+          col 3: Dossier         — minmax(340px,420px)
+
+        Two-column grid at lg–xl (1024–1280px):
+          col 1: The Scene       — minmax(0,1fr)
+          col 2: Dossier         — minmax(320px,420px)
+          The case-file rail content folds into the dossier column top.
+
+        Below lg: single scrolling column.
+      */}
+
+      {/* ── Header — spans all columns at lg+, full-width at mobile ────────── */}
       <header
-        className="pt-safe flex items-center justify-between px-4 pt-3 pb-2 flex-shrink-0"
+        className="pt-safe flex items-center justify-between px-4 pt-3 pb-2 flex-shrink-0 lg:col-span-full"
         style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
-        {/* Back — stencil label, text affordance (no border needed) */}
+        {/* Back — stencil label */}
         <button
           onClick={() => hasProgress ? setConfirmLeave(true) : props.onBack()}
           className="focus-ring text-text-muted font-mono text-xs px-2 min-h-[44px] flex items-center whitespace-nowrap flex-shrink-0 tracking-widest uppercase hover:text-text-secondary transition-colors"
@@ -140,18 +182,15 @@ export default function GameScreen(props: Props) {
             {puzzle.title}
           </h1>
           <div className="flex items-center justify-center gap-2 mt-0.5">
-            {/* Difficulty: typed mark, noir scale colour */}
             <span
               className="text-[10px] font-mono tracking-[0.18em] whitespace-nowrap"
               style={{ color: DIFF_COLOR[puzzle.difficulty] }}
             >
               {puzzle.difficulty.toUpperCase()}
             </span>
-            {/* Grid size: typewriter metadata */}
             <span className="text-text-muted text-[10px] font-mono whitespace-nowrap tracking-wider">
               {puzzle.size}×{puzzle.size}
             </span>
-            {/* Mode chip: stencilled */}
             <span
               className="text-[10px] font-mono tracking-[0.15em] px-1.5 whitespace-nowrap"
               style={{
@@ -164,7 +203,7 @@ export default function GameScreen(props: Props) {
           </div>
         </div>
 
-        {/* Timer + icon controls */}
+        {/* Timer + icon controls — always in header so it's reachable on mobile */}
         <div className="flex items-center gap-1.5">
           {!hideTimer && (
             <span className="font-mono text-accent-text text-sm tabular-nums tracking-widest">
@@ -190,36 +229,180 @@ export default function GameScreen(props: Props) {
         </div>
       </header>
 
-      {/* ── Instruction line ── typed log entry ──────────────────────────── */}
-      <p className="px-5 py-2 text-center text-text-muted text-[12px] font-mono max-w-2xl mx-auto flex-shrink-0 tracking-wide">
-        {detective
-          ? 'Place a suspect to cross out their row & column automatically. Use Draft to pencil in candidates. Each person = one row, one column.'
-          : 'Each person is in exactly one row and one column. Read the clues, place everyone, then submit.'}
-      </p>
-
       {/*
-        Four-section grid. Mobile (1-col): board → suspects → toolbar → accuse.
-        Desktop lg (2-col): left col = board+toolbar (rows 1-2), right col = suspects+accuse (rows 1-2).
-        This lets suspects stay close to the board on mobile (clues visible without deep scroll)
-        and fills the right column height on desktop so both columns end near the same baseline.
+        Body grid — three columns at xl, two at lg, one below lg.
+        `lg:grid` activates the column layout; below that it's a flex column.
+        The wrapper divs use `contents` trick (below lg) / real grid cells (lg+).
       */}
-      <div className="flex-1 w-full max-w-6xl mx-auto px-3 pb-safe pb-4 grid gap-4 lg:grid-cols-[1fr_minmax(320px,420px)] lg:grid-rows-[auto_auto]">
+      <div
+        className={[
+          'flex-1 flex flex-col min-h-0',
+          // lg: two-column grid
+          'lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:grid-rows-[1fr] lg:min-h-0',
+          // xl: three-column grid
+          'xl:grid-cols-[minmax(260px,320px)_minmax(0,1fr)_minmax(340px,420px)]',
+        ].join(' ')}
+      >
 
-        {/* Section A — Board + Legend (mobile: order 1, desktop: left col row 1) */}
-        <div className="flex flex-col gap-3 order-1 lg:col-start-1 lg:row-start-1">
-          <MapGrid
-            puzzle={puzzle}
-            marks={marks}
-            conflicts={conflicts}
-            onCellClick={props.onCell}
-            extraFurniture={customFurniture}
-            placingFurniture={showDecor ? placingFurniture : null}
-            placingRotation={placingRotation}
-            onPlaceFurniture={showDecor ? handlePlaceFurniture : undefined}
-          />
+        {/* ── CASE FILE RAIL (left) ─────────────────────────────────────────
+            Mobile: display:contents — contributes nothing to flow, children
+            are ordered via order-* on the flex column above.
+            lg: hidden (folded into dossier top via xl:block below).
+            xl: first grid column — visible side rail.
+        */}
+        <div className="contents xl:flex xl:flex-col xl:min-h-0 xl:overflow-y-auto xl:border-r xl:col-start-1 xl:row-start-1"
+          style={{ borderColor: 'var(--color-border-subtle)' }}
+        >
+          {/* Case file rail inner — only rendered visually at xl */}
+          <div className="hidden xl:flex xl:flex-col xl:gap-4 xl:p-4 xl:flex-1">
 
-          {/* Legend — case file annotation */}
-          <div className="mx-auto w-full max-w-[580px]">
+            {/* Case metadata block */}
+            <div className="border-b pb-4" style={{ borderColor: 'var(--color-border-subtle)' }}>
+              <p className="text-[9px] font-mono text-text-muted tracking-[0.25em] uppercase mb-2">Case File</p>
+              <p className="font-display font-bold text-text-primary text-lg uppercase tracking-wide leading-tight">{puzzle.title}</p>
+              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                <span
+                  className="text-[10px] font-mono tracking-[0.18em]"
+                  style={{ color: DIFF_COLOR[puzzle.difficulty] }}
+                >
+                  {puzzle.difficulty.toUpperCase()}
+                </span>
+                <span className="text-text-muted text-[10px] font-mono tracking-wider">{puzzle.size}×{puzzle.size}</span>
+                <span
+                  className="text-[10px] font-mono tracking-[0.15em] px-1.5"
+                  style={{
+                    color: detective ? 'var(--color-accent-text)' : 'var(--color-text-muted)',
+                    background: detective ? 'color-mix(in srgb, var(--color-accent) 14%, transparent)' : 'transparent',
+                  }}
+                >
+                  {detective ? 'DETECTIVE' : 'CLASSIC'}
+                </span>
+              </div>
+            </div>
+
+            {/* Timer — large, case-file data */}
+            <div className="border-b pb-4" style={{ borderColor: 'var(--color-border-subtle)' }}>
+              <p className="text-[9px] font-mono text-text-muted tracking-[0.25em] uppercase mb-2">Time Elapsed</p>
+              {!hideTimer ? (
+                <span className="font-mono text-accent-text text-3xl tabular-nums tracking-widest">{timer}</span>
+              ) : (
+                <span className="font-mono text-text-muted text-xl tracking-widest">— : — —</span>
+              )}
+              <button
+                onClick={props.onToggleTimer}
+                aria-label={hideTimer ? 'Show timer' : 'Hide timer'}
+                className="focus-ring block mt-1.5 text-[10px] font-mono text-text-muted tracking-widest uppercase hover:text-text-secondary transition-colors"
+              >
+                {hideTimer ? '+ Show timer' : '— Hide timer'}
+              </button>
+            </div>
+
+            {/* Progress */}
+            <div className="border-b pb-4" style={{ borderColor: 'var(--color-border-subtle)' }}>
+              <p className="text-[9px] font-mono text-text-muted tracking-[0.25em] uppercase mb-2">Progress</p>
+              <p className="font-mono text-text-secondary text-sm">
+                <span className="text-text-primary font-bold">{placedCount}</span>
+                <span className="text-text-muted"> / {puzzle.size}</span>
+                <span className="text-text-muted text-[10px] ml-2">suspects placed</span>
+              </p>
+              <p className="font-mono text-text-secondary text-sm mt-1">
+                <span className="text-text-primary font-bold">{hintsLeft}</span>
+                <span className="text-text-muted text-[10px] ml-1">hints remaining</span>
+              </p>
+            </div>
+
+            {/* Legend — always expanded on the desktop rail */}
+            <div className="border-b pb-4" style={{ borderColor: 'var(--color-border-subtle)' }}>
+              <p className="text-[9px] font-mono text-text-muted tracking-[0.25em] uppercase mb-2">Reading the Scene</p>
+              <LegendContent />
+            </div>
+
+            {/* Future features placeholder — deliberate empty state */}
+            <div>
+              <p className="text-[9px] font-mono text-text-muted tracking-[0.25em] uppercase mb-2">Detective&apos;s Notes</p>
+              <div
+                className="border p-3 min-h-[80px] flex items-center justify-center"
+                style={{ borderColor: 'var(--color-border-subtle)', borderStyle: 'dashed' }}
+              >
+                <p className="text-[10px] font-mono text-text-muted tracking-wide text-center">
+                  [ Coming soon ]
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* ── THE SCENE (centre / full-width at lg) ────────────────────────
+            Mobile: contents — board is order-1, toolbar is order-3.
+            lg: first grid column (two-col layout), non-scrolling.
+            xl: second grid column (three-col layout), non-scrolling.
+            The board fills available height — no scrollbar, board always visible.
+        */}
+        <div
+          className={[
+            'contents',
+            // lg: real grid column — non-scrolling, board fills the height
+            'lg:flex lg:flex-col lg:min-h-0 lg:overflow-hidden lg:col-start-1 lg:row-start-1',
+            // xl: shift to second column
+            'xl:col-start-2',
+          ].join(' ')}
+        >
+          {/* ── Instruction line (mobile: order 0, desktop: inside centre) ── */}
+          <p
+            className={[
+              'px-5 py-2 text-center text-text-muted text-[12px] font-mono tracking-wide flex-shrink-0',
+              // on desktop, show only in the scene column (hide at top-level flow)
+              'order-0 lg:block',
+            ].join(' ')}
+          >
+            {detective
+              ? 'Place a suspect to cross out their row & column automatically. Use Draft to pencil in candidates. Each person = one row, one column.'
+              : 'Each person is in exactly one row and one column. Read the clues, place everyone, then submit.'}
+          </p>
+
+          {/* ── Board slot ────────────────────────────────────────────────
+              Single MapGrid instance — no mobile/desktop fork.
+
+              Mobile: the slot is in normal flow (wrapper is `contents`).
+                `aspect-square` on the inner makes it a natural square that
+                grows to full column width.
+
+              Desktop (lg+): the slot is `flex-1 min-h-0 relative`. The
+                absolute fill + inner flex centering approach:
+                  - the absolute div fills the slot completely (known px height)
+                  - the aspect-square child with max-w/max-h 100% is constrained
+                    to whichever dimension (w or h) is smaller, staying square.
+          */}
+          <div className="order-1 lg:flex-1 lg:min-h-0 lg:relative">
+            {/* Absolute fill at desktop only; on mobile this is just a normal div */}
+            <div className="lg:absolute lg:inset-0 flex items-center justify-center p-2 lg:p-3">
+              {/* Square that fits the shorter of available width / height.
+                  Mobile: w-full drives size; aspect-square derives the height
+                    (parent has no fixed height so height:100% would be 0).
+                  Desktop (lg+): the absolute container has a known pixel height;
+                    lg:h-full takes that height, aspect-square makes width equal,
+                    and max-w-full clamps if it would exceed the container width. */}
+              <div
+                className="aspect-square w-full lg:w-auto lg:h-full"
+                style={{ maxWidth: '100%' }}
+              >
+                <MapGrid
+                  puzzle={puzzle}
+                  marks={marks}
+                  conflicts={conflicts}
+                  onCellClick={props.onCell}
+                  extraFurniture={customFurniture}
+                  placingFurniture={showDecor ? placingFurniture : null}
+                  placingRotation={placingRotation}
+                  onPlaceFurniture={showDecor ? handlePlaceFurniture : undefined}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Legend (mobile only — disclosure; on xl it's in the rail, expanded) */}
+          <div className="order-2 xl:hidden mx-auto w-full max-w-[640px] px-4 pb-1">
             <button
               onClick={() => setLegend(v => !v)}
               className="focus-ring flex items-center gap-1.5 text-[11px] text-text-muted font-mono mx-auto tracking-widest uppercase hover:text-text-secondary transition-colors"
@@ -232,174 +415,220 @@ export default function GameScreen(props: Props) {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="overflow-hidden"
+                  className="overflow-hidden mt-2"
                 >
-                  <div
-                    className="mt-2 border bg-bg-surface p-3 text-[11px] font-mono text-text-secondary grid gap-1.5"
-                    style={{ borderColor: 'var(--color-border-subtle)', boxShadow: 'var(--shadow-cut)' }}
-                  >
-                    <p>• <b className="text-text-primary">Coloured areas</b> are rooms (labelled). Different tint & floor = different room.</p>
-                    <p>• <b className="text-text-primary">Furniture icons</b> are scene decoration that clues refer to (a chair, a rug, a plant…).</p>
-                    <p>• <b className="text-text-primary">✕</b> marks a cell where nobody is; faint ✕ is auto-added when you lock a row/column.</p>
-                    <p>• A glowing ring = a placed suspect; a red ring means two suspects share a row or column.</p>
-                  </div>
+                  <LegendContent />
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
-        </div>
 
-        {/* Section B — Suspects + Furniture Picker (mobile: order 2, desktop: right col row 1) */}
-        <div className="order-2 lg:col-start-2 lg:row-start-1 flex flex-col gap-3">
-          <AnimatePresence>
-            {showDecor && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden"
-              >
-                <FurniturePicker
-                  selected={placingFurniture}
-                  rotation={placingRotation}
-                  onSelect={setPlacingFurniture}
-                  onRotate={handleRotatePlacing}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
-            {/* Section label — stencilled field header */}
-            <p className="col-span-full text-[10px] text-text-muted font-mono uppercase tracking-[0.2em] mb-0.5">
-              Suspects · tap to select{detective ? ' · check off solved clues' : ''}
-            </p>
-            {puzzle.people.map(person => (
-              <SuspectCard
-                key={person.id}
-                person={person}
-                clues={cluesOf[person.id] ?? []}
-                selected={selectedPerson === person.id}
-                placed={!!placedOf[person.id]}
-                locked={!!placedOf[person.id]?.locked}
-                conflicted={conflicts.has(person.id)}
-                resolved={resolvedClues.includes(person.id)}
-                showCheck={detective}
-                onSelect={() => props.onSelectPerson(person.id)}
-                onToggleResolved={() => props.onToggleClue(person.id)}
-              />
-            ))}
-          </div>
-        </div>
+          {/* ── Toolbar ─────────────────────────────────────────────────────
+              Mobile: order-3 — after board and suspects.
+              Desktop: flex-shrink-0 at the bottom of the scene column.
+              FurniturePicker lives here so it's beside the board.
+          */}
+          <div className="order-3 flex-shrink-0 mx-auto w-full max-w-[640px] px-3 pb-3 lg:pb-3 flex flex-col gap-2">
+            {/* FurniturePicker — transient, in the scene column */}
+            <AnimatePresence>
+              {showDecor && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <FurniturePicker
+                    selected={placingFurniture}
+                    rotation={placingRotation}
+                    onSelect={setPlacingFurniture}
+                    onRotate={handleRotatePlacing}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-        {/* Section C — Toolbar (mobile: order 3, desktop: left col row 2) */}
-        {/*
-          Split by MEANING, not by count: modes (what a tap does) sit apart from
-          actions (one-shot commands). That reads better and removes the orphan
-          for free — a single 4-column grid stranded the last button on its own
-          row at 390px, and the button count changes with detective mode.
-          Modes are 2-3 items on one line; actions are 5 in a 3-col grid → 3+2,
-          which cannot leave a lone button in either mode. On sm+ both revert to
-          auto-width flex so "Undo" isn't a 175px slab, capped to the board
-          width so the controls stay visually attached to the board.
-        */}
-        <div className="order-3 lg:col-start-1 lg:row-start-2 mx-auto w-full max-w-[580px] flex flex-col gap-2">
-          {/* Mode row — Place / Draft / Mark */}
-          <div className="flex gap-2 justify-center [&>button]:flex-1 sm:[&>button]:flex-none">
-            <ToolBtn
-              active={tool === 'place'}
-              onClick={() => props.onSetTool('place')}
-              icon={<MousePointerClick size={16} />}
-              label="Place"
-              title={detective ? 'Place a suspect — crosses out their row & column' : 'Place a suspect'}
-            />
-            {detective && (
+            {/* Mode row — Place / Draft / Mark */}
+            <div className="flex gap-2 justify-center [&>button]:flex-1 sm:[&>button]:flex-none">
               <ToolBtn
-                active={tool === 'draft'}
-                onClick={() => props.onSetTool('draft')}
-                icon={<Pencil size={16} />}
-                label="Draft"
-                title="Pencil in candidates (no elimination)"
+                active={tool === 'place'}
+                onClick={() => props.onSetTool('place')}
+                icon={<MousePointerClick size={16} />}
+                label="Place"
+                title={detective ? 'Place a suspect — crosses out their row & column' : 'Place a suspect'}
               />
-            )}
-            <ToolBtn
-              active={tool === 'x'}
-              onClick={() => props.onSetTool('x')}
-              icon={<XIcon size={16} />}
-              label="Mark ✕"
-            />
-          </div>
-          {/* Actions grid — Undo / Redo / Clear / Hint / Decorate */}
-          <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:justify-center">
-            <ToolBtn onClick={props.onUndo} disabled={!props.canUndo} icon={<Undo2 size={16} />} label="Undo" />
-            <ToolBtn onClick={props.onRedo} disabled={!props.canRedo} icon={<Redo2 size={16} />} label="Redo" />
-            <ToolBtn onClick={() => setConfirmClear(true)} icon={<Trash2 size={16} />} label="Clear" />
-            <ToolBtn onClick={props.onHint} disabled={hintsLeft <= 0} icon={<Lightbulb size={16} />} label={`Hint ×${hintsLeft}`} />
-            <ToolBtn
-              toggled={showDecor}
-              onClick={() => { setShowDecor(v => !v); if (showDecor) setPlacingFurniture(null) }}
-              icon={<Palette size={16} />}
-              label="Decorate"
-              title="Place decorative furniture"
-            />
-          </div>
-        </div>
+              {detective && (
+                <ToolBtn
+                  active={tool === 'draft'}
+                  onClick={() => props.onSetTool('draft')}
+                  icon={<Pencil size={16} />}
+                  label="Draft"
+                  title="Pencil in candidates (no elimination)"
+                />
+              )}
+              <ToolBtn
+                active={tool === 'x'}
+                onClick={() => props.onSetTool('x')}
+                icon={<XIcon size={16} />}
+                label="Mark ✕"
+              />
+            </div>
 
-        {/* Section D — Accuse CTA + feedback (mobile: order 4, desktop: right col row 2) */}
-        {/* Aligned to the row start (not `justify-end`): the grid's row 1 is as
-            tall as the board, so pushing this to the row's bottom stranded the
-            CTA ~90px below the toolbar. Starting it aligns both columns' row 2. */}
-        <div className="order-4 lg:col-start-2 lg:row-start-2 flex flex-col items-center gap-2">
+            {/* Actions grid — Undo / Redo / Clear / Hint / Decorate */}
+            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:justify-center">
+              <ToolBtn onClick={props.onUndo} disabled={!props.canUndo} icon={<Undo2 size={16} />} label="Undo" />
+              <ToolBtn onClick={props.onRedo} disabled={!props.canRedo} icon={<Redo2 size={16} />} label="Redo" />
+              <ToolBtn onClick={() => setConfirmClear(true)} icon={<Trash2 size={16} />} label="Clear" />
+              <ToolBtn onClick={props.onHint} disabled={hintsLeft <= 0} icon={<Lightbulb size={16} />} label={`Hint ×${hintsLeft}`} />
+              <ToolBtn
+                toggled={showDecor}
+                onClick={() => { setShowDecor(v => !v); if (showDecor) setPlacingFurniture(null) }}
+                icon={<Palette size={16} />}
+                label="Decorate"
+                title="Place decorative furniture"
+              />
+            </div>
+          </div>
 
-          {/* ── Accuse — the dramatic beat. Slam a file on the desk. ─────── */}
-          <motion.button
-            /* No `key` here on purpose — see the effect above. The class is
-               added imperatively so the element (and its focus) survives. */
-            ref={ctaRef}
-            whileTap={{ scale: 0.97 }}
-            onClick={handleSubmit}
-            className="focus-ring w-full py-4 font-display font-bold tracking-[0.15em] uppercase text-sm transition-colors"
-            style={{
-              // Noir: stark brass block, ink text — not a gradient pill.
-              // Sharp corners: no border-radius. Shadow punches it off the desk.
-              background: 'var(--color-accent)',
-              color: 'var(--color-on-accent)',
-              boxShadow: '0 4px 0 0 color-mix(in srgb, var(--color-accent) 45%, #000), var(--shadow-cut)',
-              letterSpacing: '0.15em',
-            }}
+        </div>{/* end scene column */}
+
+        {/* ── DOSSIER (right) ───────────────────────────────────────────────
+            Mobile: contents — suspects is order-2, accuse is order-4.
+            lg: second grid column. Suspects scroll, Accuse is anchored bottom.
+            xl: third grid column.
+            Structure: flex-col with suspects taking flex-1 (scrolls) and
+            accuse as flex-shrink-0 outside the scroll zone — so the shake's
+            translate3d never clips inside an overflow-y container.
+        */}
+        <div
+          className={[
+            'contents',
+            'lg:flex lg:flex-col lg:min-h-0 lg:border-l lg:col-start-2 lg:row-start-1',
+            'xl:col-start-3',
+          ].join(' ')}
+          style={{ borderColor: 'var(--color-border-subtle)' } as React.CSSProperties}
+        >
+
+          {/* Case meta at lg (two-col) — folded rail content at top of dossier.
+              On xl it's hidden because the side rail has it. */}
+          <div className="hidden lg:block xl:hidden flex-shrink-0 px-4 pt-3 pb-2 border-b"
+            style={{ borderColor: 'var(--color-border-subtle)' }}
           >
-            Accuse — Submit Solution ({placedCount}/{puzzle.size})
-          </motion.button>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[9px] font-mono text-text-muted tracking-[0.25em] uppercase">Progress</p>
+                <p className="font-mono text-text-secondary text-sm mt-0.5">
+                  <span className="text-text-primary font-bold">{placedCount}</span>
+                  <span className="text-text-muted"> / {puzzle.size}</span>
+                  <span className="text-text-muted text-[10px] ml-1.5">placed</span>
+                  <span className="text-text-muted text-[10px] ml-2">·</span>
+                  <span className="text-text-primary font-bold ml-2">{hintsLeft}</span>
+                  <span className="text-text-muted text-[10px] ml-1">hints</span>
+                </p>
+              </div>
+              {/* Timer shown in dossier at lg when the rail isn't visible */}
+              {!hideTimer && (
+                <span className="font-mono text-accent-text text-xl tabular-nums tracking-widest">{timer}</span>
+              )}
+            </div>
+          </div>
 
-          {/* ── Feedback message — typed log entry ───────────────────────── */}
-          <AnimatePresence>
-            {feedback !== 'none' && (
-              <motion.button
-                onClick={props.onDismissFeedback}
-                /* Framer owns this node's transform (the y entry offset), so it
-                   must NOT also carry animate-shake — two systems writing one
-                   composited property fight during the 400ms overlap. The CTA
-                   above carries the shake; this only re-plays its entry. */
-                key={`feedback-${submitNonce}`}
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="text-[12px] font-mono px-3 py-2 text-center w-full tracking-wide"
-                style={{
-                  color: 'var(--color-danger-text)',
-                  backgroundColor: 'color-mix(in srgb, var(--color-danger) 14%, transparent)',
-                  borderLeft: '2px solid var(--color-danger)',
-                }}
-              >
-                {feedback === 'incomplete'
-                  ? 'Place every person first.'
-                  : feedback === 'blocked'
-                  ? 'That row or column is already taken by another suspect.'
-                  : `Not quite — ${correctCount} of ${puzzle.people.length} are in the right spot. Keep deducing.`}
-              </motion.button>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
+          {/* Suspects list — scrollable region */}
+          {/*
+            Mobile: order-2 — between board and toolbar in the single column.
+            Desktop: flex-1 overflow-y-auto — fills dossier column, scrolls.
+          */}
+          <div className="order-2 lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
+            <div className="p-3 lg:p-4 flex flex-col gap-3">
+
+              {/* Suspects label */}
+              <p className="text-[10px] text-text-muted font-mono uppercase tracking-[0.2em]">
+                Suspects · tap to select{detective ? ' · check off solved clues' : ''}
+              </p>
+
+              {/* Suspect cards — single column on all breakpoints in the dossier */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+                {puzzle.people.map(person => (
+                  <SuspectCard
+                    key={person.id}
+                    person={person}
+                    clues={cluesOf[person.id] ?? []}
+                    selected={selectedPerson === person.id}
+                    placed={!!placedOf[person.id]}
+                    locked={!!placedOf[person.id]?.locked}
+                    conflicted={conflicts.has(person.id)}
+                    resolved={resolvedClues.includes(person.id)}
+                    showCheck={detective}
+                    onSelect={() => props.onSelectPerson(person.id)}
+                    onToggleResolved={() => props.onToggleClue(person.id)}
+                  />
+                ))}
+              </div>
+
+            </div>
+          </div>
+
+          {/* ── Accuse CTA — anchored OUTSIDE the scroll zone ────────────────
+              Mobile: order-4 — last in the single column.
+              Desktop: flex-shrink-0 below the suspects scroller.
+              Note: Accuse is outside overflow-y-auto on purpose — the shake's
+              translate3d(±5px) must not clip inside the scroll container, which
+              would also produce a transient horizontal scrollbar at 390px.
+          */}
+          <div className="order-4 flex-shrink-0 p-3 lg:p-4 flex flex-col gap-2 border-t"
+            style={{ borderColor: 'var(--color-border-subtle)' }}
+          >
+            {/* ── Accuse — the dramatic beat ─────────────────────────────── */}
+            <motion.button
+              /* No `key` here on purpose — see the effect above. The class is
+                 added imperatively so the element (and its focus) survives. */
+              ref={ctaRef}
+              whileTap={{ scale: 0.97 }}
+              onClick={handleSubmit}
+              className="focus-ring w-full py-4 font-display font-bold tracking-[0.15em] uppercase text-sm transition-colors"
+              style={{
+                background: 'var(--color-accent)',
+                color: 'var(--color-on-accent)',
+                boxShadow: '0 4px 0 0 color-mix(in srgb, var(--color-accent) 45%, #000), var(--shadow-cut)',
+                letterSpacing: '0.15em',
+              }}
+            >
+              Accuse — Submit Solution ({placedCount}/{puzzle.size})
+            </motion.button>
+
+            {/* ── Feedback message ─────────────────────────────────────────
+                Framer owns this node's transform (the y entry offset), so it
+                must NOT also carry animate-shake — two systems writing one
+                composited property fight during the 400ms overlap. The CTA
+                above carries the shake; this only re-plays its entry. */}
+            <AnimatePresence>
+              {feedback !== 'none' && (
+                <motion.button
+                  onClick={props.onDismissFeedback}
+                  key={`feedback-${submitNonce}`}
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="text-[12px] font-mono px-3 py-2 text-center w-full tracking-wide"
+                  style={{
+                    color: 'var(--color-danger-text)',
+                    backgroundColor: 'color-mix(in srgb, var(--color-danger) 14%, transparent)',
+                    borderLeft: '2px solid var(--color-danger)',
+                  }}
+                >
+                  {feedback === 'incomplete'
+                    ? 'Place every person first.'
+                    : feedback === 'blocked'
+                    ? 'That row or column is already taken by another suspect.'
+                    : `Not quite — ${correctCount} of ${puzzle.people.length} are in the right spot. Keep deducing.`}
+                </motion.button>
+              )}
+            </AnimatePresence>
+          </div>
+
+        </div>{/* end dossier column */}
+
+      </div>{/* end body grid */}
 
       {/* ── Leave confirmation ── classified dossier dialog ─────────────── */}
       <AnimatePresence>
@@ -424,7 +653,6 @@ export default function GameScreen(props: Props) {
                 boxShadow: 'var(--shadow-elevated)',
               }}
             >
-              {/* Case stamp heading */}
               <p className="font-display font-bold text-text-primary text-lg mb-1 uppercase tracking-[0.12em]">
                 Leave this case?
               </p>
@@ -432,7 +660,6 @@ export default function GameScreen(props: Props) {
                 Progress is saved — you can pick up where you left off.
               </p>
               <div className="flex gap-3">
-                {/* Stay — outline, strong border tier (border IS the affordance) */}
                 <button
                   onClick={() => setConfirmLeave(false)}
                   className="focus-ring flex-1 py-2.5 border font-display text-sm uppercase tracking-[0.1em] text-text-secondary hover:text-text-primary transition-colors"
@@ -440,7 +667,6 @@ export default function GameScreen(props: Props) {
                 >
                   Stay
                 </button>
-                {/* Leave — filled, accent */}
                 <button
                   onClick={props.onBack}
                   className="focus-ring flex-1 py-2.5 font-display text-sm uppercase tracking-[0.1em]"
@@ -484,7 +710,6 @@ export default function GameScreen(props: Props) {
                 This removes every placement, ✕ and draft. You can undo it once.
               </p>
               <div className="flex gap-3">
-                {/* Cancel — outline, strong border tier */}
                 <button
                   onClick={() => setConfirmClear(false)}
                   className="focus-ring flex-1 py-2.5 border font-display text-sm uppercase tracking-[0.1em] text-text-secondary hover:text-text-primary transition-colors"
@@ -492,7 +717,6 @@ export default function GameScreen(props: Props) {
                 >
                   Cancel
                 </button>
-                {/* Clear — filled, danger */}
                 <button
                   onClick={() => { props.onClear(); setConfirmClear(false) }}
                   className="focus-ring flex-1 py-2.5 font-display text-sm uppercase tracking-[0.1em]"
@@ -515,8 +739,6 @@ function ToolBtn({ active, toggled, disabled, cta, onClick, icon, label, title }
   // `active` = the current TOOL mode (strong fill). `toggled` = an action that
   // is currently engaged, e.g. a locked suspect (outline only — visually
   // distinct from a tool mode so it never reads as "you switched tools").
-  // Border tier: resting outline buttons use --color-border-strong because the
-  // border IS the affordance; active/toggled/cta still use accent variants.
   return (
     <button
       onClick={onClick}
@@ -525,13 +747,6 @@ function ToolBtn({ active, toggled, disabled, cta, onClick, icon, label, title }
       aria-pressed={active || toggled}
       className="focus-ring flex items-center justify-center gap-1.5 px-3.5 min-h-[44px] border text-[13px] font-display font-medium transition-colors whitespace-nowrap uppercase tracking-[0.08em]"
       style={{
-        // Only the current TOOL gets the strong filled highlight. `cta` (an
-        // available action) is a subtle coloured border; `toggled` (engaged
-        // action, e.g. locked) is a dashed coloured border. Neither is filled,
-        // so they never look like "the mode you're in".
-        // Resting state uses --color-border-strong (not subtle) because the
-        // border alone marks the interactive boundary — WCAG 1.4.11 requires
-        // the strong tier (3.5:1) whenever a border is the only affordance.
         borderColor: active
           ? 'var(--color-accent)'
           : (toggled || cta)
