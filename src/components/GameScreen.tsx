@@ -178,7 +178,7 @@ export default function GameScreen(props: Props) {
 
         {/* Case title + metadata */}
         <div className="text-center min-w-0 px-2 flex-1">
-          <h1 className="font-display text-text-primary text-base font-bold leading-tight truncate uppercase tracking-wide">
+          <h1 className="font-display text-text-primary text-sm sm:text-base font-bold leading-snug uppercase tracking-wide">
             {puzzle.title}
           </h1>
           <div className="flex items-center justify-center gap-2 mt-0.5">

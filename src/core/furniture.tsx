@@ -101,19 +101,27 @@ const RugIcon: FIcon = ({ size }) => (
   </svg>
 )
 
+// Plant: near-elevation potted plant — terracotta pot with leafy foliage above.
+// The old top-down version (radiating spikes from a central dot) read as a
+// pinwheel, ninja-star, or abstract design. The pot silhouette is the key
+// discriminator: shrub is a round bush with no pot; plant has a visible pot.
 const PlantIcon: FIcon = ({ size }) => (
   <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    <circle cx="50" cy="50" r="26" fill="#BE7050" {...O4} />
-    <circle cx="50" cy="50" r="16" fill="#A85C40" {...O} />
-    <path d="M50 50 L36 6 L54 22 Z" fill="#5C8C3C" {...O} />
-    <path d="M50 50 L78 12 L74 36 Z" fill="#4E7C34" {...O} />
-    <path d="M50 50 L96 40 L74 54 Z" fill="#6C9C48" {...O} />
-    <path d="M50 50 L90 78 L64 74 Z" fill="#5C8C3C" {...O} />
-    <path d="M50 50 L56 96 L40 76 Z" fill="#4E7C34" {...O} />
-    <path d="M50 50 L14 88 L26 62 Z" fill="#6C9C48" {...O} />
-    <path d="M50 50 L4 54 L24 38 Z" fill="#5C8C3C" {...O} />
-    <path d="M50 50 L14 16 L36 26 Z" fill="#4E7C34" {...O} />
-    <circle cx="50" cy="50" r="9" fill="#7CAC54" {...O} />
+    {/* foliage — three overlapping circles, lush rounded look */}
+    <circle cx="50" cy="30" r="22" fill="#4E7C34" {...O4} />
+    <circle cx="34" cy="38" r="18" fill="#5C8C3C" {...O4} />
+    <circle cx="66" cy="38" r="18" fill="#5C8C3C" {...O4} />
+    <circle cx="50" cy="24" r="16" fill="#6C9C48" {...O} />
+    <circle cx="38" cy="32" r="12" fill="#7CAC54" {...O} />
+    <circle cx="62" cy="32" r="12" fill="#7CAC54" {...O} />
+    {/* stem */}
+    <rect x="46" y="52" width="8" height="10" rx="2" fill="#5A7A2E" {...O} />
+    {/* terracotta pot — trapezoid body */}
+    <path d="M30 62 L36 94 L64 94 L70 62 Z" fill="#C26040" {...O4} />
+    {/* pot rim */}
+    <rect x="26" y="58" width="48" height="8" rx="4" fill="#D47050" {...O4} />
+    {/* pot highlight stripe */}
+    <path d="M35 70 L37 90" stroke="#E08060" strokeWidth="3" strokeLinecap="round" />
   </svg>
 )
 
@@ -169,12 +177,24 @@ const CounterIcon: FIcon = ({ size }) => (
   </svg>
 )
 
+// TV: elevation view — screen face-on with stand visible below.
+// The old top-down version (wooden slab + thin black edge) read as a dresser
+// or cabinet drawer. A face-on screen with bezel and the Netflix-style glow is
+// instantly recognisable at 48px.
 const TvIcon: FIcon = ({ size }) => (
   <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    {/* wooden stand */}
-    <rect x="10" y="10" width="80" height="25" rx="3" fill="#AE8656" {...O4} />
-    {/* flat-screen seen edge-on from above */}
-    <rect x="20" y="15" width="60" height="10" rx="2" fill="#1A1A1A" {...O} />
+    {/* screen bezel */}
+    <rect x="8" y="8" width="84" height="62" rx="5" fill="#1A1A28" {...O4} />
+    {/* screen glass — dark blue-grey with subtle gradient band */}
+    <rect x="14" y="14" width="72" height="50" rx="3" fill="#1C2A3A" {...O} />
+    {/* screen glow / content — lighter centre strip */}
+    <rect x="20" y="20" width="60" height="38" rx="2" fill="#2A3E56" />
+    {/* bright highlight band across top of screen */}
+    <rect x="20" y="20" width="60" height="10" rx="2" fill="#3A5270" opacity={0.7} />
+    {/* stand neck */}
+    <rect x="44" y="70" width="12" height="12" rx="2" fill="#3A3A3A" {...O4} />
+    {/* stand base — wide foot */}
+    <rect x="28" y="82" width="44" height="10" rx="5" fill="#2A2A2A" {...O4} />
   </svg>
 )
 
@@ -281,17 +301,37 @@ const ToiletIcon: FIcon = ({ size }) => (
   </svg>
 )
 
+// Shower: elevation / slight-3/4 view — showerhead pipe arm + spray rose +
+// water droplets falling. The old top-down (concentric circles + dots at
+// corners) was indistinguishable from a drain, camera lens, or speaker grille.
+// This version is unmistakable AND distinct from the bathtub (horizontal tub
+// silhouette with water) because it shows a vertical pipe + overhead head.
 const ShowerIcon: FIcon = ({ size }) => (
   <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    <rect x="8" y="8" width="84" height="84" rx="9" fill="#F0ECE4" {...O4} />
-    <circle cx="50" cy="50" r="20" fill="#B8B8B4" {...O4} />
-    <circle cx="50" cy="50" r="12" fill="#D8D8D4" {...O} />
-    {[[42, 44], [58, 44], [42, 56], [58, 56], [50, 50]].map(([x, y], i) => (
-      <circle key={i} cx={x} cy={y} r="3" fill="#586870" {...O} />
+    {/* tray / floor — thin white rectangle at the bottom */}
+    <rect x="14" y="78" width="72" height="16" rx="5" fill="#F0ECE4" {...O4} />
+    {/* drain in tray */}
+    <circle cx="50" cy="86" r="4" fill="#8A9AA0" {...O} />
+    {/* vertical pipe rising from wall */}
+    <rect x="20" y="10" width="8" height="60" rx="4" fill="#ACACA8" {...O4} />
+    {/* horizontal arm — elbow at top */}
+    <rect x="24" y="10" width="40" height="8" rx="4" fill="#ACACA8" {...O4} />
+    {/* showerhead rose — round disc at end of arm */}
+    <circle cx="62" cy="14" r="12" fill="#C8C8C4" {...O4} />
+    <circle cx="62" cy="14" r="8" fill="#D8D8D4" {...O} />
+    {/* spray holes on rose */}
+    {([[57,10],[62,10],[67,10],[57,15],[62,15],[67,15],[57,19],[62,19]]).map(([x,y],i) => (
+      <circle key={i} cx={x} cy={y} r="1.5" fill="#7A8A90" />
     ))}
-    {[[22, 24], [78, 24], [22, 76], [78, 76]].map(([x, y], i) => (
-      <circle key={i} cx={x} cy={y} r="5" fill="#A8CCE0" {...O} />
-    ))}
+    {/* falling water drops */}
+    <line x1="54" y1="28" x2="52" y2="42" stroke="#A8CCE0" strokeWidth="3" strokeLinecap="round" />
+    <line x1="62" y1="27" x2="60" y2="44" stroke="#B8D8E8" strokeWidth="3" strokeLinecap="round" />
+    <line x1="70" y1="28" x2="68" y2="46" stroke="#A8CCE0" strokeWidth="3" strokeLinecap="round" />
+    <line x1="58" y1="48" x2="56" y2="60" stroke="#B8D8E8" strokeWidth="2.5" strokeLinecap="round" />
+    <line x1="66" y1="50" x2="64" y2="64" stroke="#A8CCE0" strokeWidth="2.5" strokeLinecap="round" />
+    <line x1="54" y1="64" x2="52" y2="74" stroke="#B8D8E8" strokeWidth="2" strokeLinecap="round" />
+    <line x1="62" y1="66" x2="61" y2="74" stroke="#A8CCE0" strokeWidth="2" strokeLinecap="round" />
+    <line x1="70" y1="64" x2="69" y2="74" stroke="#B8D8E8" strokeWidth="2" strokeLinecap="round" />
   </svg>
 )
 

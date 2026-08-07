@@ -129,11 +129,20 @@ rooms defined by drawn lines plus a per-type tone. No painted materials.
   pieces in `currentColor` with a translucent fill (`D` = 0.16 detail, `D2` =
   0.34 outline). Pure outlines made a bed and a table indistinguishable at cell
   size. Icons keep their identifying geometry because clue text depends on it.
-- **Room labels** name the room wherever it fits: `compact` is decided by the
-  room's own cell `span`, not by N. Keying it off N alone hid every label behind
-  "KIT"/"STU" even where a room spanned three cells. When abbreviated, the full
-  name is still exposed via `title` **and** an `sr-only` span, with the visible
+- **Room labels** name the room wherever it fits. Multi-word names WRAP to two
+  lines rather than collapsing to initials — a Living Room rendering as "LR" in
+  the middle of the board cannot be connected to a clue saying "In the Living
+  Room". Initials are the last resort, only for a genuinely unbreakable long
+  single word. Font never below 9px. When abbreviated at all, the full name is
+  still exposed via `title` **and** an `sr-only` span, with the visible
   abbreviation `aria-hidden`. Overlay is `pointer-events-none`.
+- **Every icon is audited by LOOKING at it, not by reading its code.** Render
+  each one at cell size with no label and ask "can I name this?". Objects that
+  failed and were redrawn: the lamp (concentric rings — read as a target), the
+  shower (also concentric rings — read as a drain), the TV (a plain slab — read
+  as a dresser), the plant (an overhead succulent — read as a pinwheel). Pairs
+  that must stay mutually distinct because both can appear in one house:
+  shower vs bathtub, plant vs shrub, chair vs toilet.
 - Cells stay real `<button>`s with `aria-label`, `data-cell`/`data-grid`,
   arrow-key nav (`handleCellKey`) and a visible focus ring. The cell focus ring
   uses the **solid** `--color-accent-strong`, never the semi-transparent

@@ -307,7 +307,9 @@ export default function MapGrid({
     while (span < N
       && rm.cells.some(c => c.row === anchor.row && c.col === anchor.col + span)
       && !furnitureCells.has(`${anchor.row},${anchor.col + span}`)) span++
-    // Abbreviation: multi-word → initials (FRONT YARD → FY), single-word → first 3 chars (KITCHEN → KIT)
+    // Abbreviation ladder (used only as a last resort):
+    //   multi-word → initials (FRONT YARD → FY), single-word → first 3 chars (KITCHEN → KIT)
+    // Prefer wrapping or font-shrink over initials — see label render below.
     const words = rm.name.trim().toUpperCase().split(/\s+/)
     const abbr = words.length > 1
       ? words.map(w => w[0]).join('')
@@ -574,9 +576,30 @@ export default function MapGrid({
         }}
       >
         {labelAnchors.map((l, i) => {
-          // Abbreviate only when the room is genuinely too narrow to hold its name.
-          // Keying off span (not N) means a 3-cell Pantry gets its full name at N=7.
-          const compact = l.span < 2 || (l.name.length > 9 && l.span < 3)
+          // Label strategy — ranked by readability, initials only as true last resort:
+          //
+          //   1. FULL NAME, wrapping to 2 lines. Always tried first for multi-word
+          //      names. Even a 1-cell-wide room has ~80–160px width and can show
+          //      "LIVING / ROOM" across two lines at 9px.
+          //
+          //   2. FULL NAME single-line with ellipsis for short single-word names
+          //      that fit without wrapping.
+          //
+          //   3. INITIALS — only when the name is a single word longer than 6 chars
+          //      AND the cell span is 1. (e.g. hypothetical "Conservatory" span=1).
+          //      Visible abbr is aria-hidden; full name in title + sr-only span.
+          //
+          // "Living Room" span=1 → multi-word → strategy 1: wraps to 2 lines ✓
+          // "Bathroom"    span=2 → single word, short → strategy 2 ✓
+          // "Pantry"      span=1 → single word, ≤6 chars → strategy 2 ✓
+
+          const words = l.name.trim().split(/\s+/)
+          const isMultiWord = words.length > 1
+          // Only fall to initials for genuinely unbreakable single-word long names
+          const useInitials = !isMultiWord && l.span < 2 && l.name.length > 6
+          // Wrap multi-word names regardless of span
+          const wrapLabel = isMultiWord && !useInitials
+
           return (
             <span
               key={i}
@@ -584,29 +607,35 @@ export default function MapGrid({
               className="font-mono uppercase self-start justify-self-start"
               style={{
                 gridColumnStart: l.col + 1,
-                gridColumnEnd: compact ? 'span 1' : `span ${l.span}`,
+                // Initials fit in 1 col; wrapping names span their room width.
+                gridColumnEnd: useInitials ? 'span 1' : `span ${l.span}`,
                 gridRowStart: l.row + 1,
                 color: '#FFFFFF',
-                // min 9px floor per the hard requirement
-                fontSize: compact ? '9px' : `clamp(9px, ${Math.round(110 / N)}px, 11px)`,
-                // Black opaque plate — reads on every floor material including mahogany
+                // Font: 9px floor always. Scale up to 11px at N≤5, shrink at N=7.
+                fontSize: useInitials ? '9px' : `clamp(9px, ${Math.round(110 / N)}px, 11px)`,
                 background: 'rgba(0,0,0,0.82)',
                 borderRadius: 2,
-                padding: compact ? '1px 3px' : '2px 6px',
-                letterSpacing: compact ? '0.06em' : '0.14em',
-                margin: compact ? '2px' : '4px',
+                padding: useInitials ? '1px 3px' : '2px 6px',
+                letterSpacing: useInitials ? '0.06em' : '0.12em',
+                margin: useInitials ? '2px' : '4px',
+                // Allow wrapping for multi-word names with ≥2 span; clamp single-line otherwise.
+                whiteSpace: wrapLabel ? 'normal' : 'nowrap',
+                wordBreak: wrapLabel ? 'normal' : undefined,
                 maxWidth: '100%',
                 overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
+                // textOverflow only applies when nowrap
+                textOverflow: wrapLabel ? undefined : 'ellipsis',
                 display: 'block',
                 fontWeight: 700,
+                // Prevent the label growing beyond 2 lines even if name is very long.
+                WebkitLineClamp: wrapLabel ? 2 : undefined,
+                WebkitBoxOrient: wrapLabel ? 'vertical' as const : undefined,
               }}
             >
-              {/* Visible text: abbreviation in compact mode, full name otherwise */}
-              <span aria-hidden={compact || undefined}>{compact ? l.abbr : l.name}</span>
-              {/* SR-only full name in compact mode so screen readers hear it */}
-              {compact && <span className="sr-only">{l.name}</span>}
+              {/* Visible text: initials when compact, full name otherwise */}
+              <span aria-hidden={useInitials || undefined}>{useInitials ? l.abbr : l.name}</span>
+              {/* SR-only full name when visible text is abbreviated */}
+              {useInitials && <span className="sr-only">{l.name}</span>}
             </span>
           )
         })}
