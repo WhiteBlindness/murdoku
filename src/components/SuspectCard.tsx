@@ -51,7 +51,7 @@ export default function SuspectCard({
             boxShadow: '0 3px 8px -1px rgba(0,0,0,0.6)',
           }}
         >
-          <Avatar seed={person.avatarSeed} accent={person.accent} size={44} dead={person.isVictim} />
+          <Avatar seed={person.avatarSeed} accent={person.accent} size={44} dead={person.isVictim} name={person.name} />
           {placed && (
             /* Placement marker: sharp square badge (no rounding) for the noir
                language. NOT a correctness check — lock = committed. */

@@ -523,7 +523,7 @@ export default function MapGrid({
                       filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.7)) drop-shadow(0 0 2px rgba(0,0,0,0.5))',
                     }}
                   >
-                    <Avatar seed={person.avatarSeed} accent={person.accent} size={tokenSize} dead={person.isVictim} />
+                    <Avatar seed={person.avatarSeed} accent={person.accent} size={tokenSize} dead={person.isVictim} name={person.name} />
                     {conflicted && (
                       <span
                         className="absolute -top-1.5 -left-1.5 w-4 h-4 flex items-center justify-center font-bold text-[11px] leading-none"

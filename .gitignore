@@ -24,3 +24,11 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Agent/AI tooling config that gets dropped into the project directory.
+# These belong to the local environment, not to the game. A `git add -A` once
+# swept 95 of these files (10k+ lines) into a commit on this PUBLIC repo.
+.agents/
+.codex/
+.claude/
+AGENTS.md
