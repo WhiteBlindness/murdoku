@@ -368,25 +368,21 @@ export default function GameScreen(props: Props) {
                 `aspect-square` on the inner makes it a natural square that
                 grows to full column width.
 
-              Desktop (lg+): the slot is `flex-1 min-h-0 relative`. The
-                absolute fill + inner flex centering approach:
-                  - the absolute div fills the slot completely (known px height)
-                  - the aspect-square child with max-w/max-h 100% is constrained
-                    to whichever dimension (w or h) is smaller, staying square.
+              Desktop (lg+): the absolute fill is a size-query container. The
+                square uses min(100cqw, 100cqh), so BOTH dimensions resolve from
+                the shorter available axis instead of stretching after one axis
+                hits a max constraint.
           */}
           <div className="order-1 lg:flex-1 lg:min-h-0 lg:relative">
             {/* Absolute fill at desktop only; on mobile this is just a normal div */}
-            <div className="lg:absolute lg:inset-0 flex items-center justify-center p-3 lg:p-3">
+            <div className="lg:absolute lg:inset-0 flex items-center justify-center p-3 lg:p-3 lg:[container-type:size]">
               {/* Square that fits the shorter of available width / height.
                   Mobile: w-full drives size; aspect-square derives the height
                     (parent has no fixed height so height:100% would be 0).
-                  Desktop (lg+): the absolute container has a known pixel height;
-                    lg:h-full takes that height, aspect-square makes width equal,
-                    and max-w-full clamps if it would exceed the container width. */}
-              <div
-                className="aspect-square w-full lg:w-auto lg:h-full"
-                style={{ maxWidth: '100%' }}
-              >
+                  Desktop (lg+): container-query units let width and height use
+                    the same smaller value, preserving square cells at any
+                    centre-column width or viewport height. */}
+              <div className="aspect-square w-full lg:w-[min(100cqw,100cqh)] lg:h-[min(100cqw,100cqh)]">
                 <MapGrid
                   puzzle={puzzle}
                   marks={marks}

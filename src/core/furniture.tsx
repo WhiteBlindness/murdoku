@@ -17,7 +17,7 @@ const O = { stroke: 'black', strokeWidth: 3, strokeLinejoin: 'round' as const }
 const O4 = { stroke: 'black', strokeWidth: 4, strokeLinejoin: 'round' as const }
 
 const SofaIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     {/* backrest */}
     <rect x="6" y="6" width="88" height="24" rx="12" fill="#C4838E" {...O4} />
     {/* armrests */}
@@ -32,7 +32,7 @@ const SofaIcon: FIcon = ({ size }) => (
 )
 
 const ArmchairIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     <path
       d="M12 88 L12 38 Q12 10 40 10 L60 10 Q88 10 88 38 L88 88
          L72 88 L72 42 Q72 30 60 30 L40 30 Q28 30 28 42 L28 88 Z"
@@ -44,7 +44,7 @@ const ArmchairIcon: FIcon = ({ size }) => (
 )
 
 const BedIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     <rect x="8" y="4" width="84" height="92" rx="6" fill="#B49468" {...O4} />
     <rect x="8" y="4" width="84" height="18" rx="6" fill="#8A6C44" {...O4} />
     <rect x="14" y="22" width="72" height="68" rx="4" fill="#F2EDDF" {...O} />
@@ -59,7 +59,7 @@ const BedIcon: FIcon = ({ size }) => (
 // The top-down version (plain rectangle with grid lines) reads as a floor tile,
 // not a table. Legs make it unmistakable.
 const TableIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     {/* legs — drawn first so tabletop sits on them */}
     <rect x="10" y="62" width="12" height="30" rx="3" fill="#8A6230" {...O4} />
     <rect x="78" y="62" width="12" height="30" rx="3" fill="#8A6230" {...O4} />
@@ -76,24 +76,22 @@ const TableIcon: FIcon = ({ size }) => (
 // Box: cardboard box seen 3/4 from slightly above — open top flaps visible.
 // Pure top-down (the X pattern) reads as a target or gift-wrap, not a box.
 const BoxIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
-    {/* front face */}
-    <rect x="14" y="44" width="72" height="46" rx="3" fill="#C8A870" {...O4} />
-    {/* top face (foreshortened) */}
-    <path d="M14 44 L28 20 L86 20 L86 44 Z" fill="#D8BC88" {...O4} />
-    {/* right side face */}
-    <path d="M86 20 L86 44 L86 90 L86 44 Z" fill="#B89858" {...O4} />
-    {/* open flap left */}
-    <path d="M14 44 L14 20 L50 14 L50 44 Z" fill="#E0CC98" {...O} />
-    {/* open flap right */}
-    <path d="M86 20 L86 44 L50 44 L50 14 Z" fill="#CCBA7C" {...O} />
-    {/* tape stripe on front */}
-    <line x1="50" y1="44" x2="50" y2="90" stroke="#A8905A" strokeWidth="5" strokeLinecap="round" />
+  <svg {...S(size)} viewBox="0 0 100 100">
+    {/* Dark opening makes this read as an open cardboard box, not a cabinet. */}
+    <path d="M14 42 L50 26 L86 42 L50 59 Z" fill="#684728" {...O4} />
+    {/* Two raised back flaps establish the open-box silhouette. */}
+    <path d="M14 42 L5 22 L38 8 L50 26 Z" fill="#E0C78E" {...O4} />
+    <path d="M50 26 L63 7 L96 23 L86 42 Z" fill="#D2AF70" {...O4} />
+    {/* Filled front and side faces; the former zero-width side path is gone. */}
+    <path d="M14 42 L50 59 L50 94 L14 78 Z" fill="#C8A870" {...O4} />
+    <path d="M50 59 L86 42 L86 78 L50 94 Z" fill="#B78F58" {...O4} />
+    {/* Packing-tape stripe follows the front face perspective. */}
+    <path d="M44 56 L56 56 L56 91 L44 88 Z" fill="#A88750" {...O} />
   </svg>
 )
 
 const RugIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     <rect x="10" y="10" width="80" height="80" rx="5" fill="#8E3A3A" {...O4} />
     <rect x="20" y="20" width="60" height="60" rx="3" fill="#A85555" {...O} />
     <line x1="14" y1="5" x2="86" y2="5" stroke="black" strokeWidth="4" strokeDasharray="4 6" strokeLinecap="round" />
@@ -106,7 +104,7 @@ const RugIcon: FIcon = ({ size }) => (
 // pinwheel, ninja-star, or abstract design. The pot silhouette is the key
 // discriminator: shrub is a round bush with no pot; plant has a visible pot.
 const PlantIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     {/* foliage — three overlapping circles, lush rounded look */}
     <circle cx="50" cy="30" r="22" fill="#4E7C34" {...O4} />
     <circle cx="34" cy="38" r="18" fill="#5C8C3C" {...O4} />
@@ -126,7 +124,7 @@ const PlantIcon: FIcon = ({ size }) => (
 )
 
 const ShrubIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     <circle cx="50" cy="52" r="40" fill="#4E7434" {...O4} />
     <circle cx="30" cy="42" r="20" fill="#5C8440" {...O} />
     <circle cx="70" cy="42" r="20" fill="#5C8440" {...O} />
@@ -141,7 +139,7 @@ const ShrubIcon: FIcon = ({ size }) => (
 // The pure top-down (three concentric gold rings) reads as a coin, target, or
 // round rug. A shade + stem silhouette is immediately nameable.
 const LampIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     {/* warm glow halo behind shade */}
     <ellipse cx="50" cy="38" rx="34" ry="20" fill="#F6ECC2" opacity={0.55} />
     {/* conical shade — wide at bottom, narrow at top */}
@@ -163,7 +161,7 @@ const LampIcon: FIcon = ({ size }) => (
 // Counter: kitchen worktop seen slightly from above — sink basin visible,
 // faucet arm rising from the back edge, chopping board to the left.
 const CounterIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     <rect x="4" y="10" width="92" height="80" rx="6" fill="#E6E0D2" {...O4} />
     <line x1="50" y1="10" x2="50" y2="90" stroke="black" strokeWidth="3" />
     {/* sink */}
@@ -182,7 +180,7 @@ const CounterIcon: FIcon = ({ size }) => (
 // or cabinet drawer. A face-on screen with bezel and the Netflix-style glow is
 // instantly recognisable at 48px.
 const TvIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     {/* screen bezel */}
     <rect x="8" y="8" width="84" height="62" rx="5" fill="#1A1A28" {...O4} />
     {/* screen glass — dark blue-grey with subtle gradient band */}
@@ -199,7 +197,7 @@ const TvIcon: FIcon = ({ size }) => (
 )
 
 const BathtubIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     <rect x="6" y="8" width="88" height="84" rx="20" fill="#F0ECE2" {...O4} />
     <rect x="16" y="18" width="68" height="64" rx="14" fill="#A8CCDE" {...O4} />
     <circle cx="34" cy="22" r="7" fill="#B8B8B4" {...O} />
@@ -213,7 +211,7 @@ const BathtubIcon: FIcon = ({ size }) => (
 // in. Top-down is just a brown rectangle strip; elevation makes spine colours
 // and varying widths instantly readable as books on a shelf.
 const BookshelfIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     {/* shelf side panels */}
     <rect x="6" y="8" width="10" height="84" rx="3" fill="#7A5A30" {...O4} />
     <rect x="84" y="8" width="10" height="84" rx="3" fill="#7A5A30" {...O4} />
@@ -244,7 +242,7 @@ const BookshelfIcon: FIcon = ({ size }) => (
 )
 
 const StoveIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     <rect x="8" y="8" width="84" height="84" rx="7" fill="#5A5C62" {...O4} />
     <circle cx="32" cy="32" r="14" fill="#3A3C42" {...O4} />
     <circle cx="32" cy="32" r="6" fill="#C06848" {...O} />
@@ -258,7 +256,7 @@ const StoveIcon: FIcon = ({ size }) => (
 )
 
 const FridgeIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     <rect x="18" y="6" width="64" height="88" rx="9" fill="#DCE0E2" {...O4} />
     <line x1="18" y1="38" x2="82" y2="38" stroke="black" strokeWidth="4" />
     <rect x="68" y="14" width="8" height="16" rx="4" fill="#98A0A8" {...O} />
@@ -267,7 +265,7 @@ const FridgeIcon: FIcon = ({ size }) => (
 )
 
 const ClockIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     <circle cx="50" cy="50" r="42" fill="#7A5C34" {...O4} />
     <circle cx="50" cy="50" r="34" fill="#F6F2E4" {...O} />
     {[0, 90, 180, 270].map(deg => {
@@ -284,7 +282,7 @@ const ClockIcon: FIcon = ({ size }) => (
 )
 
 const DeskIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     <rect x="35" y="45" width="30" height="35" rx="10" fill="#5E666E" {...O4} />
     <rect x="31" y="74" width="38" height="12" rx="6" fill="#464E56" {...O4} />
     <rect x="10" y="10" width="80" height="40" rx="2" fill="#AE8656" {...O4} />
@@ -293,7 +291,7 @@ const DeskIcon: FIcon = ({ size }) => (
 )
 
 const ToiletIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     <rect x="22" y="6" width="56" height="26" rx="8" fill="#F0ECE2" {...O4} />
     <circle cx="50" cy="19" r="5" fill="#B8B8B4" {...O} />
     <ellipse cx="50" cy="62" rx="34" ry="30" fill="#F0ECE2" {...O4} />
@@ -307,7 +305,7 @@ const ToiletIcon: FIcon = ({ size }) => (
 // This version is unmistakable AND distinct from the bathtub (horizontal tub
 // silhouette with water) because it shows a vertical pipe + overhead head.
 const ShowerIcon: FIcon = ({ size }) => (
-  <svg {...S(size)} viewBox="0 0 100 100" fill="none">
+  <svg {...S(size)} viewBox="0 0 100 100">
     {/* tray / floor — thin white rectangle at the bottom */}
     <rect x="14" y="78" width="72" height="16" rx="5" fill="#F0ECE4" {...O4} />
     {/* drain in tray */}
