@@ -5,7 +5,7 @@
    highlights, blood red for danger. The interface is a detective's desk at
    night — light falls on the evidence, everything else recedes.
 
-   This REPLACES the previous Cluedo board-game world (painted floor tiles,
+   This REPLACES the previous toy board-game world (painted floor tiles,
    1950s pastels, bubbly pill labels). Those tokens are gone, not deprecated.
 
    Rules of the system:
@@ -70,18 +70,17 @@
   --diff-hard-text:      #D27B42;
   --diff-expert-text:    #E06A5A;
 
-  /* --- The board: illustrated Cluedo surface sitting on the noir desk ----
-     Floor materials are hardcoded hex in MapGrid.tsx (six SVG tiles — oak,
-     checker, grass, stone, carpet, mahogany). The board tokens here cover
-     the frame, wall dividers, and UI elements that overlay the board.
+  /* --- The board: mansion reconstruction surface on the continuity desk --
+     Twelve material finishes live in core/roomMaterials.ts. Board tokens
+     here cover the frame, wall dividers, and UI elements above the floors.
      --board-room-tint is still referenced by draft-chip backgrounds (via
      color-mix in older paths) so it survives as a light cream fallback.
      --board-room-tint-2, --room-*, --board-ink are now unused by MapGrid
      and removed. --board-glow is kept only as a named value for any
      component that references it, but MUST NOT be used as a focus ring
      (fails WCAG 2.4.11 on light floors — use --color-accent-strong). */
-  --board-ground:      #000000;  /* outer frame / wall gap fill           */
-  --board-wall:        #000000;  /* room boundary — bold black divider    */
+  --board-ground:      #241820;  /* outer frame / wall gap fill           */
+  --board-wall:        #241820;  /* room boundary — dossier divider       */
   --board-room-tint:   #F5EED8;  /* cream fallback, draft-chip plates     */
   --board-glow:        rgba(216, 154, 34, 0.55);  /* amber accent (non-focus use only) */
   --board-chalk:       #1A1008;  /* dark ink annotations on light floors  */
@@ -145,9 +144,9 @@
     --diff-hard-text:      #8A481D;
     --diff-expert-text:    #8A2A22;
 
-    /* Board sits on the daylight desk — illustrated surface, same bold black walls. */
-    --board-ground:      #000000;
-    --board-wall:        #000000;
+    /* Board sits on the daylight desk with the same restrained dossier frame. */
+    --board-ground:      #241820;
+    --board-wall:        #241820;
     --board-room-tint:   #F5EED8;
     --board-glow:        rgba(164, 108, 8, 0.5);
     --board-chalk:       #1A1008;
@@ -198,8 +197,8 @@
   --diff-hard-text:      #8A481D;
   --diff-expert-text:    #8A2A22;
 
-  --board-ground:      #000000;
-  --board-wall:        #000000;
+  --board-ground:      #241820;
+  --board-wall:        #241820;
   --board-room-tint:   #F5EED8;
   --board-glow:        rgba(164, 108, 8, 0.5);
   --board-chalk:       #1A1008;
