@@ -44,6 +44,7 @@
   /* Body copy is serif; keep numerals lining for the timer/grid. */
   body {
     overscroll-behavior-y: contain;
+    text-rendering: optimizeLegibility;
   }
 
   /* Respect users who ask for less motion. */
@@ -52,6 +53,7 @@
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
   }
 }
@@ -66,15 +68,136 @@
      bg-inset tokens so they flip automatically in light theme.
      Apply to the outermost page wrapper — HomeScreen, ReleaseNotes, GameScreen. */
   .desk-surface {
+    position: relative;
+    isolation: isolate;
     background-color: var(--color-bg-base);
     /* Subtle warm vignette: centre lighter (near-base), corners deeper (inset).
        The opacity is low — this is atmosphere, not a loud texture. */
-    background-image:
-      radial-gradient(
-        ellipse 120% 80% at 50% 0%,
-        color-mix(in srgb, var(--color-bg-inset) 0%, transparent) 0%,
-        color-mix(in srgb, var(--color-bg-inset) 60%, transparent) 100%
-      );
+    background-image: url('/assets/graphite-desk.jpg');
+    background-size: 720px 720px;
+    background-blend-mode: soft-light;
+  }
+
+  /* A restrained projection-room vignette. It is a bounded layer, never a
+     content-bearing overlay, and therefore cannot steal pointer events or
+     muddy the board's illustrated colours. */
+  .desk-surface::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 72% 46% at 52% 8%, color-mix(in srgb, var(--color-accent) 6%, transparent), transparent 70%),
+      linear-gradient(180deg, transparent 72%, color-mix(in srgb, var(--color-bg-inset) 18%, transparent));
+  }
+
+  .case-masthead {
+    background: color-mix(in srgb, var(--color-bg-inset) 88%, transparent);
+    box-shadow: inset 0 -1px 0 var(--color-border-strong);
+  }
+
+  .continuity-board {
+    position: relative;
+    border-radius: 0;
+    filter: sepia(0.18) saturate(0.72) contrast(1.04);
+  }
+
+  .continuity-board::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+    background-image: url('/assets/reconstruction-board.jpg');
+    background-size: cover;
+    mix-blend-mode: soft-light;
+    opacity: 0.62;
+  }
+
+  .evidence-strip {
+    position: relative;
+    clip-path: polygon(0 2px, 4% 0, 11% 2px, 22% 0, 36% 3px, 50% 1px, 64% 3px, 82% 0, 100% 2px, 100% calc(100% - 2px), 86% 100%, 72% calc(100% - 3px), 55% 100%, 37% calc(100% - 2px), 19% 100%, 0 calc(100% - 2px));
+  }
+
+  .contact-sheet-portrait {
+    filter: sepia(0.18) grayscale(0.2) contrast(1.08);
+    background-repeat: no-repeat;
+  }
+
+  .clue-connector {
+    overflow: visible;
+    filter: drop-shadow(0 0 5px color-mix(in srgb, var(--color-accent) 78%, transparent));
+  }
+
+  .clue-connector-line {
+    stroke: var(--color-accent-strong);
+    stroke-width: 2;
+    stroke-dasharray: 8 6;
+    vector-effect: non-scaling-stroke;
+    animation: projector-path var(--motion-aperture) var(--ease-physical) both;
+  }
+
+  .clue-connector-node {
+    fill: var(--color-bg-inset);
+    stroke: var(--color-accent-strong);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+
+  @keyframes projector-path {
+    from { stroke-dashoffset: 160; opacity: 0.25; }
+    to { stroke-dashoffset: 0; opacity: 1; }
+  }
+
+  /* Shared evidence-wall materials for the responsive screens. The clipped
+     edge is deliberately square and tactile rather than a rounded card/pill. */
+  .evidence-panel {
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border-strong);
+    box-shadow: var(--shadow-cut);
+  }
+
+  .clipped-corner {
+    clip-path: polygon(0 0, calc(100% - var(--clip-corner)) 0, 100% var(--clip-corner), 100% 100%, 0 100%);
+  }
+
+  .film-perforation {
+    background-image: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--color-border-strong) 56%, transparent) 0 var(--perforation-size),
+      transparent calc(var(--perforation-size) + 1px)
+    );
+    background-position: 0 0;
+    background-size: var(--perforation-gap) var(--perforation-gap);
+  }
+
+  .projector-field {
+    box-shadow: var(--projector-glow), var(--shadow-cut);
+  }
+
+  .command-rail {
+    background-color: color-mix(in srgb, var(--color-bg-inset) 76%, var(--color-bg-base));
+    border-top: 1px solid var(--color-border-strong);
+  }
+
+  .clue-projector-trace {
+    border: 2px solid var(--color-accent-strong);
+    box-shadow:
+      inset 0 0 18px color-mix(in srgb, var(--color-accent) 22%, transparent),
+      0 0 18px color-mix(in srgb, var(--color-accent) 38%, transparent);
+    animation: projector-trace var(--motion-slow) var(--motion-ease-out) both;
+  }
+
+  @keyframes projector-trace {
+    from {
+      clip-path: inset(0 100% 0 0);
+      opacity: 0.4;
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+      opacity: 1;
+    }
   }
 
   /* ── Case panel ────────────────────────────────────────────────────────────
@@ -114,7 +237,11 @@
      hover only fires on real pointers — never a sticky tap state.
      Extends .case-panel with interactive lift behaviour. */
   .case-card {
-    background-color: var(--color-bg-surface);
+    background-color: #D8C8A4;
+    background-image: url('/assets/evidence-paper.jpg');
+    background-size: cover;
+    background-blend-mode: multiply;
+    color: #19150F;
     border: 1px solid var(--color-border-strong);
     /* Stark directional shadow: deep drop offset left-and-down, thin specular
        highlight on top edge. Both map to the theme tokens so light/dark flip
@@ -154,6 +281,7 @@
   .focus-ring:focus-visible {
     outline: 2px solid var(--color-accent-strong);
     outline-offset: 3px;
+    box-shadow: var(--focus-ring);
     border-radius: 2px;
   }
 }

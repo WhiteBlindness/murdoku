@@ -23,13 +23,15 @@ npm run preview  # serve the production build
 - Solve the grid and submit. The murderer is the suspect sharing the victim's room.
 
 ## Features
-- **13 procedurally generated cases** across five difficulties (Very Easy 4×4 →
+- **27 procedurally generated cases** across five difficulties (Very Easy 4×4 →
   Expert 7×7), each guaranteed to have a single solution.
 - **Illustrated suspects** (DiceBear portraits) + **Lucide furniture icons**.
 - **Light & dark themes** — follows the device, one-tap toggle, remembers choice,
   WCAG-AA in both.
 - Place / Mark-✕ / Undo / Clear / Hint tools, live row-column conflict warnings,
   animated "Case Solved" reveal.
+- Search and difficulty filters, resumable in-progress cases, and private per-case
+  notes persisted on the current device.
 - Release Notes page. Installable PWA, playable offline (fonts + avatars cached).
 
 ## Architecture (portable by design)

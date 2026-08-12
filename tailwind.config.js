@@ -59,13 +59,13 @@ export default {
         //   sans    -> Hanken Grotesk. Dense UI chrome. Condensed display type
         //              is unreadable at 10-11px, so small labels get a neutral
         //              grotesk rather than being forced into the theme.
-        display:     ['Oswald', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display:     ['"Barlow Condensed"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         mono:        ['"Courier Prime"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
         typewriter:  ['"Courier Prime"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
         sans:        ['"Hanken Grotesk"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         // Legacy alias kept so any straggler `font-cinzel` still resolves to a
         // real family instead of falling back to Times.
-        cinzel:      ['Oswald', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        cinzel:      ['"Barlow Condensed"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         stamp: {

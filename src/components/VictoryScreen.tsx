@@ -49,7 +49,9 @@ export default function VictoryScreen({ puzzle, murderer, timer, hintsLeft, comp
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="flex flex-col min-h-screen bg-bg-deep items-center justify-center px-6"
+      data-testid="victory-screen"
+      aria-labelledby="victory-title"
+      className="desk-surface flex min-h-screen flex-col items-center justify-center px-6 py-8"
     >
       {/* CASE CLOSED stamp — the payoff */}
       <motion.div
@@ -64,6 +66,7 @@ export default function VictoryScreen({ puzzle, murderer, timer, hintsLeft, comp
           }}
         >
           <p
+            id="victory-title"
             className="font-display font-bold tracking-[0.35em] text-danger-text uppercase"
             style={{ fontSize: '1.6rem' }}
           >
@@ -75,9 +78,16 @@ export default function VictoryScreen({ puzzle, murderer, timer, hintsLeft, comp
       {/* Evidence header label */}
       <motion.p
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
-        className="font-mono text-paper-muted text-xs tracking-[0.3em] uppercase mb-6"
+        className="mb-2 font-mono text-xs uppercase tracking-[0.3em] text-paper-muted"
       >
         PERPETRATOR IDENTIFIED
+      </motion.p>
+
+      <motion.p
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.48 }}
+        className="mb-6 font-mono text-[11px] uppercase tracking-[0.24em] text-accent-text"
+      >
+        CASE RECONSTRUCTED
       </motion.p>
 
       {/* Killer name — presented like a name plate on a case file */}
@@ -85,7 +95,7 @@ export default function VictoryScreen({ puzzle, murderer, timer, hintsLeft, comp
         {...reveal}
         className="w-full max-w-xs border-2 border-danger px-6 py-5 text-center"
         style={{
-          boxShadow: '0 0 32px color-mix(in srgb, var(--color-danger) 18%, transparent), var(--shadow-elevated)',
+          boxShadow: '0 12px 32px -18px color-mix(in srgb, var(--color-danger) 55%, transparent), var(--shadow-elevated)',
           background: 'color-mix(in srgb, var(--color-danger) 6%, var(--color-bg-surface))',
         }}
       >

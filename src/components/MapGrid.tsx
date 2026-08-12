@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { X, Lock } from 'lucide-react'
-import type { Puzzle, CellMark, Furniture, FurnitureType } from '../core/types'
+import type { Puzzle, Cell, CellMark, Furniture, FurnitureType } from '../core/types'
 import { FURNITURE_ICON, FURNITURE_NAME } from '../core/furniture'
 import Avatar from './Avatar'
 
@@ -14,6 +14,8 @@ interface Props {
   placingFurniture?: FurnitureType | null
   placingRotation?: 0 | 90 | 180 | 270
   onPlaceFurniture?: (row: number, col: number) => void
+  highlight?: { roomId?: string; furniture?: FurnitureType; cells?: Cell[] } | null
+  highlightLabel?: string
 }
 
 // ─── Illustrated floor materials — Cluedo board-game art direction ────────────
@@ -221,31 +223,37 @@ const DECK_TILE = svgTile(320, 75,
 //   - diamond lobby → 50% = 2×2 diamond grid per cell
 //   - single-cell tiles (grass, garden, carpet, terracotta, parquet) → 100%
 function floorStyle(material: Material): React.CSSProperties {
+  const archivalMaterial = (pattern: string, patternSize = '100% 100%'): React.CSSProperties => ({
+    backgroundImage: `url("/assets/reconstruction-board.jpg"), url("/assets/evidence-paper.jpg"), ${pattern}`,
+    backgroundSize: `400% 400%, cover, ${patternSize}`,
+    backgroundPosition: 'center, center, center',
+    backgroundBlendMode: 'multiply, multiply, soft-light',
+  })
   switch (material) {
     case 'tile':
-      return { backgroundColor: '#DE8B7B', backgroundImage: CHECKER_TILE, backgroundSize: '100% 100%' }
+      return { ...archivalMaterial(CHECKER_TILE), backgroundColor: '#B77B68' }
     case 'bathtile':
-      return { backgroundColor: '#C8E0F0', backgroundImage: BATHTILE_TILE, backgroundSize: '100% 100%' }
+      return { ...archivalMaterial(BATHTILE_TILE), backgroundColor: '#9AAFAE' }
     case 'terracotta':
-      return { backgroundColor: '#C2714A', backgroundImage: TERRACOTTA_TILE, backgroundSize: '100% 100%' }
+      return { ...archivalMaterial(TERRACOTTA_TILE), backgroundColor: '#A46F50' }
     case 'wood':
-      return { backgroundColor: '#E0C48E', backgroundImage: WOOD_TILE, backgroundSize: '200% 100%' }
+      return { ...archivalMaterial(WOOD_TILE, '200% 100%'), backgroundColor: '#BFA77E' }
     case 'parquet':
-      return { backgroundColor: '#A8762A', backgroundImage: PARQUET_TILE, backgroundSize: '100% 100%' }
+      return { ...archivalMaterial(PARQUET_TILE), backgroundColor: '#92744D' }
     case 'darkwood':
-      return { backgroundColor: '#7A4A2E', backgroundImage: DARKWOOD_TILE, backgroundSize: '200% 100%' }
+      return { ...archivalMaterial(DARKWOOD_TILE, '200% 100%'), backgroundColor: '#665044' }
     case 'office':
-      return { backgroundColor: '#8A96A0', backgroundImage: OFFICE_TILE, backgroundSize: '100% 100%' }
+      return { ...archivalMaterial(OFFICE_TILE), backgroundColor: '#707D7C' }
     case 'carpet':
-      return { backgroundColor: '#D9C8A8', backgroundImage: CARPET_TILE, backgroundSize: '100% 100%' }
+      return { ...archivalMaterial(CARPET_TILE), backgroundColor: '#B6A68B' }
     case 'stone':
-      return { backgroundColor: '#F0E8C8', backgroundImage: LOBBY_TILE, backgroundSize: '50% 50%' }
+      return { ...archivalMaterial(LOBBY_TILE, '50% 50%'), backgroundColor: '#C2BBA4' }
     case 'grass':
-      return { backgroundColor: '#9CB478', backgroundImage: GRASS_TILE, backgroundSize: '100% 100%' }
+      return { ...archivalMaterial(GRASS_TILE), backgroundColor: '#788267' }
     case 'garden':
-      return { backgroundColor: '#5C7840', backgroundImage: GARDEN_TILE, backgroundSize: '100% 100%' }
+      return { ...archivalMaterial(GARDEN_TILE), backgroundColor: '#5E6A50' }
     case 'deck':
-      return { backgroundColor: '#9EA89A', backgroundImage: DECK_TILE, backgroundSize: '200% 100%' }
+      return { ...archivalMaterial(DECK_TILE, '200% 100%'), backgroundColor: '#848A7E' }
   }
 }
 
@@ -275,6 +283,7 @@ const WALL = '#000000'
 export default function MapGrid({
   puzzle, marks, conflicts, onCellClick,
   extraFurniture = [], placingFurniture, placingRotation = 0, onPlaceFurniture,
+  highlight = null, highlightLabel,
 }: Props) {
   const N = puzzle.size
   const roomOf = puzzle.roomOf
@@ -318,6 +327,8 @@ export default function MapGrid({
   })
 
   const isPlacing = !!placingFurniture && !!onPlaceFurniture
+  const highlightedCells = new Set((highlight?.cells ?? []).map(cell => `${cell.row},${cell.col}`))
+  const highlightDescriptionId = highlight && highlightLabel ? `clue-target-${puzzle.id}` : undefined
 
   return (
     /*
@@ -326,17 +337,27 @@ export default function MapGrid({
       `aspect-ratio: 1/1` STAYS: this is an N×N grid of square cells.
       Sizing is the parent's job (GameScreen's centre column).
     */
-    <div className="relative w-full h-full select-none" style={{ aspectRatio: '1 / 1' }}>
+    <div
+      data-testid="board"
+      className="relative w-full h-full select-none"
+      style={{ aspectRatio: '1 / 1' }}
+      aria-describedby={highlightDescriptionId}
+    >
+      {highlightDescriptionId && (
+        <span id={highlightDescriptionId} className="sr-only">
+          Projector highlight for the selected clue: {highlightLabel}
+        </span>
+      )}
       {/* interactive cell grid */}
       <div
         data-grid=""
-        className="w-full h-full rounded-xl overflow-hidden"
+        className="continuity-board w-full h-full overflow-hidden"
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${N}, 1fr)`,
           gridTemplateRows: `repeat(${N}, 1fr)`,
           // Bold black board-game frame — physical object sitting on the desk.
-          border: `6px solid ${WALL}`,
+          border: `4px solid ${WALL}`,
           // Directional shadow: lifts the board off the dark desk like a physical object.
           boxShadow: `
             0 20px 60px rgba(0,0,0,0.70),
@@ -370,6 +391,13 @@ export default function MapGrid({
             const cellKey = `${r},${c}`
             const isHovered = hoverCell === cellKey
             const showPreview = isPlacing && isHovered && !!placingFurniture
+            const isClueTarget = Boolean(
+              highlight && (
+                highlight.roomId === id
+                || (highlight.furniture && furn.some(item => item.type === highlight.furniture))
+                || highlightedCells.has(`${r},${c}`)
+              )
+            )
 
             // X mark colour: dark on light floors, white on dark floors.
             // Plus a contrasting text-shadow so neither extreme washes it out.
@@ -387,7 +415,8 @@ export default function MapGrid({
                 onMouseLeave={() => isPlacing && setHoverCell(null)}
                 onKeyDown={(e) => handleCellKey(e, r, c, N)}
                 title={draftNames ? `Maybe: ${draftNames}` : furnNames || undefined}
-                aria-label={`Row ${r + 1}, column ${c + 1}${person ? `, ${person.name}` : draftNames ? `, drafts: ${draftNames}` : furnNames ? `, ${furnNames}` : ''}`}
+                aria-label={`Row ${r + 1}, column ${c + 1}${person ? `, ${person.name}` : draftNames ? `, drafts: ${draftNames}` : furnNames ? `, ${furnNames}` : ''}${isClueTarget && highlightLabel ? `, matches clue: ${highlightLabel}` : ''}`}
+                data-clue-target={isClueTarget ? 'true' : undefined}
                 /* Focus ring: SOLID var(--color-accent-strong), never --board-glow.
                    The glow variant is 50% alpha and composites to ~1.8:1 on light
                    floors — fails WCAG 2.4.11. This is the only focus indicator. */
@@ -396,12 +425,12 @@ export default function MapGrid({
                   // Floor pattern lives on a dedicated child span so marks/tokens
                   // are unaffected by any filter applied to the floor layer.
                   borderRight: wallR
-                    ? `6px solid ${WALL}`
+                    ? `4px solid ${WALL}`
                     : isOutdoor
                       ? `1px dashed rgba(0,0,0,0.22)`
                       : `1px solid rgba(0,0,0,0.10)`,
                   borderBottom: wallB
-                    ? `6px solid ${WALL}`
+                    ? `4px solid ${WALL}`
                     : isOutdoor
                       ? `1px dashed rgba(0,0,0,0.22)`
                       : `1px solid rgba(0,0,0,0.10)`,
@@ -412,6 +441,9 @@ export default function MapGrid({
                   } : {}),
                 }}
               >
+                {isClueTarget && (
+                  <span aria-hidden className="clue-projector-trace absolute inset-[3px] z-[2] pointer-events-none" />
+                )}
                 {/* floor layer — SVG material tile, behind all marks and avatars.
                     Rendered first so it sits behind everything without z-index tricks.
                     The preview brightness boost only touches the floor, not tokens. */}

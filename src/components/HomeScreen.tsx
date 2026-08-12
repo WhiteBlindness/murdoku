@@ -1,6 +1,9 @@
 import { motion } from 'framer-motion'
 import { Users, LayoutGrid, Sparkles, Search, Timer } from 'lucide-react'
-import type { Puzzle, GameMode } from '../core/types'
+import { useMemo, useState } from 'react'
+import type { Puzzle, Difficulty, GameMode } from '../core/types'
+import { filterCases } from '../core/ux'
+import type { InProgressSummary } from '../core/ux'
 import type { CaseRecord } from '../hooks/useGame'
 import ThemeToggle from './ThemeToggle'
 
@@ -14,6 +17,8 @@ interface Props {
   onOpenReleases: () => void
   resolvedTheme: string
   onToggleTheme: () => void
+  inProgress?: InProgressSummary | null
+  onResume?: (id: string, mode: GameMode) => void
 }
 
 function fmt(s: number) { return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}` }
@@ -28,12 +33,23 @@ const DIFF_TOKEN: Record<string, string> = {
 const diffFill = (d: string) => `var(--diff-${DIFF_TOKEN[d]})`
 const diffText = (d: string) => `var(--diff-${DIFF_TOKEN[d]}-text)`
 
-const DIFF_ORDER = ['Very Easy', 'Easy', 'Medium', 'Hard', 'Expert'] as const
+const DIFF_ORDER: Difficulty[] = ['Very Easy', 'Easy', 'Medium', 'Hard', 'Expert']
 
-export default function HomeScreen({ puzzles, completedIds, records, mode, onSetMode, onSelect, onOpenReleases, resolvedTheme, onToggleTheme }: Props) {
+export default function HomeScreen({ puzzles, completedIds, records, mode, onSetMode, onSelect, onOpenReleases, resolvedTheme, onToggleTheme, inProgress = null, onResume }: Props) {
+  const [query, setQuery] = useState('')
+  const [difficulty, setDifficulty] = useState<'All' | Difficulty>('All')
+  const matchingPuzzles = useMemo(() => filterCases(puzzles, query, difficulty), [puzzles, query, difficulty])
   const solvedCount = completedIds.filter(id => puzzles.some(p => p.id === id)).length
   const bestTimes = puzzles.map(p => records[p.id]?.bestSeconds).filter((v): v is number => v != null)
   const fastest = bestTimes.length ? Math.min(...bestTimes) : null
+  const resumablePuzzle = inProgress ? puzzles.find(puzzle => puzzle.id === inProgress.id) : undefined
+
+  function resumeCase() {
+    if (!inProgress) return
+    if (onResume) onResume(inProgress.id, inProgress.mode)
+    else onSelect(inProgress.id)
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -68,16 +84,16 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
       {/* layers above live outside this container so they stay full-bleed.     */}
       <div className="relative z-10 w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 flex flex-col min-h-screen">
         <div className="pt-safe flex items-center justify-between pt-3">
-          <button onClick={onOpenReleases} className="focus-ring text-paper-muted text-xs font-sans tracking-wide hover:text-accent-text transition-colors px-1 py-1">
+          <button onClick={onOpenReleases} className="focus-ring min-h-11 text-paper-muted text-xs font-sans tracking-wide hover:text-accent-text transition-colors px-1 py-1" style={{ minHeight: 44 }}>
             What&rsquo;s new
           </button>
           <ThemeToggle resolved={resolvedTheme} onToggle={onToggleTheme} />
         </div>
 
-      <header className="flex flex-col items-center pt-5 pb-7 px-6 relative">
+      <header className="flex flex-col items-center pt-2 pb-4 px-6 relative">
         {/* Detective badge / seal */}
         <div className="relative mb-3">
-          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg width="58" height="58" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
             {/* outer dashed ring */}
             <circle cx="40" cy="40" r="37" stroke="var(--color-accent)" strokeOpacity="0.38" strokeWidth="1.5" strokeDasharray="4 3.5"/>
             {/* inner solid ring */}
@@ -94,14 +110,10 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
           <div className="absolute inset-0 rounded-full pointer-events-none" style={{ boxShadow: '0 0 40px 8px var(--color-accent)', opacity: 0.08 }}/>
         </div>
 
-        <span className="text-[10px] tracking-[0.32em] uppercase font-sans" style={{ color: 'var(--color-text-muted)', letterSpacing: '0.32em' }}>
-          A Game of Murder &amp; Deduction
-        </span>
-
         <h1
-          className="font-display font-bold tracking-tight mt-1 leading-none"
+          className="font-display font-bold tracking-tight mt-0.5 leading-none"
           style={{
-            fontSize: 'clamp(2.4rem, 6vw, 3.4rem)',
+            fontSize: 'clamp(2rem, 5vw, 2.8rem)',
             color: 'var(--color-text-primary)',
             textShadow: '0 2px 24px color-mix(in srgb, var(--color-accent) 40%, transparent)',
           }}
@@ -109,14 +121,7 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
           ALIBI
         </h1>
 
-        {/* ornamental divider */}
-        <div className="mt-4 flex items-center gap-3">
-          <div className="h-px w-14" style={{ background: 'linear-gradient(to right, transparent, var(--color-accent))' }}/>
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M7 1 L8.8 5.2 L13 7 L8.8 8.8 L7 13 L5.2 8.8 L1 7 L5.2 5.2 Z" fill="var(--color-accent)" fillOpacity="0.75"/>
-          </svg>
-          <div className="h-px w-14" style={{ background: 'linear-gradient(to left, transparent, var(--color-accent))' }}/>
-        </div>
+        <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">Continuity case index</p>
       </header>
 
       {/* Mode selector — bounded to readable width, centred within the column */}
@@ -134,9 +139,76 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
       {/* Case index — uses the full column width purposefully: 3 cols on md,
           4 on xl, 5 on 2xl. On a 1920 monitor that's ~5 files spread across
           the desk rather than a thin strip in the centre. */}
+      {resumablePuzzle && inProgress && (
+        <section
+          data-testid="continue-strip"
+          aria-labelledby="continue-reconstruction-heading"
+          className="mb-4 border border-accent-strong bg-bg-surface p-3 sm:p-4"
+          style={{ boxShadow: 'var(--shadow-cut)' }}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-accent-text">In progress</p>
+              <h2 id="continue-reconstruction-heading" className="mt-1 truncate font-display text-lg font-bold uppercase tracking-[0.04em] text-text-primary">
+                {resumablePuzzle.title}
+              </h2>
+              <p className="mt-1 font-mono text-[11px] text-text-secondary">
+                {inProgress.placedCount} / {resumablePuzzle.people.length} placed · {fmt(inProgress.elapsedSeconds)} · {inProgress.mode === 'detective' ? 'Detective' : 'Classic'}
+              </p>
+            </div>
+            <button
+              type="button"
+              data-testid="continue-reconstruction"
+              onClick={resumeCase}
+              className="focus-ring min-h-11 border border-accent-strong bg-accent px-4 font-sans text-xs font-bold uppercase tracking-[0.12em] text-on-accent"
+              style={{ minHeight: 44 }}
+            >
+              Continue reconstruction
+            </button>
+          </div>
+        </section>
+      )}
+
+      <section aria-labelledby="case-search-heading" className="mb-5 border border-border-strong bg-bg-surface p-3 sm:p-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <h2 id="case-search-heading" className="font-display text-sm font-bold uppercase tracking-[0.14em] text-text-primary">Find a case</h2>
+            <label htmlFor="case-search" className="sr-only">Search cases</label>
+            <div className="relative mt-2">
+              <Search size={16} aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+              <input
+                id="case-search"
+                data-testid="home-search"
+                type="search"
+                value={query}
+                onChange={event => setQuery(event.currentTarget.value)}
+                placeholder="Search cases, rooms, or suspects"
+                className="h-11 w-full border border-border-strong bg-bg-inset pl-10 pr-3 font-mono text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-accent-strong"
+                style={{ minHeight: 44 }}
+              />
+            </div>
+          </div>
+          <p data-testid="case-result-count" aria-live="polite" className="font-mono text-[11px] uppercase tracking-[0.12em] text-text-muted">
+            {matchingPuzzles.length} matching {matchingPuzzles.length === 1 ? 'case' : 'cases'}
+          </p>
+        </div>
+
+        <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter cases by difficulty">
+          <DifficultyButton active={difficulty === 'All'} onClick={() => setDifficulty('All')} label="All" />
+          {DIFF_ORDER.map(item => (
+            <DifficultyButton key={item} active={difficulty === item} onClick={() => setDifficulty(item)} label={item} />
+          ))}
+        </div>
+      </section>
+
       <main className="flex-1 overflow-y-auto pb-8">
+        {matchingPuzzles.length === 0 && (
+          <p className="border border-border-strong bg-bg-surface p-6 text-center font-mono text-sm text-text-secondary" role="status">
+            No cases match that search or difficulty.
+          </p>
+        )}
         {DIFF_ORDER.map(diff => {
-          const group = puzzles.filter(p => p.difficulty === diff)
+          const group = matchingPuzzles.filter(p => p.difficulty === diff)
           if (!group.length) return null
           const solvedInGroup = group.filter(p => completedIds.includes(p.id)).length
           return (
@@ -171,15 +243,13 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
                     <button
                       key={p.id}
                       onClick={() => onSelect(p.id)}
-                      className="case-card focus-ring group relative text-left rounded-none border border-border-strong bg-bg-surface overflow-hidden"
-                      style={{ ['--diff' as string]: diffFill(p.difficulty) }}
+                      className="case-card evidence-strip focus-ring group relative text-left rounded-none border border-border-strong overflow-hidden"
+                      style={{ ['--diff' as string]: diffFill(p.difficulty), minHeight: 44 }}
                     >
                       {/* Difficulty spine: file-folder tab colour running the
                           full height of the left edge, like a coloured folder tab
                           in a physical evidence cabinet. */}
-                      <span aria-hidden className="absolute left-0 top-0 bottom-0 w-[4px]" style={{ backgroundColor: diffFill(p.difficulty) }} />
-
-                      <div className="pl-5 pr-3.5 py-3.5">
+                      <div className="px-3.5 py-3.5">
                         <div className="flex items-center justify-between mb-1.5">
                           {/* Case number: typed evidence reference, font-mono */}
                           <span
@@ -207,11 +277,11 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
                           )}
                         </div>
 
-                        <h2 className="font-display text-paper text-[17px] font-bold leading-[1.15] tracking-[0.01em] mb-2.5 uppercase">
+                        <h2 className="font-display text-[17px] font-bold leading-[1.15] tracking-[0.01em] mb-2.5 uppercase" style={{ color: '#19150F' }}>
                           {p.title}
                         </h2>
 
-                        <div className="flex items-center gap-3 text-paper-muted text-[11px] font-sans">
+                        <div className="flex items-center gap-3 text-[11px] font-sans" style={{ color: '#4B4232' }}>
                           <span className="flex items-center gap-1"><LayoutGrid size={12} />{p.size}×{p.size}</span>
 
                           {/* The cast, as accent dots. Real portraits would be
@@ -273,19 +343,44 @@ function ModeBtn({ active, onClick, icon, title, desc }: {
 }) {
   return (
     <button onClick={onClick}
-      className="focus-ring flex-1 rounded-none px-3 py-2 flex items-center gap-2 transition-colors"
+      className="focus-ring flex-1 min-h-11 rounded-none px-3 py-2 flex items-center gap-2 transition-colors"
       style={{
         background: active ? 'color-mix(in srgb, var(--color-accent) 14%, transparent)' : 'transparent',
         color: active ? 'var(--color-accent-text)' : 'var(--color-text-secondary)',
         /* border-strong: this is an unfilled button outline = the border IS the affordance */
         boxShadow: active ? 'inset 0 0 0 1px var(--color-border-strong)' : undefined,
-        borderLeft: active ? '2px solid var(--color-accent)' : '2px solid transparent',
+        borderBottom: active ? '2px solid var(--color-accent)' : '2px solid transparent',
+        minHeight: 44,
       }}>
       {icon}
       <span className="text-left">
         <span className="block font-display font-bold text-xs leading-tight tracking-wide uppercase">{title}</span>
         <span className="block text-[10px] font-mono opacity-70 leading-tight">{desc}</span>
       </span>
+    </button>
+  )
+}
+
+function DifficultyButton({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className="focus-ring h-11 w-11 border p-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors"
+      style={{
+        minHeight: 44,
+        minWidth: 44,
+        height: 44,
+        width: 44,
+        aspectRatio: '1 / 1',
+        borderColor: active ? 'var(--color-accent-strong)' : 'var(--color-border-strong)',
+        backgroundColor: active ? 'var(--color-accent)' : 'var(--color-bg-inset)',
+        color: active ? 'var(--color-on-accent)' : 'var(--color-text-secondary)',
+        clipPath: 'polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)',
+      }}
+    >
+      {label}
     </button>
   )
 }

@@ -20,16 +20,22 @@ export default function HowToPlay({ mode, onClose }: Props) {
         exit={{ scale: 0.96, opacity: 0 }}
         transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
         onClick={e => e.stopPropagation()}
-        className="w-full max-w-md border border-border-strong bg-bg-panel p-5 max-h-[85vh] overflow-y-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="how-to-play-title"
+        data-testid="how-to-play"
+        className="clipped-corner w-full max-w-md border border-border-strong bg-bg-panel p-4 max-h-[min(720px,calc(100dvh-2rem))] overflow-y-auto overscroll-contain sm:p-5"
         style={{ boxShadow: 'var(--shadow-elevated)' }}
       >
+        <div className="film-perforation mb-4 h-2 w-full opacity-60" aria-hidden="true" />
+
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="font-mono text-[9px] tracking-[0.3em] uppercase text-paper-muted mb-0.5">
               DETECTIVE BRIEFING
             </p>
-            <h2 className="font-display text-xl font-bold text-text-primary tracking-wide uppercase">
+            <h2 id="how-to-play-title" className="font-display text-xl font-bold text-text-primary tracking-wide uppercase">
               How to Play
             </h2>
           </div>

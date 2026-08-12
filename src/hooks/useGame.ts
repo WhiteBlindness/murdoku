@@ -2,6 +2,8 @@ import { useReducer, useEffect, useCallback, useMemo } from 'react'
 import type { Puzzle, CellMark, Screen, GameMode } from '../core/types'
 import { getAllPuzzles, getPuzzleById, initCatalog } from '../core/catalog'
 import { findMurderer } from '../core/engine'
+import { IN_PROGRESS_KEY, LEGACY_IN_PROGRESS_KEY, parseInProgress } from '../core/ux'
+import type { InProgressSummary } from '../core/ux'
 
 export type Tool = 'place' | 'x' | 'draft'
 
@@ -74,13 +76,51 @@ function loadMode(): GameMode { try { return (localStorage.getItem(MODE_KEY) as 
 function loadHideTimer(): boolean { try { return localStorage.getItem(TIMER_KEY) === '1' } catch { return false } }
 
 // --- mid-solve autosave (survives backing out to the case list / tab close) --
-const PLAY_KEY = 'murdoku_inprogress'
+// v1 is the public read-only summary source. Keep writing the original key
+// too so existing installs retain their resume behavior and compatibility.
+const PLAY_KEY = IN_PROGRESS_KEY
+const LEGACY_PLAY_KEY = LEGACY_IN_PROGRESS_KEY
 interface SavedPlay { id: string; mode: GameMode; marks: CellMark[][]; elapsed: number; hints: number; selected: string | null }
-function loadPlay(): SavedPlay | null {
-  try { return JSON.parse(localStorage.getItem(PLAY_KEY) ?? 'null') } catch { return null }
+function loadPlay(puzzle?: Puzzle): SavedPlay | null {
+  for (const key of [PLAY_KEY, LEGACY_PLAY_KEY]) {
+    try {
+      const raw = localStorage.getItem(key)
+      if (!raw) continue
+      const parsed = JSON.parse(raw) as SavedPlay
+      if (
+        parsed
+        && typeof parsed === 'object'
+        && typeof parsed.hints === 'number'
+        && Number.isFinite(parsed.hints)
+        && parsed.hints >= 0
+        && (!puzzle || parseInProgress(raw, [puzzle]))
+      ) return parsed
+    } catch { /* try the compatibility key */ }
+  }
+  return null
 }
-function savePlay(p: SavedPlay) { try { localStorage.setItem(PLAY_KEY, JSON.stringify(p)) } catch { /* ignore */ } }
-function clearPlay() { try { localStorage.removeItem(PLAY_KEY) } catch { /* ignore */ } }
+function savePlay(p: SavedPlay) {
+  try {
+    const raw = JSON.stringify(p)
+    localStorage.setItem(PLAY_KEY, raw)
+    localStorage.setItem(LEGACY_PLAY_KEY, raw)
+  } catch { /* ignore */ }
+}
+function clearPlay() {
+  try {
+    localStorage.removeItem(PLAY_KEY)
+    localStorage.removeItem(LEGACY_PLAY_KEY)
+  } catch { /* ignore */ }
+}
+function loadInProgressSummary(puzzles: readonly Puzzle[]): InProgressSummary | null {
+  for (const key of [PLAY_KEY, LEGACY_PLAY_KEY]) {
+    try {
+      const summary = parseInProgress(localStorage.getItem(key), puzzles)
+      if (summary) return summary
+    } catch { /* ignore unavailable storage */ }
+  }
+  return null
+}
 function hasAnyPlacement(marks: CellMark[][]): boolean {
   return marks.some(row => row.some(c => c.kind === 'person' || c.kind === 'draft' || c.kind === 'x'))
 }
@@ -165,7 +205,7 @@ function reducer(state: GameState, action: Action): GameState {
       if (!puzzle) return state
       try { localStorage.setItem(MODE_KEY, action.mode) } catch { /* ignore */ }
       // Resume an unsubmitted attempt on this exact case + mode, if one exists.
-      const saved = loadPlay()
+      const saved = loadPlay(puzzle)
       const resume = saved && saved.id === action.puzzleId && saved.mode === action.mode
         && Array.isArray(saved.marks) && saved.marks.length === puzzle.size
       return {
@@ -369,6 +409,8 @@ export function useGame() {
           id: state.puzzle.id, mode: state.mode, marks: state.marks,
           elapsed: state.elapsedSeconds, hints: state.hintsLeft, selected: state.selectedPerson,
         })
+      } else {
+        clearPlay()
       }
     }
   }, [state.marks, state.elapsedSeconds, state.screen, state.completed, state.puzzle, state.mode, state.hintsLeft, state.selectedPerson])
@@ -395,11 +437,14 @@ export function useGame() {
     return bad
   }, [placedOf, state.puzzle])
 
+  const inProgress = loadInProgressSummary(puzzles)
+
   return {
     ...state,
     puzzles,
     placedOf,
     conflicts,
+    inProgress,
     records: loadRecords(),
     timer: formatTime(state.elapsedSeconds),
     start: useCallback((id: string, mode: GameMode) => dispatch({ type: 'START', puzzleId: id, mode }), []),

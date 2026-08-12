@@ -27,7 +27,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,jpg,woff2}'],
         // Cache Google Fonts so repeat/offline visits paint instantly.
         runtimeCaching: [
           {

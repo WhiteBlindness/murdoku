@@ -1,13 +1,16 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useId, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Undo2, Redo2, Trash2, Lightbulb, X as XIcon, MousePointerClick, Pencil,
   HelpCircle, Eye, EyeOff, Info, Palette,
 } from 'lucide-react'
 import type { Puzzle, CellMark, GameMode, Furniture, FurnitureType } from '../core/types'
+import { resolveClueHighlight } from '../core/ux'
 import type { Tool } from '../hooks/useGame'
 import MapGrid from './MapGrid'
 import SuspectCard from './SuspectCard'
+import CaseProgressStrip from './CaseProgressStrip'
+import CaseNotes from './CaseNotes'
 import HowToPlay from './HowToPlay'
 import FurniturePicker from './FurniturePicker'
 
@@ -68,11 +71,30 @@ export default function GameScreen(props: Props) {
   for (const ct of puzzle.clues) (cluesOf[ct.clue.person] ||= []).push(ct.text)
   const placedCount = Object.keys(placedOf).length
   const detective = mode === 'detective'
+  const clueHighlight = selectedPerson ? resolveClueHighlight(puzzle, selectedPerson) : null
+  const clueHighlightLabel = selectedPerson
+    ? cluesOf[selectedPerson]?.[0] ?? 'Selected suspect clue'
+    : undefined
+  const clueTargetCell = clueHighlight?.cells?.[0]
+    ?? (clueHighlight?.furniture ? puzzle.furniture.find(item => item.type === clueHighlight.furniture) : undefined)
+    ?? (clueHighlight?.roomId ? puzzle.rooms.find(room => room.id === clueHighlight.roomId)?.cells[0] : undefined)
+  const clueTargetPoint = clueTargetCell
+    ? {
+        x: `${13.5 + ((clueTargetCell.col + 0.5) / puzzle.size) * 43.8}%`,
+        y: `${17 + ((clueTargetCell.row + 0.5) / puzzle.size) * 68}%`,
+      }
+    : null
 
   const [help, setHelp] = useState(false)
   const [legend, setLegend] = useState(false)
   const [confirmClear, setConfirmClear] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
+  const leaveTitleId = useId()
+  const leaveDescriptionId = useId()
+  const clearTitleId = useId()
+  const clearDescriptionId = useId()
+  const stayRef = useRef<HTMLButtonElement>(null)
+  const cancelClearRef = useRef<HTMLButtonElement>(null)
 
   // Furniture decoration editor
   const [showDecor, setShowDecor] = useState(false)
@@ -129,11 +151,29 @@ export default function GameScreen(props: Props) {
     try { if (!localStorage.getItem(HELP_KEY)) { setHelp(true); localStorage.setItem(HELP_KEY, '1') } } catch { /* ignore */ }
   }, [])
 
+  useEffect(() => {
+    const open = confirmLeave || confirmClear
+    if (!open) return
+    const previousFocus = document.activeElement as HTMLElement | null
+    const focusTarget = confirmLeave ? stayRef.current : cancelClearRef.current
+    focusTarget?.focus()
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      setConfirmLeave(false)
+      setConfirmClear(false)
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      previousFocus?.focus()
+    }
+  }, [confirmLeave, confirmClear])
+
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      className="bg-bg-base flex flex-col min-h-[100dvh] lg:h-[100dvh] lg:overflow-hidden"
+      className="desk-surface bg-bg-base flex flex-col min-h-[100dvh] lg:h-[100dvh] lg:overflow-hidden"
     >
       <AnimatePresence>{help && <HowToPlay mode={mode} onClose={() => setHelp(false)} />}</AnimatePresence>
 
@@ -165,7 +205,7 @@ export default function GameScreen(props: Props) {
 
       {/* ── Header — spans all columns at lg+, full-width at mobile ────────── */}
       <header
-        className="pt-safe flex items-center justify-between px-4 min-h-[56px] flex-shrink-0 lg:col-span-full"
+        className="case-masthead pt-safe grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-stretch px-3 min-h-[64px] flex-shrink-0 lg:col-span-full"
         style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
         {/* Back — stencil label */}
@@ -177,7 +217,7 @@ export default function GameScreen(props: Props) {
         </button>
 
         {/* Case title + metadata */}
-        <div className="text-center min-w-0 px-2 flex-1">
+        <div className="text-center min-w-0 px-3 flex-1 flex flex-col justify-center border-x" style={{ borderColor: 'var(--color-border-subtle)' }}>
           <h1 className="font-display text-text-primary text-sm sm:text-base font-bold leading-snug uppercase tracking-wide">
             {puzzle.title}
           </h1>
@@ -200,6 +240,17 @@ export default function GameScreen(props: Props) {
             >
               {detective ? 'DETECTIVE' : 'CLASSIC'}
             </span>
+          </div>
+        </div>
+
+        <div className="hidden md:flex min-w-[240px] items-center justify-between gap-6 px-4 border-r" style={{ borderColor: 'var(--color-border-subtle)' }}>
+          <div>
+            <span className="block font-mono text-[9px] uppercase tracking-[0.22em] text-text-muted">Objective</span>
+            <span className="block font-mono text-[11px] text-text-secondary">Reconstruct every alibi</span>
+          </div>
+          <div className="text-right">
+            <span className="block font-mono text-[9px] uppercase tracking-[0.22em] text-text-muted">Clues placed</span>
+            <span className="block font-mono text-sm text-accent-text tabular-nums">{placedCount}/{puzzle.people.length}</span>
           </div>
         </div>
 
@@ -236,13 +287,29 @@ export default function GameScreen(props: Props) {
       */}
       <div
         className={[
-          'flex-1 flex flex-col min-h-0',
+          'relative flex-1 flex flex-col min-h-0',
           // lg: two-column grid
-          'lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)] lg:grid-rows-[1fr] lg:min-h-0',
-          // xl: three-column grid
-          'xl:grid-cols-[minmax(260px,320px)_minmax(0,1fr)_minmax(340px,420px)]',
+          'lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:grid-rows-[auto_minmax(0,1fr)] lg:min-h-0',
         ].join(' ')}
       >
+
+        <div className="order-2 lg:order-none lg:col-span-full lg:row-start-1">
+          <CaseProgressStrip
+            puzzle={puzzle}
+            placedOf={placedOf}
+            conflicts={conflicts}
+            selectedPerson={selectedPerson}
+            onSelectPerson={props.onSelectPerson}
+          />
+        </div>
+
+        {clueTargetPoint && (
+          <svg aria-hidden className="clue-connector pointer-events-none absolute inset-0 z-30 hidden h-full w-full lg:block">
+            <line className="clue-connector-line" x1="74%" y1="34%" x2={clueTargetPoint.x} y2={clueTargetPoint.y} />
+            <circle className="clue-connector-node" cx="74%" cy="34%" r="5" />
+            <circle className="clue-connector-node" cx={clueTargetPoint.x} cy={clueTargetPoint.y} r="7" />
+          </svg>
+        )}
 
         {/* ── CASE FILE RAIL (left) ─────────────────────────────────────────
             Mobile: display:contents — contributes nothing to flow, children
@@ -250,7 +317,7 @@ export default function GameScreen(props: Props) {
             lg: hidden (folded into dossier top via xl:block below).
             xl: first grid column — visible side rail.
         */}
-        <div className="contents xl:flex xl:flex-col xl:min-h-0 xl:overflow-y-auto xl:border-r xl:col-start-1 xl:row-start-1"
+        <div className="hidden" aria-hidden="true"
           style={{ borderColor: 'var(--color-border-subtle)' }}
         >
           {/* Case file rail inner — only rendered visually at xl */}
@@ -343,9 +410,7 @@ export default function GameScreen(props: Props) {
           className={[
             'contents',
             // lg: real grid column — non-scrolling, board fills the height
-            'lg:flex lg:flex-col lg:min-h-0 lg:overflow-hidden lg:col-start-1 lg:row-start-1',
-            // xl: shift to second column
-            'xl:col-start-2',
+            'lg:flex lg:flex-col lg:min-h-0 lg:overflow-hidden lg:col-start-1 lg:row-start-2',
           ].join(' ')}
         >
           {/* ── Instruction line (mobile: order 0, desktop: inside centre) ── */}
@@ -388,6 +453,8 @@ export default function GameScreen(props: Props) {
                   marks={marks}
                   conflicts={conflicts}
                   onCellClick={props.onCell}
+                  highlight={clueHighlight}
+                  highlightLabel={clueHighlightLabel}
                   extraFurniture={customFurniture}
                   placingFurniture={showDecor ? placingFurniture : null}
                   placingRotation={placingRotation}
@@ -398,10 +465,10 @@ export default function GameScreen(props: Props) {
           </div>
 
           {/* Legend (mobile only — disclosure; on xl it's in the rail, expanded) */}
-          <div className="order-2 xl:hidden mx-auto w-full max-w-[640px] px-4 pb-1">
+          <div className="order-4 lg:hidden mx-auto w-full max-w-[640px] px-4 pb-1">
             <button
               onClick={() => setLegend(v => !v)}
-              className="focus-ring flex items-center gap-1.5 text-[11px] text-text-muted font-mono mx-auto tracking-widest uppercase hover:text-text-secondary transition-colors"
+              className="focus-ring flex min-h-[44px] items-center gap-1.5 text-[11px] text-text-muted font-mono mx-auto tracking-widest uppercase hover:text-text-secondary transition-colors"
             >
               <Info size={13} /> {legend ? '— Hide' : 'What am I looking at?'}
             </button>
@@ -424,7 +491,7 @@ export default function GameScreen(props: Props) {
               Desktop: flex-shrink-0 at the bottom of the scene column.
               FurniturePicker lives here so it's beside the board.
           */}
-          <div className="order-3 flex-shrink-0 mx-auto w-full max-w-[640px] px-3 pb-3 lg:pb-3 flex flex-col gap-2">
+          <div className="command-rail order-5 flex-shrink-0 w-full px-3 py-2 flex flex-col gap-2">
             {/* FurniturePicker — transient, in the scene column */}
             <AnimatePresence>
               {showDecor && (
@@ -445,7 +512,7 @@ export default function GameScreen(props: Props) {
             </AnimatePresence>
 
             {/* Mode row — Place / Draft / Mark */}
-            <div className="flex gap-2 justify-center [&>button]:flex-1 sm:[&>button]:flex-none">
+            <div className="flex gap-2 justify-center [&>button]:flex-1 sm:[&>button]:flex-none lg:justify-start">
               <ToolBtn
                 active={tool === 'place'}
                 onClick={() => props.onSetTool('place')}
@@ -471,7 +538,7 @@ export default function GameScreen(props: Props) {
             </div>
 
             {/* Actions grid — Undo / Redo / Clear / Hint / Decorate */}
-            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:justify-center">
+            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:justify-center lg:justify-start">
               <ToolBtn onClick={props.onUndo} disabled={!props.canUndo} icon={<Undo2 size={16} />} label="Undo" />
               <ToolBtn onClick={props.onRedo} disabled={!props.canRedo} icon={<Redo2 size={16} />} label="Redo" />
               <ToolBtn onClick={() => setConfirmClear(true)} icon={<Trash2 size={16} />} label="Clear" />
@@ -499,15 +566,14 @@ export default function GameScreen(props: Props) {
         <div
           className={[
             'contents',
-            'lg:flex lg:flex-col lg:min-h-0 lg:border-l lg:col-start-2 lg:row-start-1',
-            'xl:col-start-3',
+            'lg:flex lg:flex-col lg:min-h-0 lg:border-l lg:col-start-2 lg:row-start-2',
           ].join(' ')}
           style={{ borderColor: 'var(--color-border-subtle)' } as React.CSSProperties}
         >
 
           {/* Case meta at lg (two-col) — folded rail content at top of dossier.
               On xl it's hidden because the side rail has it. */}
-          <div className="hidden lg:block xl:hidden flex-shrink-0 px-4 pt-3 pb-2 border-b"
+          <div className="hidden flex-shrink-0 px-4 pt-3 pb-2 border-b"
             style={{ borderColor: 'var(--color-border-subtle)' }}
           >
             <div className="flex items-center justify-between gap-3">
@@ -534,8 +600,8 @@ export default function GameScreen(props: Props) {
             Mobile: order-2 — between board and toolbar in the single column.
             Desktop: flex-1 overflow-y-auto — fills dossier column, scrolls.
           */}
-          <div className="order-2 lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
-            <div className="p-3 lg:p-4 flex flex-col gap-3">
+          <div className="order-3 lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
+            <div className="relative p-3 lg:p-4 flex flex-col gap-3">
 
               {/* Suspects label */}
               <p className="text-[10px] text-text-muted font-mono uppercase tracking-[0.2em]">
@@ -561,6 +627,8 @@ export default function GameScreen(props: Props) {
                 ))}
               </div>
 
+              <CaseNotes caseId={puzzle.id} />
+
             </div>
           </div>
 
@@ -571,7 +639,7 @@ export default function GameScreen(props: Props) {
               translate3d(±5px) must not clip inside the scroll container, which
               would also produce a transient horizontal scrollbar at 390px.
           */}
-          <div className="order-4 flex-shrink-0 p-3 lg:p-4 flex flex-col gap-2 border-t"
+          <div className="command-rail order-6 flex-shrink-0 p-3 lg:p-4 flex flex-col gap-2 border-t"
             style={{ borderColor: 'var(--color-border-subtle)' }}
           >
             {/* ── Accuse — the dramatic beat ─────────────────────────────── */}
@@ -585,7 +653,7 @@ export default function GameScreen(props: Props) {
               style={{
                 background: 'var(--color-accent)',
                 color: 'var(--color-on-accent)',
-                boxShadow: '0 4px 0 0 color-mix(in srgb, var(--color-accent) 45%, #000), var(--shadow-cut)',
+                boxShadow: 'var(--shadow-cut), 0 8px 22px -12px color-mix(in srgb, var(--color-accent) 60%, transparent)',
                 letterSpacing: '0.15em',
               }}
             >
@@ -605,7 +673,7 @@ export default function GameScreen(props: Props) {
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="text-[12px] font-mono px-3 py-2 text-center w-full tracking-wide"
+                  className="min-h-[44px] text-[12px] font-mono px-3 py-2 text-center w-full tracking-wide"
                   style={{
                     color: 'var(--color-danger-text)',
                     backgroundColor: 'color-mix(in srgb, var(--color-danger) 14%, transparent)',
@@ -636,11 +704,15 @@ export default function GameScreen(props: Props) {
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             style={{ background: 'var(--overlay-scrim)' }}
             onClick={() => setConfirmLeave(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={leaveTitleId}
+            aria-describedby={leaveDescriptionId}
           >
             <motion.div
-              initial={{ scale: 0.94, y: 8 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.96, opacity: 0 }}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 4 }}
               transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
               onClick={e => e.stopPropagation()}
               className="w-full max-w-xs border bg-bg-surface p-6 text-center"
@@ -649,23 +721,24 @@ export default function GameScreen(props: Props) {
                 boxShadow: 'var(--shadow-elevated)',
               }}
             >
-              <p className="font-display font-bold text-text-primary text-lg mb-1 uppercase tracking-[0.12em]">
+              <p id={leaveTitleId} className="font-display font-bold text-text-primary text-lg mb-1 uppercase tracking-[0.12em]">
                 Leave this case?
               </p>
-              <p className="text-text-secondary text-[13px] font-mono mb-5 tracking-wide">
+              <p id={leaveDescriptionId} className="text-text-secondary text-[13px] font-mono mb-5 tracking-wide">
                 Progress is saved — you can pick up where you left off.
               </p>
               <div className="flex gap-3">
                 <button
+                  ref={stayRef}
                   onClick={() => setConfirmLeave(false)}
-                  className="focus-ring flex-1 py-2.5 border font-display text-sm uppercase tracking-[0.1em] text-text-secondary hover:text-text-primary transition-colors"
+                  className="focus-ring flex-1 min-h-[44px] py-2.5 border font-display text-sm uppercase tracking-[0.1em] text-text-secondary hover:text-text-primary transition-colors"
                   style={{ borderColor: 'var(--color-border-strong)' }}
                 >
                   Stay
                 </button>
                 <button
                   onClick={props.onBack}
-                  className="focus-ring flex-1 py-2.5 font-display text-sm uppercase tracking-[0.1em]"
+                  className="focus-ring flex-1 min-h-[44px] py-2.5 font-display text-sm uppercase tracking-[0.1em]"
                   style={{ background: 'var(--color-accent)', color: 'var(--color-on-accent)' }}
                 >
                   Leave
@@ -686,11 +759,15 @@ export default function GameScreen(props: Props) {
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             style={{ background: 'var(--overlay-scrim)' }}
             onClick={() => setConfirmClear(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={clearTitleId}
+            aria-describedby={clearDescriptionId}
           >
             <motion.div
-              initial={{ scale: 0.94, y: 8 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.96, opacity: 0 }}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 4 }}
               transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
               onClick={e => e.stopPropagation()}
               className="w-full max-w-xs border bg-bg-surface p-6 text-center"
@@ -699,23 +776,24 @@ export default function GameScreen(props: Props) {
                 boxShadow: 'var(--shadow-elevated)',
               }}
             >
-              <p className="font-display font-bold text-text-primary text-lg mb-1 uppercase tracking-[0.12em]">
+              <p id={clearTitleId} className="font-display font-bold text-text-primary text-lg mb-1 uppercase tracking-[0.12em]">
                 Clear the board?
               </p>
-              <p className="text-text-secondary text-[13px] font-mono mb-5 tracking-wide">
+              <p id={clearDescriptionId} className="text-text-secondary text-[13px] font-mono mb-5 tracking-wide">
                 This removes every placement, ✕ and draft. You can undo it once.
               </p>
               <div className="flex gap-3">
                 <button
+                  ref={cancelClearRef}
                   onClick={() => setConfirmClear(false)}
-                  className="focus-ring flex-1 py-2.5 border font-display text-sm uppercase tracking-[0.1em] text-text-secondary hover:text-text-primary transition-colors"
+                  className="focus-ring flex-1 min-h-[44px] py-2.5 border font-display text-sm uppercase tracking-[0.1em] text-text-secondary hover:text-text-primary transition-colors"
                   style={{ borderColor: 'var(--color-border-strong)' }}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => { props.onClear(); setConfirmClear(false) }}
-                  className="focus-ring flex-1 py-2.5 font-display text-sm uppercase tracking-[0.1em]"
+                  className="focus-ring flex-1 min-h-[44px] py-2.5 font-display text-sm uppercase tracking-[0.1em]"
                   style={{ background: 'var(--color-danger)', color: 'var(--color-on-accent)' }}
                 >
                   Clear

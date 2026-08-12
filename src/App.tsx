@@ -112,6 +112,8 @@ function AppInner() {
               mode={game.mode}
               onSetMode={game.setMode}
               onSelect={(id) => game.start(id, game.mode)}
+              inProgress={game.inProgress}
+              onResume={game.start}
               onOpenReleases={() => setAux('releases')}
               resolvedTheme={theme.resolved}
               onToggleTheme={theme.toggle}

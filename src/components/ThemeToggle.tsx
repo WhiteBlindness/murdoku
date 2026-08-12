@@ -19,9 +19,10 @@ export default function ThemeToggle({ resolved, onToggle, className = '' }: Prop
       type="button"
       whileTap={{ scale: 0.88 }}
       onClick={onToggle}
+      data-testid="theme-toggle"
       aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
       title={isDark ? 'Light theme' : 'Dark theme'}
-      className={`focus-ring flex items-center justify-center w-11 h-11 border border-border-strong bg-bg-panel text-gold ${className}`}
+      className={`focus-ring flex h-11 w-11 items-center justify-center border border-border-strong bg-bg-surface text-accent-text transition-colors hover:border-accent-strong ${className}`}
     >
       {isDark ? (
         /* moon — night watch */

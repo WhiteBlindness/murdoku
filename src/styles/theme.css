@@ -24,33 +24,33 @@
   color-scheme: dark;
 
   /* --- Surfaces: obsidian -> charcoal. Light falls front-to-back. -------- */
-  --color-bg-base:      #0B0B0D;   /* the room the desk sits in  */
-  --color-bg-surface:   #141518;   /* case folders / panels      */
-  --color-bg-elevated:  #1D1F23;   /* cells / inputs             */
-  --color-bg-inset:     #08080A;   /* wells / shadow / track     */
+  --color-bg-base:      #080A08;   /* magnetic table             */
+  --color-bg-surface:   #111511;   /* instrument panel           */
+  --color-bg-elevated:  #192019;   /* selected evidence plate    */
+  --color-bg-inset:     #050705;   /* film gate / recess         */
 
   /* --- Borders ----------------------------------------------------------
      TWO TIERS WITH DIFFERENT OBLIGATIONS, do not collapse them:
      `subtle`  = decorative hairline (1.83:1). It may NEVER be the only thing
                  marking an interactive boundary — WCAG 1.4.11 would apply.
      `strong`  = 3.52:1, meets 1.4.11. Use wherever a border IS the affordance. */
-  --color-border-subtle: #3A3E46;
-  --color-border-strong: #636873;
+  --color-border-subtle: #E8DFC51F;
+  --color-border-strong: #737565;
 
   /* --- Text: parchment on obsidian -------------------------------------- */
-  --color-text-primary:   #EDE6D6;  /* 15.82:1 on base           */
-  --color-text-secondary: #B8AE99;  /*  8.95:1 on base           */
-  --color-text-muted:     #8E8676;  /*  5.45:1 on base           */
+  --color-text-primary:   #F1E8CE;  /* bone-white primary text   */
+  --color-text-secondary: #C8C0AA;  /* evidence copy             */
+  --color-text-muted:     #949184;  /* metadata                  */
 
   /* --- Accent: brass (desk lamp, badge, stamped seal) ------------------- */
-  --color-accent:         #C9A227;  /* fills, rules, icons       */
-  --color-accent-strong:  #E3BC3F;  /* hovered / emphasis        */
-  --color-accent-text:    #D9B437;  /*  9.86:1 on base           */
-  --color-on-accent:      #0B0B0D;  /*  8.13:1 on the brass fill */
+  --color-accent:         #D89A22;  /* projector amber fill      */
+  --color-accent-strong:  #FFC24B;  /* focus and active outline  */
+  --color-accent-text:    #FFC85E;  /* amber text on dark        */
+  --color-on-accent:      #160F04;  /* ink on amber              */
 
   /* --- Danger: dried blood --------------------------------------------- */
-  --color-danger:         #8E1B1B;
-  --color-danger-text:    #E06C6C;  /*  6.12:1 on base           */
+  --color-danger:         #8C2D24;
+  --color-danger-text:    #FFB6AA;  /* danger text on dark       */
 
   /* --- Difficulty scale -------------------------------------------------
      Deliberately NOT a traffic-light. Noir has no bright green. The scale
@@ -58,17 +58,17 @@
      heat rather than as a colour category. `-text` is the AA-safe
      foreground; the base token is decorative fill (rules, spines, gradients).
      All ten pairings verified >= 4.5:1 in BOTH themes. */
-  --diff-very-easy:      #C3C9BE;
-  --diff-easy:           #CBBE9A;
-  --diff-medium:         #D6A94E;
-  --diff-hard:           #D2803F;
-  --diff-expert:         #DE5F5F;
+  --diff-very-easy:      #AEB8A7;
+  --diff-easy:           #C7B879;
+  --diff-medium:         #D89A22;
+  --diff-hard:           #D27B42;
+  --diff-expert:         #E06A5A;
 
-  --diff-very-easy-text: #C3C9BE;  /* 11.63:1 on base */
-  --diff-easy-text:      #CBBE9A;  /* 10.65:1 on base */
-  --diff-medium-text:    #D6A94E;  /*  9.03:1 on base */
-  --diff-hard-text:      #D2803F;  /*  6.46:1 on base */
-  --diff-expert-text:    #DE5F5F;  /*  5.53:1 on base */
+  --diff-very-easy-text: #AEB8A7;
+  --diff-easy-text:      #C7B879;
+  --diff-medium-text:    #D89A22;
+  --diff-hard-text:      #D27B42;
+  --diff-expert-text:    #E06A5A;
 
   /* --- The board: illustrated Cluedo surface sitting on the noir desk ----
      Floor materials are hardcoded hex in MapGrid.tsx (six SVG tiles — oak,
@@ -83,8 +83,19 @@
   --board-ground:      #000000;  /* outer frame / wall gap fill           */
   --board-wall:        #000000;  /* room boundary — bold black divider    */
   --board-room-tint:   #F5EED8;  /* cream fallback, draft-chip plates     */
-  --board-glow:        rgba(201, 162, 39, 0.55);  /* brass accent (non-focus use only) */
+  --board-glow:        rgba(216, 154, 34, 0.55);  /* amber accent (non-focus use only) */
   --board-chalk:       #1A1008;  /* dark ink annotations on light floors  */
+
+  /* --- Continuity desk materials -------------------------------------- */
+  --perforation-size:   8px;
+  --perforation-gap:    12px;
+  --clip-corner:        10px;
+  --projector-glow:     0 0 28px color-mix(in srgb, var(--color-accent) 22%, transparent);
+  --focus-ring:         0 0 0 2px var(--color-bg-base), 0 0 0 4px var(--color-accent-strong);
+  --motion-snap:        120ms;
+  --motion-trace:       220ms;
+  --motion-aperture:    420ms;
+  --ease-physical:      cubic-bezier(.2, .8, .2, 1);
 
   /* --- Semantic FX ------------------------------------------------------
      Chiaroscuro: shadows are deep and directional, not soft ambient haze. */
@@ -102,46 +113,46 @@
   :root:not(.theme-dark) {
     color-scheme: light;
 
-    --color-bg-base:      #E8E1D0;   /* aged dossier paper        */
-    --color-bg-surface:   #F2ECDD;
-    --color-bg-elevated:  #F8F3E7;
-    --color-bg-inset:     #DCD3BE;
+    --color-bg-base:      #D7D3C7;   /* daylight editing bench    */
+    --color-bg-surface:   #EBE6D9;
+    --color-bg-elevated:  #F6F0E1;
+    --color-bg-inset:     #C5C2B7;
 
-    --color-border-subtle: #B0A283;  /* 1.93:1 — decorative only  */
-    --color-border-strong: #7E7154;  /* 3.68:1 — meets 1.4.11     */
+    --color-border-subtle: #3F433522;  /* decorative only           */
+    --color-border-strong: #575B4E;    /* interactive boundary       */
 
-    --color-text-primary:   #17171A;  /* 13.73:1 on base          */
-    --color-text-secondary: #3E3A31;  /*  8.69:1 on base          */
-    --color-text-muted:     #635C4C;  /*  5.09:1 on base          */
+    --color-text-primary:   #171914;  /* ink                        */
+    --color-text-secondary: #3F433B;  /* evidence copy              */
+    --color-text-muted:     #686B61;  /* metadata                   */
 
-    --color-accent:         #8A6A12;
-    --color-accent-strong:  #6E5410;
-    --color-accent-text:    #6B520E;  /*  5.68:1 on base          */
-    --color-on-accent:      #F8F3E7;
+    --color-accent:         #A46C08;
+    --color-accent-strong:  #704900;
+    --color-accent-text:    #704900;
+    --color-on-accent:      #FFF7E4;
 
-    --color-danger:         #8E1B1B;
-    --color-danger-text:    #7E1414;  /*  8.07:1 on base          */
+    --color-danger:         #8A2A22;
+    --color-danger-text:    #702019;
 
-    --diff-very-easy:      #4A5147;
-    --diff-easy:           #5C5231;
-    --diff-medium:         #7A5A12;
-    --diff-hard:           #8A4413;
-    --diff-expert:         #8E1B1B;
+    --diff-very-easy:      #4D5A4D;
+    --diff-easy:           #665A2B;
+    --diff-medium:         #7B5708;
+    --diff-hard:           #8A481D;
+    --diff-expert:         #8A2A22;
 
-    --diff-very-easy-text: #4A5147;  /* 6.30:1 on base */
-    --diff-easy-text:      #5C5231;  /* 5.95:1 on base */
-    --diff-medium-text:    #7A5A12;  /* 4.88:1 on base */
-    --diff-hard-text:      #8A4413;  /* 5.52:1 on base */
-    --diff-expert-text:    #8E1B1B;  /* 6.94:1 on base */
+    --diff-very-easy-text: #4D5A4D;
+    --diff-easy-text:      #665A2B;
+    --diff-medium-text:    #7B5708;
+    --diff-hard-text:      #8A481D;
+    --diff-expert-text:    #8A2A22;
 
     /* Board sits on the daylight desk — illustrated surface, same bold black walls. */
     --board-ground:      #000000;
     --board-wall:        #000000;
     --board-room-tint:   #F5EED8;
-    --board-glow:        rgba(138, 106, 18, 0.5);
+    --board-glow:        rgba(164, 108, 8, 0.5);
     --board-chalk:       #1A1008;
 
-    --shadow-elevated: 0 18px 44px -14px rgba(70, 58, 34, 0.42),
+    --shadow-elevated: 0 18px 44px -14px rgba(70, 58, 34, 0.34),
                        0 2px 0 0 rgba(255, 255, 255, 0.5);
     --shadow-cut:      inset 0 1px 0 rgba(255, 255, 255, 0.6),
                        inset 0 -1px 0 rgba(120, 100, 60, 0.25);
@@ -155,45 +166,45 @@
 :root.theme-light {
   color-scheme: light;
 
-  --color-bg-base:      #E8E1D0;
-  --color-bg-surface:   #F2ECDD;
-  --color-bg-elevated:  #F8F3E7;
-  --color-bg-inset:     #DCD3BE;
+  --color-bg-base:      #D7D3C7;
+  --color-bg-surface:   #EBE6D9;
+  --color-bg-elevated:  #F6F0E1;
+  --color-bg-inset:     #C5C2B7;
 
-  --color-border-subtle: #B0A283;
-  --color-border-strong: #7E7154;
+  --color-border-subtle: #3F433522;
+  --color-border-strong: #575B4E;
 
-  --color-text-primary:   #17171A;
-  --color-text-secondary: #3E3A31;
-  --color-text-muted:     #635C4C;
+  --color-text-primary:   #171914;
+  --color-text-secondary: #3F433B;
+  --color-text-muted:     #686B61;
 
-  --color-accent:         #8A6A12;
-  --color-accent-strong:  #6E5410;
-  --color-accent-text:    #6B520E;
-  --color-on-accent:      #F8F3E7;
+  --color-accent:         #A46C08;
+  --color-accent-strong:  #704900;
+  --color-accent-text:    #704900;
+  --color-on-accent:      #FFF7E4;
 
-  --color-danger:         #8E1B1B;
-  --color-danger-text:    #7E1414;
+  --color-danger:         #8A2A22;
+  --color-danger-text:    #702019;
 
-  --diff-very-easy:      #4A5147;
-  --diff-easy:           #5C5231;
-  --diff-medium:         #7A5A12;
-  --diff-hard:           #8A4413;
-  --diff-expert:         #8E1B1B;
+  --diff-very-easy:      #4D5A4D;
+  --diff-easy:           #665A2B;
+  --diff-medium:         #7B5708;
+  --diff-hard:           #8A481D;
+  --diff-expert:         #8A2A22;
 
-  --diff-very-easy-text: #4A5147;
-  --diff-easy-text:      #5C5231;
-  --diff-medium-text:    #7A5A12;
-  --diff-hard-text:      #8A4413;
-  --diff-expert-text:    #8E1B1B;
+  --diff-very-easy-text: #4D5A4D;
+  --diff-easy-text:      #665A2B;
+  --diff-medium-text:    #7B5708;
+  --diff-hard-text:      #8A481D;
+  --diff-expert-text:    #8A2A22;
 
   --board-ground:      #000000;
   --board-wall:        #000000;
   --board-room-tint:   #F5EED8;
-  --board-glow:        rgba(138, 106, 18, 0.5);
+  --board-glow:        rgba(164, 108, 8, 0.5);
   --board-chalk:       #1A1008;
 
-  --shadow-elevated: 0 18px 44px -14px rgba(70, 58, 34, 0.42),
+  --shadow-elevated: 0 18px 44px -14px rgba(70, 58, 34, 0.34),
                      0 2px 0 0 rgba(255, 255, 255, 0.5);
   --shadow-cut:      inset 0 1px 0 rgba(255, 255, 255, 0.6),
                      inset 0 -1px 0 rgba(120, 100, 60, 0.25);

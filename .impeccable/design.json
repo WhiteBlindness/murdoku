@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-12T14:59:22.090Z",
+  "title": "Design System: Alibi",
+  "extensions": {
+    "colorMeta": {
+      "background-base": {
+        "role": "neutral",
+        "displayName": "Magnetic Ground",
+        "canonical": "var(--color-bg-base)",
+        "tonalRamp": ["oklch(from var(--color-bg-base) 0.15 c h)", "oklch(from var(--color-bg-base) 0.27 c h)", "oklch(from var(--color-bg-base) 0.39 c h)", "oklch(from var(--color-bg-base) 0.51 c h)", "oklch(from var(--color-bg-base) 0.63 c h)", "oklch(from var(--color-bg-base) 0.75 c h)", "oklch(from var(--color-bg-base) 0.87 c h)", "oklch(from var(--color-bg-base) 0.95 c h)"]
+      },
+      "background-surface": {
+        "role": "neutral",
+        "displayName": "Instrument Surface",
+        "canonical": "var(--color-bg-surface)",
+        "tonalRamp": ["oklch(from var(--color-bg-surface) 0.15 c h)", "oklch(from var(--color-bg-surface) 0.27 c h)", "oklch(from var(--color-bg-surface) 0.39 c h)", "oklch(from var(--color-bg-surface) 0.51 c h)", "oklch(from var(--color-bg-surface) 0.63 c h)", "oklch(from var(--color-bg-surface) 0.75 c h)", "oklch(from var(--color-bg-surface) 0.87 c h)", "oklch(from var(--color-bg-surface) 0.95 c h)"]
+      },
+      "background-elevated": {
+        "role": "neutral",
+        "displayName": "Selected Plate",
+        "canonical": "var(--color-bg-elevated)",
+        "tonalRamp": ["oklch(from var(--color-bg-elevated) 0.15 c h)", "oklch(from var(--color-bg-elevated) 0.27 c h)", "oklch(from var(--color-bg-elevated) 0.39 c h)", "oklch(from var(--color-bg-elevated) 0.51 c h)", "oklch(from var(--color-bg-elevated) 0.63 c h)", "oklch(from var(--color-bg-elevated) 0.75 c h)", "oklch(from var(--color-bg-elevated) 0.87 c h)", "oklch(from var(--color-bg-elevated) 0.95 c h)"]
+      },
+      "background-inset": {
+        "role": "neutral",
+        "displayName": "Film Gate",
+        "canonical": "var(--color-bg-inset)",
+        "tonalRamp": ["oklch(from var(--color-bg-inset) 0.15 c h)", "oklch(from var(--color-bg-inset) 0.27 c h)", "oklch(from var(--color-bg-inset) 0.39 c h)", "oklch(from var(--color-bg-inset) 0.51 c h)", "oklch(from var(--color-bg-inset) 0.63 c h)", "oklch(from var(--color-bg-inset) 0.75 c h)", "oklch(from var(--color-bg-inset) 0.87 c h)", "oklch(from var(--color-bg-inset) 0.95 c h)"]
+      },
+      "border-subtle": {
+        "role": "neutral",
+        "displayName": "Decorative Hairline",
+        "canonical": "var(--color-border-subtle)",
+        "tonalRamp": ["oklch(from var(--color-border-subtle) 0.15 c h)", "oklch(from var(--color-border-subtle) 0.27 c h)", "oklch(from var(--color-border-subtle) 0.39 c h)", "oklch(from var(--color-border-subtle) 0.51 c h)", "oklch(from var(--color-border-subtle) 0.63 c h)", "oklch(from var(--color-border-subtle) 0.75 c h)", "oklch(from var(--color-border-subtle) 0.87 c h)", "oklch(from var(--color-border-subtle) 0.95 c h)"]
+      },
+      "border-strong": {
+        "role": "neutral",
+        "displayName": "Strong Edge",
+        "canonical": "var(--color-border-strong)",
+        "tonalRamp": ["oklch(from var(--color-border-strong) 0.15 c h)", "oklch(from var(--color-border-strong) 0.27 c h)", "oklch(from var(--color-border-strong) 0.39 c h)", "oklch(from var(--color-border-strong) 0.51 c h)", "oklch(from var(--color-border-strong) 0.63 c h)", "oklch(from var(--color-border-strong) 0.75 c h)", "oklch(from var(--color-border-strong) 0.87 c h)", "oklch(from var(--color-border-strong) 0.95 c h)"]
+      },
+      "text-primary": {
+        "role": "neutral",
+        "displayName": "Bone Copy",
+        "canonical": "var(--color-text-primary)",
+        "tonalRamp": ["oklch(from var(--color-text-primary) 0.15 c h)", "oklch(from var(--color-text-primary) 0.27 c h)", "oklch(from var(--color-text-primary) 0.39 c h)", "oklch(from var(--color-text-primary) 0.51 c h)", "oklch(from var(--color-text-primary) 0.63 c h)", "oklch(from var(--color-text-primary) 0.75 c h)", "oklch(from var(--color-text-primary) 0.87 c h)", "oklch(from var(--color-text-primary) 0.95 c h)"]
+      },
+      "text-secondary": {
+        "role": "neutral",
+        "displayName": "Evidence Copy",
+        "canonical": "var(--color-text-secondary)",
+        "tonalRamp": ["oklch(from var(--color-text-secondary) 0.15 c h)", "oklch(from var(--color-text-secondary) 0.27 c h)", "oklch(from var(--color-text-secondary) 0.39 c h)", "oklch(from var(--color-text-secondary) 0.51 c h)", "oklch(from var(--color-text-secondary) 0.63 c h)", "oklch(from var(--color-text-secondary) 0.75 c h)", "oklch(from var(--color-text-secondary) 0.87 c h)", "oklch(from var(--color-text-secondary) 0.95 c h)"]
+      },
+      "text-muted": {
+        "role": "neutral",
+        "displayName": "Metadata Copy",
+        "canonical": "var(--color-text-muted)",
+        "tonalRamp": ["oklch(from var(--color-text-muted) 0.15 c h)", "oklch(from var(--color-text-muted) 0.27 c h)", "oklch(from var(--color-text-muted) 0.39 c h)", "oklch(from var(--color-text-muted) 0.51 c h)", "oklch(from var(--color-text-muted) 0.63 c h)", "oklch(from var(--color-text-muted) 0.75 c h)", "oklch(from var(--color-text-muted) 0.87 c h)", "oklch(from var(--color-text-muted) 0.95 c h)"]
+      },
+      "projector-amber": {
+        "role": "primary",
+        "displayName": "Projector Amber",
+        "canonical": "var(--color-accent)",
+        "tonalRamp": ["oklch(from var(--color-accent) 0.15 c h)", "oklch(from var(--color-accent) 0.27 c h)", "oklch(from var(--color-accent) 0.39 c h)", "oklch(from var(--color-accent) 0.51 c h)", "oklch(from var(--color-accent) 0.63 c h)", "oklch(from var(--color-accent) 0.75 c h)", "oklch(from var(--color-accent) 0.87 c h)", "oklch(from var(--color-accent) 0.95 c h)"]
+      },
+      "projector-focus": {
+        "role": "primary",
+        "displayName": "Projector Focus",
+        "canonical": "var(--color-accent-strong)",
+        "tonalRamp": ["oklch(from var(--color-accent-strong) 0.15 c h)", "oklch(from var(--color-accent-strong) 0.27 c h)", "oklch(from var(--color-accent-strong) 0.39 c h)", "oklch(from var(--color-accent-strong) 0.51 c h)", "oklch(from var(--color-accent-strong) 0.63 c h)", "oklch(from var(--color-accent-strong) 0.75 c h)", "oklch(from var(--color-accent-strong) 0.87 c h)", "oklch(from var(--color-accent-strong) 0.95 c h)"]
+      },
+      "ink-on-amber": {
+        "role": "neutral",
+        "displayName": "Ink on Amber",
+        "canonical": "var(--color-on-accent)",
+        "tonalRamp": ["oklch(from var(--color-on-accent) 0.15 c h)", "oklch(from var(--color-on-accent) 0.27 c h)", "oklch(from var(--color-on-accent) 0.39 c h)", "oklch(from var(--color-on-accent) 0.51 c h)", "oklch(from var(--color-on-accent) 0.63 c h)", "oklch(from var(--color-on-accent) 0.75 c h)", "oklch(from var(--color-on-accent) 0.87 c h)", "oklch(from var(--color-on-accent) 0.95 c h)"]
+      },
+      "oxblood": {
+        "role": "tertiary",
+        "displayName": "Oxblood Conflict",
+        "canonical": "var(--color-danger)",
+        "tonalRamp": ["oklch(from var(--color-danger) 0.15 c h)", "oklch(from var(--color-danger) 0.27 c h)", "oklch(from var(--color-danger) 0.39 c h)", "oklch(from var(--color-danger) 0.51 c h)", "oklch(from var(--color-danger) 0.63 c h)", "oklch(from var(--color-danger) 0.75 c h)", "oklch(from var(--color-danger) 0.87 c h)", "oklch(from var(--color-danger) 0.95 c h)"]
+      },
+      "danger-copy": {
+        "role": "tertiary",
+        "displayName": "Danger Copy",
+        "canonical": "var(--color-danger-text)",
+        "tonalRamp": ["oklch(from var(--color-danger-text) 0.15 c h)", "oklch(from var(--color-danger-text) 0.27 c h)", "oklch(from var(--color-danger-text) 0.39 c h)", "oklch(from var(--color-danger-text) 0.51 c h)", "oklch(from var(--color-danger-text) 0.63 c h)", "oklch(from var(--color-danger-text) 0.75 c h)", "oklch(from var(--color-danger-text) 0.87 c h)", "oklch(from var(--color-danger-text) 0.95 c h)"]
+      },
+      "bone-evidence": {
+        "role": "secondary",
+        "displayName": "Bone Evidence",
+        "canonical": "#D8C8A4",
+        "tonalRamp": ["oklch(0.15 0.035 82)", "oklch(0.27 0.035 82)", "oklch(0.39 0.035 82)", "oklch(0.51 0.035 82)", "oklch(0.63 0.035 82)", "oklch(0.75 0.035 82)", "oklch(0.87 0.035 82)", "oklch(0.95 0.035 82)"]
+      },
+      "evidence-ink": {
+        "role": "neutral",
+        "displayName": "Evidence Ink",
+        "canonical": "#19150F",
+        "tonalRamp": ["oklch(0.15 0.015 75)", "oklch(0.27 0.015 75)", "oklch(0.39 0.015 75)", "oklch(0.51 0.015 75)", "oklch(0.63 0.015 75)", "oklch(0.75 0.015 75)", "oklch(0.87 0.015 75)", "oklch(0.95 0.015 75)"]
+      },
+      "board-wall": {
+        "role": "neutral",
+        "displayName": "Board Wall",
+        "canonical": "var(--board-wall)",
+        "tonalRamp": ["oklch(from var(--board-wall) 0.15 c h)", "oklch(from var(--board-wall) 0.27 c h)", "oklch(from var(--board-wall) 0.39 c h)", "oklch(from var(--board-wall) 0.51 c h)", "oklch(from var(--board-wall) 0.63 c h)", "oklch(from var(--board-wall) 0.75 c h)", "oklch(from var(--board-wall) 0.87 c h)", "oklch(from var(--board-wall) 0.95 c h)"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The ALIBI masthead only." },
+      "headline": { "displayName": "Headline", "purpose": "Case titles and evidence subjects." },
+      "action": { "displayName": "Action", "purpose": "Tool and command labels." },
+      "evidence": { "displayName": "Evidence", "purpose": "Clues, notes, timers, counts, and explanatory copy." },
+      "technical-label": { "displayName": "Technical Label", "purpose": "Compact metadata adjacent to a meaningful value or section." },
+      "ui": { "displayName": "UI", "purpose": "Dense utility controls where monospace would become noisy." }
+    },
+    "shadows": [
+      { "name": "cut-edge", "value": "var(--shadow-cut)", "purpose": "Inset physical edge for panels and evidence paper." },
+      { "name": "evidence-lift", "value": "var(--shadow-elevated)", "purpose": "Directional lift for elevated or hovered evidence." },
+      { "name": "projector-field", "value": "var(--projector-glow)", "purpose": "Restrained amber bloom around the active reasoning field." },
+      { "name": "accessible-focus", "value": "var(--focus-ring)", "purpose": "Two-stage base-and-amber focus reinforcement used with a solid outline." }
+    ],
+    "motion": [
+      { "name": "snap", "value": "120ms", "purpose": "Immediate tool and placement state response." },
+      { "name": "trace", "value": "220ms", "purpose": "Short evidence-selection transitions." },
+      { "name": "aperture", "value": "420ms cubic-bezier(.2, .8, .2, 1)", "purpose": "Authored projector-path reveal." },
+      { "name": "case-lift", "value": "160ms cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Fine-pointer evidence lift." },
+      { "name": "rejection", "value": "400ms cubic-bezier(0.36,0.07,0.19,0.97)", "purpose": "In-place accusation rejection without remounting the focused button." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "2xl", "value": "1536px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Masthead Navigation",
+      "kind": "nav",
+      "refersTo": "masthead-navigation",
+      "description": "Compact case navigation, title, timer, and help rail.",
+      "html": "<nav class=\"ds-masthead\"><button class=\"ds-masthead-back\"><svg class=\"ds-masthead-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M19 12H5m6 6-6-6 6-6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>CASES</button><strong class=\"ds-masthead-title\">MIDNIGHT DELIVERY</strong><span class=\"ds-masthead-timer\">06:42</span><button class=\"ds-masthead-help\" aria-label=\"How to play\"><svg class=\"ds-masthead-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"M9.8 9a2.4 2.4 0 0 1 4.6 1c0 1.8-2.4 2-2.4 4m0 3h.01\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg></button></nav>",
+      "css": ".ds-masthead{min-height:64px;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:stretch;background:color-mix(in srgb,var(--color-bg-inset) 88%,transparent);box-shadow:inset 0 -1px 0 var(--color-border-strong);color:var(--color-text-primary);font-family:'Courier Prime',ui-monospace,monospace}.ds-masthead-back,.ds-masthead-help{min-width:44px;min-height:44px;border:0;background:transparent;color:var(--color-text-muted);font:inherit;letter-spacing:.14em}.ds-masthead-back{display:flex;align-items:center;gap:6px}.ds-masthead-icon{width:16px;height:16px}.ds-masthead-title{display:flex;align-items:center;justify-content:center;padding:0 12px;border-inline:1px solid var(--color-border-subtle);font-family:'Barlow Condensed',ui-sans-serif,sans-serif;font-size:16px;letter-spacing:.04em}.ds-masthead-timer{display:flex;align-items:center;padding:0 12px;color:var(--color-accent-text);letter-spacing:.12em}.ds-masthead-back:hover,.ds-masthead-help:hover{color:var(--color-text-secondary)}.ds-masthead-back:focus-visible,.ds-masthead-help:focus-visible{outline:2px solid var(--color-accent-strong);outline-offset:3px;box-shadow:var(--focus-ring)}"
+    },
+    {
+      "name": "Primary Accuse Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Permanent primary commitment at the foot of the dossier.",
+      "html": "<button class=\"ds-btn-primary\">ACCUSE — SUBMIT SOLUTION (4/4)</button>",
+      "css": ".ds-btn-primary{width:100%;min-height:44px;padding:16px;border:0;border-radius:0;background:var(--color-accent);color:var(--color-on-accent);box-shadow:var(--shadow-cut),0 8px 22px -12px color-mix(in srgb,var(--color-accent) 60%,transparent);font:700 14px/1.25 'Barlow Condensed',ui-sans-serif,sans-serif;letter-spacing:.15em;text-transform:uppercase;transition:filter 120ms var(--ease-physical),transform 120ms var(--ease-physical)}.ds-btn-primary:hover{filter:brightness(1.06)}.ds-btn-primary:active{transform:scale(.97)}.ds-btn-primary:focus-visible{outline:2px solid var(--color-accent-strong);outline-offset:3px;box-shadow:var(--focus-ring)}"
+    },
+    {
+      "name": "Tool Button",
+      "kind": "button",
+      "refersTo": "button-tool",
+      "description": "Outlined command control with a distinct active tool state.",
+      "html": "<button class=\"ds-btn-tool\" aria-pressed=\"true\">PLACE</button>",
+      "css": ".ds-btn-tool{min-height:44px;padding:0 14px;border:1px solid var(--color-border-strong);border-radius:0;background:var(--color-bg-surface);color:var(--color-text-secondary);font:600 13px/1.25 'Barlow Condensed',ui-sans-serif,sans-serif;letter-spacing:.08em;text-transform:uppercase;transition:color 120ms var(--ease-physical),border-color 120ms var(--ease-physical),background-color 120ms var(--ease-physical)}.ds-btn-tool[aria-pressed='true']{border-color:var(--color-accent);background:color-mix(in srgb,var(--color-accent) 22%,transparent);color:var(--color-accent-text);box-shadow:var(--shadow-cut)}.ds-btn-tool:hover{border-color:var(--color-accent-strong);color:var(--color-accent-text)}.ds-btn-tool:active{filter:brightness(.94)}.ds-btn-tool:focus-visible{outline:2px solid var(--color-accent-strong);outline-offset:3px;box-shadow:var(--focus-ring)}"
+    },
+    {
+      "name": "Difficulty Filter",
+      "kind": "chip",
+      "refersTo": "filter-chip",
+      "description": "A compact square filter magnet with a clipped corner.",
+      "html": "<button class=\"ds-filter-chip\" aria-pressed=\"false\">HARD</button>",
+      "css": ".ds-filter-chip{width:44px;height:44px;padding:4px;border:1px solid var(--color-border-strong);border-radius:0;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,0 100%);background:var(--color-bg-inset);color:var(--color-text-secondary);font:600 10px/1.2 'Courier Prime',ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;transition:background-color 120ms var(--ease-physical),color 120ms var(--ease-physical)}.ds-filter-chip[aria-pressed='true']{border-color:var(--color-accent-strong);background:var(--color-accent);color:var(--color-on-accent)}.ds-filter-chip:hover{border-color:var(--color-accent-strong)}.ds-filter-chip:active{filter:brightness(.94)}.ds-filter-chip:focus-visible{outline:2px solid var(--color-accent-strong);outline-offset:3px;box-shadow:var(--focus-ring)}"
+    },
+    {
+      "name": "Case Search Field",
+      "kind": "input",
+      "refersTo": "search-field",
+      "description": "Recessed case-index search with evidence-copy typography.",
+      "html": "<label class=\"ds-search\"><svg class=\"ds-search-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"7\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"m16.2 16.2 4.3 4.3\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg><input class=\"ds-search-input\" type=\"search\" placeholder=\"Search cases, rooms, or suspects\"></label>",
+      "css": ".ds-search{position:relative;display:block}.ds-search-icon{position:absolute;left:12px;top:50%;width:16px;height:16px;transform:translateY(-50%);color:var(--color-text-muted);pointer-events:none}.ds-search-input{width:100%;height:44px;padding:0 12px 0 40px;border:1px solid var(--color-border-strong);border-radius:0;background:var(--color-bg-inset);color:var(--color-text-primary);font:400 14px/1.25 'Courier Prime',ui-monospace,monospace;outline:none}.ds-search-input::placeholder{color:var(--color-text-muted)}.ds-search-input:hover{border-color:var(--color-accent-strong)}.ds-search-input:focus-visible{border-color:var(--color-accent-strong);outline:2px solid var(--color-accent-strong);outline-offset:2px;box-shadow:var(--focus-ring)}"
+    },
+    {
+      "name": "Case File Card",
+      "kind": "card",
+      "refersTo": "case-card",
+      "description": "Archival-paper case index entry with a torn evidence edge.",
+      "html": "<button class=\"ds-case-card\"><span class=\"ds-case-number\">CASE 014</span><strong class=\"ds-case-title\">MIDNIGHT DELIVERY</strong><span class=\"ds-case-meta\">4×4 · 4 PEOPLE</span></button>",
+      "css": ".ds-case-card{display:grid;width:100%;gap:8px;padding:14px;border:1px solid var(--color-border-strong);border-radius:0;clip-path:polygon(0 2px,4% 0,11% 2px,22% 0,36% 3px,50% 1px,64% 3px,82% 0,100% 2px,100% calc(100% - 2px),86% 100%,72% calc(100% - 3px),55% 100%,37% calc(100% - 2px),19% 100%,0 calc(100% - 2px));background:#D8C8A4 url('/assets/evidence-paper.jpg') center/cover;background-blend-mode:multiply;color:#19150F;text-align:left;box-shadow:var(--shadow-cut),0 3px 8px -2px color-mix(in srgb,var(--color-bg-inset) 80%,transparent);transition:transform 160ms cubic-bezier(.22,1,.36,1),box-shadow 160ms cubic-bezier(.22,1,.36,1)}.ds-case-number,.ds-case-meta{font:400 10px/1.25 'Courier Prime',ui-monospace,monospace;letter-spacing:.18em}.ds-case-title{font:700 17px/1.15 'Barlow Condensed',ui-sans-serif,sans-serif;letter-spacing:.01em}.ds-case-card:hover{transform:translateY(-3px) translateX(-1px);box-shadow:var(--shadow-elevated)}.ds-case-card:active{transform:scale(.985)}.ds-case-card:focus-visible{outline:2px solid var(--color-accent-strong);outline-offset:3px;box-shadow:var(--focus-ring)}"
+    },
+    {
+      "name": "Continuity Frame",
+      "kind": "custom",
+      "refersTo": "continuity-frame",
+      "description": "Ordered placement step with a magnetic number and explicit text state.",
+      "html": "<button class=\"ds-continuity-frame\" aria-current=\"step\"><span class=\"ds-frame-number\">2</span><span><strong class=\"ds-frame-name\">ALEXANDER</strong><small class=\"ds-frame-state\">NEXT SUGGESTED</small></span></button>",
+      "css": ".ds-continuity-frame{display:flex;min-width:142px;min-height:52px;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--color-border-strong);border-radius:0;clip-path:polygon(0 0,calc(100% - 9px) 0,100% 50%,calc(100% - 9px) 100%,0 100%);background:#E2D7BD url('/assets/evidence-paper.jpg') center/cover;background-blend-mode:multiply;color:#19150F;text-align:left;transition:background-color 120ms var(--ease-physical),border-color 120ms var(--ease-physical)}.ds-continuity-frame[aria-current='step']{border-color:var(--color-accent-strong);background-color:#D9A94E}.ds-frame-number{display:grid;width:28px;height:28px;flex:0 0 28px;place-items:center;border:1px solid var(--color-border-strong);background:#312A20;color:#F1E8CE;font:700 12px/1 'Courier Prime',ui-monospace,monospace}.ds-frame-name{display:block;font:600 13px/1.2 'Barlow Condensed',ui-sans-serif,sans-serif;letter-spacing:.08em}.ds-frame-state{display:block;margin-top:2px;color:#4B4232;font:400 9px/1.2 'Courier Prime',ui-monospace,monospace;letter-spacing:.13em}.ds-continuity-frame:hover{border-color:var(--color-accent-strong)}.ds-continuity-frame:active{filter:brightness(.96)}.ds-continuity-frame:focus-visible{outline:2px solid var(--color-accent-strong);outline-offset:3px;box-shadow:var(--focus-ring)}"
+    },
+    {
+      "name": "Suspect Evidence Strip",
+      "kind": "card",
+      "refersTo": "suspect-evidence",
+      "description": "Contact-sheet dossier record that binds a person to typewritten clues.",
+      "html": "<button class=\"ds-suspect\" aria-pressed=\"true\"><span class=\"ds-suspect-photo\" aria-hidden=\"true\"></span><span class=\"ds-suspect-copy\"><strong>ALEXANDER</strong><small>— ON THE LAMP</small></span></button>",
+      "css": ".ds-suspect{display:flex;width:100%;gap:10px;padding:10px;border:1px solid var(--color-border-strong);border-radius:0;clip-path:polygon(0 2px,4% 0,11% 2px,22% 0,36% 3px,50% 1px,64% 3px,82% 0,100% 2px,100% calc(100% - 2px),86% 100%,72% calc(100% - 3px),55% 100%,37% calc(100% - 2px),19% 100%,0 calc(100% - 2px));background:#DDD1B3 url('/assets/evidence-paper.jpg') center/cover;background-blend-mode:multiply;color:#19150F;text-align:left;box-shadow:var(--shadow-cut);transition:background-color 120ms var(--ease-physical),border-color 120ms var(--ease-physical)}.ds-suspect[aria-pressed='true']{border-color:var(--color-accent-strong);background-color:#E4C477}.ds-suspect-photo{width:44px;height:52px;flex:0 0 44px;border:3px solid #F1E8CE;border-bottom-width:9px;background:linear-gradient(135deg,#5C5A51,#B3A987);box-shadow:0 3px 8px -1px rgba(0,0,0,.6);transform:rotate(-2deg)}.ds-suspect-copy{min-width:0}.ds-suspect-copy strong{display:block;font:700 14px/1.15 'Barlow Condensed',ui-sans-serif,sans-serif;letter-spacing:.04em}.ds-suspect-copy small{display:block;margin-top:3px;color:#30291D;font:400 11px/1.375 'Courier Prime',ui-monospace,monospace}.ds-suspect:hover{border-color:var(--color-accent-strong)}.ds-suspect:active{transform:scale(.99)}.ds-suspect:focus-visible{outline:2px solid var(--color-accent-strong);outline-offset:3px;box-shadow:var(--focus-ring)}"
+    },
+    {
+      "name": "Case Notes Field",
+      "kind": "input",
+      "refersTo": "notes-field",
+      "description": "Local-only reasoning pad with explicit save state.",
+      "html": "<label class=\"ds-notes\"><span class=\"ds-notes-title\">CASE NOTES</span><span class=\"ds-notes-status\">SAVED LOCALLY</span><textarea class=\"ds-notes-field\" placeholder=\"Record a room, a contradiction, or your next deduction…\"></textarea></label>",
+      "css": ".ds-notes{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px;border:1px solid var(--color-border-strong);background:var(--color-bg-surface);color:var(--color-text-primary);box-shadow:var(--shadow-cut)}.ds-notes-title{font:700 14px/1.2 'Barlow Condensed',ui-sans-serif,sans-serif;letter-spacing:.14em}.ds-notes-status{color:var(--color-accent-text);font:400 10px/1.2 'Courier Prime',ui-monospace,monospace;letter-spacing:.12em}.ds-notes-field{grid-column:1/-1;min-height:112px;padding:12px;border:1px solid var(--color-border-strong);border-radius:0;background:var(--color-bg-inset);color:var(--color-text-primary);font:400 14px/1.4 'Courier Prime',ui-monospace,monospace;resize:vertical;outline:none}.ds-notes-field::placeholder{color:var(--color-text-muted)}.ds-notes-field:hover{border-color:var(--color-accent-strong)}.ds-notes-field:focus-visible{border-color:var(--color-accent-strong);outline:2px solid var(--color-accent-strong);outline-offset:2px;box-shadow:var(--focus-ring)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Continuity Desk",
+    "overview": "Alibi is a working 1940s film-editing continuity desk translated into a modern deduction interface. Magnetic graphite holds the workspace together; bone evidence strips, contact-sheet portraits, clipped tabs, film perforations, and restrained projector amber make the player's reasoning feel assembled by hand. It is cinematic without becoming a poster: the board, clues, tools, and accusation remain unmistakably operative.\n\nThe chrome and the board intentionally use different materials. The surrounding interface is dark, archival, and controlled, while the board is a bright illustrated Cluedo-like floor plan with twelve distinct room materials and nameable furniture. Paper is reserved for evidence-bearing objects, never spread across the whole application as a parchment dashboard.",
+    "keyCharacteristics": [
+      "Magnetic graphite and smoky-olive chrome in dark mode; a daylight editing bench in light mode.",
+      "Fixed bone paper for evidence, continuity frames, and case files.",
+      "One projector-amber chain linking the selected frame, clue, and literal board target.",
+      "Condensed industrial headlines, typewritten evidence, and neutral compact controls.",
+      "Sharp rectangles, clipped corners, torn edges, perforations, and contact-sheet crops.",
+      "A dominant square illustrated board whose room and furniture identities outrank atmospheric purity."
+    ],
+    "rules": [
+      { "name": "The Amber Evidence Rule", "body": "Projector amber marks the current reasoning path and primary commitment; it is not ambient decoration.", "section": "colors" },
+      { "name": "The Oxblood Exception Rule", "body": "Oxblood is reserved for danger, conflict, victim, destructive confirmation, and rejection.", "section": "colors" },
+      { "name": "The Strong Edge Rule", "body": "A border that is the only visible affordance must use the strong tier; the subtle tier may divide content but never carry interaction alone.", "section": "colors" },
+      { "name": "The Three Voices Rule", "body": "Barlow names the subject, Courier records the evidence, and Hanken operates the chrome; do not swap their jobs.", "section": "typography" },
+      { "name": "The Board-First Rule", "body": "On narrow screens, the board precedes evidence, tools, and accusation because spatial reading starts the solving loop.", "section": "layout" },
+      { "name": "The Directional Depth Rule", "body": "Every shadow must describe paper, steel, or projector light; generic ambient card shadows do not belong on the desk.", "section": "elevation" },
+      { "name": "The Clipped, Not Rounded Rule", "body": "Use clipping, not pills or generous radii, to create tactile silhouettes.", "section": "shapes" },
+      { "name": "The Literal Board Rule", "body": "Every room material and furniture silhouette must remain nameable because clue language points directly to them; projection purity always loses to recognition.", "section": "components" },
+      { "name": "The Taut Connection Rule", "body": "Only the selected literal clue earns the authored amber connector, and the trace must terminate at its actual board target.", "section": "components" }
+    ],
+    "dos": [
+      "Do keep theme-aware chrome and fixed evidence/board materials as separate layers.",
+      "Do keep paper on evidence-bearing objects and steel/graphite on application chrome.",
+      "Do preserve full room names wherever they fit and expose any abbreviation with the full accessible name.",
+      "Do use real buttons, 44px targets, visible focus, keyboard board navigation, and reduced-motion fallbacks.",
+      "Do keep avatar use to the active dossier; use inexpensive accent markers in the case catalog.",
+      "Do test both themes at phone and desktop widths with the board, clues, and accusation all visible and legible."
+    ],
+    "donts": [
+      "Don't turn the interface into a generic rounded-card dashboard, glass surface, neon cyberpunk scene, or full-screen parchment tableau.",
+      "Don't use projector amber for passive decoration or oxblood for ordinary emphasis.",
+      "Don't let two rooms share the same floor signature or reduce nameable furniture to ambiguous wireframes.",
+      "Don't use the translucent board glow as a focus ring or the subtle border as an interactive boundary.",
+      "Don't load every suspect portrait in the home catalog.",
+      "Don't remount the accusation button to replay rejection motion; preserve focus and restart the CSS animation in place."
+    ]
+  }
+}

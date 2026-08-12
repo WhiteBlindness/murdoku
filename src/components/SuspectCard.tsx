@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion'
 import { Check, Lock } from 'lucide-react'
 import type { Person } from '../core/types'
-import Avatar from './Avatar'
 
 interface Props {
   person: Person
@@ -19,21 +18,29 @@ interface Props {
 export default function SuspectCard({
   person, clues, selected, placed, locked, conflicted, resolved, showCheck, onSelect, onToggleResolved,
 }: Props) {
+  const portraitIndex = [...person.id].reduce((sum, character) => sum + character.charCodeAt(0), 0) % 8
+  const portraitColumn = portraitIndex % 4
+  const portraitRow = Math.floor(portraitIndex / 4)
   return (
     <motion.div
       whileTap={{ scale: 0.99 }}
-      className="w-full border p-2.5 flex gap-2.5 transition-colors"
+      data-testid="suspect-card"
+      data-person={person.id}
+      className="evidence-strip w-full border p-2.5 flex gap-2.5 transition-colors"
       style={{
         /* Unselected card: border-strong so the card boundary meets WCAG 1.4.11
            (bg-surface vs bg-base is near-zero contrast, the border IS the affordance).
            Selected: person.accent ring — accent carries the boundary at that point. */
         borderColor: selected ? person.accent : 'var(--color-border-strong)',
-        backgroundColor: selected ? person.accent + '18' : 'var(--color-bg-surface)',
+        backgroundColor: selected ? '#E4C477' : '#DDD1B3',
+        backgroundImage: 'url("/assets/evidence-paper.jpg")',
+        backgroundSize: 'cover',
+        backgroundBlendMode: 'multiply',
         /* Selected: double-ring — outer accent halo signals commitment */
         boxShadow: selected ? `0 0 0 1px ${person.accent}, var(--shadow-cut)` : 'var(--shadow-cut)',
         opacity: resolved ? 0.5 : 1,
         /* Accent left-spine when selected: same file-folder language as case cards */
-        borderLeftWidth: selected ? '3px' : '1px',
+        borderLeftWidth: '1px',
         borderLeftColor: selected ? person.accent : 'var(--color-border-strong)',
       }}
     >
@@ -51,7 +58,17 @@ export default function SuspectCard({
             boxShadow: '0 3px 8px -1px rgba(0,0,0,0.6)',
           }}
         >
-          <Avatar seed={person.avatarSeed} accent={person.accent} size={44} dead={person.isVictim} name={person.name} />
+          <span
+            className="contact-sheet-portrait block h-11 w-11"
+            role="img"
+            aria-label={`${person.name} portrait`}
+            style={{
+              backgroundImage: 'url("/assets/contact-sheet.jpg")',
+              backgroundSize: '400% 200%',
+              backgroundPosition: `${portraitColumn * 33.333}% ${portraitRow * 100}%`,
+            }}
+          >
+          </span>
           {placed && (
             /* Placement marker: sharp square badge (no rounding) for the noir
                language. NOT a correctness check — lock = committed. */
@@ -70,7 +87,7 @@ export default function SuspectCard({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 flex-wrap">
             {/* Suspect name: headline font-display, the case file's subject line */}
-            <span className={`font-display font-bold text-sm text-paper leading-tight truncate tracking-wide uppercase ${resolved ? 'line-through' : ''}`}>{person.name}</span>
+            <span className={`font-display font-bold text-sm leading-tight truncate tracking-wide uppercase ${resolved ? 'line-through' : ''}`} style={{ color: '#1A1710' }}>{person.name}</span>
             {person.isVictim && (
               /* Stamped-ink VICTIM marker: rectangular (no rounding), danger-text
                  on a muted danger wash. Same rubber-stamp aesthetic as CLOSED on
@@ -95,8 +112,8 @@ export default function SuspectCard({
             /* Clue text: font-mono — typed evidence on the case file.
                This is the signature move of the redesign: clues read as
                a detective's typewritten notes, not UI body copy. */
-            <p key={i} className={`text-paper-dim text-[11px] leading-snug mt-0.5 font-mono flex gap-1 ${resolved ? 'line-through' : ''}`}>
-              {clues.length > 1 && <span className="text-paper-muted flex-shrink-0" aria-hidden>—</span>}
+            <p key={i} className={`text-[11px] leading-snug mt-0.5 font-mono flex gap-1 ${resolved ? 'line-through' : ''}`} style={{ color: '#30291D' }}>
+              {clues.length > 1 && <span className="flex-shrink-0 opacity-60" aria-hidden>—</span>}
               <span>{c}</span>
             </p>
           ))}
@@ -110,7 +127,7 @@ export default function SuspectCard({
           onClick={onToggleResolved}
           aria-label={resolved ? 'Mark clue unsolved' : 'Mark clue solved'}
           title="Your own note — check off clues you've worked out"
-          className="focus-ring flex-shrink-0 self-start w-6 h-6 border flex items-center justify-center transition-colors"
+          className="focus-ring flex-shrink-0 self-start w-11 h-11 border flex items-center justify-center transition-colors"
           style={{
             /* Unresolved: unfilled outline button → border-strong (WCAG 1.4.11) */
             borderColor: resolved ? 'var(--color-accent)' : 'var(--color-border-strong)',
