@@ -4,11 +4,21 @@ import type { FurnitureType } from './types'
 /**
  * Noire Illustration board miniatures.
  *
- * These are small, literal objects rather than abstract map symbols: the board
- * language is part of the puzzle's clue vocabulary. Every icon has one or more
- * deliberate espresso contours, quieter internal construction lines, material
- * shading, and a small cast shadow. The 100×100 viewBox keeps the illustrated
- * details readable from the 4×4 board through the denser 7×7 cases.
+ * Drawing rules, in the order they matter:
+ *
+ *  1. Nameable silhouette first. Every piece is a literal, top-down or
+ *     three-quarter object — a bed has a pillow and a turned-down sheet, a lamp
+ *     has a drawn shade and a weighted base, a plant has individual leaves. The
+ *     board is part of the clue vocabulary, so "what is that?" must never be a
+ *     question a player has to ask.
+ *  2. Confident contours. One deep-espresso outer line (`#1a1a1a`, ~3.2px in a
+ *     100x100 viewBox) carries the shape; interior construction lines are thin
+ *     and quiet so they never fight the silhouette at 40px cells.
+ *  3. Flat noire colour. Fills are broad and flat — parchment, brass, mahogany,
+ *     oxblood, desaturated olive, porcelain, charcoal. The only gradient per
+ *     piece is a near-flat body tone that keeps the token from reading as paper.
+ *  4. Cast shadow. Each token drops a small directional shadow so it sits on the
+ *     floor like a physical cardboard piece on a dark dossier.
  */
 export interface FurnitureIconProps { size?: number }
 export type FurnitureIcon = (props: FurnitureIconProps) => React.ReactElement
@@ -17,111 +27,85 @@ const S = (size?: number) => size
   ? { width: size, height: size }
   : { width: '100%', height: '100%' }
 
-const OUTER = {
-  'data-furniture-contour': 'true',
-  stroke: '#241820',
-  strokeWidth: 3,
-  strokeLinejoin: 'round' as const,
-  strokeLinecap: 'round' as const,
-}
+/** Deep espresso, never pure black: keeps the board warm under the amber key light. */
+const INK = '#1a1a1a'
 
-const OUTER_DARK = {
+// Noire palette — the whole board is painted from this shelf and nothing else.
+const WOOD_L = '#8A5A32'
+const WOOD = '#6B4325'
+const WOOD_D = '#3E2614'
+const BONE = '#EFE3C2'
+const BONE_D = '#CDBB92'
+const LINEN = '#E0D0A6'
+const BRASS = '#C9922E'
+const BRASS_L = '#E7C070'
+const BRASS_D = '#8A6220'
+const OLIVE = '#63744A'
+const OLIVE_L = '#87975F'
+const OLIVE_D = '#3F4C2E'
+const BLOOD = '#8C2D24'
+const BLOOD_D = '#5E1E19'
+const SLATE = '#6E7368'
+const SLATE_L = '#8F9488'
+const SLATE_D = '#474C43'
+const PORC = '#CFCCB8'
+const PORC_D = '#A5A492'
+const CHAR = '#2E2E29'
+const CHAR_L = '#45453D'
+const GLASS = '#46564F'
+const CLAY = '#A4573A'
+const CLAY_D = '#743823'
+const LEATHER = '#B08A55'
+const LEATHER_L = '#CDA96D'
+
+/** The one confident outer line every silhouette is built on. */
+const OUT = {
   'data-furniture-contour': 'true',
-  stroke: '#1a1a1a',
+  stroke: INK,
   strokeWidth: 3.2,
   strokeLinejoin: 'round' as const,
   strokeLinecap: 'round' as const,
 }
 
+/** Secondary contour for parts that sit inside the silhouette. */
+const OUT_IN = {
+  stroke: INK,
+  strokeWidth: 2.2,
+  strokeLinejoin: 'round' as const,
+  strokeLinecap: 'round' as const,
+}
+
+/** Construction lines: seams, planks, grain. Quiet on purpose. */
 const SEAM = {
   fill: 'none',
-  stroke: '#654246',
-  strokeWidth: 1.15,
+  stroke: INK,
+  strokeOpacity: 0.5,
+  strokeWidth: 1.6,
   strokeLinejoin: 'round' as const,
   strokeLinecap: 'round' as const,
 }
 
-const HIGHLIGHT = {
+/** Single warm catch-light, as if from the board's amber key. */
+const SHEEN = {
   fill: 'none',
-  stroke: '#d8b777',
-  strokeOpacity: 0.58,
-  strokeWidth: 0.95,
+  stroke: '#D8B777', // DESIGN.md: miniature-highlight
+  strokeOpacity: 0.3,
+  strokeWidth: 1.8,
   strokeLinejoin: 'round' as const,
   strokeLinecap: 'round' as const,
 }
 
-const SvgDefs = ({ prefix }: { prefix: string }) => (
-  <defs>
-    <linearGradient id={`${prefix}-wood`} x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stopColor="#9b6449" />
-      <stop offset="0.42" stopColor="#6d4036" />
-      <stop offset="1" stopColor="#38232a" />
-    </linearGradient>
-    <linearGradient id={`${prefix}-wood-deep`} x1="0" y1="0" x2="0.8" y2="1">
-      <stop offset="0" stopColor="#704033" />
-      <stop offset="0.55" stopColor="#482a2c" />
-      <stop offset="1" stopColor="#2b1b25" />
-    </linearGradient>
-    <linearGradient id={`${prefix}-fabric`} x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stopColor="#9b655f" />
-      <stop offset="0.5" stopColor="#6a414d" />
-      <stop offset="1" stopColor="#392b3b" />
-    </linearGradient>
-    <linearGradient id={`${prefix}-fabric-light`} x1="0" y1="0" x2="0.9" y2="1">
-      <stop offset="0" stopColor="#b77c6c" />
-      <stop offset="0.58" stopColor="#82515b" />
-      <stop offset="1" stopColor="#4a3449" />
-    </linearGradient>
-    <linearGradient id={`${prefix}-brass`} x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stopColor="#e2c384" />
-      <stop offset="0.35" stopColor="#bd914c" />
-      <stop offset="0.72" stopColor="#725333" />
-      <stop offset="1" stopColor="#d5ae68" />
-    </linearGradient>
-    <linearGradient id={`${prefix}-metal`} x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stopColor="#c8c7b8" />
-      <stop offset="0.4" stopColor="#78817c" />
-      <stop offset="0.7" stopColor="#3e4a4c" />
-      <stop offset="1" stopColor="#a9aaa0" />
-    </linearGradient>
-    <linearGradient id={`${prefix}-porcelain`} x1="0" y1="0" x2="0.9" y2="1">
-      <stop offset="0" stopColor="#dfd8c4" />
-      <stop offset="0.46" stopColor="#b8b8aa" />
-      <stop offset="1" stopColor="#72807d" />
-    </linearGradient>
-    <linearGradient id={`${prefix}-glass`} x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stopColor="#b9cbbd" stopOpacity="0.83" />
-      <stop offset="0.48" stopColor="#66837e" stopOpacity="0.66" />
-      <stop offset="1" stopColor="#31464b" stopOpacity="0.9" />
-    </linearGradient>
-    <linearGradient id={`${prefix}-paper`} x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stopColor="#ead6a8" />
-      <stop offset="1" stopColor="#b89363" />
-    </linearGradient>
-    <linearGradient id={`${prefix}-olive`} x1="0" y1="0" x2="0.85" y2="1">
-      <stop offset="0" stopColor="#819064" />
-      <stop offset="0.52" stopColor="#53644a" />
-      <stop offset="1" stopColor="#304538" />
-    </linearGradient>
-    <radialGradient id={`${prefix}-glow`} cx="50%" cy="46%" r="52%">
-      <stop offset="0" stopColor="#f3dda0" stopOpacity="0.78" />
-      <stop offset="0.38" stopColor="#c99b55" stopOpacity="0.3" />
-      <stop offset="1" stopColor="#7d4937" stopOpacity="0" />
-    </radialGradient>
-    <radialGradient id={`${prefix}-glint`} cx="35%" cy="26%" r="78%">
-      <stop offset="0" stopColor="#eee2bb" />
-      <stop offset="0.32" stopColor="#c4b47f" />
-      <stop offset="1" stopColor="#4c493e" />
-    </radialGradient>
-    <filter id={`${prefix}-shadow`} x="-20%" y="-20%" width="145%" height="150%">
-      <feDropShadow dx="1.8" dy="2.8" stdDeviation="1.75" floodColor="#1a1a1a" floodOpacity="0.54" />
-    </filter>
-  </defs>
-)
+const FOOT = { stroke: INK, strokeWidth: 3, strokeLinecap: 'round' as const }
 
-function Frame({ prefix, size, children }: {
+/**
+ * One near-flat body tone per piece plus the cast shadow. Two close stops, not a
+ * showy ramp: enough to read as a moulded object, never enough to muddy the
+ * flat-illustration language.
+ */
+function Frame({ prefix, size, tone, children }: {
   prefix: string
   size?: number
+  tone: [string, string]
   children: React.ReactNode
 }) {
   return (
@@ -132,291 +116,369 @@ function Frame({ prefix, size, children }: {
       aria-hidden="true"
       data-furniture-icon={prefix}
     >
-      <SvgDefs prefix={prefix} />
+      <defs>
+        <linearGradient id={`${prefix}-tone`} x1="0" y1="0" x2="0.25" y2="1">
+          <stop offset="0" stopColor={tone[0]} />
+          <stop offset="1" stopColor={tone[1]} />
+        </linearGradient>
+        <filter id={`${prefix}-shadow`} x="-25%" y="-25%" width="155%" height="155%">
+          <feDropShadow dx="1.6" dy="2.6" stdDeviation="1.5" floodColor="#120E0A" floodOpacity="0.55" />
+        </filter>
+      </defs>
       <g filter={`url(#${prefix}-shadow)`}>{children}</g>
     </svg>
   )
 }
 
-const SofaIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="sofa" size={size}>
-    <path d="M8 34c0-14 9-23 22-23h40c13 0 22 9 22 23v48H8Z" fill="url(#sofa-fabric)" {...OUTER} />
-    <path d="M18 18c10-5 54-5 64 0v22H18Z" fill="#573744" {...OUTER} />
-    <path d="M18 22c16-5 48-5 64 0" {...HIGHLIGHT} />
-    <path d="M8 43c-4 4-5 11-5 23v15c0 7 5 11 12 11h10V52c0-7-6-11-17-9Z" fill="#754751" {...OUTER} />
-    <path d="M92 43c4 4 5 11 5 23v15c0 7-5 11-12 11H75V52c0-7 6-11 17-9Z" fill="#754751" {...OUTER} />
-    <rect x="22" y="36" width="56" height="43" rx="7" fill="url(#sofa-fabric-light)" {...OUTER} />
-    <path d="M50 38v38M24 67c14 4 38 4 52 0" {...SEAM} />
-    <path d="M27 43c6-4 12-5 18-2M55 41c7-3 13-2 18 2" {...HIGHLIGHT} />
-    <path d="M20 79h60v13c-13 5-47 5-60 0Z" fill="#603a43" {...OUTER} />
-    <path d="M28 87c12 2 32 2 44 0" {...HIGHLIGHT} />
-    <path d="M14 91v4M86 91v4" stroke="#1a1a1a" strokeWidth="2.4" strokeLinecap="round" />
-  </Frame>
-)
+/* ------------------------------------------------------------------ seating */
 
 const ArmchairIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="chair" size={size}>
-    <path d="M13 86V37c0-17 10-27 27-27h20c17 0 27 10 27 27v49H72V44c0-8-5-12-12-12H40c-7 0-12 4-12 12v42Z" fill="url(#chair-fabric)" {...OUTER} />
-    <path d="M18 37c2-12 10-18 22-18h20c12 0 20 6 22 18l-4 12H22Z" fill="#543842" {...OUTER} />
-    <path d="M23 45c4-7 10-10 18-10h18c8 0 14 3 18 10v32c-7 8-17 11-27 11S30 85 23 77Z" fill="url(#chair-fabric-light)" {...OUTER} />
-    <path d="M26 48c8-4 40-4 48 0M27 70c12 5 34 5 46 0" {...SEAM} />
-    <path d="M14 47c-6 4-8 13-8 26 0 10 5 16 14 17l10-14-3-28c-4-4-8-5-13-1ZM86 47c6 4 8 13 8 26 0 10-5 16-14 17L70 76l3-28c4-4 8-5 13-1Z" fill="#6f4651" {...OUTER} />
-    <path d="M17 57c-1 8 0 15 3 21M83 57c1 8 0 15-3 21" {...HIGHLIGHT} />
-    <path d="M24 86v8M76 86v8" stroke="#1a1a1a" strokeWidth="2.4" strokeLinecap="round" />
+  <Frame prefix="chair" size={size} tone={[LEATHER_L, '#8E6B3E']}>
+    {/* backrest and both arms carved as one horseshoe, seen from above */}
+    <path d="M13 92V38c0-14 10-25 25-25h24c15 0 25 11 25 25v54H73V48H27v44Z" fill="url(#chair-tone)" {...OUT} />
+    {/* back pillow */}
+    <rect x="27" y="20" width="46" height="25" rx="9" fill={LEATHER_L} {...OUT_IN} />
+    {/* seat cushion */}
+    <rect x="26" y="48" width="48" height="42" rx="8" fill={LEATHER_L} {...OUT_IN} />
+    {/* arm caps */}
+    <rect x="15" y="42" width="11" height="46" rx="5" fill={LEATHER} {...OUT_IN} />
+    <rect x="74" y="42" width="11" height="46" rx="5" fill={LEATHER} {...OUT_IN} />
+    <path d="M50 52v34M32 70h36" {...SEAM} />
+    <path d="M33 26h34" {...SHEEN} />
+    <path d="M19 92v5M81 92v5" {...FOOT} />
   </Frame>
 )
 
+const SofaIcon: FurnitureIcon = ({ size }) => (
+  <Frame prefix="sofa" size={size} tone={[LEATHER_L, '#8A6739']}>
+    <path d="M5 90V36c0-13 9-22 22-22h46c13 0 22 9 22 22v54H85V46H15v44Z" fill="url(#sofa-tone)" {...OUT} />
+    {/* two back pillows */}
+    <rect x="17" y="19" width="31" height="24" rx="7" fill={LEATHER_L} {...OUT_IN} />
+    <rect x="52" y="19" width="31" height="24" rx="7" fill={LEATHER_L} {...OUT_IN} />
+    {/* two seat cushions */}
+    <rect x="16" y="47" width="32" height="41" rx="6" fill={LEATHER_L} {...OUT_IN} />
+    <rect x="52" y="47" width="32" height="41" rx="6" fill={LEATHER_L} {...OUT_IN} />
+    {/* arm caps */}
+    <rect x="6" y="40" width="10" height="48" rx="5" fill={LEATHER} {...OUT_IN} />
+    <rect x="84" y="40" width="10" height="48" rx="5" fill={LEATHER} {...OUT_IN} />
+    <path d="M22 68h20M58 68h20" {...SEAM} />
+    <path d="M22 25h20M58 25h20" {...SHEEN} />
+    <path d="M12 90v6M88 90v6" {...FOOT} />
+  </Frame>
+)
+
+/* -------------------------------------------------------------- bedroom set */
+
 const BedIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="bed" size={size}>
-    <rect x="8" y="5" width="84" height="90" rx="6" fill="url(#bed-wood-deep)" {...OUTER_DARK} />
-    <path d="M10 10c15-7 65-7 80 0v18H10Z" fill="url(#bed-wood)" {...OUTER} />
-    <path d="M17 17c17-4 49-4 66 0M20 23c17-3 43-3 60 0" {...HIGHLIGHT} />
-    <rect x="15" y="24" width="70" height="63" rx="4" fill="url(#bed-paper)" {...OUTER} />
-    <path d="M18 29h64v19H18Z" fill="#d8c59f" stroke="#654246" strokeWidth="1.15" strokeLinejoin="round" />
-    <path d="M21 28h25c3 0 5 3 5 7v9H18v-9c0-4 1-7 3-7ZM54 28h25c3 0 4 3 4 7v9H49v-9c0-4 2-7 5-7Z" fill="#e7d5ad" {...OUTER} />
-    <path d="M18 49c16-6 48-6 64 0v31c-17 8-47 8-64 0Z" fill="url(#bed-fabric)" {...OUTER} />
-    <path d="M50 49c-3 10-3 21 0 31M23 65c13 5 39 5 54 0" {...SEAM} />
-    <path d="M18 73c16 4 48 4 64 0v9c-16 7-48 7-64 0Z" fill="#5a3845" stroke="#654246" strokeWidth="1.15" />
-    <path d="M16 88h68" {...HIGHLIGHT} />
-    <path d="M13 93v4M87 93v4" stroke="#1a1a1a" strokeWidth="2.4" strokeLinecap="round" />
+  <Frame prefix="bed" size={size} tone={[WOOD_L, WOOD_D]}>
+    {/* frame with a headboard at the top of the cell */}
+    <rect x="9" y="5" width="82" height="90" rx="6" fill="url(#bed-tone)" {...OUT} />
+    <rect x="13" y="8" width="74" height="16" rx="4" fill={WOOD_L} {...OUT_IN} />
+    <path d="M20 12h60" {...SHEEN} />
+    {/* mattress */}
+    <rect x="14" y="26" width="72" height="65" rx="4" fill={BONE_D} {...OUT_IN} />
+    {/* pillow */}
+    <rect x="20" y="30" width="60" height="19" rx="7" fill={BONE} {...OUT_IN} />
+    <path d="M50 32v15" {...SEAM} />
+    {/* blanket with its sheet turned down */}
+    <path d="M14 53h72v34a4 4 0 0 1-4 4H18a4 4 0 0 1-4-4Z" fill={BLOOD_D} {...OUT_IN} />
+    <rect x="14" y="53" width="72" height="10" rx="2" fill={LINEN} {...OUT_IN} />
+    <path d="M22 72v16M50 70v20M78 72v16" {...SEAM} />
+    <path d="M20 58h58" {...SHEEN} />
   </Frame>
 )
 
 const TableIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="table" size={size}>
-    <path d="M12 59h15v32H13c-4-9-4-22-1-32ZM73 59h15c3 10 3 23-1 32H73Z" fill="url(#table-wood-deep)" {...OUTER} />
-    <path d="M16 64h8v20M76 64h8v20" {...HIGHLIGHT} />
-    <path d="M8 28c16-10 68-10 84 0v37c-17 10-67 10-84 0Z" fill="url(#table-wood)" {...OUTER_DARK} />
-    <path d="M14 34c18-7 54-7 72 0v24c-18 7-54 7-72 0Z" fill="#8b593f" stroke="#654246" strokeWidth="1.15" />
-    <path d="M18 41c15-5 47-5 64 0M18 53c16 5 48 5 64 0" {...HIGHLIGHT} />
-    <path d="M34 39h31l-4 17H38Z" fill="url(#table-paper)" {...OUTER} />
-    <path d="M39 45h19M39 50h15" stroke="#7e5543" strokeWidth="1.05" strokeLinecap="round" />
-    <ellipse cx="24" cy="51" rx="4" ry="3" fill="#bb944f" stroke="#654246" strokeWidth="1" />
-    <ellipse cx="75" cy="45" rx="4" ry="3" fill="#6f3740" stroke="#654246" strokeWidth="1" />
+  <Frame prefix="table" size={size} tone={[WOOD_L, WOOD]}>
+    {/* legs peek out at the corners so the top reads as a raised slab */}
+    <rect x="12" y="12" width="12" height="76" rx="3" fill={WOOD_D} {...OUT_IN} />
+    <rect x="76" y="12" width="12" height="76" rx="3" fill={WOOD_D} {...OUT_IN} />
+    {/* top */}
+    <rect x="7" y="17" width="86" height="66" rx="9" fill="url(#table-tone)" {...OUT} />
+    <rect x="15" y="25" width="70" height="50" rx="5" fill={WOOD_L} {...OUT_IN} />
+    <path d="M22 34h56M22 50h56M22 66h56" {...SEAM} />
+    {/* a laid place setting: plate, glass, folded napkin */}
+    <ellipse cx="38" cy="50" rx="10" ry="8" fill={PORC} {...OUT_IN} />
+    <ellipse cx="38" cy="50" rx="5" ry="4" fill={PORC_D} />
+    <circle cx="64" cy="43" r="5" fill={BRASS_L} {...OUT_IN} />
+    <path d="M58 60h14l-2 8H60Z" fill={LINEN} {...OUT_IN} />
   </Frame>
 )
 
 const BoxIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="box" size={size}>
-    <path d="M15 42 50 25 85 42 50 60Z" fill="#302128" {...OUTER_DARK} />
-    <path d="M15 42 5 20 37 7 50 25Z" fill="url(#box-paper)" {...OUTER} />
-    <path d="M50 25 64 7 96 22 85 42Z" fill="#c69c5d" {...OUTER} />
-    <path d="M15 42 50 60v34L15 78Z" fill="url(#box-wood)" {...OUTER} />
-    <path d="M50 60 85 42v36L50 94Z" fill="url(#box-wood-deep)" {...OUTER} />
-    <path d="m21 38 15-7 10 5-15 8ZM61 35l14-7 7 4-15 8Z" fill="#e0c28b" stroke="#654246" strokeWidth="1.1" />
-    <path d="M44 57h12v33l-12-5Z" fill="#b7864c" stroke="#654246" strokeWidth="1.15" />
-    <path d="M17 46 47 62M83 46 53 62M22 72l20 9M78 72l-20 9" {...HIGHLIGHT} />
-    <path d="M23 22 34 18M67 19l12 6" {...SEAM} />
+  <Frame prefix="box" size={size} tone={[WOOD_L, WOOD]}>
+    {/* a nailed crate, lid slightly proud of the body */}
+    <rect x="12" y="20" width="76" height="70" rx="4" fill="url(#box-tone)" {...OUT} />
+    <rect x="8" y="10" width="84" height="16" rx="4" fill={WOOD_D} {...OUT} />
+    <rect x="17" y="30" width="66" height="16" rx="2" fill={WOOD_L} {...OUT_IN} />
+    <rect x="17" y="52" width="66" height="16" rx="2" fill={WOOD_L} {...OUT_IN} />
+    <rect x="17" y="74" width="66" height="11" rx="2" fill={WOOD_L} {...OUT_IN} />
+    <path d="M18 30 82 85M82 30 18 85" {...SEAM} />
+    <circle cx="20" cy="16" r="2.4" fill={BRASS} />
+    <circle cx="80" cy="16" r="2.4" fill={BRASS} />
+    <path d="M16 15h68" {...SHEEN} />
   </Frame>
 )
 
 const RugIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="rug" size={size}>
-    <rect x="8" y="9" width="84" height="82" rx="4" fill="#4a2634" {...OUTER_DARK} />
-    <rect x="13" y="14" width="74" height="72" rx="2" fill="#763f45" stroke="#8e5c54" strokeWidth="1.1" />
-    <rect x="19" y="20" width="62" height="60" rx="2" fill="#5b3244" stroke="#c28b67" strokeWidth="1.15" />
-    <path d="M50 26 72 50 50 74 28 50Z" fill="#a66a57" {...OUTER} />
-    <path d="M50 33 64 50 50 67 36 50Z" fill="#41263a" stroke="#d1a06f" strokeWidth="1" />
-    <path d="M24 28c7 5 9 12 7 20M76 28c-7 5-9 12-7 20M24 72c7-5 9-12 7-20M76 72c-7-5-9-12-7-20" {...HIGHLIGHT} />
-    <path d="M13 7v-4M21 7v-4M29 7v-4M37 7v-4M45 7v-4M53 7v-4M61 7v-4M69 7v-4M77 7v-4M85 7v-4" stroke="#241820" strokeWidth="2" strokeLinecap="round" />
-    <path d="M13 93v4M21 93v4M29 93v4M37 93v4M45 93v4M53 93v4M61 93v4M69 93v4M77 93v4M85 93v4" stroke="#241820" strokeWidth="2" strokeLinecap="round" />
+  <Frame prefix="rug" size={size} tone={[BLOOD, BLOOD_D]}>
+    <rect x="8" y="12" width="84" height="76" rx="3" fill="url(#rug-tone)" {...OUT} />
+    <rect x="15" y="19" width="70" height="62" rx="2" fill={WOOD_D} {...OUT_IN} />
+    <rect x="22" y="26" width="56" height="48" rx="2" fill={BLOOD_D} stroke={BRASS_D} strokeWidth="1.6" />
+    {/* woven medallion */}
+    <path d="M50 30 74 50 50 70 26 50Z" fill={BRASS_D} {...OUT_IN} />
+    <path d="M50 38 64 50 50 62 36 50Z" fill={LINEN} {...OUT_IN} />
+    <path d="M28 32h8M64 32h8M28 68h8M64 68h8" stroke={BRASS} strokeWidth="2" strokeLinecap="round" />
+    {/* knotted fringe, top and bottom */}
+    <path d="M13 12V6M23 12V6M33 12V6M43 12V6M53 12V6M63 12V6M73 12V6M83 12V6" stroke={INK} strokeWidth="2.4" strokeLinecap="round" />
+    <path d="M13 88v6M23 88v6M33 88v6M43 88v6M53 88v6M63 88v6M73 88v6M83 88v6" stroke={INK} strokeWidth="2.4" strokeLinecap="round" />
   </Frame>
 )
 
+/* ----------------------------------------------------------------- greenery */
+
 const PlantIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="plant" size={size}>
-    <ellipse cx="50" cy="85" rx="29" ry="7" fill="#1f2c27" opacity="0.52" />
-    <path d="M47 63c-8-18-18-28-28-33 0 16 8 28 27 39Z" fill="url(#plant-olive)" {...OUTER} />
-    <path d="M49 62c-3-24-1-38 7-50 7 15 6 32-4 52Z" fill="#71805a" {...OUTER} />
-    <path d="M53 64c7-21 19-32 31-38-2 18-12 32-29 42Z" fill="url(#plant-olive)" {...OUTER} />
-    <path d="M45 67c-16-9-29-11-38-8 9 14 23 19 40 13Z" fill="#526542" {...OUTER} />
-    <path d="M55 67c16-7 28-7 38-2-11 13-25 16-40 8Z" fill="#66754d" {...OUTER} />
-    <path d="M49 63c-13-17-23-20-31-19 6 12 16 19 30 25Z" fill="#607348" {...OUTER} />
-    <path d="M51 62c8-16 17-22 27-23-4 13-13 22-26 28Z" fill="#7d8a5d" {...OUTER} />
-    <path d="M21 35 46 63M56 16 50 63M82 31 54 65M11 60l35 8M89 65 55 68" {...HIGHLIGHT} />
-    <path d="M32 68h36l-5 25H37Z" fill="url(#plant-wood)" {...OUTER_DARK} />
-    <path d="M28 65h44l-3 9H31Z" fill="#a85d43" {...OUTER} />
-    <path d="M40 75 42 88M50 75v16M60 75l-2 13" {...HIGHLIGHT} />
+  <Frame prefix="plant" size={size} tone={[CLAY, CLAY_D]}>
+    <ellipse cx="50" cy="90" rx="26" ry="5" fill="#12140F" opacity="0.45" />
+    {/* eight drawn leaves, each with its own midrib */}
+    <path d="M48 58C34 50 24 36 22 20c16 4 27 18 30 36Z" fill={OLIVE} {...OUT} />
+    <path d="M52 56c-2-19 3-34 14-44 5 17 1 33-10 46Z" fill={OLIVE_L} {...OUT} />
+    <path d="M55 58c8-16 21-26 37-29-4 17-17 29-34 34Z" fill={OLIVE} {...OUT} />
+    <path d="M45 62C31 60 18 62 8 68c13 9 27 8 39-1Z" fill={OLIVE_D} {...OUT} />
+    <path d="M56 63c14-4 27-3 37 3-12 10-26 10-38 2Z" fill={OLIVE_D} {...OUT} />
+    <path d="M46 55C40 43 30 34 17 30c3 14 13 24 28 30Z" fill={OLIVE_L} {...OUT} />
+    <path d="M54 54c6-13 15-22 27-25-2 14-11 24-25 30Z" fill={OLIVE} {...OUT} />
+    <path d="M50 60c-1-14-6-25-14-33 10 6 16 19 17 33Z" fill={OLIVE_D} {...OUT} />
+    <path d="M27 26 46 57M64 20 52 55M85 32 57 56M14 68l30-4M88 68l-31-3" {...SEAM} />
+    {/* terracotta pot */}
+    <path d="M31 68h38l-6 24H37Z" fill="url(#plant-tone)" {...OUT} />
+    <rect x="27" y="62" width="46" height="10" rx="3" fill={CLAY} {...OUT} />
+    <path d="M33 67h34" {...SHEEN} />
+    <path d="M42 76l2 12M58 76l-2 12" {...SEAM} />
   </Frame>
 )
 
 const ShrubIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="shrub" size={size}>
-    <path d="M12 77c-4-16 4-31 19-38 4-16 19-26 34-21 14 4 22 15 23 28 10 7 14 20 9 32-14 12-68 13-85-1Z" fill="#3e573d" {...OUTER_DARK} />
-    <path d="M16 62c7-14 17-21 29-23-4 13-12 22-27 29Z" fill="#60734d" {...OUTER} />
-    <path d="M30 40c7-15 18-21 30-20-4 14-13 23-28 27Z" fill="#718159" {...OUTER} />
-    <path d="M50 37c11-13 23-15 34-10-9 12-20 17-33 16Z" fill="#536b47" {...OUTER} />
-    <path d="M57 52c14-9 26-9 35-2-12 10-24 12-36 6Z" fill="#607c52" {...OUTER} />
-    <path d="M42 58c-12-6-24-5-34 2 11 9 24 11 36 5Z" fill="#4b6946" {...OUTER} />
-    <path d="M31 72c7-10 17-14 28-12-7 12-17 17-29 16Z" fill="#6c7c54" {...OUTER} />
-    <path d="M58 72c8-10 18-12 30-7-8 11-19 15-31 12Z" fill="#4a6040" {...OUTER} />
-    <path d="M21 63 43 52M35 41l15 19M58 34l-6 25M81 31 59 55M83 53 58 62M20 75l24-8M82 74 59 67" {...HIGHLIGHT} />
-    <circle cx="51" cy="58" r="3.5" fill="#b58d52" stroke="#654246" strokeWidth="1.1" />
+  <Frame prefix="shrub" size={size} tone={[OLIVE, OLIVE_D]}>
+    <ellipse cx="50" cy="88" rx="30" ry="6" fill="#12140F" opacity="0.45" />
+    {/* a low succulent rosette: outer ring of blades, then an inner ring */}
+    <path d="M50 84C30 82 14 70 10 52c20-2 35 10 40 32Z" fill="url(#shrub-tone)" {...OUT} />
+    <path d="M50 84c20-2 36-14 40-32-20-2-35 10-40 32Z" fill={OLIVE_D} {...OUT} />
+    <path d="M48 74C34 66 26 50 28 32c15 8 21 25 20 42Z" fill={OLIVE} {...OUT} />
+    <path d="M52 74c14-8 22-24 20-42-15 8-21 25-20 42Z" fill={OLIVE_L} {...OUT} />
+    <path d="M50 70c-8-14-8-30 0-44 8 14 8 30 0 44Z" fill={OLIVE} {...OUT} />
+    <path d="M46 78C30 76 18 68 12 58c14-4 27 2 34 20Z" fill={OLIVE_L} {...OUT} />
+    <path d="M54 78c16-2 28-10 34-20-14-4-27 2-34 20Z" fill={OLIVE} {...OUT} />
+    <path d="M50 76c-6-10-6-22 0-32 6 10 6 22 0 32Z" fill={OLIVE_D} {...OUT} />
+    <path d="M20 56 47 76M80 56 53 76M34 40l13 30M66 40 53 70" {...SEAM} />
+    <circle cx="50" cy="66" r="4" fill={BRASS} {...OUT_IN} />
   </Frame>
 )
+
+/* -------------------------------------------------------------- light & set */
 
 const LampIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="lamp" size={size}>
-    <ellipse cx="49" cy="37" rx="39" ry="30" fill="url(#lamp-glow)" opacity="0.82" />
-    <path d="M22 53 34 15h32l13 38Z" fill="url(#lamp-brass)" {...OUTER_DARK} />
-    <ellipse cx="50" cy="53" rx="29" ry="7" fill="#9d733e" {...OUTER} />
-    <ellipse cx="50" cy="51" rx="19" ry="4.5" fill="#e6c778" stroke="#654246" strokeWidth="1.15" />
-    <ellipse cx="50" cy="40" rx="11" ry="10" fill="#edd897" stroke="#654246" strokeWidth="1.1" />
-    <path d="M35 18h30M29 48c10 4 29 4 41 0" {...HIGHLIGHT} />
-    <path d="M50 55c2 10 8 15 18 19l9 5" fill="none" stroke="#241820" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M50 55c2 10 8 15 18 19l9 5" fill="none" stroke="url(#lamp-brass)" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
-    <circle cx="50" cy="55" r="4" fill="url(#lamp-glint)" stroke="#241820" strokeWidth="1.8" />
-    <circle cx="68" cy="74" r="4" fill="url(#lamp-glint)" stroke="#241820" strokeWidth="1.8" />
-    <ellipse cx="80" cy="83" rx="17" ry="8" fill="url(#lamp-brass)" {...OUTER_DARK} />
-    <ellipse cx="80" cy="81" rx="11" ry="4" fill="#d8b66d" stroke="#654246" strokeWidth="1.05" />
+  <Frame prefix="lamp" size={size} tone={[BRASS_L, BRASS_D]}>
+    {/* pooled light under the shade */}
+    <ellipse cx="50" cy="48" rx="42" ry="32" fill={BRASS_L} opacity="0.16" />
+    {/* drawn shade: tapered drum with a bright lower rim */}
+    <path d="M25 52 34 14h32l9 38Z" fill="url(#lamp-tone)" {...OUT} />
+    <ellipse cx="50" cy="52" rx="25" ry="7" fill={BRASS} {...OUT} />
+    <ellipse cx="50" cy="14" rx="16" ry="4.5" fill={BRASS_D} {...OUT_IN} />
+    <ellipse cx="50" cy="51" rx="17" ry="4" fill={LINEN} />
+    <path d="M36 18h28M31 44c11 3 27 3 38 0" {...SHEEN} />
+    {/* stem, weighted base, pull chain */}
+    <path d="M50 56v22" stroke={INK} strokeWidth="6" strokeLinecap="round" />
+    <path d="M50 56v22" stroke={BRASS} strokeWidth="3" strokeLinecap="round" />
+    <path d="M32 88h36l-4-10H36Z" fill={BRASS_D} {...OUT} />
+    <ellipse cx="50" cy="88" rx="18" ry="5" fill={BRASS} {...OUT} />
+    <path d="M62 54v8" stroke={INK} strokeWidth="1.6" />
+    <circle cx="62" cy="64" r="2.6" fill={BRASS_L} {...OUT_IN} />
   </Frame>
 )
+
+/* ------------------------------------------------------------------ kitchen */
 
 const CounterIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="counter" size={size}>
-    <path d="M7 13h86v76H7Z" fill="url(#counter-wood-deep)" {...OUTER_DARK} />
-    <path d="M12 18h76v58H12Z" fill="#7b4d39" stroke="#c09362" strokeWidth="1.05" />
-    <path d="M14 25h32v42H14Z" fill="#a2734a" {...OUTER} />
-    <path d="M18 33h24M18 42h24M18 51h24" {...HIGHLIGHT} />
-    <circle cx="29" cy="31" r="2" fill="#d8b674" /><circle cx="29" cy="40" r="2" fill="#d8b674" /><circle cx="29" cy="49" r="2" fill="#d8b674" />
-    <rect x="53" y="25" width="31" height="42" rx="7" fill="url(#counter-porcelain)" {...OUTER} />
-    <rect x="57" y="30" width="23" height="30" rx="5" fill="url(#counter-glass)" stroke="#654246" strokeWidth="1.15" />
-    <ellipse cx="69" cy="48" rx="6" ry="4" fill="#3f605f" stroke="#d1d5c3" strokeWidth="1" />
-    <path d="M65 24v-8c0-5 4-8 8-8h7" fill="none" stroke="#241820" strokeWidth="3.2" strokeLinecap="round" />
-    <path d="M65 24v-8c0-5 4-8 8-8h7" fill="none" stroke="url(#counter-metal)" strokeWidth="1.6" strokeLinecap="round" />
-    <circle cx="80" cy="9" r="3.4" fill="url(#counter-glint)" stroke="#241820" strokeWidth="1.5" />
-    <path d="M13 75h75M17 81h67" {...HIGHLIGHT} />
-  </Frame>
-)
-
-const TvIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="tv" size={size}>
-    <path d="M10 14c6-7 15-10 27-10h28c12 0 21 3 25 10l4 9v44l-5 11c-5 7-13 10-24 10H36c-11 0-20-3-25-10L6 67V23Z" fill="#2b2b32" {...OUTER_DARK} />
-    <rect x="14" y="16" width="72" height="46" rx="6" fill="url(#tv-glass)" {...OUTER} />
-    <path d="M20 25c18-7 43-7 60 0M20 55c17 5 43 5 60 0" stroke="#c7d0bd" strokeOpacity="0.38" strokeWidth="1.15" fill="none" />
-    <path d="M16 67h68v12H16Z" fill="#39363a" {...OUTER} />
-    <path d="M24 72h5M34 72h5M44 72h5M54 72h5M64 72h5M74 72h5" stroke="#bcad7c" strokeWidth="1.35" strokeLinecap="round" />
-    <path d="M38 79h24l6 13H32Z" fill="#40373b" {...OUTER} />
-    <path d="M39 88h22" {...HIGHLIGHT} />
-    <circle cx="77" cy="27" r="2.5" fill="#b99250" stroke="#654246" strokeWidth="1" />
-  </Frame>
-)
-
-const BathtubIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="bathtub" size={size}>
-    <path d="M7 28c0-15 12-24 27-24h32c15 0 27 9 27 24v42c0 16-11 25-26 25H33C18 95 7 86 7 70Z" fill="url(#bathtub-porcelain)" {...OUTER_DARK} />
-    <path d="M15 31c0-11 8-17 19-17h32c11 0 19 6 19 17v34c0 13-9 20-21 20H36c-12 0-21-7-21-20Z" fill="url(#bathtub-glass)" {...OUTER} />
-    <path d="M20 49c15-6 45-6 60 0v17c-16 8-44 8-60 0Z" fill="#70938d" opacity="0.65" stroke="#654246" strokeWidth="1.1" />
-    <circle cx="31" cy="19" r="5" fill="url(#bathtub-glint)" {...OUTER} />
-    <circle cx="69" cy="19" r="5" fill="url(#bathtub-glint)" {...OUTER} />
-    <path d="M31 24v10M69 24v10" stroke="#3d4a4c" strokeWidth="2" strokeLinecap="round" />
-    <ellipse cx="50" cy="69" rx="7" ry="5" fill="#3d5b5b" {...OUTER} />
-    <circle cx="50" cy="69" r="2" fill="#d5d5c2" />
-    <path d="M21 34c12-6 25-7 36-4M22 78c14 6 32 7 47 3" {...HIGHLIGHT} />
-    <path d="M19 89v5M81 89v5" stroke="#241820" strokeWidth="2.4" strokeLinecap="round" />
-  </Frame>
-)
-
-const BookshelfIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="bookshelf" size={size}>
-    <path d="M7 7h86v87H7Z" fill="url(#bookshelf-wood-deep)" {...OUTER_DARK} />
-    <rect x="14" y="14" width="72" height="73" fill="#39272a" stroke="#b77d50" strokeWidth="1.1" />
-    <path d="M10 17h80M10 50h80M10 84h80" stroke="#241820" strokeWidth="4" strokeLinecap="round" />
-    <path d="M12 16h76M12 49h76M12 83h76" stroke="#c7945e" strokeWidth="1.1" strokeLinecap="round" />
-    <rect x="18" y="20" width="8" height="26" fill="#87463f" stroke="#241820" strokeWidth="1.1" /><rect x="27" y="19" width="7" height="27" fill="#b48a4d" stroke="#241820" strokeWidth="1.1" /><rect x="35" y="21" width="9" height="25" fill="#526956" stroke="#241820" strokeWidth="1.1" /><rect x="45" y="18" width="8" height="28" fill="#6d4656" stroke="#241820" strokeWidth="1.1" /><rect x="54" y="20" width="10" height="26" fill="#87463f" stroke="#241820" strokeWidth="1.1" /><rect x="65" y="19" width="7" height="27" fill="#b48a4d" stroke="#241820" strokeWidth="1.1" /><rect x="73" y="22" width="9" height="24" fill="#526956" stroke="#241820" strokeWidth="1.1" />
-    <rect x="19" y="54" width="9" height="25" fill="#617355" stroke="#241820" strokeWidth="1.1" /><rect x="29" y="52" width="7" height="27" fill="#aa7646" stroke="#241820" strokeWidth="1.1" /><rect x="37" y="55" width="10" height="24" fill="#7d3f3c" stroke="#241820" strokeWidth="1.1" /><rect x="48" y="53" width="8" height="26" fill="#664455" stroke="#241820" strokeWidth="1.1" /><rect x="57" y="54" width="10" height="25" fill="#617355" stroke="#241820" strokeWidth="1.1" /><rect x="68" y="52" width="7" height="27" fill="#a47748" stroke="#241820" strokeWidth="1.1" /><rect x="76" y="55" width="7" height="24" fill="#7a4540" stroke="#241820" strokeWidth="1.1" />
-    <path d="M18 27h8M36 29h7M55 28h8M74 30h7M19 62h8M38 64h8M58 63h8M76 65h7" stroke="#ddbf7c" strokeWidth="1.05" strokeLinecap="round" />
-    <path d="M22 19v26M42 18v28M62 20v26M25 53v25M45 53v26M65 54v25" stroke="#d2a66a" strokeOpacity="0.45" strokeWidth="0.75" />
-    <path d="M8 91h84" {...HIGHLIGHT} />
+  <Frame prefix="counter" size={size} tone={[WOOD_L, WOOD_D]}>
+    <rect x="8" y="14" width="84" height="76" rx="4" fill="url(#counter-tone)" {...OUT} />
+    {/* stone worktop */}
+    <rect x="8" y="14" width="84" height="18" rx="4" fill={SLATE} {...OUT} />
+    <path d="M14 20h72" {...SHEEN} />
+    {/* sunk sink with a drain and mixer tap */}
+    <rect x="47" y="38" width="38" height="30" rx="4" fill={SLATE_D} {...OUT_IN} />
+    <rect x="52" y="43" width="28" height="20" rx="3" fill={GLASS} {...OUT_IN} />
+    <circle cx="66" cy="53" r="4" fill={SLATE_L} {...OUT_IN} />
+    <path d="M66 38V28c0-4 4-6 8-6h6" fill="none" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+    <path d="M66 38V28c0-4 4-6 8-6h6" fill="none" stroke={BRASS} strokeWidth="2.4" strokeLinecap="round" />
+    {/* drawer stack */}
+    <rect x="15" y="38" width="26" height="20" rx="3" fill={WOOD_L} {...OUT_IN} />
+    <rect x="15" y="63" width="26" height="20" rx="3" fill={WOOD_L} {...OUT_IN} />
+    <path d="M21 48h14M21 73h14" stroke={BRASS_L} strokeWidth="2.6" strokeLinecap="round" />
   </Frame>
 )
 
 const StoveIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="stove" size={size}>
-    <rect x="8" y="8" width="84" height="84" rx="7" fill="url(#stove-metal)" {...OUTER_DARK} />
-    <rect x="14" y="15" width="72" height="58" rx="4" fill="#333c3c" {...OUTER} />
-    <circle cx="32" cy="31" r="14" fill="#283032" {...OUTER} /><circle cx="32" cy="31" r="8" fill="none" stroke="#ba9658" strokeWidth="1.6" /><circle cx="32" cy="31" r="3" fill="#7f453d" />
-    <circle cx="68" cy="31" r="14" fill="#283032" {...OUTER} /><circle cx="68" cy="31" r="8" fill="none" stroke="#ba9658" strokeWidth="1.6" /><circle cx="68" cy="31" r="3" fill="#7f453d" />
-    <circle cx="32" cy="57" r="14" fill="#283032" {...OUTER} /><circle cx="32" cy="57" r="8" fill="none" stroke="#ba9658" strokeWidth="1.6" /><circle cx="32" cy="57" r="3" fill="#7f453d" />
-    <circle cx="68" cy="57" r="14" fill="#283032" {...OUTER} /><circle cx="68" cy="57" r="8" fill="none" stroke="#ba9658" strokeWidth="1.6" /><circle cx="68" cy="57" r="3" fill="#7f453d" />
-    <path d="M16 78h68v10H16Z" fill="#484b46" {...OUTER} />
-    <circle cx="32" cy="83" r="2.2" fill="#c8a76d" /><circle cx="50" cy="83" r="2.2" fill="#c8a76d" /><circle cx="68" cy="83" r="2.2" fill="#c8a76d" />
+  <Frame prefix="stove" size={size} tone={[SLATE_L, SLATE_D]}>
+    <rect x="8" y="8" width="84" height="84" rx="6" fill="url(#stove-tone)" {...OUT} />
+    <rect x="13" y="13" width="74" height="52" rx="4" fill={CHAR} {...OUT_IN} />
+    {/* four drawn burners with cast rings */}
+    <circle cx="33" cy="28" r="12" fill={CHAR_L} {...OUT_IN} /><circle cx="33" cy="28" r="6" fill="none" stroke={BRASS} strokeWidth="2" />
+    <circle cx="67" cy="28" r="12" fill={CHAR_L} {...OUT_IN} /><circle cx="67" cy="28" r="6" fill="none" stroke={BRASS} strokeWidth="2" />
+    <circle cx="33" cy="52" r="12" fill={CHAR_L} {...OUT_IN} /><circle cx="33" cy="52" r="6" fill="none" stroke={BRASS} strokeWidth="2" />
+    <circle cx="67" cy="52" r="12" fill={CHAR_L} {...OUT_IN} /><circle cx="67" cy="52" r="6" fill="none" stroke={BRASS} strokeWidth="2" />
+    {/* oven door, handle and control knobs */}
+    <rect x="13" y="70" width="74" height="18" rx="3" fill={SLATE_D} {...OUT_IN} />
+    <path d="M20 76h60" stroke={BRASS_L} strokeWidth="3" strokeLinecap="round" />
+    <circle cx="26" cy="84" r="2.6" fill={BRASS} /><circle cx="50" cy="84" r="2.6" fill={BRASS} /><circle cx="74" cy="84" r="2.6" fill={BRASS} />
   </Frame>
 )
 
 const FridgeIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="fridge" size={size}>
-    <rect x="16" y="7" width="68" height="86" rx="7" fill="url(#fridge-metal)" {...OUTER_DARK} />
-    <path d="M21 13h58v25H21ZM21 42h58v45H21Z" fill="#aeb5a9" stroke="#654246" strokeWidth="1.15" />
-    <path d="M23 18c12-4 31-4 52 0M23 48c12-4 31-4 52 0" {...HIGHLIGHT} />
-    <path d="M20 39h60" stroke="#241820" strokeWidth="3" strokeLinecap="round" />
-    <path d="M70 19v13M70 51v27" stroke="#394648" strokeWidth="3" strokeLinecap="round" />
-    <path d="M70 19v13M70 51v27" stroke="#d1d0b8" strokeWidth="1.05" strokeLinecap="round" />
-    <circle cx="25" cy="84" r="2.4" fill="#ab6b50" /><circle cx="75" cy="84" r="2.4" fill="#7a8d72" />
-    <path d="M22 87h56" {...HIGHLIGHT} />
+  <Frame prefix="fridge" size={size} tone={[PORC, PORC_D]}>
+    <rect x="17" y="6" width="66" height="88" rx="6" fill="url(#fridge-tone)" {...OUT} />
+    <rect x="22" y="11" width="56" height="26" rx="3" fill={PORC} {...OUT_IN} />
+    <rect x="22" y="42" width="56" height="47" rx="3" fill={PORC} {...OUT_IN} />
+    <path d="M19 39h62" stroke={INK} strokeWidth="3" strokeLinecap="round" />
+    {/* long pull handles */}
+    <path d="M69 17v14M69 48v22" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+    <path d="M69 17v14M69 48v22" stroke={BRASS} strokeWidth="2.4" strokeLinecap="round" />
+    <rect x="28" y="76" width="16" height="8" rx="2" fill={BRASS_D} {...OUT_IN} />
+    <path d="M26 15h34" {...SHEEN} />
   </Frame>
 )
 
-const ClockIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="clock" size={size}>
-    <path d="M13 28c3-11 12-17 25-19h24c13 2 22 8 25 19v41c-3 12-12 19-25 21H38c-13-2-22-9-25-21Z" fill="url(#clock-wood-deep)" {...OUTER_DARK} />
-    <path d="M18 32c5-9 12-13 22-14h20c10 1 17 5 22 14v31c-5 9-12 13-22 14H40c-10-1-17-5-22-14Z" fill="#71463a" {...OUTER} />
-    <circle cx="58" cy="48" r="20" fill="#2d2327" {...OUTER} />
-    <circle cx="58" cy="48" r="15" fill="url(#clock-paper)" stroke="#654246" strokeWidth="1.2" />
-    <path d="M58 36v4M58 56v4M46 48h4M66 48h4M49 39l3 3M67 39l-3 3M49 57l3-3M67 57l-3-3" stroke="#6d5141" strokeWidth="1.1" strokeLinecap="round" />
-    <path d="M58 48V40M58 48l7 5" stroke="#3c2930" strokeWidth="2.1" strokeLinecap="round" />
-    <circle cx="58" cy="48" r="2.6" fill="#934a42" />
-    <path d="M25 45h14v20H25Z" fill="#34262a" {...OUTER} />
-    <path d="M29 49v12M35 49v12" stroke="#c79b60" strokeWidth="1.2" />
-    <path d="M22 72h11M70 72h11" stroke="#241820" strokeWidth="3" strokeLinecap="round" />
-    <path d="M26 27 39 23M24 54h-7M21 51l-4 3 4 3" {...HIGHLIGHT} />
+/* ----------------------------------------------------------- study & living */
+
+const TvIcon: FurnitureIcon = ({ size }) => (
+  <Frame prefix="tv" size={size} tone={[CHAR_L, CHAR]}>
+    {/* valve set: deep cabinet, rounded tube, speaker grille */}
+    <rect x="8" y="12" width="84" height="60" rx="10" fill="url(#tv-tone)" {...OUT} />
+    <path d="M17 22c11-5 55-5 66 0 4 12 4 26 0 38-11 5-55 5-66 0-4-12-4-26 0-38Z" fill={GLASS} {...OUT_IN} />
+    <path d="M24 28c14-4 38-4 52 0M24 58c14 4 38 4 52 0" {...SHEEN} />
+    <rect x="18" y="76" width="44" height="12" rx="3" fill={CHAR} {...OUT_IN} />
+    <path d="M24 82h32" stroke={BRASS_D} strokeWidth="2" strokeLinecap="round" />
+    <circle cx="74" cy="82" r="5" fill={BRASS} {...OUT_IN} />
+    <circle cx="84" cy="82" r="3.4" fill={BRASS_D} {...OUT_IN} />
+    <path d="M22 90h56" stroke={INK} strokeWidth="3" strokeLinecap="round" />
+  </Frame>
+)
+
+const BookshelfIcon: FurnitureIcon = ({ size }) => (
+  <Frame prefix="bookshelf" size={size} tone={[WOOD_L, WOOD_D]}>
+    <rect x="7" y="7" width="86" height="86" rx="4" fill="url(#bookshelf-tone)" {...OUT} />
+    <rect x="14" y="14" width="72" height="72" rx="2" fill={WOOD_D} {...OUT_IN} />
+    {/* three shelf boards */}
+    <path d="M14 38h72M14 62h72" stroke={WOOD_L} strokeWidth="4" strokeLinecap="round" />
+    <path d="M14 38h72M14 62h72" stroke={INK} strokeWidth="1.4" strokeLinecap="round" />
+    {/* upper row of spines */}
+    <rect x="18" y="18" width="8" height="19" fill={BLOOD} {...OUT_IN} />
+    <rect x="28" y="16" width="7" height="21" fill={BRASS} {...OUT_IN} />
+    <rect x="37" y="19" width="9" height="18" fill={OLIVE} {...OUT_IN} />
+    <rect x="48" y="17" width="8" height="20" fill={LINEN} {...OUT_IN} />
+    <rect x="58" y="18" width="9" height="19" fill={BLOOD_D} {...OUT_IN} />
+    <rect x="69" y="16" width="7" height="21" fill={BRASS_L} {...OUT_IN} />
+    {/* lower row of spines */}
+    <rect x="18" y="43" width="9" height="18" fill={OLIVE_L} {...OUT_IN} />
+    <rect x="29" y="41" width="7" height="20" fill={BLOOD} {...OUT_IN} />
+    <rect x="38" y="44" width="9" height="17" fill={BRASS} {...OUT_IN} />
+    <rect x="49" y="42" width="8" height="19" fill={LINEN} {...OUT_IN} />
+    <rect x="59" y="43" width="9" height="18" fill={OLIVE} {...OUT_IN} />
+    <rect x="70" y="41" width="7" height="20" fill={BLOOD_D} {...OUT_IN} />
+    {/* bottom shelf: stacked flat books and a globe */}
+    <rect x="18" y="72" width="34" height="7" rx="1.5" fill={BRASS_D} {...OUT_IN} />
+    <rect x="21" y="79" width="30" height="6" rx="1.5" fill={LINEN} {...OUT_IN} />
+    <circle cx="70" cy="76" r="9" fill={GLASS} {...OUT_IN} />
+    <path d="M62 76h16M70 67v18" {...SEAM} />
   </Frame>
 )
 
 const DeskIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="desk" size={size}>
-    <path d="M8 14h84v42H8Z" fill="url(#desk-wood)" {...OUTER_DARK} />
-    <path d="M13 21c22-7 50 4 74-3M13 31c22-7 51 4 74-3M13 42c22-7 51 4 74-3" {...HIGHLIGHT} />
-    <path d="M14 56h17v34H14ZM69 56h17v34H69Z" fill="url(#desk-wood-deep)" {...OUTER} />
-    <path d="M22 60v23M78 60v23" {...HIGHLIGHT} />
-    <path d="M29 26h42v24H29Z" fill="#483942" {...OUTER} />
-    <path d="M34 31h32v15H34Z" fill="#664650" stroke="#b08472" strokeWidth="1.05" />
-    <path d="M38 35h21M38 40h16" stroke="#d0a082" strokeOpacity="0.65" strokeWidth="1" strokeLinecap="round" />
-    <path d="m16 18 18 5-4 14-18-5Z" fill="url(#desk-paper)" {...OUTER} />
-    <path d="m68 44 16 5-4 13-16-5Z" fill="#dbc8a2" {...OUTER} />
-    <path d="M19 22 30 25M71 48l9 3" stroke="#765041" strokeWidth="1" strokeLinecap="round" />
-    <path d="M34 79h31" stroke="#c9a363" strokeWidth="2.6" strokeLinecap="round" /><circle cx="67" cy="79" r="2.6" fill="#d5b771" />
+  <Frame prefix="desk" size={size} tone={[WOOD_L, WOOD]}>
+    {/* pedestal desk seen from above: top, blotter, drawers, case file */}
+    <rect x="6" y="16" width="88" height="68" rx="5" fill="url(#desk-tone)" {...OUT} />
+    <rect x="12" y="22" width="46" height="40" rx="3" fill={OLIVE_D} {...OUT_IN} />
+    <rect x="17" y="27" width="36" height="30" rx="2" fill={LINEN} {...OUT_IN} />
+    <path d="M23 35h24M23 42h20M23 49h15" stroke={WOOD} strokeWidth="1.6" strokeLinecap="round" />
+    {/* drawer bank */}
+    <rect x="64" y="22" width="24" height="17" rx="2" fill={WOOD_D} {...OUT_IN} />
+    <rect x="64" y="43" width="24" height="17" rx="2" fill={WOOD_D} {...OUT_IN} />
+    <path d="M70 31h12M70 52h12" stroke={BRASS_L} strokeWidth="2.6" strokeLinecap="round" />
+    {/* pen, inkwell, telephone cradle */}
+    <path d="M14 70l26 6" stroke={INK} strokeWidth="3" strokeLinecap="round" />
+    <circle cx="52" cy="72" r="6" fill={CHAR} {...OUT_IN} />
+    <rect x="64" y="66" width="24" height="12" rx="3" fill={CHAR_L} {...OUT_IN} />
+  </Frame>
+)
+
+const ClockIcon: FurnitureIcon = ({ size }) => (
+  <Frame prefix="clock" size={size} tone={[WOOD_L, WOOD_D]}>
+    {/* longcase clock: hood, dial, trunk and swinging bob */}
+    <path d="M22 22c0-9 6-14 14-16h28c8 2 14 7 14 16v60c0 8-6 12-14 12H36c-8 0-14-4-14-12Z" fill="url(#clock-tone)" {...OUT} />
+    <path d="M30 12h40l-6-8H36Z" fill={WOOD_D} {...OUT} />
+    <circle cx="50" cy="38" r="22" fill={WOOD_D} {...OUT_IN} />
+    <circle cx="50" cy="38" r="17" fill={LINEN} {...OUT_IN} />
+    <path d="M50 24v4M50 48v4M36 38h4M60 38h4M40 28l3 3M60 28l-3 3M40 48l3-3M60 48l-3-3" stroke={WOOD} strokeWidth="1.6" strokeLinecap="round" />
+    <path d="M50 38V27M50 38l8 6" stroke={INK} strokeWidth="2.6" strokeLinecap="round" />
+    <circle cx="50" cy="38" r="2.6" fill={BLOOD} />
+    <rect x="34" y="64" width="32" height="26" rx="3" fill={GLASS} {...OUT_IN} />
+    <path d="M50 64v16" stroke={BRASS_D} strokeWidth="2" />
+    <circle cx="50" cy="82" r="6" fill={BRASS} {...OUT_IN} />
+  </Frame>
+)
+
+/* ----------------------------------------------------------------- bathroom */
+
+const BathtubIcon: FurnitureIcon = ({ size }) => (
+  <Frame prefix="bathtub" size={size} tone={[PORC, PORC_D]}>
+    <rect x="8" y="16" width="84" height="74" rx="22" fill="url(#bathtub-tone)" {...OUT} />
+    <rect x="16" y="24" width="68" height="58" rx="16" fill={PORC_D} {...OUT_IN} />
+    <rect x="21" y="29" width="58" height="48" rx="13" fill={GLASS} {...OUT_IN} />
+    <path d="M28 40c12-5 32-5 44 0" {...SHEEN} />
+    {/* mixer tap and two taps at the head end */}
+    <path d="M50 16V8c0-3 3-5 6-5h6" fill="none" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+    <path d="M50 16V8c0-3 3-5 6-5h6" fill="none" stroke={BRASS} strokeWidth="2.4" strokeLinecap="round" />
+    <circle cx="34" cy="10" r="4.5" fill={BRASS_L} {...OUT_IN} />
+    <circle cx="70" cy="10" r="4.5" fill={BRASS_L} {...OUT_IN} />
+    <ellipse cx="50" cy="70" rx="6" ry="4" fill={SLATE_D} {...OUT_IN} />
+    <path d="M20 88h60" stroke={INK} strokeWidth="3" strokeLinecap="round" />
   </Frame>
 )
 
 const ToiletIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="toilet" size={size}>
-    <rect x="23" y="7" width="54" height="28" rx="7" fill="url(#toilet-porcelain)" {...OUTER_DARK} />
-    <rect x="29" y="13" width="42" height="15" rx="4" fill="#b9c3b7" stroke="#654246" strokeWidth="1.05" />
-    <circle cx="51" cy="21" r="3.2" fill="url(#toilet-glint)" stroke="#654246" strokeWidth="1" />
-    <path d="M18 49c0-8 7-13 16-13h33c9 0 15 5 15 13v18c0 17-12 27-32 27S18 84 18 67Z" fill="url(#toilet-porcelain)" {...OUTER_DARK} />
-    <ellipse cx="50" cy="62" rx="25" ry="20" fill="#b5c5ba" {...OUTER} />
-    <ellipse cx="50" cy="62" rx="17" ry="13" fill="#587875" stroke="#654246" strokeWidth="1.15" />
-    <ellipse cx="50" cy="60" rx="8" ry="4" fill="#cbdacd" opacity="0.82" />
-    <path d="M27 47c10-7 37-7 46 0M30 79c11 8 29 9 40 0" {...HIGHLIGHT} />
-    <path d="M29 90v4M71 90v4" stroke="#241820" strokeWidth="2.4" strokeLinecap="round" />
+  <Frame prefix="toilet" size={size} tone={[PORC, PORC_D]}>
+    {/* cistern with a lever, then the bowl and seat */}
+    <rect x="24" y="6" width="52" height="26" rx="5" fill="url(#toilet-tone)" {...OUT} />
+    <rect x="30" y="12" width="40" height="14" rx="3" fill={PORC_D} {...OUT_IN} />
+    <path d="M76 16h7" stroke={INK} strokeWidth="4" strokeLinecap="round" />
+    <path d="M76 16h7" stroke={BRASS} strokeWidth="2" strokeLinecap="round" />
+    <path d="M20 48c0-8 7-13 15-13h30c8 0 15 5 15 13v14c0 18-13 30-30 30S20 80 20 62Z" fill="url(#toilet-tone)" {...OUT} />
+    <ellipse cx="50" cy="62" rx="26" ry="22" fill={PORC_D} {...OUT_IN} />
+    <ellipse cx="50" cy="62" rx="18" ry="15" fill={GLASS} {...OUT_IN} />
+    <ellipse cx="50" cy="59" rx="8" ry="4" fill={PORC} opacity="0.7" />
+    <path d="M28 46c12-6 32-6 44 0" {...SHEEN} />
+    <path d="M34 90h32" stroke={INK} strokeWidth="3" strokeLinecap="round" />
   </Frame>
 )
 
 const ShowerIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="shower" size={size}>
-    <path d="M10 77h80v16H10Z" fill="url(#shower-porcelain)" {...OUTER_DARK} />
-    <path d="M16 80h68v8H16Z" fill="#6e8782" stroke="#654246" strokeWidth="1.1" />
-    <circle cx="50" cy="84" r="4" fill="#3e5959" {...OUTER} />
-    <path d="M20 75V17c0-6 4-10 10-10h30" fill="none" stroke="#241820" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M20 75V17c0-6 4-10 10-10h30" fill="none" stroke="url(#shower-metal)" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" />
-    <ellipse cx="63" cy="10" rx="14" ry="8" fill="url(#shower-metal)" {...OUTER_DARK} transform="rotate(14 63 10)" />
-    <ellipse cx="63" cy="10" rx="8" ry="4" fill="#b7c3b8" stroke="#654246" strokeWidth="1" transform="rotate(14 63 10)" />
-    <circle cx="58" cy="9" r="1.2" fill="#526364" /><circle cx="63" cy="10" r="1.2" fill="#526364" /><circle cx="68" cy="11" r="1.2" fill="#526364" />
-    <path d="M55 20c-3 11-3 19-5 29M63 20c0 13-1 23-1 34M70 21c3 11 4 19 5 29M58 53c-2 8-2 14-3 20M66 56c2 7 2 12 3 17" stroke="#c3dbcc" strokeWidth="2.2" strokeLinecap="round" />
-    <path d="M75 23v48M82 28v38" stroke="#d5dfcc" strokeOpacity="0.55" strokeWidth="1.2" />
-    <path d="M13 75V15h74v62" fill="none" stroke="#d0d1b9" strokeOpacity="0.56" strokeWidth="1.25" strokeLinecap="round" />
-    <rect x="67" y="67" width="12" height="6" rx="2" fill="#c8c1a6" stroke="#654246" strokeWidth="1" />
+  <Frame prefix="shower" size={size} tone={[PORC, PORC_D]}>
+    {/* glass screen behind the tray */}
+    <rect x="10" y="10" width="80" height="66" rx="3" fill={GLASS} opacity="0.5" {...OUT_IN} />
+    <path d="M18 16v54M32 16v54" stroke={PORC} strokeOpacity="0.35" strokeWidth="2" />
+    {/* tray */}
+    <rect x="8" y="72" width="84" height="20" rx="4" fill="url(#shower-tone)" {...OUT} />
+    <rect x="14" y="76" width="72" height="12" rx="2" fill={PORC_D} {...OUT_IN} />
+    <circle cx="50" cy="82" r="4.5" fill={SLATE_D} {...OUT_IN} />
+    {/* riser and drawn rose head */}
+    <path d="M78 70V22c0-6-4-10-10-10H56" fill="none" stroke={INK} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M78 70V22c0-6-4-10-10-10H56" fill="none" stroke={BRASS} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+    <ellipse cx="48" cy="14" rx="15" ry="7" fill={BRASS} {...OUT} />
+    <ellipse cx="48" cy="13" rx="9" ry="3.4" fill={BRASS_L} {...OUT_IN} />
+    <circle cx="42" cy="18" r="1.4" fill={INK} /><circle cx="48" cy="19" r="1.4" fill={INK} /><circle cx="54" cy="18" r="1.4" fill={INK} />
+    {/* falling water */}
+    <path d="M40 26c-2 12-3 22-3 34M48 26c0 14-1 24-1 36M56 26c2 12 3 22 4 32" stroke="#BFD3C6" strokeOpacity="0.7" strokeWidth="2.4" strokeLinecap="round" />
+    <rect x="16" y="58" width="14" height="10" rx="2" fill={LINEN} {...OUT_IN} />
   </Frame>
 )
 

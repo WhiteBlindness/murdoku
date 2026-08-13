@@ -5,140 +5,212 @@ export type RoomMaterial =
   | 'kitchen' | 'bathroom' | 'pantry' | 'living-room' | 'dining-room'
   | 'study' | 'office' | 'bedroom' | 'hallway' | 'front-yard' | 'garden' | 'porch'
 
-const rgba = (hex: string, alpha: number) => {
-  const value = hex.replace('#', '')
-  const red = Number.parseInt(value.slice(0, 2), 16)
-  const green = Number.parseInt(value.slice(2, 4), 16)
-  const blue = Number.parseInt(value.slice(4, 6), 16)
-  return `rgba(${red}, ${green}, ${blue}, ${alpha})`
-}
+/**
+ * Each finish is an authored material tile — floorboards, encaustic checker,
+ * stone courses, slate slabs, wool weave, clipped lawn — drawn as one SVG that
+ * is stretched to exactly one board cell. Stretching one tile per cell (rather
+ * than tiling a fixed pixel pattern) keeps the plank count and grout rhythm
+ * identical from a 4x4 board through a 7x7 one, and stops a half-cut seam from
+ * landing in the middle of a cell.
+ *
+ * Every base stays dark: the board's light X-mark and bone suspect tokens must
+ * read the same way in all twelve rooms.
+ */
+const tile = (svg: string) =>
+  `url("data:image/svg+xml,${encodeURIComponent(svg.replace(/\s+/g, ' ').trim())}")`
+
+const wrap = (body: string) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">${body}</svg>`
+
+/** Three courses of floorboards with staggered end joints and rubbed grain. */
+const planks = (seam: string, a: string, b: string, grain: string) => wrap(`
+  <rect width="100" height="100" fill="${seam}"/>
+  <g>
+    <rect x="0" y="1" width="61" height="31" fill="${a}"/>
+    <rect x="63" y="1" width="37" height="31" fill="${b}"/>
+    <rect x="0" y="34" width="29" height="31" fill="${b}"/>
+    <rect x="31" y="34" width="69" height="31" fill="${a}"/>
+    <rect x="0" y="67" width="73" height="32" fill="${a}"/>
+    <rect x="75" y="67" width="25" height="32" fill="${b}"/>
+  </g>
+  <g stroke="${grain}" stroke-width="1" fill="none" opacity="0.5">
+    <path d="M6 11h46M12 23h34M8 45h58M40 56h44M10 78h52M22 90h40"/>
+  </g>
+`)
+
+/** The same boards run the other way for porches and hall runners. */
+const boards = (seam: string, a: string, b: string, grain: string) => wrap(`
+  <rect width="100" height="100" fill="${seam}"/>
+  <g>
+    <rect x="1" y="0" width="31" height="61" fill="${a}"/>
+    <rect x="1" y="63" width="31" height="37" fill="${b}"/>
+    <rect x="34" y="0" width="31" height="29" fill="${b}"/>
+    <rect x="34" y="31" width="31" height="69" fill="${a}"/>
+    <rect x="67" y="0" width="32" height="73" fill="${a}"/>
+    <rect x="67" y="75" width="32" height="25" fill="${b}"/>
+  </g>
+  <g stroke="${grain}" stroke-width="1" fill="none" opacity="0.5">
+    <path d="M11 6v46M23 12v34M45 8v58M56 40v44M78 10v52M90 22v40"/>
+  </g>
+`)
+
+/** Encaustic checker: four tiles per cell with a hairline grout. */
+const checker = (grout: string, a: string, b: string, inlay: string) => wrap(`
+  <rect width="100" height="100" fill="${grout}"/>
+  <rect x="1" y="1" width="47" height="47" fill="${a}"/>
+  <rect x="52" y="1" width="47" height="47" fill="${b}"/>
+  <rect x="1" y="52" width="47" height="47" fill="${b}"/>
+  <rect x="52" y="52" width="47" height="47" fill="${a}"/>
+  <g fill="${inlay}" opacity="0.36">
+    <circle cx="24" cy="24" r="6"/>
+    <circle cx="76" cy="76" r="6"/>
+    <path d="M76 18l7 7-7 7-7-7zM24 68l7 7-7 7-7-7z"/>
+  </g>
+`)
+
+/** Stone courses: staggered blocks with a deep mortar joint. */
+const bricks = (mortar: string, a: string, b: string, chip: string) => wrap(`
+  <rect width="100" height="100" fill="${mortar}"/>
+  <g>
+    <rect x="1" y="1" width="46" height="30" fill="${a}"/>
+    <rect x="49" y="1" width="50" height="30" fill="${b}"/>
+    <rect x="1" y="34" width="22" height="30" fill="${b}"/>
+    <rect x="25" y="34" width="47" height="30" fill="${a}"/>
+    <rect x="74" y="34" width="25" height="30" fill="${b}"/>
+    <rect x="1" y="67" width="51" height="32" fill="${b}"/>
+    <rect x="54" y="67" width="45" height="32" fill="${a}"/>
+  </g>
+  <g stroke="${chip}" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.22">
+    <path d="M8 22h14M58 12h18M30 44h16M80 56h12M12 76h20M62 90h16"/>
+  </g>
+`)
+
+/** Wide slate slabs — quiet enough to sit under desks and porcelain. */
+const slabs = (joint: string, a: string, b: string, bloom: string) => wrap(`
+  <rect width="100" height="100" fill="${joint}"/>
+  <rect x="1" y="1" width="63" height="47" fill="${a}"/>
+  <rect x="66" y="1" width="33" height="47" fill="${b}"/>
+  <rect x="1" y="51" width="33" height="48" fill="${b}"/>
+  <rect x="36" y="51" width="63" height="48" fill="${a}"/>
+  <g stroke="${bloom}" stroke-width="1" fill="none" opacity="0.18">
+    <path d="M8 12h34M8 60h24M70 22h22M44 84h32"/>
+  </g>
+`)
+
+/** Clipped lawn: blade tufts scattered over packed earth. */
+const lawn = (base: string, patch: string, blade: string, earth: string) => wrap(`
+  <rect width="100" height="100" fill="${base}"/>
+  <g fill="${patch}" opacity="0.3">
+    <ellipse cx="30" cy="34" rx="18" ry="12"/>
+    <ellipse cx="76" cy="70" rx="16" ry="11"/>
+  </g>
+  <g fill="${earth}" opacity="0.28">
+    <ellipse cx="82" cy="24" rx="9" ry="5"/>
+    <ellipse cx="20" cy="82" rx="10" ry="5"/>
+  </g>
+  <g stroke="${blade}" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.62">
+    <path d="M12 26c1-6 3-10 6-13M18 26c1-5 1-9 0-13"/>
+    <path d="M44 14c2-7 5-11 9-13M50 15c0-6-1-10-3-14"/>
+    <path d="M72 40c-2-8-2-14 1-19M78 41c2-7 4-11 8-14"/>
+    <path d="M26 58c-3-7-4-13-3-19M32 59c1-8 3-13 6-16"/>
+    <path d="M58 66c2-6 5-10 9-12M64 67c-1-7-3-12-6-15"/>
+    <path d="M88 58c-1-7 0-12 2-16"/>
+    <path d="M14 90c0-8 1-13 4-17M20 91c3-6 6-10 10-12"/>
+    <path d="M50 96c-2-7-2-12 0-17M56 95c2-6 5-10 9-12"/>
+    <path d="M80 88c1-7 3-12 7-15M86 89c-1-6-3-10-6-13"/>
+  </g>
+`)
 
 /**
- * Each finish uses an authored material cue rather than an anonymous board
- * pattern: encaustic tile, stone, walnut, wool, parquet, earth, or timber.
- * Bases intentionally stay dark so the light token and X-mark treatment works
- * across all twelve rooms without changing meaning from room to room.
+ * Wool weave: a fine warp/weft grid. Deliberately no centre bloom — anything
+ * that reads as one soft blob per cell turns a carpeted room into polka dots.
  */
+const weave = (base: string, warp: string, weft: string, pile: string) => wrap(`
+  <rect width="100" height="100" fill="${base}"/>
+  <g stroke="${warp}" stroke-width="2" opacity="0.34">
+    <path d="M8 0v100M25 0v100M42 0v100M58 0v100M75 0v100M92 0v100"/>
+  </g>
+  <g stroke="${weft}" stroke-width="2" opacity="0.3">
+    <path d="M0 8h100M0 25h100M0 42h100M0 58h100M0 75h100M0 92h100"/>
+  </g>
+  <g stroke="${pile}" stroke-width="1" opacity="0.16">
+    <path d="M0 16h100M0 50h100M0 84h100"/>
+  </g>
+`)
+
+/** Mahogany parquet blocks laid in alternating grain. */
+const parquet = (pitch: string, a: string, b: string, grain: string) => wrap(`
+  <rect width="100" height="100" fill="${pitch}"/>
+  <rect x="1" y="1" width="47" height="47" fill="${a}"/>
+  <rect x="52" y="1" width="47" height="47" fill="${b}"/>
+  <rect x="1" y="52" width="47" height="47" fill="${b}"/>
+  <rect x="52" y="52" width="47" height="47" fill="${a}"/>
+  <g stroke="${grain}" stroke-width="1.2" opacity="0.42">
+    <path d="M1 13h47M1 25h47M1 37h47M52 64h47M52 76h47M52 88h47"/>
+    <path d="M64 1v47M76 1v47M88 1v47M13 52v47M25 52v47M37 52v47"/>
+  </g>
+`)
+
 export const ROOM_MATERIALS: Record<RoomMaterial, CSSProperties> = {
+  // Oxblood-and-clay encaustic tile, dulled to kitchen-at-night levels.
   kitchen: {
-    // Aged encaustic tiles: oxblood clay, worn cream inlay, and hairline grout.
-    backgroundColor: '#46342d',
-    backgroundImage: [
-      `radial-gradient(circle at 25% 24%, ${rgba('#c7a770', 0.18)} 0 4%, transparent 4.8%)`,
-      `linear-gradient(45deg, transparent 43%, ${rgba('#b1885a', 0.19)} 44% 47%, transparent 48%)`,
-      `linear-gradient(135deg, #694536 0 46%, #4b312d 47% 53%, #56382f 54% 100%)`,
-    ].join(', '),
-    backgroundSize: '32px 32px, 32px 32px, 32px 32px',
+    backgroundColor: '#2A211B',
+    backgroundImage: tile(checker('#1B1511', '#4A382C', '#33261E', '#C9A063')),
   },
+  // Cold slate slabs with mineral bloom.
   bathroom: {
-    // Slate slabs with mineral bloom and deep, irregular-looking joins.
-    backgroundColor: '#4d5754',
-    backgroundImage: [
-      `radial-gradient(ellipse at 26% 28%, ${rgba('#a9b09a', 0.14)} 0 7%, transparent 8%)`,
-      `repeating-linear-gradient(0deg, transparent 0 31px, ${rgba('#293737', 0.62)} 32px 34px, transparent 35px 62px)`,
-      'linear-gradient(132deg, #66706a 0%, #4d5754 48%, #394846 100%)',
-    ].join(', '),
-    backgroundSize: '64px 64px, 100% 64px, 100% 100%',
+    backgroundColor: '#2C3330',
+    backgroundImage: tile(slabs('#161B19', '#3F4844', '#333B38', '#A9B09A')),
   },
+  // Narrow walnut shelving boards.
   pantry: {
-    // Narrow dark-walnut shelving boards, softly rubbed along their grain.
-    backgroundColor: '#4b3128',
-    backgroundImage: [
-      `linear-gradient(90deg, transparent 0 82%, ${rgba('#c59561', 0.12)} 83% 85%, transparent 86%)`,
-      `repeating-linear-gradient(0deg, #674331 0 18px, #4b3128 19px 21px, #593729 22px 39px)`,
-      `linear-gradient(112deg, ${rgba('#d0a16c', 0.12)} 0%, transparent 28%, ${rgba('#24191d', 0.22)} 100%)`,
-    ].join(', '),
-    backgroundSize: '48px 100%, 100% 40px, 100% 100%',
+    backgroundColor: '#2C1E16',
+    backgroundImage: tile(boards('#150E0A', '#4A3222', '#3A271A', '#B98A50')),
   },
+  // Faded wool carpet, richer at the edges than the centre.
   'living-room': {
-    // Faded aubergine wool carpet, richer at the room edges than its centre.
-    backgroundColor: '#382a33',
-    backgroundImage: [
-      `radial-gradient(ellipse at 42% 34%, ${rgba('#a46d61', 0.23)} 0%, transparent 48%)`,
-      `radial-gradient(circle at 73% 69%, ${rgba('#c0926d', 0.1)} 0 2%, transparent 3%)`,
-      'linear-gradient(145deg, #573a43 0%, #382a33 56%, #2c202d 100%)',
-    ].join(', '),
-    backgroundSize: '100% 100%, 35px 35px, 100% 100%',
+    backgroundColor: '#2B2320',
+    backgroundImage: tile(weave('#2B2320', '#4A3A31', '#1B1512', '#7A5B45')),
   },
+  // Mahogany parquet.
   'dining-room': {
-    // Mahogany parquet: long diagonal blocks with a dark pitch between them.
-    backgroundColor: '#402925',
-    backgroundImage: [
-      `linear-gradient(45deg, transparent 46%, ${rgba('#ca9360', 0.18)} 47% 49%, transparent 50%)`,
-      `linear-gradient(-45deg, transparent 46%, ${rgba('#21181b', 0.56)} 47% 49%, transparent 50%)`,
-      'linear-gradient(135deg, #61382c 0%, #402925 50%, #2f2021 100%)',
-    ].join(', '),
-    backgroundSize: '44px 44px, 44px 44px, 100% 100%',
+    backgroundColor: '#2A1C15',
+    backgroundImage: tile(parquet('#150E0A', '#4E3323', '#3B261A', '#C08A50')),
   },
+  // Nearly black library walnut, wide boards.
   study: {
-    // Nearly black library walnut: wide boards, amber catch-light, knot shadows.
-    backgroundColor: '#2c1d1e',
-    backgroundImage: [
-      `radial-gradient(ellipse at 74% 36%, ${rgba('#bb7b50', 0.17)} 0 5%, transparent 6%)`,
-      `repeating-linear-gradient(90deg, #482920 0 44px, #2c1d1e 45px 48px, #3b241f 49px 92px)`,
-      `linear-gradient(12deg, ${rgba('#d49a64', 0.12)} 0%, transparent 32%, ${rgba('#1c171b', 0.4)} 100%)`,
-    ].join(', '),
-    backgroundSize: '94px 94px, 96px 100%, 100% 100%',
+    backgroundColor: '#22160F',
+    backgroundImage: tile(planks('#120C08', '#3E2718', '#301D12', '#B57C44')),
   },
+  // Smoked slate, restrained under paperwork.
   office: {
-    // Smoked slate slabs, restrained enough to sit behind papers and desks.
-    backgroundColor: '#343d39',
-    backgroundImage: [
-      `radial-gradient(circle at 20% 72%, ${rgba('#a5a98c', 0.12)} 0 2%, transparent 3%)`,
-      `linear-gradient(118deg, transparent 49%, ${rgba('#202c2c', 0.55)} 50% 52%, transparent 53%)`,
-      'linear-gradient(136deg, #505b55 0%, #343d39 52%, #293330 100%)',
-    ].join(', '),
-    backgroundSize: '39px 39px, 76px 76px, 100% 100%',
+    backgroundColor: '#282E2A',
+    backgroundImage: tile(slabs('#141816', '#39413C', '#2E3531', '#9AA189')),
   },
+  // Warm bedroom floorboards.
   bedroom: {
-    // Worn oxblood-and-aubergine runner weave, intentionally quiet beneath a bed.
-    backgroundColor: '#47333e',
-    backgroundImage: [
-      `radial-gradient(ellipse at 50% 47%, ${rgba('#bc856d', 0.17)} 0%, transparent 48%)`,
-      `linear-gradient(90deg, transparent 46%, ${rgba('#d0a47c', 0.08)} 48% 52%, transparent 54%)`,
-      'linear-gradient(135deg, #664652 0%, #47333e 54%, #352a36 100%)',
-    ].join(', '),
-    backgroundSize: '100% 100%, 18px 18px, 100% 100%',
+    backgroundColor: '#2E2116',
+    backgroundImage: tile(planks('#170F09', '#503320', '#3F2818', '#C08E4E')),
   },
+  // Aged limestone courses.
   hallway: {
-    // Aged limestone: low-contrast blocks, burnished at the edges rather than bright tile.
-    backgroundColor: '#5f584c',
-    backgroundImage: [
-      `radial-gradient(ellipse at 30% 26%, ${rgba('#c3b38a', 0.14)} 0 9%, transparent 10%)`,
-      `linear-gradient(90deg, transparent 48%, ${rgba('#302d29', 0.34)} 49% 51%, transparent 52%)`,
-      'linear-gradient(145deg, #746d5d 0%, #5f584c 52%, #49463e 100%)',
-    ].join(', '),
-    backgroundSize: '76px 76px, 76px 76px, 100% 100%',
+    backgroundColor: '#3A362E',
+    backgroundImage: tile(bricks('#1D1A16', '#4E4A3F', '#413D34', '#BEB08B')),
   },
+  // Clipped lawn over packed earth.
   'front-yard': {
-    // Clipped grass over packed earth, with a few deliberately sparse blades.
-    backgroundColor: '#3f513f',
-    backgroundImage: [
-      `radial-gradient(ellipse at 22% 76%, ${rgba('#836443', 0.65)} 0 10%, transparent 11%)`,
-      `linear-gradient(74deg, transparent 45%, ${rgba('#a1a76d', 0.15)} 47% 49%, transparent 51%)`,
-      'linear-gradient(145deg, #5d704f 0%, #3f513f 56%, #304638 100%)',
-    ].join(', '),
-    backgroundSize: '72px 72px, 22px 22px, 100% 100%',
+    backgroundColor: '#28331F',
+    backgroundImage: tile(lawn('#28331F', '#33421F', '#8B9A5E', '#5A4326')),
   },
+  // Damper, darker planting beds.
   garden: {
-    // Damp earth pockets interrupt desaturated garden grass; no lawn-grid treatment.
-    backgroundColor: '#344738',
-    backgroundImage: [
-      `radial-gradient(ellipse at 24% 34%, ${rgba('#85623d', 0.78)} 0 12%, transparent 13%)`,
-      `radial-gradient(ellipse at 72% 70%, ${rgba('#9a7147', 0.58)} 0 15%, transparent 16%)`,
-      'linear-gradient(145deg, #596847 0%, #344738 54%, #293b30 100%)',
-    ].join(', '),
-    backgroundSize: '100% 100%, 100% 100%, 100% 100%',
+    backgroundColor: '#1F2A1B',
+    backgroundImage: tile(lawn('#1F2A1B', '#2B3A1F', '#778A54', '#4E3A22')),
   },
+  // Weathered porch timber.
   porch: {
-    // Weathered porch boards: long charcoal timber with pale rubbed edges.
-    backgroundColor: '#4d4941',
-    backgroundImage: [
-      `linear-gradient(8deg, transparent 44%, ${rgba('#c3a47b', 0.16)} 46% 48%, transparent 50%)`,
-      `repeating-linear-gradient(90deg, #62584d 0 46px, #3b3a35 47px 50px, #524c43 51px 96px)`,
-      `linear-gradient(135deg, ${rgba('#d2b783', 0.12)} 0%, transparent 31%, ${rgba('#252529', 0.34)} 100%)`,
-    ].join(', '),
-    backgroundSize: '31px 31px, 98px 100%, 100% 100%',
+    backgroundColor: '#2B2822',
+    backgroundImage: tile(boards('#151310', '#423E34', '#35322A', '#B0A277')),
   },
 }
 
@@ -166,8 +238,10 @@ export function roomMaterial(name: string): RoomMaterial {
 export function floorStyle(material: RoomMaterial): CSSProperties {
   return {
     ...ROOM_MATERIALS[material],
+    // One authored tile per cell: no repeat rounding, no half-cut plank.
+    backgroundSize: '100% 100%',
     backgroundPosition: 'center',
-    backgroundRepeat: 'repeat',
+    backgroundRepeat: 'no-repeat',
   }
 }
 

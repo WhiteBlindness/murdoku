@@ -27,6 +27,13 @@ export interface ChangeEntry {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    date: '2026-08-13',
+    headline: 'The board is hand-drawn again',
+    detail:
+      'Every object on the board was redrawn as a real illustration: pillows and a turned-down sheet on the beds, spines and a globe on the bookshelf, individual leaves on the plants, a shade and weighted base on the lamps. Floors are drawn materials now — floorboards, encaustic tile, stone courses, clipped lawn — and they hold the same rhythm on a 4x4 case and a 7x7 one. Room walls print heavier, so a room reads as one space at a glance.',
+    tag: 'Improvement',
+  },
+  {
     date: '2026-07-08',
     headline: 'Every case is fair again',
     detail:

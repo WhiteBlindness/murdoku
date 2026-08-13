@@ -80,7 +80,7 @@
      component that references it, but MUST NOT be used as a focus ring
      (fails WCAG 2.4.11 on light floors — use --color-accent-strong). */
   --board-ground:      #241820;  /* outer frame / wall gap fill           */
-  --board-wall:        #241820;  /* room boundary — dossier divider       */
+  --board-wall:        #1a1a1a;  /* room boundary — printed heavy rule    */
   --board-room-tint:   #F5EED8;  /* cream fallback, draft-chip plates     */
   --board-glow:        rgba(216, 154, 34, 0.55);  /* amber accent (non-focus use only) */
   --board-chalk:       #1A1008;  /* dark ink annotations on light floors  */
@@ -146,7 +146,7 @@
 
     /* Board sits on the daylight desk with the same restrained dossier frame. */
     --board-ground:      #241820;
-    --board-wall:        #241820;
+    --board-wall:        #1a1a1a;
     --board-room-tint:   #F5EED8;
     --board-glow:        rgba(164, 108, 8, 0.5);
     --board-chalk:       #1A1008;
@@ -198,7 +198,7 @@
   --diff-expert-text:    #8A2A22;
 
   --board-ground:      #241820;
-  --board-wall:        #241820;
+  --board-wall:        #1a1a1a;
   --board-room-tint:   #F5EED8;
   --board-glow:        rgba(164, 108, 8, 0.5);
   --board-chalk:       #1A1008;

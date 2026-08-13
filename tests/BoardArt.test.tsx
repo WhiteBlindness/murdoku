@@ -120,9 +120,15 @@ describe('Noire Illustration room materials', () => {
 
       expect(base, `${material} needs a fixed material base`).toMatch(/^#[0-9a-f]{6}$/i)
       expect(luminance(base), `${material} is too bright for the mansion board`).toBeLessThan(0.22)
-      expect(image, `${material} should use layered paint, grain, or stone`).toMatch(/(?:linear|radial)-gradient/)
-      expect(image).not.toMatch(/data:image|#000(?:000)?/i)
-      expect((image.match(/repeating-linear-gradient/g) ?? []).length, `${material} should not become a generic grid`).toBeLessThanOrEqual(1)
+
+      // Finishes are authored SVG material tiles (planks, checker, stone
+      // courses, lawn), stretched one per cell rather than pixel-tiled.
+      expect(image, `${material} should be an authored material tile`).toMatch(/^url\("data:image\/svg\+xml,/)
+      expect(decodeURIComponent(image), `${material} needs drawn material shapes, not a flat field`)
+        .toMatch(/<rect|<ellipse|<path|<circle/)
+      expect(decodeURIComponent(image), `${material} must not fall back to pure black`)
+        .not.toMatch(/#000(?:000)?\b/i)
+      expect(style.backgroundSize, `${material} must land exactly one tile per cell`).toBe('100% 100%')
       expect(isDarkFloor(material), `${material} should use the light-token contrast treatment`).toBe(true)
     }
   })
@@ -136,7 +142,7 @@ describe('Noire Illustration room materials', () => {
 })
 
 describe('Noire Illustration board frame', () => {
-  it('uses an aubergine espresso frame while leaving the interactive grid intact', () => {
+  it('uses a heavy espresso frame while leaving the interactive grid intact', () => {
     const marks: CellMark[][] = Array.from({ length: 4 }, () =>
       Array.from({ length: 4 }, () => ({ kind: 'empty' as const })),
     )
@@ -145,8 +151,8 @@ describe('Noire Illustration board frame', () => {
     )
     const grid = container.querySelector('[data-board-frame="noire"]') as HTMLDivElement | null
     expect(grid).not.toBeNull()
-    expect(grid?.style.borderWidth).toBe('3px')
-    expect(grid?.style.borderColor).toMatch(/(?:#2b1b2f|rgb\(43, 27, 47\))/)
+    expect(grid?.style.borderWidth).toBe('5px')
+    expect(grid?.style.borderColor).toMatch(/(?:#1a1a1a|rgb\(26, 26, 26\))/)
     expect(container.querySelectorAll('button[data-cell]')).toHaveLength(16)
   })
 })

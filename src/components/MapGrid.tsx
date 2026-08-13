@@ -36,8 +36,9 @@ function handleCellKey(e: React.KeyboardEvent, r: number, c: number, N: number) 
   ;(grid?.querySelector(`[data-cell="${nr}-${nc}"]`) as HTMLElement)?.focus()
 }
 
-// Aubergine architecture frames the board without competing with its miniatures.
-const WALL = '#2b1b2f'
+// Heavy espresso architecture, drawn like the printed rules of a physical board:
+// room divisions are the boldest line on the table, cell divisions are hairlines.
+const WALL = '#1a1a1a'
 const ESPRESSO = '#241820'
 
 export default function MapGrid({
@@ -118,7 +119,7 @@ export default function MapGrid({
           gridTemplateColumns: `repeat(${N}, 1fr)`,
           gridTemplateRows: `repeat(${N}, 1fr)`,
           // Bold black board-game frame â€” physical object sitting on the desk.
-          border: `3px solid ${WALL}`,
+          border: `5px solid ${WALL}`,
           // Directional shadow: lifts the board off the dark desk like a physical object.
           boxShadow: `
             0 20px 48px rgba(26,18,22,0.72),
@@ -185,16 +186,18 @@ export default function MapGrid({
                 style={{
                   // Floor pattern lives on a dedicated child span so marks/tokens
                   // are unaffected by any filter applied to the floor layer.
+                  // Room walls are printed heavy; the grid inside a room is a
+                  // hairline, so a room reads as one continuous floor first.
                   borderRight: wallR
-                    ? `2px solid ${WALL}`
+                    ? `4px solid ${WALL}`
                     : isOutdoor
-                      ? `1px dashed rgba(91, 105, 72, 0.4)`
-                      : `1px solid rgba(96, 65, 71, 0.34)`,
+                      ? `1px dashed rgba(26, 26, 26, 0.5)`
+                      : `1px solid rgba(26, 26, 26, 0.5)`,
                   borderBottom: wallB
-                    ? `2px solid ${WALL}`
+                    ? `4px solid ${WALL}`
                     : isOutdoor
-                      ? `1px dashed rgba(91, 105, 72, 0.4)`
-                      : `1px solid rgba(96, 65, 71, 0.34)`,
+                      ? `1px dashed rgba(26, 26, 26, 0.5)`
+                      : `1px solid rgba(26, 26, 26, 0.5)`,
                   cursor: isPlacing ? 'crosshair' : 'pointer',
                   ...(showPreview ? {
                     outline: '2px dashed rgba(255,255,255,0.65)',
