@@ -36,7 +36,9 @@ function handleCellKey(e: React.KeyboardEvent, r: number, c: number, N: number) 
   ;(grid?.querySelector(`[data-cell="${nr}-${nc}"]`) as HTMLElement)?.focus()
 }
 
-const WALL = '#241820'
+// Aubergine architecture frames the board without competing with its miniatures.
+const WALL = '#2b1b2f'
+const ESPRESSO = '#241820'
 
 export default function MapGrid({
   puzzle, marks, conflicts, onCellClick,
@@ -109,21 +111,22 @@ export default function MapGrid({
       {/* interactive cell grid */}
       <div
         data-grid=""
+        data-board-frame="noire"
         className="continuity-board w-full h-full overflow-hidden"
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${N}, 1fr)`,
           gridTemplateRows: `repeat(${N}, 1fr)`,
           // Bold black board-game frame â€” physical object sitting on the desk.
-          border: `2px solid ${WALL}`,
+          border: `3px solid ${WALL}`,
           // Directional shadow: lifts the board off the dark desk like a physical object.
           boxShadow: `
-            0 20px 60px rgba(0,0,0,0.70),
-            0 8px 24px rgba(0,0,0,0.50),
-            0 2px 0 0 rgba(255,255,255,0.06),
-            inset 0 0 0 2px rgba(255,255,255,0.08)
+            0 20px 48px rgba(26,18,22,0.72),
+            0 7px 17px rgba(36,24,32,0.62),
+            0 1px 0 0 rgba(221,195,145,0.18),
+            inset 0 0 0 1px rgba(214,180,125,0.22)
           `,
-          background: WALL,
+          background: ESPRESSO,
           gap: '0',
         }}
       >
@@ -161,8 +164,8 @@ export default function MapGrid({
             // Plus a contrasting text-shadow so neither extreme washes it out.
             const xColor = darkFloor ? '#FFFFFF' : '#1A1008'
             const xShadow = darkFloor
-              ? '0 0 3px rgba(0,0,0,0.9), 0 1px 4px rgba(0,0,0,0.7)'
-              : '0 0 3px rgba(255,255,255,0.9), 0 1px 3px rgba(255,255,255,0.6)'
+              ? '0 0 3px rgba(26,26,26,0.9), 0 1px 4px rgba(26,26,26,0.72)'
+              : '0 0 3px rgba(244,233,208,0.9), 0 1px 3px rgba(244,233,208,0.6)'
 
             return (
               <button
@@ -185,13 +188,13 @@ export default function MapGrid({
                   borderRight: wallR
                     ? `2px solid ${WALL}`
                     : isOutdoor
-                      ? `1px dashed rgba(31, 49, 38, 0.18)`
-                      : `1px solid rgba(64, 42, 42, 0.11)`,
+                      ? `1px dashed rgba(91, 105, 72, 0.4)`
+                      : `1px solid rgba(96, 65, 71, 0.34)`,
                   borderBottom: wallB
                     ? `2px solid ${WALL}`
                     : isOutdoor
-                      ? `1px dashed rgba(31, 49, 38, 0.18)`
-                      : `1px solid rgba(64, 42, 42, 0.11)`,
+                      ? `1px dashed rgba(91, 105, 72, 0.4)`
+                      : `1px solid rgba(96, 65, 71, 0.34)`,
                   cursor: isPlacing ? 'crosshair' : 'pointer',
                   ...(showPreview ? {
                     outline: '2px dashed rgba(255,255,255,0.65)',
@@ -290,7 +293,7 @@ export default function MapGrid({
                             color: p.accent,
                             // Opaque cream plate so chips are legible on any floor
                             background: '#F5EED8',
-                            boxShadow: '0 1px 4px rgba(0,0,0,0.35)',
+                            boxShadow: '0 1px 4px rgba(36,24,32,0.45)',
                           }}
                         >{p.name[0]}</span>
                       )
@@ -307,10 +310,10 @@ export default function MapGrid({
                     style={{
                       boxShadow: conflicted
                         ? '0 0 0 2px #fff, 0 0 0 4px var(--color-danger), 0 0 10px var(--color-danger)'
-                        : `0 0 0 2px ${person.accent}, 0 0 0 3px rgba(0,0,0,0.5)`,
+                        : `0 0 0 2px ${person.accent}, 0 0 0 3px rgba(36,24,32,0.66)`,
                       borderRadius: 6,
                       // Two-layer drop-shadow so token reads on light AND dark floors
-                      filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.7)) drop-shadow(0 0 2px rgba(0,0,0,0.5))',
+                      filter: 'drop-shadow(0 2px 5px rgba(36,24,32,0.76)) drop-shadow(0 0 2px rgba(36,24,32,0.5))',
                     }}
                   >
                     <Avatar seed={person.avatarSeed} accent={person.accent} size={tokenSize} dead={person.isVictim} name={person.name} />
@@ -335,7 +338,7 @@ export default function MapGrid({
                           color: 'var(--color-on-accent)',
                           borderRadius: 2,
                           // Same halo treatment for lock badge
-                          boxShadow: '0 0 0 1.5px rgba(0,0,0,0.6)',
+                          boxShadow: '0 0 0 1.5px rgba(36,24,32,0.78)',
                         }}
                       >
                         <Lock size={9} strokeWidth={3} />
@@ -400,10 +403,10 @@ export default function MapGrid({
                 // Initials fit in 1 col; wrapping names span their room width.
                 gridColumnEnd: useInitials ? 'span 1' : `span ${l.span}`,
                 gridRowStart: l.row + 1,
-                color: '#FFFFFF',
+                color: '#F4E9D0',
                 // Font: 9px floor always. Scale up to 11px at Nâ‰¤5, shrink at N=7.
                 fontSize: useInitials ? '9px' : `clamp(9px, ${Math.round(110 / N)}px, 11px)`,
-                background: 'rgba(0,0,0,0.82)',
+                background: 'rgba(36,24,32,0.9)',
                 borderRadius: 2,
                 padding: useInitials ? '1px 3px' : '2px 6px',
                 letterSpacing: useInitials ? '0.06em' : '0.12em',

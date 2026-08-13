@@ -105,6 +105,30 @@
         "displayName": "Aubergine Divider",
         "canonical": "var(--board-wall)",
         "tonalRamp": ["oklch(from var(--board-wall) 0.15 c h)", "oklch(from var(--board-wall) 0.27 c h)", "oklch(from var(--board-wall) 0.39 c h)", "oklch(from var(--board-wall) 0.51 c h)", "oklch(from var(--board-wall) 0.63 c h)", "oklch(from var(--board-wall) 0.75 c h)", "oklch(from var(--board-wall) 0.87 c h)", "oklch(from var(--board-wall) 0.95 c h)"]
+      },
+      "miniature-contour": {
+        "role": "neutral",
+        "displayName": "Espresso Illustration Ink",
+        "canonical": "#241820",
+        "tonalRamp": ["oklch(0.15 0.025 340)", "oklch(0.27 0.025 340)", "oklch(0.39 0.025 340)", "oklch(0.51 0.025 340)", "oklch(0.63 0.025 340)", "oklch(0.75 0.025 340)", "oklch(0.87 0.025 340)", "oklch(0.95 0.025 340)"]
+      },
+      "miniature-contour-deep": {
+        "role": "neutral",
+        "displayName": "Deep Illustration Ink",
+        "canonical": "#1A1A1A",
+        "tonalRamp": ["oklch(0.15 0 0)", "oklch(0.27 0 0)", "oklch(0.39 0 0)", "oklch(0.51 0 0)", "oklch(0.63 0 0)", "oklch(0.75 0 0)", "oklch(0.87 0 0)", "oklch(0.95 0 0)"]
+      },
+      "miniature-seam": {
+        "role": "neutral",
+        "displayName": "Mahogany Seam",
+        "canonical": "#654246",
+        "tonalRamp": ["oklch(0.15 0.035 15)", "oklch(0.27 0.035 15)", "oklch(0.39 0.035 15)", "oklch(0.51 0.035 15)", "oklch(0.63 0.035 15)", "oklch(0.75 0.035 15)", "oklch(0.87 0.035 15)", "oklch(0.95 0.035 15)"]
+      },
+      "miniature-highlight": {
+        "role": "secondary",
+        "displayName": "Muted Brass Highlight",
+        "canonical": "#D8B777",
+        "tonalRamp": ["oklch(0.15 0.08 82)", "oklch(0.27 0.08 82)", "oklch(0.39 0.08 82)", "oklch(0.51 0.08 82)", "oklch(0.63 0.08 82)", "oklch(0.75 0.08 82)", "oklch(0.87 0.08 82)", "oklch(0.95 0.08 82)"]
       }
     },
     "typographyMeta": {
@@ -219,7 +243,7 @@
       "One projector-amber chain linking the selected frame, clue, and literal board target.",
       "Condensed industrial headlines, typewritten evidence, and neutral compact controls.",
       "Sharp rectangles, clipped corners, torn edges, perforations, and contact-sheet crops.",
-      "A dominant square mansion reconstruction built from authored materials and miniatures rather than a full-board raster."
+      "A dominant square mansion reconstruction built from authored dark materials and thick-contoured illustrated miniatures rather than a full-board raster."
     ],
     "rules": [
       { "name": "The Amber Evidence Rule", "body": "Projector amber marks the current reasoning path and primary commitment; it is not ambient decoration.", "section": "colors" },
@@ -231,12 +255,12 @@
       { "name": "The Clipped, Not Rounded Rule", "body": "Use clipping, not pills or generous radii, to create tactile silhouettes.", "section": "shapes" },
       { "name": "The Literal Board Rule", "body": "Every room material and furniture silhouette must remain nameable because clue language points directly to them; projection purity always loses to recognition.", "section": "components" },
       { "name": "The Taut Connection Rule", "body": "Only the selected literal clue earns the authored amber connector, and the trace must terminate at its actual board target.", "section": "components" },
-      { "name": "The Miniature, Not Pictogram Rule", "body": "Furniture is rendered as shaded overhead objects with material identity and restrained internal seams; never collapse it into heavy outlined symbols.", "section": "components" }
+      { "name": "The Miniature, Not Pictogram Rule", "body": "Furniture is rendered as fully illustrated overhead or cheated-projection objects: a confident espresso outer silhouette, recognizable construction details, and restrained internal seams. Never collapse it into wireframe symbols or uniform black-outlined clip art.", "section": "components" }
     ],
     "dos": [
       "Do keep theme-aware chrome and fixed evidence/board materials as separate layers.",
       "Do keep paper on evidence-bearing objects and steel/graphite on application chrome.",
-      "Do preserve all twelve room finishes and the nineteen-object miniature vocabulary; use the lamp's localized glow as the board's projector moment.",
+      "Do preserve all twelve dark room finishes and the nineteen-object miniature vocabulary; preserve recognition cues such as cushions, armrests, taps, book spines, leaves, papers, and the lamp's shade, arm, base, and localized projector glow.",
       "Do preserve full room names wherever they fit and expose any abbreviation with the full accessible name.",
       "Do use real buttons, 44px targets, visible focus, keyboard board navigation, and reduced-motion fallbacks.",
       "Do keep avatar use to the active dossier; use inexpensive accent markers in the case catalog.",
@@ -245,7 +269,7 @@
     "donts": [
       "Don't turn the interface into a generic rounded-card dashboard, glass surface, neon cyberpunk scene, or full-screen parchment tableau.",
       "Don't use projector amber for passive decoration or oxblood for ordinary emphasis.",
-      "Don't let two rooms share the same floor signature or reduce nameable furniture to ambiguous wireframes or heavy black outlines.",
+      "Don't let two rooms share the same floor signature or reduce nameable furniture to ambiguous wireframes, borderless blobs, pure-black contouring, uniformly outlined clip art, or neon/plastic fills.",
       "Don't replace the authored room materials and miniatures with a full-board reconstruction raster.",
       "Don't use the translucent board glow as a focus ring or the subtle border as an interactive boundary.",
       "Don't load every suspect portrait in the home catalog.",

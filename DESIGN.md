@@ -19,6 +19,10 @@ colors:
   bone-evidence: "#D8C8A4"
   evidence-ink: "#19150F"
   board-wall: "var(--board-wall)"
+  miniature-contour: "#241820"
+  miniature-contour-deep: "#1A1A1A"
+  miniature-seam: "#654246"
+  miniature-highlight: "#D8B777"
 typography:
   display:
     fontFamily: "Barlow Condensed, ui-sans-serif, system-ui, sans-serif"
@@ -135,7 +139,7 @@ components:
 
 Alibi is a working 1940s film-editing continuity desk translated into a modern deduction interface. Magnetic graphite holds the workspace together; bone evidence strips, contact-sheet portraits, clipped tabs, film perforations, and restrained projector amber make the player's reasoning feel assembled by hand. It is cinematic without becoming a poster: the board, clues, tools, and accusation remain unmistakably operative.
 
-The chrome and the board intentionally use different materials. The surrounding interface is dark, archival, and controlled, while the board is a premium detective-dossier mansion reconstruction: twelve distinct room materials, nineteen top-down shaded miniatures, and restrained aubergine dividers keep every clue target nameable. Paper is reserved for evidence-bearing objects, never spread across the whole application as a parchment dashboard.
+The chrome and the board intentionally use different materials. The surrounding interface is dark, archival, and controlled, while the board is a premium detective-dossier mansion reconstruction: twelve distinct dark room materials, nineteen hand-illustrated miniatures with confident espresso contours, and restrained aubergine dividers keep every clue target nameable. Paper is reserved for evidence-bearing objects, never spread across the whole application as a parchment dashboard.
 
 **Key Characteristics:**
 
@@ -144,7 +148,7 @@ The chrome and the board intentionally use different materials. The surrounding 
 - One projector-amber chain linking the selected frame, clue, and literal board target.
 - Condensed industrial headlines, typewritten evidence, and neutral compact controls.
 - Sharp rectangles, clipped corners, torn edges, perforations, and contact-sheet crops.
-- A dominant square mansion reconstruction built from authored materials and miniatures rather than a full-board raster.
+- A dominant square mansion reconstruction built from authored dark materials and thick-contoured illustrated miniatures rather than a full-board raster.
 
 ## Colors
 
@@ -176,6 +180,8 @@ The palette separates theme-aware desk chrome from fixed physical evidence and b
 - **Subtle Hairline** (`colors.border-subtle`): decorative dividers only.
 - **Evidence Ink** (`colors.evidence-ink`): fixed near-black copy on bone paper.
 - **Aubergine Divider** (`colors.board-wall`): the restrained deep-aubergine frame and room boundaries that organize the mansion without overpowering its materials.
+- **Espresso Illustration Ink** (`colors.miniature-contour`, `colors.miniature-contour-deep`): the 2.4–3.2px outer silhouette and directional shadow on board miniatures; never substitute pure black.
+- **Mahogany Seam and Muted Brass** (`colors.miniature-seam`, `colors.miniature-highlight`): fine construction detail, hardware, paper edges, and selective highlights inside the stronger silhouette.
 
 ### Named Rules
 
@@ -268,7 +274,7 @@ The default form is a sharp rectangle. Evidence frames use clipped 6–10px corn
 
 ### Illustrated Reconstruction Board
 
-The board is a square collection of real buttons with a restrained deep-aubergine frame and room dividers, twelve distinct repeating material finishes, persistent room labels, nineteen recognizable top-down furniture miniatures, suspect tokens, draft chips, and conflict marks. Furniture reads through layered surfaces, material highlights, quiet tonal seams, and directional shadow rather than heavy black outlines. A selected literal clue adds one amber projector trace to its target; the lamp miniature answers it with a localized brass glow, creating the signature projector moment without washing the whole board. Keyboard arrows retain cell navigation and every cell keeps a visible solid focus ring.
+The board is a square collection of real buttons with a restrained deep-aubergine frame and room dividers, twelve distinct dark material finishes, persistent room labels, nineteen recognizable top-down furniture miniatures, suspect tokens, draft chips, and conflict marks. Furniture reads through a 2.4–3.2px deep espresso outer contour, layered muted fills, finer mahogany seams, brass or parchment highlights, and directional shadow. The contour is illustration ink, never pure black and never applied uniformly to every interior detail. A selected literal clue adds one amber projector trace to its target; the lamp miniature answers it with a localized brass glow, creating the signature projector moment without washing the whole board. Keyboard arrows retain cell navigation and every cell keeps a visible solid focus ring.
 
 ### Named Rules
 
@@ -276,7 +282,7 @@ The board is a square collection of real buttons with a restrained deep-aubergin
 
 **The Taut Connection Rule.** Only the selected literal clue earns the authored amber connector, and the trace must terminate at its actual board target.
 
-**The Miniature, Not Pictogram Rule.** Furniture is rendered as shaded overhead objects with material identity and restrained internal seams; never collapse it into heavy outlined symbols.
+**The Miniature, Not Pictogram Rule.** Furniture is rendered as fully illustrated overhead or cheated-projection objects: a confident espresso outer silhouette, recognizable construction details, and restrained internal seams. Never collapse it into wireframe symbols or uniform black-outlined clip art.
 
 ## Do's and Don'ts
 
@@ -284,7 +290,7 @@ The board is a square collection of real buttons with a restrained deep-aubergin
 
 - **Do** keep theme-aware chrome and fixed evidence/board materials as separate layers.
 - **Do** keep paper on evidence-bearing objects and steel/graphite on application chrome.
-- **Do** preserve all twelve room finishes and the nineteen-object miniature vocabulary; use the lamp's localized glow as the board's projector moment.
+- **Do** preserve all twelve dark room finishes and the nineteen-object miniature vocabulary; preserve recognition cues such as cushions, armrests, taps, book spines, leaves, papers, and the lamp's shade, arm, base, and localized projector glow.
 - **Do** preserve full room names wherever they fit and expose any abbreviation with the full accessible name.
 - **Do** use real buttons, 44px targets, visible focus, keyboard board navigation, and reduced-motion fallbacks.
 - **Do** keep avatar use to the active dossier; use inexpensive accent markers in the case catalog.
@@ -294,7 +300,7 @@ The board is a square collection of real buttons with a restrained deep-aubergin
 
 - **Don't** turn the interface into a generic rounded-card dashboard, glass surface, neon cyberpunk scene, or full-screen parchment tableau.
 - **Don't** use projector amber for passive decoration or oxblood for ordinary emphasis.
-- **Don't** let two rooms share the same floor signature or reduce nameable furniture to ambiguous wireframes or heavy black outlines.
+- **Don't** let two rooms share the same floor signature or reduce nameable furniture to ambiguous wireframes, borderless blobs, pure-black contouring, uniformly outlined clip art, or neon/plastic fills.
 - **Don't** replace the authored room materials and miniatures with a full-board reconstruction raster.
 - **Don't** use the translucent board glow as a focus ring or the subtle border as an interactive boundary.
 - **Don't** load every suspect portrait in the home catalog.

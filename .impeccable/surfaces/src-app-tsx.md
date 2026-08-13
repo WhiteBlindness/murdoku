@@ -18,7 +18,7 @@ Solo puzzle players reconstruct a murder case by mapping literal suspect clues o
 ## Constraints
 
 - Preserve product behavior, generated cases, local-storage compatibility, offline PWA behavior, both themes, keyboard/touch use, reduced motion, and WCAG AA.
-- Board rooms and furniture remain colorful, labeled, and nameable.
+- Board rooms and furniture remain visually distinct, labeled, and nameable; the hybrid Noire-Illustration treatment uses dark muted materials and espresso contours rather than neon color.
 - Mobile order remains board → suspects/clues → tools → accuse.
 - Home must never load every avatar.
 
@@ -36,7 +36,7 @@ Memorable moment: selecting Alexander lights his continuity frame, clue record, 
 |---|---|
 | Compact case masthead and timer | semantic HTML/CSS |
 | Full-width continuity strip | ordered list + CSS perforation |
-| Dominant illustrated board | existing React/SVG/CSS |
+| Dominant illustrated board | authored React SVG miniatures + layered CSS materials |
 | Active clue connector | authored SVG/CSS overlay |
 | Contact-sheet dossier | semantic buttons + existing avatars |
 | Command rail and accuse | semantic buttons + Lucide icons |

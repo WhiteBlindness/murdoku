@@ -1,11 +1,6 @@
 import type { CSSProperties } from 'react'
 
-/** The room finishes used by the investigation board.
- *
- * These are deliberately material-first rather than game-board patterns. The
- * gradients have enough scale to read at a 4×4 board and enough restraint to
- * stay quiet behind a suspect token at 7×7.
- */
+/** Dark, clue-readable finishes for the mansion reconstruction board. */
 export type RoomMaterial =
   | 'kitchen' | 'bathroom' | 'pantry' | 'living-room' | 'dining-room'
   | 'study' | 'office' | 'bedroom' | 'hallway' | 'front-yard' | 'garden' | 'porch'
@@ -18,116 +13,132 @@ const rgba = (hex: string, alpha: number) => {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`
 }
 
-/** Public so visual regression tests can prove every room has a unique finish. */
+/**
+ * Each finish uses an authored material cue rather than an anonymous board
+ * pattern: encaustic tile, stone, walnut, wool, parquet, earth, or timber.
+ * Bases intentionally stay dark so the light token and X-mark treatment works
+ * across all twelve rooms without changing meaning from room to room.
+ */
 export const ROOM_MATERIALS: Record<RoomMaterial, CSSProperties> = {
   kitchen: {
-    backgroundColor: '#6f4b43',
+    // Aged encaustic tiles: oxblood clay, worn cream inlay, and hairline grout.
+    backgroundColor: '#46342d',
     backgroundImage: [
-      `radial-gradient(circle at 14% 28%, ${rgba('#e1c1a2', 0.22)} 0 1px, transparent 1.8px)`,
-      `radial-gradient(circle at 74% 68%, ${rgba('#2b1c22', 0.2)} 0 1.2px, transparent 2px)`,
-      'linear-gradient(132deg, #8a5b4f 0%, #69443f 48%, #4f3438 100%)',
+      `radial-gradient(circle at 25% 24%, ${rgba('#c7a770', 0.18)} 0 4%, transparent 4.8%)`,
+      `linear-gradient(45deg, transparent 43%, ${rgba('#b1885a', 0.19)} 44% 47%, transparent 48%)`,
+      `linear-gradient(135deg, #694536 0 46%, #4b312d 47% 53%, #56382f 54% 100%)`,
     ].join(', '),
-    backgroundSize: '27px 27px, 39px 39px, 100% 100%',
+    backgroundSize: '32px 32px, 32px 32px, 32px 32px',
   },
   bathroom: {
-    backgroundColor: '#87979a',
+    // Slate slabs with mineral bloom and deep, irregular-looking joins.
+    backgroundColor: '#4d5754',
     backgroundImage: [
-      `repeating-linear-gradient(0deg, transparent 0 31px, ${rgba('#f6f0dc', 0.2)} 31px 32px)`,
-      `repeating-linear-gradient(90deg, transparent 0 31px, ${rgba('#30464c', 0.16)} 31px 32px)`,
-      'linear-gradient(135deg, #d3d7ce 0%, #9faeaa 50%, #74888d 100%)',
+      `radial-gradient(ellipse at 26% 28%, ${rgba('#a9b09a', 0.14)} 0 7%, transparent 8%)`,
+      `repeating-linear-gradient(0deg, transparent 0 31px, ${rgba('#293737', 0.62)} 32px 34px, transparent 35px 62px)`,
+      'linear-gradient(132deg, #66706a 0%, #4d5754 48%, #394846 100%)',
     ].join(', '),
-    backgroundSize: '32px 32px, 32px 32px, 100% 100%',
+    backgroundSize: '64px 64px, 100% 64px, 100% 100%',
   },
   pantry: {
-    backgroundColor: '#815344',
+    // Narrow dark-walnut shelving boards, softly rubbed along their grain.
+    backgroundColor: '#4b3128',
     backgroundImage: [
-      `repeating-linear-gradient(45deg, transparent 0 22px, ${rgba('#321e22', 0.12)} 22px 23px, transparent 23px 45px)`,
-      `repeating-linear-gradient(-45deg, transparent 0 22px, ${rgba('#f0c49e', 0.12)} 22px 23px, transparent 23px 45px)`,
-      'linear-gradient(135deg, #9a6851 0%, #754b41 100%)',
+      `linear-gradient(90deg, transparent 0 82%, ${rgba('#c59561', 0.12)} 83% 85%, transparent 86%)`,
+      `repeating-linear-gradient(0deg, #674331 0 18px, #4b3128 19px 21px, #593729 22px 39px)`,
+      `linear-gradient(112deg, ${rgba('#d0a16c', 0.12)} 0%, transparent 28%, ${rgba('#24191d', 0.22)} 100%)`,
     ].join(', '),
-    backgroundSize: '64px 64px, 64px 64px, 100% 100%',
+    backgroundSize: '48px 100%, 100% 40px, 100% 100%',
   },
   'living-room': {
-    backgroundColor: '#44303a',
+    // Faded aubergine wool carpet, richer at the room edges than its centre.
+    backgroundColor: '#382a33',
     backgroundImage: [
-      `radial-gradient(ellipse at 30% 30%, ${rgba('#bd896e', 0.18)} 0%, transparent 48%)`,
-      `repeating-linear-gradient(18deg, transparent 0 5px, ${rgba('#d2aa8a', 0.045)} 5px 6px)`,
-      'linear-gradient(145deg, #6d4a4a 0%, #50363f 44%, #382832 100%)',
+      `radial-gradient(ellipse at 42% 34%, ${rgba('#a46d61', 0.23)} 0%, transparent 48%)`,
+      `radial-gradient(circle at 73% 69%, ${rgba('#c0926d', 0.1)} 0 2%, transparent 3%)`,
+      'linear-gradient(145deg, #573a43 0%, #382a33 56%, #2c202d 100%)',
     ].join(', '),
-    backgroundSize: '100% 100%, 13px 13px, 100% 100%',
+    backgroundSize: '100% 100%, 35px 35px, 100% 100%',
   },
   'dining-room': {
-    backgroundColor: '#4c2928',
+    // Mahogany parquet: long diagonal blocks with a dark pitch between them.
+    backgroundColor: '#402925',
     backgroundImage: [
-      `repeating-linear-gradient(45deg, transparent 0 41px, ${rgba('#d9a873', 0.1)} 41px 42px, transparent 42px 84px)`,
-      `repeating-linear-gradient(-45deg, transparent 0 41px, ${rgba('#26171d', 0.2)} 41px 42px, transparent 42px 84px)`,
-      'linear-gradient(135deg, #6c3b30 0%, #482629 54%, #321e23 100%)',
+      `linear-gradient(45deg, transparent 46%, ${rgba('#ca9360', 0.18)} 47% 49%, transparent 50%)`,
+      `linear-gradient(-45deg, transparent 46%, ${rgba('#21181b', 0.56)} 47% 49%, transparent 50%)`,
+      'linear-gradient(135deg, #61382c 0%, #402925 50%, #2f2021 100%)',
     ].join(', '),
-    backgroundSize: '84px 84px, 84px 84px, 100% 100%',
+    backgroundSize: '44px 44px, 44px 44px, 100% 100%',
   },
   study: {
-    backgroundColor: '#321b20',
+    // Nearly black library walnut: wide boards, amber catch-light, knot shadows.
+    backgroundColor: '#2c1d1e',
     backgroundImage: [
-      `repeating-linear-gradient(90deg, transparent 0 46px, ${rgba('#d08d62', 0.12)} 46px 47px, transparent 47px 94px)`,
-      `repeating-linear-gradient(12deg, transparent 0 7px, ${rgba('#210f16', 0.16)} 7px 8px, transparent 8px 23px)`,
-      'linear-gradient(135deg, #623129 0%, #442229 48%, #2b171e 100%)',
+      `radial-gradient(ellipse at 74% 36%, ${rgba('#bb7b50', 0.17)} 0 5%, transparent 6%)`,
+      `repeating-linear-gradient(90deg, #482920 0 44px, #2c1d1e 45px 48px, #3b241f 49px 92px)`,
+      `linear-gradient(12deg, ${rgba('#d49a64', 0.12)} 0%, transparent 32%, ${rgba('#1c171b', 0.4)} 100%)`,
     ].join(', '),
-    backgroundSize: '94px 100%, 31px 31px, 100% 100%',
+    backgroundSize: '94px 94px, 96px 100%, 100% 100%',
   },
   office: {
-    backgroundColor: '#344045',
+    // Smoked slate slabs, restrained enough to sit behind papers and desks.
+    backgroundColor: '#343d39',
     backgroundImage: [
-      `repeating-linear-gradient(0deg, transparent 0 39px, ${rgba('#d3d1be', 0.1)} 39px 40px)`,
-      `repeating-linear-gradient(90deg, transparent 0 39px, ${rgba('#1f2a31', 0.2)} 39px 40px)`,
-      'linear-gradient(140deg, #5f6b6d 0%, #3f4d52 48%, #29363c 100%)',
+      `radial-gradient(circle at 20% 72%, ${rgba('#a5a98c', 0.12)} 0 2%, transparent 3%)`,
+      `linear-gradient(118deg, transparent 49%, ${rgba('#202c2c', 0.55)} 50% 52%, transparent 53%)`,
+      'linear-gradient(136deg, #505b55 0%, #343d39 52%, #293330 100%)',
     ].join(', '),
-    backgroundSize: '40px 40px, 40px 40px, 100% 100%',
+    backgroundSize: '39px 39px, 76px 76px, 100% 100%',
   },
   bedroom: {
-    backgroundColor: '#5a4d55',
+    // Worn oxblood-and-aubergine runner weave, intentionally quiet beneath a bed.
+    backgroundColor: '#47333e',
     backgroundImage: [
-      `radial-gradient(ellipse at 50% 45%, ${rgba('#b98a78', 0.16)} 0%, transparent 52%)`,
-      `repeating-radial-gradient(ellipse at 50% 50%, transparent 0 8px, ${rgba('#d3af91', 0.05)} 8px 9px, transparent 9px 18px)`,
-      'linear-gradient(135deg, #806260 0%, #5d4b56 52%, #423944 100%)',
+      `radial-gradient(ellipse at 50% 47%, ${rgba('#bc856d', 0.17)} 0%, transparent 48%)`,
+      `linear-gradient(90deg, transparent 46%, ${rgba('#d0a47c', 0.08)} 48% 52%, transparent 54%)`,
+      'linear-gradient(135deg, #664652 0%, #47333e 54%, #352a36 100%)',
     ].join(', '),
-    backgroundSize: '100% 100%, 38px 38px, 100% 100%',
+    backgroundSize: '100% 100%, 18px 18px, 100% 100%',
   },
   hallway: {
-    backgroundColor: '#a09683',
+    // Aged limestone: low-contrast blocks, burnished at the edges rather than bright tile.
+    backgroundColor: '#5f584c',
     backgroundImage: [
-      `repeating-linear-gradient(45deg, transparent 0 47px, ${rgba('#f2e6c7', 0.22)} 47px 48px)`,
-      `repeating-linear-gradient(-45deg, transparent 0 47px, ${rgba('#584b49', 0.14)} 47px 48px)`,
-      'linear-gradient(135deg, #c4b9a2 0%, #a79b88 50%, #837b71 100%)',
+      `radial-gradient(ellipse at 30% 26%, ${rgba('#c3b38a', 0.14)} 0 9%, transparent 10%)`,
+      `linear-gradient(90deg, transparent 48%, ${rgba('#302d29', 0.34)} 49% 51%, transparent 52%)`,
+      'linear-gradient(145deg, #746d5d 0%, #5f584c 52%, #49463e 100%)',
     ].join(', '),
-    backgroundSize: '96px 96px, 96px 96px, 100% 100%',
+    backgroundSize: '76px 76px, 76px 76px, 100% 100%',
   },
   'front-yard': {
-    backgroundColor: '#526b58',
+    // Clipped grass over packed earth, with a few deliberately sparse blades.
+    backgroundColor: '#3f513f',
     backgroundImage: [
-      `repeating-linear-gradient(74deg, transparent 0 9px, ${rgba('#b3c48e', 0.11)} 9px 10px, transparent 10px 21px)`,
-      `radial-gradient(circle at 20% 74%, ${rgba('#273b2c', 0.2)} 0 2px, transparent 2.5px)`,
-      'linear-gradient(145deg, #718767 0%, #526b58 55%, #3b5148 100%)',
+      `radial-gradient(ellipse at 22% 76%, ${rgba('#836443', 0.65)} 0 10%, transparent 11%)`,
+      `linear-gradient(74deg, transparent 45%, ${rgba('#a1a76d', 0.15)} 47% 49%, transparent 51%)`,
+      'linear-gradient(145deg, #5d704f 0%, #3f513f 56%, #304638 100%)',
     ].join(', '),
-    backgroundSize: '25px 25px, 43px 43px, 100% 100%',
+    backgroundSize: '72px 72px, 22px 22px, 100% 100%',
   },
   garden: {
-    backgroundColor: '#3f4d3a',
+    // Damp earth pockets interrupt desaturated garden grass; no lawn-grid treatment.
+    backgroundColor: '#344738',
     backgroundImage: [
-      `radial-gradient(ellipse at 24% 34%, ${rgba('#8e6a43', 0.48)} 0 12px, transparent 13px)`,
-      `radial-gradient(ellipse at 72% 70%, ${rgba('#9a724a', 0.42)} 0 15px, transparent 16px)`,
-      `repeating-linear-gradient(22deg, transparent 0 13px, ${rgba('#b2bf7e', 0.08)} 13px 14px, transparent 14px 28px)`,
-      'linear-gradient(145deg, #61704b 0%, #465b40 52%, #2e4335 100%)',
+      `radial-gradient(ellipse at 24% 34%, ${rgba('#85623d', 0.78)} 0 12%, transparent 13%)`,
+      `radial-gradient(ellipse at 72% 70%, ${rgba('#9a7147', 0.58)} 0 15%, transparent 16%)`,
+      'linear-gradient(145deg, #596847 0%, #344738 54%, #293b30 100%)',
     ].join(', '),
-    backgroundSize: '100% 100%, 100% 100%, 33px 33px, 100% 100%',
+    backgroundSize: '100% 100%, 100% 100%, 100% 100%',
   },
   porch: {
-    backgroundColor: '#605a54',
+    // Weathered porch boards: long charcoal timber with pale rubbed edges.
+    backgroundColor: '#4d4941',
     backgroundImage: [
-      `repeating-linear-gradient(90deg, transparent 0 48px, ${rgba('#e0bf96', 0.14)} 48px 49px, transparent 49px 98px)`,
-      `repeating-linear-gradient(8deg, transparent 0 6px, ${rgba('#342a2a', 0.12)} 6px 7px, transparent 7px 17px)`,
-      'linear-gradient(135deg, #81766b 0%, #665e59 48%, #4c4a49 100%)',
+      `linear-gradient(8deg, transparent 44%, ${rgba('#c3a47b', 0.16)} 46% 48%, transparent 50%)`,
+      `repeating-linear-gradient(90deg, #62584d 0 46px, #3b3a35 47px 50px, #524c43 51px 96px)`,
+      `linear-gradient(135deg, ${rgba('#d2b783', 0.12)} 0%, transparent 31%, ${rgba('#252529', 0.34)} 100%)`,
     ].join(', '),
-    backgroundSize: '98px 100%, 29px 29px, 100% 100%',
+    backgroundSize: '31px 31px, 98px 100%, 100% 100%',
   },
 }
 
@@ -160,11 +171,7 @@ export function floorStyle(material: RoomMaterial): CSSProperties {
   }
 }
 
-export function isDarkFloor(material: RoomMaterial): boolean {
-  return material === 'study'
-    || material === 'office'
-    || material === 'front-yard'
-    || material === 'garden'
-    || material === 'living-room'
-    || material === 'dining-room'
+/** Every finish is intentionally dark enough for the board's light mark treatment. */
+export function isDarkFloor(_material: RoomMaterial): boolean {
+  return true
 }
