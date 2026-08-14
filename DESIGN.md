@@ -60,6 +60,48 @@ typography:
     fontWeight: 600
     lineHeight: 1.25
     letterSpacing: "0.1em"
+  reveal:
+    fontFamily: "Barlow Condensed, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "30px"
+    fontWeight: 700
+    lineHeight: 1.1
+    letterSpacing: "0.02em"
+  verdict:
+    fontFamily: "Barlow Condensed, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "24px"
+    fontWeight: 700
+    lineHeight: 1.1
+    letterSpacing: "0.35em"
+  section:
+    fontFamily: "Barlow Condensed, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "20px"
+    fontWeight: 700
+    lineHeight: 1.15
+    letterSpacing: "0.02em"
+  panel-title:
+    fontFamily: "Barlow Condensed, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "18px"
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: "0.12em"
+  subject:
+    fontFamily: "Barlow Condensed, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "14px"
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: "0.14em"
+  copy:
+    fontFamily: "Courier Prime, ui-monospace, SFMono-Regular, Menlo, monospace"
+    fontSize: "14px"
+    fontWeight: 400
+    lineHeight: 1.45
+    letterSpacing: "normal"
+  headline-wide:
+    fontFamily: "Barlow Condensed, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "16px"
+    fontWeight: 700
+    lineHeight: 1.15
+    letterSpacing: "0.01em"
 rounded:
   square: "0"
   micro: "2px"
@@ -207,12 +249,21 @@ The palette separates theme-aware desk chrome from fixed physical evidence and b
 - **Headline** (700, `typography.headline`): case titles and evidence subjects, usually uppercase.
 - **Action** (600, `typography.action`): tool and command labels with moderate tracking.
 - **Evidence** (400, `typography.evidence`): clues, notes, timers, counts, and explanatory copy.
-- **Technical Label** (400, `typography.technical-label`): compact uppercase metadata at 9–10px with wide tracking; use only where the nearby value or section content carries the meaning.
+- **Technical Label** (400, `typography.technical-label`): compact uppercase metadata at 10px with wide tracking; use only where the nearby value or section content carries the meaning. 10px is the floor — the previous "9–10px" wording is what let a second, undocumented step accumulate across the app.
 - **UI** (600, `typography.ui`): compact search, resume, and secondary control copy where monospace would become noisy.
+- **Subject** (700, `typography.subject`): suspect names and primary button labels — the smallest size Barlow is allowed to name something at.
+- **Copy** (400, `typography.copy`): the case-notes field and any evidence paragraph that has to be read rather than scanned.
+- **Headline Wide** (700, `typography.headline-wide`): the case masthead title once there is room for it; `subject` is its narrow-screen step.
+- **Panel Title** (700, `typography.panel-title`): panel, rail, and modal headings.
+- **Section** (700, `typography.section`): screen-level section titles and large monospace readouts.
+- **Verdict** (700, `typography.verdict`): the CASE CLOSED stamp. One element, deliberately its own step.
+- **Reveal** (700, `typography.reveal`): the murderer's name on the victory screen, and the headline stat readouts beside it.
 
 ### Named Rules
 
 **The Three Voices Rule.** Barlow names the subject, Courier records the evidence, and Hanken operates the chrome; do not swap their jobs.
+
+**The Closed Ramp Rule.** The thirteen steps above are the whole type scale: 10, 11, 12, 13, 14, 16, 17, 18, 20, 24, 30, and the display clamp. Every size shipping in the app maps to one of them, whether it is written as an arbitrary value, an inline style, or a Tailwind step. A size that does not appear here is drift, not a decision — add a named role with a stated job, or use the nearest existing one. This ramp was reconciled against the running app rather than asserted: before reconciliation the document described five steps while the components rendered eleven, so the automated check could only police how a size was written, never whether it was on the scale.
 
 ## Layout
 

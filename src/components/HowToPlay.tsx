@@ -32,7 +32,7 @@ export default function HowToPlay({ mode, onClose }: Props) {
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="font-mono text-[9px] tracking-[0.3em] uppercase text-paper-muted mb-0.5">
+            <p className="font-mono text-[10px] tracking-[0.24em] uppercase text-paper-muted mb-0.5">
               DETECTIVE BRIEFING
             </p>
             <h2 id="how-to-play-title" className="font-display text-xl font-bold text-text-primary tracking-wide uppercase">
@@ -76,7 +76,7 @@ export default function HowToPlay({ mode, onClose }: Props) {
 
         {/* Tools section */}
         <div className="mt-5 pt-4 border-t border-border-strong">
-          <p className="font-mono text-[9px] text-paper-muted tracking-[0.3em] uppercase mb-3">
+          <p className="font-mono text-[10px] text-paper-muted tracking-[0.3em] uppercase mb-3">
             FIELD TOOLS
           </p>
           <ul className="flex flex-col gap-3">

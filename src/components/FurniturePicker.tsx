@@ -25,7 +25,7 @@ export default function FurniturePicker({ selected, rotation, onSelect, onRotate
     >
       {/* Header — evidence-marker tray label */}
       <div className="flex items-center justify-between">
-        <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-paper-muted">
+        <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-paper-muted">
           SCENE PROPS
         </span>
         <button
@@ -75,7 +75,7 @@ export default function FurniturePicker({ selected, rotation, onSelect, onRotate
               >
                 <Icon size={22} />
               </span>
-              <span className="font-mono text-[9px] leading-none tracking-tight text-center">
+              <span className="font-mono text-[10px] leading-none tracking-tight text-center">
                 {LABELS[type]}
               </span>
             </button>

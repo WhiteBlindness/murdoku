@@ -40,7 +40,7 @@ export default function ReleaseNotes({ onBack }: Props) {
           >
             ← BACK
           </button>
-          <span className="font-mono text-paper-muted text-[9px] tracking-[0.3em] uppercase">
+          <span className="font-mono text-paper-muted text-[10px] tracking-[0.24em] uppercase">
             FIELD REPORTS
           </span>
         </div>
@@ -52,7 +52,7 @@ export default function ReleaseNotes({ onBack }: Props) {
 
       <main className="flex-1 overflow-y-auto py-6 w-full max-w-3xl mx-auto px-4 sm:px-6">
         <header className="mb-8">
-          <p className="font-mono text-[9px] tracking-[0.3em] uppercase text-paper-muted mb-1">
+          <p className="font-mono text-[10px] tracking-[0.24em] uppercase text-paper-muted mb-1">
             CASE FILE — REVISION HISTORY
           </p>
           <h1 className="font-display text-3xl font-bold text-text-primary tracking-wide uppercase">
@@ -68,7 +68,7 @@ export default function ReleaseNotes({ onBack }: Props) {
             {/* Sticky month header — stamped section divider */}
             <h2
               id={`m-${group.key}`}
-              className="sticky top-0 z-10 py-2 mb-3 font-mono text-[10px] tracking-[0.3em] uppercase text-accent-text border-b border-border-strong"
+              className="sticky top-0 z-10 py-2 mb-3 font-mono text-[10px] tracking-[0.24em] uppercase text-accent-text border-b border-border-strong"
               style={{ background: 'var(--color-bg-base)', backdropFilter: 'blur(4px)' }}
             >
               {group.label}
@@ -89,7 +89,7 @@ export default function ReleaseNotes({ onBack }: Props) {
                         const ts = TAG_STYLE[entry.tag]
                         return (
                           <span
-                            className="font-mono text-[9px] uppercase tracking-[0.2em] px-1.5 py-0.5 flex-shrink-0 border"
+                            className="font-mono text-[10px] uppercase tracking-[0.2em] px-1.5 py-0.5 flex-shrink-0 border"
                             style={{
                               color: ts.color,
                               borderColor: ts.color,
