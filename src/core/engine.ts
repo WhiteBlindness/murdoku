@@ -124,26 +124,48 @@ export function countSolutions(p: Puzzle, cap = 2): number {
   const place: Placement = {}
   let count = 0
 
+  // Two optimisations, both of which change only the ORDER of the search and
+  // never its result:
+  //
+  //  1. Each person's unary-legal cells are computed once up front, instead of
+  //     re-testing every clue at every node of the tree.
+  //  2. Most-constrained-first. Searching a suspect with 3 legal cells before
+  //     one with 60 prunes whole subtrees near the root. On an 8x8 board whose
+  //     clues are all indirect this is the difference between validating a
+  //     puzzle in ~90 seconds and doing it in milliseconds: in people-array
+  //     order the search pays most of the 8! permutation cost before the first
+  //     contradiction surfaces.
+  const order = people
+    .map(person => {
+      const cells: Cell[] = []
+      for (let r = 0; r < N; r++) {
+        for (let c = 0; c < N; c++) {
+          const cell = { row: r, col: c }
+          if (unaryClueOk(p, person.id, cell)) cells.push(cell)
+        }
+      }
+      return { id: person.id, cells }
+    })
+    .sort((a, b) => a.cells.length - b.cells.length)
+
+  // A person with no legal cell at all makes the board unsatisfiable outright.
+  if (order.some(entry => entry.cells.length === 0)) return 0
+
   function recurse(i: number) {
     if (count >= cap) return
-    if (i === people.length) {
+    if (i === order.length) {
       if (isSolution(p, place)) count++
       return
     }
-    const person = people[i]
-    for (let r = 0; r < N; r++) {
-      if (usedRow[r]) continue
-      for (let c = 0; c < N; c++) {
-        if (usedCol[c]) continue
-        const cell = { row: r, col: c }
-        if (!unaryClueOk(p, person.id, cell)) continue
-        usedRow[r] = usedCol[c] = true
-        place[person.id] = cell
-        recurse(i + 1)
-        delete place[person.id]
-        usedRow[r] = usedCol[c] = false
-        if (count >= cap) return
-      }
+    const { id, cells } = order[i]
+    for (const cell of cells) {
+      if (usedRow[cell.row] || usedCol[cell.col]) continue
+      usedRow[cell.row] = usedCol[cell.col] = true
+      place[id] = cell
+      recurse(i + 1)
+      delete place[id]
+      usedRow[cell.row] = usedCol[cell.col] = false
+      if (count >= cap) return
     }
   }
   recurse(0)

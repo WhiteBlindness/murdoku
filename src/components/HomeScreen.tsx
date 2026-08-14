@@ -29,11 +29,12 @@ function fmt(s: number) { return `${String(Math.floor(s / 60)).padStart(2, '0')}
 //   --diff-<slug>-text  AA-safe foreground text (>= 4.5:1 contrast in both light and dark themes)
 const DIFF_TOKEN: Record<string, string> = {
   'Very Easy': 'very-easy', Easy: 'easy', Medium: 'medium', Hard: 'hard', Expert: 'expert',
+  Master: 'master',
 }
 const diffFill = (d: string) => `var(--diff-${DIFF_TOKEN[d]})`
 const diffText = (d: string) => `var(--diff-${DIFF_TOKEN[d]}-text)`
 
-const DIFF_ORDER: Difficulty[] = ['Very Easy', 'Easy', 'Medium', 'Hard', 'Expert']
+const DIFF_ORDER: Difficulty[] = ['Very Easy', 'Easy', 'Medium', 'Hard', 'Expert', 'Master']
 
 export default function HomeScreen({ puzzles, completedIds, records, mode, onSetMode, onSelect, onOpenReleases, resolvedTheme, onToggleTheme, inProgress = null, onResume }: Props) {
   const [query, setQuery] = useState('')
@@ -367,13 +368,13 @@ function DifficultyButton({ active, onClick, label }: { active: boolean; onClick
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className="focus-ring h-11 w-11 border p-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors"
+      className="focus-ring h-11 border px-2.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] whitespace-nowrap transition-colors"
       style={{
+        // Height stays a 44px touch target, but width follows the label: a hard
+        // 44px square clipped "EXPERT" and "MASTER" mid-word.
         minHeight: 44,
         minWidth: 44,
         height: 44,
-        width: 44,
-        aspectRatio: '1 / 1',
         borderColor: active ? 'var(--color-accent-strong)' : 'var(--color-border-strong)',
         backgroundColor: active ? 'var(--color-accent)' : 'var(--color-bg-inset)',
         color: active ? 'var(--color-on-accent)' : 'var(--color-text-secondary)',

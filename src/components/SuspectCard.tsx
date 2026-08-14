@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Check, Lock } from 'lucide-react'
+import { Check, Lock, Crosshair } from 'lucide-react'
 import type { Person } from '../core/types'
 
 interface Props {
@@ -11,12 +11,18 @@ interface Props {
   conflicted: boolean
   resolved?: boolean
   showCheck?: boolean
+  /** This suspect's clue is currently squared off on the board. */
+  located?: boolean
+  /** False when the clue has no drawable board target (e.g. a pure row clue with no cells). */
+  canLocate?: boolean
   onSelect: () => void
   onToggleResolved?: () => void
+  onToggleLocate?: () => void
 }
 
 export default function SuspectCard({
-  person, clues, selected, placed, locked, conflicted, resolved, showCheck, onSelect, onToggleResolved,
+  person, clues, selected, placed, locked, conflicted, resolved, showCheck,
+  located, canLocate, onSelect, onToggleResolved, onToggleLocate,
 }: Props) {
   const portraitIndex = [...person.id].reduce((sum, character) => sum + character.charCodeAt(0), 0) % 8
   const portraitColumn = portraitIndex % 4
@@ -119,6 +125,26 @@ export default function SuspectCard({
           ))}
         </div>
       </button>
+
+      {canLocate && onToggleLocate && (
+        /* Locate: the only thing that puts an amber square on the board. Help is
+           asked for, never volunteered — selecting a suspect must stay a pure
+           placement action. Pressed state is carried by fill + aria-pressed. */
+        <button
+          onClick={onToggleLocate}
+          aria-pressed={!!located}
+          aria-label={located ? `Hide ${person.name}'s clue on the board` : `Show ${person.name}'s clue on the board`}
+          title="Show me where this clue points"
+          className="focus-ring flex-shrink-0 self-start w-11 h-11 border flex items-center justify-center transition-colors"
+          style={{
+            borderColor: located ? 'var(--color-accent)' : 'var(--color-border-strong)',
+            background: located ? 'var(--color-accent)' : 'transparent',
+            color: located ? 'var(--color-on-accent)' : 'var(--color-text-muted)',
+          }}
+        >
+          <Crosshair size={15} strokeWidth={2.4} />
+        </button>
+      )}
 
       {showCheck && (
         /* Checkbox: sharp-cornered dossier tick box. Unresolved = unfilled

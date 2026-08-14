@@ -5,8 +5,31 @@ import { countSolutions, findMurderer } from '../src/core/engine'
 const puzzles = getAllPuzzles()
 
 describe('generated puzzle catalog', () => {
-  it('contains the complete 27-case catalog', () => {
-    expect(puzzles).toHaveLength(27)
+  it('contains the complete 60-case catalog', () => {
+    expect(puzzles).toHaveLength(60)
+  })
+
+  it('gives every case a distinct title and case number', () => {
+    expect(new Set(puzzles.map(p => p.title)).size).toBe(puzzles.length)
+    expect(new Set(puzzles.map(p => p.caseNumber)).size).toBe(puzzles.length)
+  })
+
+  it('escalates board size across the difficulty ladder', () => {
+    const sizesFor = (difficulty: string) =>
+      new Set(puzzles.filter(p => p.difficulty === difficulty).map(p => p.size))
+    expect(sizesFor('Very Easy')).toEqual(new Set([4]))
+    expect(sizesFor('Expert')).toEqual(new Set([7]))
+    expect(sizesFor('Master')).toEqual(new Set([8]))
+  })
+
+  it('never hands a Master suspect a bare room clue', () => {
+    // Master's whole identity is that "In the Study" is off the table, so every
+    // suspect must be triangulated rather than read off a single card.
+    const master = puzzles.filter(p => p.difficulty === 'Master')
+    expect(master.length).toBeGreaterThan(0)
+    for (const puzzle of master) {
+      expect(puzzle.clues.every(({ clue }) => clue.kind !== 'room'), puzzle.title).toBe(true)
+    }
   })
 
   for (const puzzle of puzzles) {

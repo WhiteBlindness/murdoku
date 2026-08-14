@@ -45,7 +45,7 @@ interface Props {
 }
 
 const DIFF_COLOR: Record<string, string> = {
-  'Very Easy': 'var(--diff-very-easy-text)', 'Easy': 'var(--diff-easy-text)', 'Medium': 'var(--diff-medium-text)', 'Hard': 'var(--diff-hard-text)', 'Expert': 'var(--diff-expert-text)',
+  'Very Easy': 'var(--diff-very-easy-text)', 'Easy': 'var(--diff-easy-text)', 'Medium': 'var(--diff-medium-text)', 'Hard': 'var(--diff-hard-text)', 'Expert': 'var(--diff-expert-text)', 'Master': 'var(--diff-master-text)',
 }
 const HELP_KEY = 'murdoku_seen_help'
 
@@ -71,19 +71,18 @@ export default function GameScreen(props: Props) {
   for (const ct of puzzle.clues) (cluesOf[ct.clue.person] ||= []).push(ct.text)
   const placedCount = Object.keys(placedOf).length
   const detective = mode === 'detective'
-  const clueHighlight = selectedPerson ? resolveClueHighlight(puzzle, selectedPerson) : null
-  const clueHighlightLabel = selectedPerson
-    ? cluesOf[selectedPerson]?.[0] ?? 'Selected suspect clue'
+  // Locating a clue on the board is HELP, so it is opt-in per suspect and never
+  // fires just because a suspect is selected — selection is a placement tool.
+  //
+  // The board answers with an amber square around the target cells. There is
+  // deliberately no drawn connector: a line between two independently-sized
+  // layout regions can only be positioned by guessed percentages, and it landed
+  // in open space at every viewport that wasn't the one it was tuned on.
+  const [locatedPerson, setLocatedPerson] = useState<string | null>(null)
+  const clueHighlight = locatedPerson ? resolveClueHighlight(puzzle, locatedPerson) : null
+  const clueHighlightLabel = locatedPerson
+    ? cluesOf[locatedPerson]?.[0] ?? 'Selected suspect clue'
     : undefined
-  const clueTargetCell = clueHighlight?.cells?.[0]
-    ?? (clueHighlight?.furniture ? puzzle.furniture.find(item => item.type === clueHighlight.furniture) : undefined)
-    ?? (clueHighlight?.roomId ? puzzle.rooms.find(room => room.id === clueHighlight.roomId)?.cells[0] : undefined)
-  const clueTargetPoint = clueTargetCell
-    ? {
-        x: `${13.5 + ((clueTargetCell.col + 0.5) / puzzle.size) * 43.8}%`,
-        y: `${17 + ((clueTargetCell.row + 0.5) / puzzle.size) * 68}%`,
-      }
-    : null
 
   const [help, setHelp] = useState(false)
   const [legend, setLegend] = useState(false)
@@ -204,21 +203,36 @@ export default function GameScreen(props: Props) {
       */}
 
       {/* ── Header — spans all columns at lg+, full-width at mobile ────────── */}
+      {/*
+        Masthead geometry, one structure from 320px to ultrawide:
+
+          [ 1fr back ][ auto title ][ 1fr controls ]
+
+        The centre track is `auto`, so the title is sized by its own content and
+        sits optically centred; the two `1fr` rails absorb the slack evenly. The
+        previous `minmax(0,1fr)` centre track grew to fill every spare pixel,
+        which at 1920px produced a title stranded in ~1500px of empty band.
+
+        `items-center` + a fixed h-16 (the 64px documented in DESIGN.md) replaces
+        `items-stretch` + `min-h`, so no child can inflate the bar.
+      */}
       <header
-        className="case-masthead pt-safe grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-stretch px-3 min-h-[64px] flex-shrink-0 lg:col-span-full"
+        className="case-masthead pt-safe grid grid-cols-[1fr_auto_1fr] items-center gap-1 px-2 sm:px-3 h-16 flex-shrink-0 lg:col-span-full"
         style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
-        {/* Back — stencil label */}
+        {/* Back — stencil label. `justify-self-start` keeps it pinned left while
+            its 1fr rail absorbs slack. */}
         <button
           onClick={() => hasProgress ? setConfirmLeave(true) : props.onBack()}
-          className="focus-ring text-text-muted font-mono text-xs px-2 min-h-[44px] flex items-center whitespace-nowrap flex-shrink-0 tracking-widest uppercase hover:text-text-secondary transition-colors"
+          className="focus-ring justify-self-start text-text-muted font-mono text-xs px-2 h-11 flex items-center whitespace-nowrap tracking-widest uppercase hover:text-text-secondary transition-colors"
         >
           ← Cases
         </button>
 
-        {/* Case title + metadata */}
-        <div className="text-center min-w-0 px-3 flex-1 flex flex-col justify-center border-x" style={{ borderColor: 'var(--color-border-subtle)' }}>
-          <h1 className="font-display text-text-primary text-sm sm:text-base font-bold leading-snug uppercase tracking-wide">
+        {/* Case title + metadata — content-sized and capped so a long title
+            truncates instead of shoving the controls off a 320px screen. */}
+        <div className="text-center min-w-0 max-w-[min(60vw,460px)] px-2 flex flex-col justify-center">
+          <h1 className="font-display text-text-primary text-sm sm:text-base font-bold leading-snug uppercase tracking-wide truncate">
             {puzzle.title}
           </h1>
           <div className="flex items-center justify-center gap-2 mt-0.5">
@@ -243,21 +257,25 @@ export default function GameScreen(props: Props) {
           </div>
         </div>
 
-        <div className="hidden md:flex min-w-[240px] items-center justify-between gap-6 px-4 border-r" style={{ borderColor: 'var(--color-border-subtle)' }}>
-          <div>
-            <span className="block font-mono text-[9px] uppercase tracking-[0.22em] text-text-muted">Objective</span>
-            <span className="block font-mono text-[11px] text-text-secondary">Reconstruct every alibi</span>
-          </div>
-          <div className="text-right">
-            <span className="block font-mono text-[9px] uppercase tracking-[0.22em] text-text-muted">Clues placed</span>
-            <span className="block font-mono text-sm text-accent-text tabular-nums">{placedCount}/{puzzle.people.length}</span>
-          </div>
-        </div>
-
-        {/* Timer + icon controls — always in header so it's reachable on mobile */}
-        <div className="flex items-center gap-1.5">
+        {/* Right rail: placement count, timer, controls.
+            "Objective / Reconstruct every alibi" was removed — it is static
+            copy that never changes during a case, and it was the widest thing
+            in the bar. The live count is what the player actually reads, so it
+            is promoted and now survives down to 320px instead of vanishing
+            under `md:`. */}
+        <div className="flex items-center justify-end gap-1 sm:gap-1.5 justify-self-end">
+          <span
+            className="font-mono text-[11px] tabular-nums whitespace-nowrap px-1.5 py-0.5 leading-none"
+            title="Suspects placed"
+            style={{
+              color: 'var(--color-accent-text)',
+              border: '1px solid color-mix(in srgb, var(--color-accent) 42%, transparent)',
+            }}
+          >
+            <span className="sr-only">Suspects placed: </span>{placedCount}/{puzzle.people.length}
+          </span>
           {!hideTimer && (
-            <span className="font-mono text-accent-text text-sm tabular-nums tracking-widest">
+            <span className="font-mono text-accent-text text-sm tabular-nums tracking-widest hidden sm:inline">
               {timer}
             </span>
           )}
@@ -302,14 +320,6 @@ export default function GameScreen(props: Props) {
             onSelectPerson={props.onSelectPerson}
           />
         </div>
-
-        {clueTargetPoint && (
-          <svg aria-hidden className="clue-connector pointer-events-none absolute inset-0 z-30 hidden h-full w-full lg:block">
-            <line className="clue-connector-line" x1="74%" y1="34%" x2={clueTargetPoint.x} y2={clueTargetPoint.y} />
-            <circle className="clue-connector-node" cx="74%" cy="34%" r="5" />
-            <circle className="clue-connector-node" cx={clueTargetPoint.x} cy={clueTargetPoint.y} r="7" />
-          </svg>
-        )}
 
         {/* ── CASE FILE RAIL (left) ─────────────────────────────────────────
             Mobile: display:contents — contributes nothing to flow, children
@@ -621,8 +631,11 @@ export default function GameScreen(props: Props) {
                     conflicted={conflicts.has(person.id)}
                     resolved={resolvedClues.includes(person.id)}
                     showCheck={detective}
+                    located={locatedPerson === person.id}
+                    canLocate={!!resolveClueHighlight(puzzle, person.id)}
                     onSelect={() => props.onSelectPerson(person.id)}
                     onToggleResolved={() => props.onToggleClue(person.id)}
+                    onToggleLocate={() => setLocatedPerson(current => current === person.id ? null : person.id)}
                   />
                 ))}
               </div>

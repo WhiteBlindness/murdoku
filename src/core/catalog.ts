@@ -7,24 +7,34 @@ import type { Puzzle, Difficulty } from './types'
 // it in localStorage so reloads are instant and ids stay stable for progress.
 // ============================================================================
 
+// The curve is deliberately fattest in the middle: Very Easy exists to teach
+// the rules once, while Medium/Hard is where a player who likes the game
+// actually lives. Master (8x8, no direct room clues) is the long tail.
 const SPEC: { difficulty: Difficulty; count: number }[] = [
-  { difficulty: 'Very Easy', count: 6 },
-  { difficulty: 'Easy', count: 6 },
-  { difficulty: 'Medium', count: 6 },
-  { difficulty: 'Hard', count: 5 },
-  { difficulty: 'Expert', count: 4 },
+  { difficulty: 'Very Easy', count: 8 },
+  { difficulty: 'Easy', count: 10 },
+  { difficulty: 'Medium', count: 12 },
+  { difficulty: 'Hard', count: 12 },
+  { difficulty: 'Expert', count: 10 },
+  { difficulty: 'Master', count: 8 },
 ]
 
 // v12: the L.A. Noire redesign muted the per-suspect ACCENTS palette in
 // generate.ts. Cached catalogs embed the generated colours, so without this
 // bump every returning player would keep the old candy palette from cache.
-const KEY = 'murdoku_catalog_v12'
+// v13: the catalog grew from 27 to 60 cases and gained the Master tier, and the
+// generator's directness floor changed which clues Expert boards draw from. A
+// cached v12 list would pin returning players to the old, smaller catalog.
+const KEY = 'murdoku_catalog_v13'
 let puzzles: Puzzle[] = []
 
 function slug(s: string) { return s.toLowerCase().replace(/\s+/g, '-') }
 function hash(s: string) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) } return Math.abs(h) }
 function roman(n: number): string {
-  const map: [number, string][] = [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']]
+  const map: [number, string][] = [
+    [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'],
+    [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I'],
+  ]
   let out = ''
   for (const [v, r] of map) while (n >= v) { out += r; n -= v }
   return out
@@ -39,6 +49,17 @@ const UNIQUE_TITLES = [
   'A Toast to Murder', 'The Torn Letter', 'Shadows in the Hall',
   'The Poisoned Pen', 'One Last Waltz', 'The Butler’s Secret',
   'Whispers Upstairs', 'The Cracked Mirror', 'A Debt Repaid',
+  // Added with the 60-case catalog. One title per case, so this list must stay
+  // at least as long as the sum of SPEC counts or titles begin to repeat.
+  'The Second Shot', 'Nobody Left', 'A Quiet Alibi', 'The Wrong Coat',
+  'Ashes at Midnight', 'The Last Train', 'Room Without a Door', 'The Cold Kettle',
+  'A Name in Pencil', 'The Unlit Lamp', 'Three Empty Glasses', 'The Late Arrival',
+  'A Story Rehearsed', 'The Missing Hour', 'Nothing Was Taken', 'The Open Window',
+  'A Witness Recants', 'The Locked Pantry', 'Dust on the Sill', 'The Borrowed Knife',
+  'A Clock Stopped', 'The Second Study', 'No One Heard', 'The Spare Key',
+  'A Quiet Confession', 'The Torn Ledger', 'Shadows at the Door', 'The Last Guest',
+  'A Debt Unsettled', 'The Silent Kitchen', 'Two Sets of Prints', 'The Final Alibi',
+  'Nobody Was Home',
 ]
 
 function build(): Puzzle[] {

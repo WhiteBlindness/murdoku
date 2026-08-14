@@ -126,30 +126,10 @@
     background-repeat: no-repeat;
   }
 
-  .clue-connector {
-    overflow: visible;
-    filter: drop-shadow(0 0 5px color-mix(in srgb, var(--color-accent) 78%, transparent));
-  }
-
-  .clue-connector-line {
-    stroke: var(--color-accent-strong);
-    stroke-width: 2;
-    stroke-dasharray: 8 6;
-    vector-effect: non-scaling-stroke;
-    animation: projector-path var(--motion-aperture) var(--ease-physical) both;
-  }
-
-  .clue-connector-node {
-    fill: var(--color-bg-inset);
-    stroke: var(--color-accent-strong);
-    stroke-width: 2;
-    vector-effect: non-scaling-stroke;
-  }
-
-  @keyframes projector-path {
-    from { stroke-dashoffset: 160; opacity: 0.25; }
-    to { stroke-dashoffset: 0; opacity: 1; }
-  }
+  /* The clue-to-board connector line was removed: it was positioned with
+     hardcoded viewport percentages and could not stay attached to its target
+     across board sizes or breakpoints. The board target is now squared off
+     directly — see .clue-projector-trace below. */
 
   /* Shared evidence-wall materials for the responsive screens. The clipped
      edge is deliberately square and tactile rather than a rounded card/pill. */

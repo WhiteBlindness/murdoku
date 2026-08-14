@@ -27,6 +27,20 @@ export interface ChangeEntry {
 
 export const CHANGELOG: ChangeEntry[] = [
   {
+    date: '2026-08-14',
+    headline: 'Sixty cases and a new Master tier',
+    detail:
+      'The case index grew from 27 to 60, including a new Master tier: 8x8 boards, more rooms, and no suspect ever handed a plain "In the Study" — everyone has to be triangulated. The solver behind the generator now searches the most-constrained suspect first, which made the whole catalog quicker to build than the old, smaller one.',
+    tag: 'Content',
+  },
+  {
+    date: '2026-08-14',
+    headline: 'Help when you ask for it',
+    detail:
+      'The dotted line from a clue to the board is gone; it could not stay attached to its target and often pointed at nothing. Each suspect card now has a crosshair button that squares off exactly where that clue points, and only when you press it. The top bar was rebuilt too, so it stays one tidy row from a phone up to an ultrawide monitor.',
+    tag: 'Improvement',
+  },
+  {
     date: '2026-08-13',
     headline: 'The board is hand-drawn again',
     detail:

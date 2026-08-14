@@ -63,12 +63,14 @@
   --diff-medium:         #D89A22;
   --diff-hard:           #D27B42;
   --diff-expert:         #E06A5A;
+  --diff-master:         #D9C4A8;
 
   --diff-very-easy-text: #AEB8A7;
   --diff-easy-text:      #C7B879;
   --diff-medium-text:    #D89A22;
   --diff-hard-text:      #D27B42;
   --diff-expert-text:    #E06A5A;
+  --diff-master-text:    #D9C4A8;
 
   /* --- The board: mansion reconstruction surface on the continuity desk --
      Twelve material finishes live in core/roomMaterials.ts. Board tokens
@@ -137,12 +139,14 @@
     --diff-medium:         #7B5708;
     --diff-hard:           #8A481D;
     --diff-expert:         #8A2A22;
+    --diff-master:         #4A3B2A;
 
     --diff-very-easy-text: #4D5A4D;
     --diff-easy-text:      #665A2B;
     --diff-medium-text:    #7B5708;
     --diff-hard-text:      #8A481D;
     --diff-expert-text:    #8A2A22;
+    --diff-master-text:    #4A3B2A;
 
     /* Board sits on the daylight desk with the same restrained dossier frame. */
     --board-ground:      #241820;
@@ -190,12 +194,14 @@
   --diff-medium:         #7B5708;
   --diff-hard:           #8A481D;
   --diff-expert:         #8A2A22;
+  --diff-master:         #4A3B2A;
 
   --diff-very-easy-text: #4D5A4D;
   --diff-easy-text:      #665A2B;
   --diff-medium-text:    #7B5708;
   --diff-hard-text:      #8A481D;
   --diff-expert-text:    #8A2A22;
+  --diff-master-text:    #4A3B2A;
 
   --board-ground:      #241820;
   --board-wall:        #1a1a1a;

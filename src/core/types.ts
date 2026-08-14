@@ -9,7 +9,7 @@
 // This module is pure data/logic — no React — so it ports to any runtime.
 // ============================================================================
 
-export type GridSize = 4 | 5 | 6 | 7
+export type GridSize = 4 | 5 | 6 | 7 | 8
 
 /** A cell coordinate. row 0 = top, col 0 = left. */
 export interface Cell { row: number; col: number }
@@ -86,7 +86,7 @@ export interface Puzzle {
   source?: 'builtin' | 'imported' | 'custom' | 'generated'
 }
 
-export type Difficulty = 'Very Easy' | 'Easy' | 'Medium' | 'Hard' | 'Expert'
+export type Difficulty = 'Very Easy' | 'Easy' | 'Medium' | 'Hard' | 'Expert' | 'Master'
 
 // --- Play state ------------------------------------------------------------
 

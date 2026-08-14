@@ -110,7 +110,9 @@ function splitRects(size: number, targetRooms: number): Rect[] {
 function area(r: Rect) { return (r.r1 - r.r0 + 1) * (r.c1 - r.c0 + 1) }
 
 function buildRooms(size: number): { rooms: Room[]; roomOf: string[][] } {
-  const target = size <= 4 ? 3 : size <= 5 ? 4 : 4 + Math.floor(rand() * 2)
+  // Room count tracks area: an 8x8 split into 4 rooms gives 16-cell rooms, which
+  // makes "In the Kitchen" nearly free information.
+  const target = size <= 4 ? 3 : size <= 5 ? 4 : size <= 7 ? 4 + Math.floor(rand() * 2) : 5 + Math.floor(rand() * 2)
   const rects = splitRects(size, target)
   const names = shuffle(ROOM_NAMES).slice(0, rects.length)
   const roomOf: string[][] = Array.from({ length: size }, () => new Array(size).fill(''))
@@ -301,12 +303,21 @@ function cap(s: string) { return s.charAt(0).toUpperCase() + s.slice(1) }
 
 // --- selection -------------------------------------------------------------
 
-const DIFF_CONFIG: Record<Difficulty, { size: GridSize; maxDirectness: number }> = {
-  'Very Easy': { size: 4, maxDirectness: 3 },
-  'Easy': { size: 5, maxDirectness: 4 },
-  'Medium': { size: 6, maxDirectness: 5 },
-  'Hard': { size: 6, maxDirectness: 6 },
-  'Expert': { size: 7, maxDirectness: 6 },
+/**
+ * `maxDirectness` admits progressively vaguer clues as difficulty rises.
+ * `minDirectness` is the other half of the dial, and it is what actually makes
+ * the top tiers hard: it BANS the most direct clue kinds, so a suspect can no
+ * longer be handed "In the Study" (directness 0) and must instead be
+ * triangulated from relational statements. Raising the grid size alone only
+ * makes a puzzle longer; raising the floor makes it harder.
+ */
+const DIFF_CONFIG: Record<Difficulty, { size: GridSize; maxDirectness: number; minDirectness: number }> = {
+  'Very Easy': { size: 4, maxDirectness: 3, minDirectness: 0 },
+  'Easy': { size: 5, maxDirectness: 4, minDirectness: 0 },
+  'Medium': { size: 6, maxDirectness: 5, minDirectness: 0 },
+  'Hard': { size: 6, maxDirectness: 6, minDirectness: 0 },
+  'Expert': { size: 7, maxDirectness: 6, minDirectness: 1 },
+  'Master': { size: 8, maxDirectness: 6, minDirectness: 1 },
 }
 
 /** Build one full puzzle. Retries internally until a unique one is produced. */
@@ -339,11 +350,17 @@ export function generatePuzzle(difficulty: Difficulty, id: string, caseNumber: s
     base.furniture = placeFurniture(rooms, roomOf, place)
 
     // candidate clues, biased toward the difficulty's directness
-    const pool = candidateClues(base).filter(c => clueDirectness(c) <= cfg.maxDirectness)
+    const ceiling = candidateClues(base).filter(c => clueDirectness(c) <= cfg.maxDirectness)
+    // The floor is a preference, not a hard gate: a suspect whose only available
+    // clues are direct ones still gets a clue rather than failing the whole
+    // attempt. Otherwise a Master board with one tiny room could never generate.
+    const pool = ceiling.filter(c => clueDirectness(c) >= cfg.minDirectness)
     const byPerson: Record<string, Clue[]> = {}
     for (const person of people) {
       if (person.id === victim.id) continue
-      byPerson[person.id] = pool.filter(c => c.person === person.id)
+      const indirect = pool.filter(c => c.person === person.id)
+      const any = ceiling.filter(c => c.person === person.id)
+      byPerson[person.id] = (indirect.length ? indirect : any)
         .sort((a, b) => clueDirectness(a) - clueDirectness(b))
     }
     const suspects = people.filter(p => p.id !== victim.id)
@@ -368,7 +385,10 @@ export function generatePuzzle(difficulty: Difficulty, id: string, caseNumber: s
       base.clues = toClueText(base, acc)
       let guard = 0
       while (countSolutions(base, 2) > 1 && guard++ < 40) {
-        const remaining = pool.filter(c => !acc.includes(c))
+        // Prefer indirect patch clues; fall back to the full ceiling rather than
+        // abandoning uniqueness, which is non-negotiable.
+        const preferred = pool.filter(c => !acc.includes(c))
+        const remaining = preferred.length ? preferred : ceiling.filter(c => !acc.includes(c))
         if (!remaining.length) break
         let bestClue: Clue | null = null, bestCount = Infinity
         for (const cand of shuffle(remaining).slice(0, 30)) {
