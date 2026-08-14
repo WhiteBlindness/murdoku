@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-14T10:16:38.000Z",
+  "generatedAt": "2026-08-14T13:33:50.000Z",
   "title": "Design System: Alibi",
   "extensions": {
     "colorMeta": {
@@ -318,6 +318,30 @@
           "oklch(0.87 0.08 82)",
           "oklch(0.95 0.08 82)"
         ]
+      },
+      "evidence-amber-ink": {
+        "displayName": "Evidence Amber Ink",
+        "purpose": "Placed-count readout printed on the parchment continuity strip."
+      },
+      "evidence-danger-ink": {
+        "displayName": "Evidence Danger Ink",
+        "purpose": "Conflict state printed on the parchment continuity strip."
+      },
+      "step-numeral": {
+        "displayName": "Step Numeral",
+        "purpose": "Sequence number on the continuity strip's dark chip."
+      },
+      "step-numeral-selected": {
+        "displayName": "Step Numeral Selected",
+        "purpose": "Sequence number on the continuity strip's amber chip."
+      },
+      "board-vignette": {
+        "displayName": "Board Vignette",
+        "purpose": "Outer falloff of the reconstruction board's lighting wash."
+      },
+      "board-keylight": {
+        "displayName": "Board Key Light",
+        "purpose": "Warm upper-left sheen of the board's lighting wash."
       }
     },
     "typographyMeta": {
@@ -586,6 +610,11 @@
         "name": "The Closed Ramp Rule",
         "body": "The thirteen documented steps are the whole type scale: 10, 11, 12, 13, 14, 16, 17, 18, 20, 24, 30 and the display clamp. Every size shipping in the app maps to one of them whether it is written as an arbitrary value, an inline style, or a Tailwind step. A size that is not here is drift, not a decision.",
         "section": "typography"
+      },
+      {
+        "name": "The Fixed Material Rule",
+        "body": "Anything printed on a physical surface - parchment evidence, the continuity strip, the board and its lighting - keeps a fixed literal colour and does not follow the theme. Parchment is parchment in both themes, so ink that flipped would go bone-on-bone and vanish in daylight.",
+        "section": "colors"
       }
     ],
     "dos": [

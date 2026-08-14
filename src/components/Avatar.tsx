@@ -61,7 +61,12 @@ export default function Avatar({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontFamily: 'Oswald, ui-sans-serif, system-ui, sans-serif',
+          // Barlow Condensed is the naming voice (DESIGN.md `subject`). This
+          // said Oswald, which is loaded nowhere in the project — no @import,
+          // no <link>, no Tailwind family — so these initials have been
+          // silently rendering in whatever ui-sans-serif resolves to rather
+          // than a chosen face. Leftover from a superseded art direction.
+          fontFamily: '"Barlow Condensed", ui-sans-serif, system-ui, sans-serif',
           fontWeight: 700,
           fontSize: Math.round(size * 0.46),
           lineHeight: 1,

@@ -51,7 +51,10 @@ export default {
       },
       fontFamily: {
         // L.A. Noire type system — three voices, each with one job:
-        //   display -> Oswald. Stark condensed newspaper headline. Titles only.
+        //   display -> Barlow Condensed. Taut condensed headline. Titles and
+        //              names only. (This line read "Oswald" long after the
+        //              value stopped being Oswald, which is how a dead font
+        //              name survived in Avatar.tsx.)
         //   mono    -> Courier Prime. The case file: clues, evidence, timer,
         //              case numbers. A screenplay typewriter, so it stays
         //              legible at body size where a distressed novelty face

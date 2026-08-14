@@ -23,6 +23,12 @@ colors:
   miniature-contour-deep: "#1A1A1A"
   miniature-seam: "#654246"
   miniature-highlight: "#D8B777"
+  evidence-amber-ink: "#62400B"
+  evidence-danger-ink: "#641F19"
+  step-numeral: "#F1E8CE"
+  step-numeral-selected: "#FFF7E4"
+  board-vignette: "rgba(24, 14, 19, 0.18)"
+  board-keylight: "rgba(255, 244, 211, 0.08)"
 typography:
   display:
     fontFamily: "Barlow Condensed, ui-sans-serif, system-ui, sans-serif"
@@ -224,6 +230,9 @@ The palette separates theme-aware desk chrome from fixed physical evidence and b
 - **Espresso Divider** (`colors.board-wall`): the heavy near-black frame and room boundaries, printed like the rules of a physical board, that organize the mansion without overpowering its materials.
 - **Espresso Illustration Ink** (`colors.miniature-contour`, `colors.miniature-contour-deep`): the 2.4–3.2px outer silhouette and directional shadow on board miniatures; never substitute pure black.
 - **Mahogany Seam and Muted Brass** (`colors.miniature-seam`, `colors.miniature-highlight`): fine construction detail, hardware, paper edges, and selective highlights inside the stronger silhouette.
+- **Evidence Amber and Danger Ink** (`colors.evidence-amber-ink`, `colors.evidence-danger-ink`): the placed-count readout and the conflict state printed on the parchment continuity strip.
+- **Step Numerals** (`colors.step-numeral`, `colors.step-numeral-selected`): the sequence numbers on the continuity strip's dark and amber chips.
+- **Board Vignette and Key Light** (`colors.board-vignette`, `colors.board-keylight`): the two-layer lighting wash over the reconstruction board.
 
 ### Named Rules
 
@@ -232,6 +241,8 @@ The palette separates theme-aware desk chrome from fixed physical evidence and b
 **The Oxblood Exception Rule.** Oxblood is reserved for danger, conflict, victim, destructive confirmation, and rejection.
 
 **The Strong Edge Rule.** A border that is the only visible affordance must use the strong tier; the subtle tier may divide content but never carry interaction alone.
+
+**The Fixed Material Rule.** Anything printed on a physical surface — parchment evidence, the continuity strip, the board and its lighting — keeps a fixed literal colour and does not follow the theme. Parchment is parchment in both themes, so ink that flipped with the theme would go bone-on-bone and vanish in daylight. These values are listed as tokens above precisely so they read as decisions rather than as stray hex; do not "helpfully" convert them to `var(--color-*)`.
 
 ## Typography
 
