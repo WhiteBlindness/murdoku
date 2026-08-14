@@ -88,8 +88,7 @@ export default function VictoryScreen({ puzzle, murderer, timer, elapsedSeconds,
         >
           <p
             id="victory-title"
-            className="font-display font-bold tracking-[0.35em] text-danger-text uppercase"
-            style={{ fontSize: '1.6rem' }}
+            className="font-display text-2xl font-bold tracking-[0.35em] text-danger-text uppercase"
           >
             Case Closed
           </p>
