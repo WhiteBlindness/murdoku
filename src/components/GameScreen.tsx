@@ -2,10 +2,10 @@ import { useState, useEffect, useId, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Undo2, Redo2, Trash2, Lightbulb, X as XIcon, MousePointerClick, Pencil,
-  HelpCircle, Eye, EyeOff, Info, Palette,
+  HelpCircle, Eye, EyeOff, Info, Palette, Wand2,
 } from 'lucide-react'
 import type { Puzzle, CellMark, GameMode, Furniture, FurnitureType } from '../core/types'
-import { resolveClueHighlight } from '../core/ux'
+import { resolveClueHighlights } from '../core/ux'
 import type { Tool } from '../hooks/useGame'
 import MapGrid from './MapGrid'
 import SuspectCard from './SuspectCard'
@@ -38,6 +38,7 @@ interface Props {
   onRedo: () => void
   onClear: () => void
   onHint: () => void
+  onAssist?: () => void
   onToggleTimer: () => void
   onSubmit: () => void
   onDismissFeedback: () => void
@@ -79,9 +80,9 @@ export default function GameScreen(props: Props) {
   // layout regions can only be positioned by guessed percentages, and it landed
   // in open space at every viewport that wasn't the one it was tuned on.
   const [locatedPerson, setLocatedPerson] = useState<string | null>(null)
-  const clueHighlight = locatedPerson ? resolveClueHighlight(puzzle, locatedPerson) : null
+  const clueHighlight = locatedPerson ? resolveClueHighlights(puzzle, locatedPerson) : null
   const clueHighlightLabel = locatedPerson
-    ? cluesOf[locatedPerson]?.[0] ?? 'Selected suspect clue'
+    ? cluesOf[locatedPerson]?.join(' · ') || 'Selected suspect clue'
     : undefined
 
   const [help, setHelp] = useState(false)
@@ -145,6 +146,33 @@ export default function GameScreen(props: Props) {
   }, [submitNonce, hardReject])
 
   const hasProgress = marks.some(row => row.some(c => c.kind !== 'empty'))
+
+  // Tool hotkeys. Switching tool previously meant leaving the board and
+  // reaching for the toolbar under it on every single change, which is the most
+  // repeated action in a solve. Draft is bound only in detective mode, where it
+  // is the only mode that has the tool.
+  const { onSetTool, onHint, onAssist } = props
+  const modalOpen = help || confirmClear || confirmLeave
+  useEffect(() => {
+    if (modalOpen) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return
+      const active = document.activeElement as HTMLElement | null
+      // Never steal a keystroke from the case-notes field or any other input.
+      if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement || active?.isContentEditable) return
+      switch (event.key.toLowerCase()) {
+        case 'p': onSetTool('place'); break
+        case 'x': onSetTool('x'); break
+        case 'd': if (detective) onSetTool('draft'); else return; break
+        case 'h': onHint(); break
+        case 'a': if (onAssist) onAssist(); else return; break
+        default: return
+      }
+      event.preventDefault()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [modalOpen, detective, onSetTool, onHint, onAssist])
 
   useEffect(() => {
     try { if (!localStorage.getItem(HELP_KEY)) { setHelp(true); localStorage.setItem(HELP_KEY, '1') } } catch { /* ignore */ }
@@ -335,7 +363,7 @@ export default function GameScreen(props: Props) {
 
             {/* Case metadata block */}
             <div className="border-b pb-4" style={{ borderColor: 'var(--color-border-subtle)' }}>
-              <p className="text-[9px] font-mono text-text-muted tracking-[0.25em] uppercase mb-2">Case File</p>
+              <p className="text-[10px] font-mono text-text-muted tracking-[0.25em] uppercase mb-2">Case File</p>
               <p className="font-display font-bold text-text-primary text-lg uppercase tracking-wide leading-tight">{puzzle.title}</p>
               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                 <span
@@ -359,7 +387,7 @@ export default function GameScreen(props: Props) {
 
             {/* Timer — large, case-file data */}
             <div className="border-b pb-4" style={{ borderColor: 'var(--color-border-subtle)' }}>
-              <p className="text-[9px] font-mono text-text-muted tracking-[0.25em] uppercase mb-2">Time Elapsed</p>
+              <p className="text-[10px] font-mono text-text-muted tracking-[0.25em] uppercase mb-2">Time Elapsed</p>
               {!hideTimer ? (
                 <span className="font-mono text-accent-text text-3xl tabular-nums tracking-widest">{timer}</span>
               ) : (
@@ -376,7 +404,7 @@ export default function GameScreen(props: Props) {
 
             {/* Progress */}
             <div className="border-b pb-4" style={{ borderColor: 'var(--color-border-subtle)' }}>
-              <p className="text-[9px] font-mono text-text-muted tracking-[0.25em] uppercase mb-2">Progress</p>
+              <p className="text-[10px] font-mono text-text-muted tracking-[0.25em] uppercase mb-2">Progress</p>
               <p className="font-mono text-text-secondary text-sm">
                 <span className="text-text-primary font-bold">{placedCount}</span>
                 <span className="text-text-muted"> / {puzzle.size}</span>
@@ -390,13 +418,13 @@ export default function GameScreen(props: Props) {
 
             {/* Legend — always expanded on the desktop rail */}
             <div className="border-b pb-4" style={{ borderColor: 'var(--color-border-subtle)' }}>
-              <p className="text-[9px] font-mono text-text-muted tracking-[0.25em] uppercase mb-2">Reading the Scene</p>
+              <p className="text-[10px] font-mono text-text-muted tracking-[0.25em] uppercase mb-2">Reading the Scene</p>
               <LegendContent />
             </div>
 
             {/* Future features placeholder — deliberate empty state */}
             <div>
-              <p className="text-[9px] font-mono text-text-muted tracking-[0.25em] uppercase mb-2">Detective&apos;s Notes</p>
+              <p className="text-[10px] font-mono text-text-muted tracking-[0.25em] uppercase mb-2">Detective&apos;s Notes</p>
               <div
                 className="border p-3 min-h-[80px] flex items-center justify-center"
                 style={{ borderColor: 'var(--color-border-subtle)', borderStyle: 'dashed' }}
@@ -553,6 +581,12 @@ export default function GameScreen(props: Props) {
               <ToolBtn onClick={props.onRedo} disabled={!props.canRedo} icon={<Redo2 size={16} />} label="Redo" />
               <ToolBtn onClick={() => setConfirmClear(true)} icon={<Trash2 size={16} />} label="Clear" />
               <ToolBtn onClick={props.onHint} disabled={hintsLeft <= 0} icon={<Lightbulb size={16} />} label={`Hint ×${hintsLeft}`} />
+              {props.onAssist && (
+                /* Assist marks only cells that are provably empty from the rules
+                   the player already has. It never places anyone, so unlike a
+                   hint it is free and unlimited. */
+                <ToolBtn onClick={props.onAssist} icon={<Wand2 size={16} />} label="Assist" title="Cross off cells that are already impossible" />
+              )}
               <ToolBtn
                 toggled={showDecor}
                 onClick={() => { setShowDecor(v => !v); if (showDecor) setPlacingFurniture(null) }}
@@ -588,7 +622,7 @@ export default function GameScreen(props: Props) {
           >
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-[9px] font-mono text-text-muted tracking-[0.25em] uppercase">Progress</p>
+                <p className="text-[10px] font-mono text-text-muted tracking-[0.25em] uppercase">Progress</p>
                 <p className="font-mono text-text-secondary text-sm mt-0.5">
                   <span className="text-text-primary font-bold">{placedCount}</span>
                   <span className="text-text-muted"> / {puzzle.size}</span>
@@ -632,7 +666,7 @@ export default function GameScreen(props: Props) {
                     resolved={resolvedClues.includes(person.id)}
                     showCheck={detective}
                     located={locatedPerson === person.id}
-                    canLocate={!!resolveClueHighlight(puzzle, person.id)}
+                    canLocate={resolveClueHighlights(puzzle, person.id).length > 0}
                     onSelect={() => props.onSelectPerson(person.id)}
                     onToggleResolved={() => props.onToggleClue(person.id)}
                     onToggleLocate={() => setLocatedPerson(current => current === person.id ? null : person.id)}

@@ -6,6 +6,9 @@ import { FURNITURE_ICON, FURNITURE_NAME } from '../core/furniture'
 import { floorStyle, isDarkFloor, roomMaterial } from '../core/roomMaterials'
 import Avatar from './Avatar'
 
+/** A board target a clue points at: a whole room, a furniture type, or cells. */
+interface ClueTarget { roomId?: string; furniture?: FurnitureType; cells?: Cell[] }
+
 interface Props {
   puzzle: Puzzle
   marks: CellMark[][]
@@ -15,7 +18,8 @@ interface Props {
   placingFurniture?: FurnitureType | null
   placingRotation?: 0 | 90 | 180 | 270
   onPlaceFurniture?: (row: number, col: number) => void
-  highlight?: { roomId?: string; furniture?: FurnitureType; cells?: Cell[] } | null
+  /** One target, or every target a suspect's clues point at. */
+  highlight?: ClueTarget | ClueTarget[] | null
   highlightLabel?: string
 }
 
@@ -88,8 +92,16 @@ export default function MapGrid({
   })
 
   const isPlacing = !!placingFurniture && !!onPlaceFurniture
-  const highlightedCells = new Set((highlight?.cells ?? []).map(cell => `${cell.row},${cell.col}`))
-  const highlightDescriptionId = highlight && highlightLabel ? `clue-target-${puzzle.id}` : undefined
+  // A suspect can carry several clues, each with its own board target, so the
+  // highlight is normalised to a list and every target is squared off. Showing
+  // only the first of two constraints reads as the whole answer.
+  const targets: ClueTarget[] = highlight ? (Array.isArray(highlight) ? highlight : [highlight]) : []
+  const highlightedCells = new Set(
+    targets.flatMap(target => (target.cells ?? []).map(cell => `${cell.row},${cell.col}`)),
+  )
+  const highlightedRooms = new Set(targets.map(target => target.roomId).filter(Boolean))
+  const highlightedFurniture = new Set(targets.map(target => target.furniture).filter(Boolean))
+  const highlightDescriptionId = targets.length && highlightLabel ? `clue-target-${puzzle.id}` : undefined
 
   return (
     /*
@@ -154,9 +166,9 @@ export default function MapGrid({
             const isHovered = hoverCell === cellKey
             const showPreview = isPlacing && isHovered && !!placingFurniture
             const isClueTarget = Boolean(
-              highlight && (
-                highlight.roomId === id
-                || (highlight.furniture && furn.some(item => item.type === highlight.furniture))
+              targets.length && (
+                highlightedRooms.has(id)
+                || furn.some(item => highlightedFurniture.has(item.type))
                 || highlightedCells.has(`${r},${c}`)
               )
             )
@@ -200,7 +212,7 @@ export default function MapGrid({
                       : `1px solid rgba(26, 26, 26, 0.5)`,
                   cursor: isPlacing ? 'crosshair' : 'pointer',
                   ...(showPreview ? {
-                    outline: '2px dashed rgba(255,255,255,0.65)',
+                    outline: '2px dashed color-mix(in srgb, var(--color-text-primary) 65%, transparent)',
                     outlineOffset: '-4px',
                   } : {}),
                 }}
@@ -326,10 +338,10 @@ export default function MapGrid({
                         title="Two suspects share this row or column"
                         style={{
                           background: 'var(--color-danger)',
-                          color: '#fff',
+                          color: 'var(--color-on-accent)',
                           borderRadius: 2,
-                          // White halo so the badge reads on the mahogany floor too
-                          boxShadow: '0 0 0 1.5px #fff',
+                          // Light halo so the badge reads on the mahogany floor too
+                          boxShadow: '0 0 0 1.5px var(--color-text-primary)',
                         }}
                       >!</span>
                     )}
@@ -408,7 +420,7 @@ export default function MapGrid({
                 gridRowStart: l.row + 1,
                 color: '#F4E9D0',
                 // Font: 9px floor always. Scale up to 11px at Nâ‰¤5, shrink at N=7.
-                fontSize: useInitials ? '9px' : `clamp(9px, ${Math.round(110 / N)}px, 11px)`,
+                fontSize: useInitials ? '10px' : `clamp(10px, ${Math.round(110 / N)}px, 11px)`,
                 background: 'rgba(36,24,32,0.9)',
                 borderRadius: 2,
                 padding: useInitials ? '1px 3px' : '2px 6px',

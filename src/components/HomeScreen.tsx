@@ -6,6 +6,7 @@ import { filterCases } from '../core/ux'
 import type { InProgressSummary } from '../core/ux'
 import type { CaseRecord } from '../hooks/useGame'
 import ThemeToggle from './ThemeToggle'
+import { dailyPuzzle, loadStreak, streakIsLive, computeBadges } from '../core/daily'
 
 interface Props {
   puzzles: Puzzle[]
@@ -137,6 +138,12 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
         </div>
       </div>
 
+      {/* ── Daily Case panel ── */}
+      <DailyPanel puzzles={puzzles} completedIds={completedIds} records={records} onSelect={onSelect} />
+
+      {/* ── Badge shelf ── */}
+      <BadgeShelf puzzles={puzzles} completedIds={completedIds} records={records} />
+
       {/* Case index — uses the full column width purposefully: 3 cols on md,
           4 on xl, 5 on 2xl. On a 1920 monitor that's ~5 files spread across
           the desk rather than a thin strip in the centre. */}
@@ -264,7 +271,7 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
                                slightly rotated to evoke a rubber-stamp over a
                                case file. Uses accent tokens, not a bright pill. */
                             <span
-                              className="text-[9px] font-display font-bold uppercase tracking-[0.22em] px-1.5 py-[3px] leading-none"
+                              className="text-[10px] font-display font-bold uppercase tracking-[0.18em] px-1.5 py-[3px] leading-none"
                               style={{
                                 color: 'var(--color-accent-text)',
                                 border: '1px solid color-mix(in srgb, var(--color-accent) 60%, transparent)',
@@ -383,5 +390,164 @@ function DifficultyButton({ active, onClick, label }: { active: boolean; onClick
     >
       {label}
     </button>
+  )
+}
+
+// ── Daily Case panel ────────────────────────────────────────────────────────
+
+function DailyPanel({
+  puzzles,
+  completedIds,
+  records,
+  onSelect,
+}: {
+  puzzles: Puzzle[]
+  completedIds: string[]
+  records: Record<string, CaseRecord>
+  onSelect: (id: string) => void
+}) {
+  const daily = useMemo(() => dailyPuzzle(puzzles), [puzzles])
+  const streak = useMemo(() => loadStreak(), [])
+  const live = useMemo(() => streakIsLive(streak), [streak])
+
+  if (!daily) return null
+
+  const solved = completedIds.includes(daily.id)
+
+  return (
+    <section
+      aria-labelledby="daily-case-heading"
+      className="mb-4 border border-accent-strong bg-bg-surface p-3 sm:p-4"
+      style={{ boxShadow: 'var(--shadow-cut)' }}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-accent-text">
+            {live && streak.current > 1
+              ? `Today's case · ${streak.current}-day streak`
+              : "Today's case"}
+          </p>
+          <h2
+            id="daily-case-heading"
+            className="mt-1 truncate font-display font-bold uppercase tracking-[0.04em] text-text-primary"
+            style={{ fontSize: 17 }}
+          >
+            {daily.title}
+          </h2>
+          <p className="mt-1 font-mono text-[11px] text-text-secondary">
+            {daily.caseNumber} · {daily.difficulty} · {daily.size}×{daily.size}
+            {solved && (
+              <span
+                className="ml-2 text-[10px] font-display font-bold uppercase tracking-[0.18em] px-1.5 py-[3px] leading-none"
+                style={{
+                  color: 'var(--color-accent-text)',
+                  border: '1px solid color-mix(in srgb, var(--color-accent) 60%, transparent)',
+                  background: 'color-mix(in srgb, var(--color-accent) 10%, transparent)',
+                  transform: 'rotate(-1.5deg)',
+                  display: 'inline-block',
+                }}
+              >
+                CLOSED
+              </span>
+            )}
+          </p>
+          {records[daily.id] && (
+            <p className="mt-1 font-mono text-[10px] text-accent-text flex items-center gap-1">
+              <Timer size={11} /> best {fmt(records[daily.id].bestSeconds)}
+            </p>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={() => onSelect(daily.id)}
+          className="focus-ring min-h-11 border border-accent-strong bg-accent px-4 font-sans text-xs font-bold uppercase tracking-[0.12em] text-on-accent"
+          style={{ minHeight: 44 }}
+          aria-label={solved ? "Play today's case again" : "Play today's case"}
+        >
+          {solved ? 'Play again' : 'Play'}
+        </button>
+      </div>
+    </section>
+  )
+}
+
+// ── Badge shelf ─────────────────────────────────────────────────────────────
+
+function BadgeShelf({
+  puzzles,
+  completedIds,
+  records,
+}: {
+  puzzles: Puzzle[]
+  completedIds: string[]
+  records: Record<string, CaseRecord>
+}) {
+  const [open, setOpen] = useState(false)
+  const streak = useMemo(() => loadStreak(), [])
+  const badges = useMemo(
+    () => computeBadges({ puzzles, completedIds, records, streak }),
+    [puzzles, completedIds, records, streak],
+  )
+  const earnedCount = badges.filter(b => b.earned).length
+
+  return (
+    <div data-testid="badge-shelf" className="mb-4 border border-border-strong bg-bg-surface" style={{ boxShadow: 'var(--shadow-cut)' }}>
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        aria-expanded={open}
+        aria-controls="badge-shelf-items"
+        className="focus-ring w-full flex items-center justify-between px-3 sm:px-4 py-3 text-left"
+        style={{ minHeight: 44 }}
+      >
+        <span className="font-display font-bold uppercase tracking-[0.14em] text-text-primary" style={{ fontSize: 13 }}>
+          Achievements
+        </span>
+        <span className="font-mono text-[11px] text-text-secondary flex items-center gap-2">
+          {earnedCount}/{badges.length}
+          <span
+            aria-hidden
+            className="font-mono text-[10px]"
+            style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', display: 'inline-block', transition: 'transform 0.2s' }}
+          >
+            ▾
+          </span>
+        </span>
+      </button>
+
+      {open && (
+        <div id="badge-shelf-items" className="px-3 sm:px-4 pb-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {badges.map(badge => (
+            <div
+              key={badge.id}
+              className="flex items-start gap-2 py-2 border-t border-border-strong"
+              style={{ opacity: badge.earned ? 1 : 0.4 }}
+            >
+              <span
+                aria-hidden
+                className="mt-0.5 font-mono text-[13px]"
+                style={{ color: badge.earned ? 'var(--color-accent-text)' : 'var(--color-text-muted)' }}
+              >
+                {badge.earned ? '◆' : '◇'}
+              </span>
+              <div className="min-w-0">
+                <p
+                  className="font-display font-bold uppercase tracking-[0.06em]"
+                  style={{ fontSize: 12, color: 'var(--color-text-primary)' }}
+                >
+                  {badge.name}
+                </p>
+                <p
+                  className="font-mono leading-snug"
+                  style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}
+                >
+                  {badge.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }

@@ -1,7 +1,9 @@
-import { useReducer, useEffect, useCallback, useMemo } from 'react'
+import { useReducer, useEffect, useCallback, useMemo, useState } from 'react'
 import type { Puzzle, CellMark, Screen, GameMode } from '../core/types'
-import { getAllPuzzles, getPuzzleById, initCatalog } from '../core/catalog'
-import { findMurderer } from '../core/engine'
+import { getAllPuzzles, getPuzzleById, initCatalogAsync } from '../core/catalog'
+import { deriveEliminations, findMurderer } from '../core/engine'
+import { advanceStreak, dailyPuzzle, loadStreak, saveStreak, todayStamp } from '../core/daily'
+import type { StreakState } from '../core/daily'
 import { IN_PROGRESS_KEY, LEGACY_IN_PROGRESS_KEY, parseInProgress } from '../core/ux'
 import type { InProgressSummary } from '../core/ux'
 
@@ -44,6 +46,7 @@ type Action =
   | { type: 'REDO' }
   | { type: 'TOGGLE_TIMER' }
   | { type: 'TICK' }
+  | { type: 'ASSIST' }
 
 const HINTS_START = 3
 const STORAGE_KEY = 'murdoku_solved_v2'
@@ -321,6 +324,27 @@ function reducer(state: GameState, action: Action): GameState {
       return { ...state, hideTimer: v }
     }
 
+    case 'ASSIST': {
+      // The Logic Assistant marks only cells that are provably empty given the
+      // current placements (see deriveEliminations). It is NOT a solver: it
+      // never places anybody and never reveals an answer, so unlike HINT it
+      // costs nothing. Marks land as auto X's so the player's own X's stay
+      // visually distinct and a single UNDO takes the whole sweep back.
+      if (!state.puzzle) return state
+      const placed: Record<string, { row: number; col: number }> = {}
+      for (const person of state.puzzle.people) {
+        const cell = personCell(state.marks, person.id)
+        if (cell) placed[person.id] = cell
+      }
+      const eliminations = deriveEliminations(state.puzzle, placed)
+      const fresh = eliminations.filter(({ row, col }) => state.marks[row][col].kind === 'empty')
+      if (!fresh.length) return state
+      const history = pushHistory(state)
+      const marks = cloneMarks(state.marks)
+      for (const { row, col } of fresh) marks[row][col] = { kind: 'x', auto: true }
+      return { ...state, marks, history, future: [] }
+    }
+
     case 'HINT': {
       if (!state.puzzle || state.hintsLeft <= 0) return state
       const target = state.puzzle.people.find(person => {
@@ -384,6 +408,14 @@ function win(state: GameState): GameState {
     ? state.completedIds : [...state.completedIds, state.puzzle!.id]
   saveSolved(completedIds)
   saveRecord(state.puzzle!.id, state.elapsedSeconds, HINTS_START - state.hintsLeft)
+
+  // A streak only advances for the case that IS today's daily. Solving six
+  // cases in one evening is not a six-day streak.
+  const today = todayStamp()
+  if (dailyPuzzle(getAllPuzzles(), today)?.id === state.puzzle!.id) {
+    saveStreak(advanceStreak(loadStreak(), today))
+  }
+
   clearPlay() // solved — drop the in-progress autosave
   return { ...state, completed: true, murderer, screen: 'victory', completedIds, feedback: 'none' }
 }
@@ -391,7 +423,24 @@ function win(state: GameState): GameState {
 export function useGame() {
   const [state, dispatch] = useReducer(reducer, initial)
 
-  useEffect(() => { initCatalog() }, [])
+  // The catalog is built AFTER first paint, one case per macrotask. Building it
+  // inside render meant a cold visitor watched a blank page for the length of a
+  // 60-case generation. `catalogProgress` lets the shell say what it is doing;
+  // a warm cache resolves on the first tick and is never seen.
+  const [puzzles, setPuzzles] = useState<Puzzle[]>([])
+  const [catalogProgress, setCatalogProgress] = useState<{ done: number; total: number } | null>(null)
+  useEffect(() => {
+    let live = true
+    initCatalogAsync((done, total) => { if (live) setCatalogProgress({ done, total }) })
+      .then(list => { if (live) { setPuzzles(list); setCatalogProgress(null) } })
+    return () => { live = false }
+  }, [])
+
+  const [streak, setStreak] = useState<StreakState>(() => loadStreak())
+  // The streak is written inside the reducer's win path, so re-read it whenever
+  // a case closes rather than duplicating the advance logic here.
+  useEffect(() => { if (state.completed) setStreak(loadStreak()) }, [state.completed])
+
   useEffect(() => {
     let paused = document.hidden
     const onVisibility = () => { paused = document.hidden }
@@ -415,7 +464,7 @@ export function useGame() {
     }
   }, [state.marks, state.elapsedSeconds, state.screen, state.completed, state.puzzle, state.mode, state.hintsLeft, state.selectedPerson])
 
-  const puzzles = useMemo(() => getAllPuzzles(), [])
+  const daily = useMemo(() => dailyPuzzle(puzzles), [puzzles])
 
   const placedOf = useMemo(() => {
     const map: Record<string, { row: number; col: number; locked?: boolean }> = {}
@@ -442,6 +491,9 @@ export function useGame() {
   return {
     ...state,
     puzzles,
+    catalogProgress,
+    daily,
+    streak,
     placedOf,
     conflicts,
     inProgress,
@@ -460,6 +512,7 @@ export function useGame() {
     redo: useCallback(() => dispatch({ type: 'REDO' }), []),
     toggleTimer: useCallback(() => dispatch({ type: 'TOGGLE_TIMER' }), []),
     hint: useCallback(() => dispatch({ type: 'HINT' }), []),
+    assist: useCallback(() => dispatch({ type: 'ASSIST' }), []),
     submit: useCallback(() => dispatch({ type: 'SUBMIT' }), []),
     dismissFeedback: useCallback(() => dispatch({ type: 'DISMISS_FEEDBACK' }), []),
   }

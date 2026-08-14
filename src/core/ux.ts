@@ -1,6 +1,7 @@
 import type {
   Cell,
   CellMark,
+  Clue,
   Difficulty,
   FurnitureType,
   GameMode,
@@ -185,44 +186,56 @@ function cellsForCorner(size: number): Cell[] {
   ]
 }
 
-/** Resolve the most direct board target represented by a person's clue. */
+const nonEmpty = (cells: Cell[]): ClueHighlight | null => cells.length ? { cells } : null
+
+/** The board target, if any, that one clue points at. */
+function highlightForClue(puzzle: Puzzle, clue: Clue): ClueHighlight | null {
+  switch (clue.kind) {
+    case 'room':
+      return { roomId: clue.roomId }
+    case 'onFurniture':
+    case 'onlyOnFurniture':
+    case 'besideFurniture':
+      return { furniture: clue.furniture }
+    case 'besideAny': {
+      const furniture = clue.furniture[0]
+      return furniture ? { furniture } : null
+    }
+    // An out-of-range coordinate produces no cells, and a highlight with an
+    // empty cell list would draw nothing while still reading as "located".
+    case 'row':
+      return nonEmpty(cellsForRow(puzzle.size, clue.row))
+    case 'col':
+      return nonEmpty(cellsForColumn(puzzle.size, clue.col))
+    case 'edge':
+      return nonEmpty(cellsForEdge(puzzle.size))
+    case 'corner':
+      return nonEmpty(cellsForCorner(puzzle.size))
+    default:
+      // Relational clues (besidePerson, sameRoomAs, direction) depend on where
+      // another suspect lands, so they have no fixed square to draw around.
+      return null
+  }
+}
+
+/**
+ * Every board target a person's clues point at.
+ *
+ * A suspect can carry more than one clue ("Beside the rug." + "In row 2."), and
+ * the previous single-target version returned only the first match in a fixed
+ * room > furniture > coordinate order, silently dropping the rest. Showing one
+ * of two constraints is worse than showing none: it reads as the whole answer.
+ */
+export function resolveClueHighlights(puzzle: Puzzle, personId: string): ClueHighlight[] {
+  return puzzle.clues
+    .filter(({ clue }) => clue.person === personId)
+    .map(({ clue }) => highlightForClue(puzzle, clue))
+    .filter((highlight): highlight is ClueHighlight => highlight !== null)
+}
+
+/** Back-compatible single-target accessor: the first drawable target. */
 export function resolveClueHighlight(puzzle: Puzzle, personId: string): ClueHighlight | null {
-  const clues = puzzle.clues.filter(({ clue }) => clue.person === personId)
-  if (!clues.length) return null
-
-  const roomClue = clues.find(({ clue }) => clue.kind === 'room')?.clue
-  if (roomClue?.kind === 'room') return { roomId: roomClue.roomId }
-
-  const furnitureClue = clues.find(({ clue }) =>
-    clue.kind === 'onFurniture'
-      || clue.kind === 'onlyOnFurniture'
-      || clue.kind === 'besideFurniture'
-      || clue.kind === 'besideAny'
-  )?.clue
-  if (furnitureClue?.kind === 'onFurniture' || furnitureClue?.kind === 'onlyOnFurniture' || furnitureClue?.kind === 'besideFurniture') {
-    return { furniture: furnitureClue.furniture }
-  }
-  if (furnitureClue?.kind === 'besideAny') {
-    const furniture = furnitureClue.furniture[0]
-    return furniture ? { furniture } : null
-  }
-
-  const coordinateClue = clues.find(({ clue }) =>
-    clue.kind === 'row'
-      || clue.kind === 'col'
-      || clue.kind === 'edge'
-      || clue.kind === 'corner'
-  )?.clue
-  if (!coordinateClue) return null
-
-  let cells: Cell[] = []
-  switch (coordinateClue.kind) {
-    case 'row': cells = cellsForRow(puzzle.size, coordinateClue.row); break
-    case 'col': cells = cellsForColumn(puzzle.size, coordinateClue.col); break
-    case 'edge': cells = cellsForEdge(puzzle.size); break
-    case 'corner': cells = cellsForCorner(puzzle.size); break
-  }
-  return cells.length ? { cells } : null
+  return resolveClueHighlights(puzzle, personId)[0] ?? null
 }
 
 function emptyCaseNotes(): CaseNotesStore {

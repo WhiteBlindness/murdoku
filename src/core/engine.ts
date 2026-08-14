@@ -172,6 +172,46 @@ export function countSolutions(p: Puzzle, cap = 2): number {
   return count
 }
 
+/**
+ * Cells that provably cannot hold anybody, given what is already placed.
+ *
+ * This is the Logic Assistant's entire reasoning, and it is deliberately the
+ * narrow, sound half of the deduction rather than a solver:
+ *
+ *   1. A cell whose row or column already holds a placed person is out, because
+ *      everybody occupies a distinct row and column.
+ *   2. A cell no remaining person could legally stand on — every one of them
+ *      fails their own unary clue there — is out.
+ *
+ * Both are things the player could derive with certainty from the rules alone,
+ * so marking them never spoils a deduction the player was entitled to make.
+ * Anything requiring a relational clue or a search is left to the player.
+ */
+export function deriveEliminations(p: Puzzle, placed: Placement): Cell[] {
+  const N = p.size
+  const usedRow = new Set<number>()
+  const usedCol = new Set<number>()
+  const taken = new Set<string>()
+  for (const cell of Object.values(placed)) {
+    if (!cell) continue
+    usedRow.add(cell.row)
+    usedCol.add(cell.col)
+    taken.add(`${cell.row},${cell.col}`)
+  }
+
+  const remaining = p.people.filter(person => !placed[person.id])
+  const out: Cell[] = []
+  for (let row = 0; row < N; row++) {
+    for (let col = 0; col < N; col++) {
+      if (taken.has(`${row},${col}`)) continue
+      if (usedRow.has(row) || usedCol.has(col)) { out.push({ row, col }); continue }
+      const cell = { row, col }
+      if (!remaining.some(person => unaryClueOk(p, person.id, cell))) out.push(cell)
+    }
+  }
+  return out
+}
+
 export function hasUniqueSolution(p: Puzzle): boolean {
   return countSolutions(p, 2) === 1
 }

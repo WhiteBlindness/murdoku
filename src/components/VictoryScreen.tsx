@@ -1,12 +1,18 @@
 import { motion, useReducedMotion } from 'framer-motion'
+import { useState, useEffect } from 'react'
 import type { Puzzle } from '../core/types'
 import { roomIdAt } from '../core/engine'
 import { getAllPuzzles } from '../core/catalog'
+import { buildShareText, copyShareText } from '../core/share'
+import { loadStreak } from '../core/daily'
 
 interface Props {
   puzzle: Puzzle
   murderer: string
   timer: string
+  /** Raw elapsed time. The share card should not be derived from the display
+   *  string: a future change to the timer's format would silently corrupt it. */
+  elapsedSeconds?: number
   hintsLeft: number
   completedIds: string[]
   onNext: () => void
@@ -14,7 +20,7 @@ interface Props {
   onHome: () => void
 }
 
-export default function VictoryScreen({ puzzle, murderer, timer, hintsLeft, completedIds, onNext, onPlayUnsolved, onHome }: Props) {
+export default function VictoryScreen({ puzzle, murderer, timer, elapsedSeconds, hintsLeft, completedIds, onNext, onPlayUnsolved, onHome }: Props) {
   const killer = puzzle.people.find(p => p.id === murderer)!
   const victim = puzzle.people.find(p => p.id === puzzle.victimId)!
   const room = puzzle.rooms.find(r => r.id === roomIdAt(puzzle, puzzle.solution[puzzle.victimId]))
@@ -24,6 +30,21 @@ export default function VictoryScreen({ puzzle, murderer, timer, hintsLeft, comp
   const unsolved = allPuzzles.find(p => !completedIds.includes(p.id) && p.id !== puzzle.id)
   const hasUnsolved = !hasNext && !!unsolved
   const reduceMotion = useReducedMotion()
+
+  // The real elapsed seconds when the caller supplies them; parsing the MM:SS
+  // display is only a fallback so the component still works standalone.
+  const [timerM, timerS] = timer.split(':').map(Number)
+  const seconds = elapsedSeconds ?? (timerM || 0) * 60 + (timerS || 0)
+  const streak = loadStreak()
+  const shareText = buildShareText({
+    caseNumber: puzzle.caseNumber,
+    difficulty: puzzle.difficulty,
+    size: puzzle.size,
+    seconds,
+    hintsLeft,
+    hintsTotal: 3,
+    streak: streak.current > 1 ? streak.current : undefined,
+  })
 
   // The stamp is the emotional payoff — a rubber verdict being pressed onto the
   // dossier. Spring with overshoot so it physically thuds. Reduced motion: plain
@@ -150,6 +171,10 @@ export default function VictoryScreen({ puzzle, murderer, timer, hintsLeft, comp
             ANOTHER CASE →
           </motion.button>
         )}
+
+        {/* Share result — spoiler-free card */}
+        <ShareButton shareText={shareText} />
+
         <motion.button
           whileTap={{ scale: 0.97 }}
           onClick={onHome}
@@ -166,8 +191,71 @@ export default function VictoryScreen({ puzzle, murderer, timer, hintsLeft, comp
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="font-mono text-paper-muted text-[9px] uppercase tracking-[0.25em] mb-1">{label}</p>
+      <p className="font-mono text-paper-muted text-[10px] uppercase tracking-[0.2em] mb-1">{label}</p>
       <p className="font-display text-paper text-sm font-semibold tracking-wide">{value}</p>
+    </div>
+  )
+}
+
+// ── Share button ─────────────────────────────────────────────────────────────
+// Never reveals murderer, victim, room, or clue text — buildShareText enforces
+// this; we only pass case number, shape, time, and hint pips.
+
+type ShareStatus = 'idle' | 'copied' | 'failed'
+
+function ShareButton({ shareText }: { shareText: string }) {
+  const [status, setStatus] = useState<ShareStatus>('idle')
+
+  // Reset "Copied" feedback after 2 s
+  useEffect(() => {
+    if (status !== 'copied') return
+    const t = setTimeout(() => setStatus('idle'), 2000)
+    return () => clearTimeout(t)
+  }, [status])
+
+  async function handleShare() {
+    const ok = await copyShareText(shareText)
+    setStatus(ok ? 'copied' : 'failed')
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <motion.button
+        whileTap={{ scale: 0.97 }}
+        type="button"
+        onClick={handleShare}
+        aria-label="Share result"
+        className="focus-ring w-full py-3 border border-border-strong font-display text-sm tracking-widest uppercase"
+        style={{
+          background: 'var(--color-bg-surface)',
+          color: 'var(--color-text-primary)',
+          boxShadow: 'var(--shadow-cut)',
+          minHeight: 44,
+        }}
+      >
+        {status === 'copied' ? 'Copied ✓' : 'Share result'}
+      </motion.button>
+
+      {status === 'failed' && (
+        <div className="flex flex-col gap-1">
+          <p className="font-mono text-[11px] text-text-secondary text-center">
+            Copy failed — select and copy below:
+          </p>
+          <textarea
+            readOnly
+            value={shareText}
+            aria-label="Share text — select and copy"
+            rows={5}
+            className="focus-ring w-full border border-border-strong bg-bg-inset px-3 py-2 font-mono resize-none"
+            style={{
+              fontSize: 11,
+              color: 'var(--color-text-primary)',
+              lineHeight: 1.5,
+            }}
+            onFocus={e => e.currentTarget.select()}
+          />
+        </div>
+      )}
     </div>
   )
 }

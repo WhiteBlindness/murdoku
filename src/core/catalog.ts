@@ -62,31 +62,85 @@ const UNIQUE_TITLES = [
   'Nobody Was Home',
 ]
 
-function build(): Puzzle[] {
-  const list: Puzzle[] = []
+/** Every case the catalog will contain, in order, before any is generated. */
+function plan(): { difficulty: Difficulty; index: number; caseNumber: number }[] {
+  const specs: { difficulty: Difficulty; index: number; caseNumber: number }[] = []
   let n = 1
   for (const { difficulty, count } of SPEC) {
-    for (let i = 0; i < count; i++) {
-      reseed(hash(difficulty) + i * 7919 + 13)
-      try {
-        const p = generatePuzzle(difficulty, `${slug(difficulty)}-${i + 1}`, `Case No. ${roman(n)}`)
-        p.title = UNIQUE_TITLES[(n - 1) % UNIQUE_TITLES.length]  // guarantee distinct titles
-        list.push(p)
-        n++
-      } catch { /* skip a rare failed seed */ }
-    }
+    for (let i = 0; i < count; i++) specs.push({ difficulty, index: i, caseNumber: n++ })
   }
-  return list
+  return specs
 }
 
-export function initCatalog(): void {
-  if (puzzles.length) return
+function buildOne(spec: { difficulty: Difficulty; index: number; caseNumber: number }): Puzzle | null {
+  reseed(hash(spec.difficulty) + spec.index * 7919 + 13)
+  try {
+    const p = generatePuzzle(
+      spec.difficulty,
+      `${slug(spec.difficulty)}-${spec.index + 1}`,
+      `Case No. ${roman(spec.caseNumber)}`,
+    )
+    // Guarantee distinct titles. Case numbers come from the plan, so a rare
+    // failed seed leaves a gap rather than renumbering everything after it.
+    p.title = UNIQUE_TITLES[(spec.caseNumber - 1) % UNIQUE_TITLES.length]
+    return p
+  } catch { return null }
+}
+
+function build(): Puzzle[] {
+  return plan().map(buildOne).filter((p): p is Puzzle => p !== null)
+}
+
+function readCache(): Puzzle[] | null {
   try {
     const cached = localStorage.getItem(KEY)
-    if (cached) { puzzles = JSON.parse(cached); if (puzzles.length) return }
-  } catch { /* ignore */ }
+    if (!cached) return null
+    const parsed: Puzzle[] = JSON.parse(cached)
+    return parsed.length ? parsed : null
+  } catch { return null }
+}
+
+function writeCache(list: Puzzle[]): void {
+  try { localStorage.setItem(KEY, JSON.stringify(list)) } catch { /* ignore */ }
+}
+
+/** Synchronous build. Kept for tests and for any caller that cannot await. */
+export function initCatalog(): void {
+  if (puzzles.length) return
+  const cached = readCache()
+  if (cached) { puzzles = cached; return }
   puzzles = build()
-  try { localStorage.setItem(KEY, JSON.stringify(puzzles)) } catch { /* ignore */ }
+  writeCache(puzzles)
+}
+
+/**
+ * Build the catalog without freezing the tab.
+ *
+ * A cold 60-case build costs a few seconds of solid CPU, and doing it inside
+ * render meant the player stared at a blank page until it finished. Generating
+ * one case per macrotask hands control back to the browser between cases, so
+ * the shell paints immediately and progress can be shown. A warm cache still
+ * resolves on the first tick.
+ */
+export async function initCatalogAsync(
+  onProgress?: (done: number, total: number) => void,
+): Promise<Puzzle[]> {
+  if (puzzles.length) return puzzles
+  const cached = readCache()
+  if (cached) { puzzles = cached; return puzzles }
+
+  const specs = plan()
+  const list: Puzzle[] = []
+  for (const spec of specs) {
+    const built = buildOne(spec)
+    if (built) list.push(built)
+    onProgress?.(list.length, specs.length)
+    // Yield to the event loop so input and paint are not starved.
+    await new Promise(resolve => setTimeout(resolve, 0))
+  }
+  puzzles = list
+  writeCache(puzzles)
+  return puzzles
 }
 
 export function getAllPuzzles(): Puzzle[] {

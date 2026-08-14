@@ -28,6 +28,27 @@ export interface ChangeEntry {
 export const CHANGELOG: ChangeEntry[] = [
   {
     date: '2026-08-14',
+    headline: 'A case of the day, and a record of your own',
+    detail:
+      'Everyone now gets the same case each day, and solving it builds a streak. Badges track the rest — your first case, an Expert, a Master, a solve with no hints spent, a case closed inside two minutes. Finishing a case also offers a share card that gives away nothing: case number, board size, your time, and how many hints you had left.',
+    tag: 'Feature',
+  },
+  {
+    date: '2026-08-14',
+    headline: 'An assistant that only states the obvious',
+    detail:
+      'A new Assist button crosses off every cell that is already impossible — the rows and columns taken by someone you have placed, and any cell no remaining suspect could stand on. It never places anyone and never reveals an answer, so it costs no hints. One undo takes the whole sweep back. Tools also have keys now: P to place, X to mark, D to draft, H for a hint, A for assist.',
+    tag: 'Feature',
+  },
+  {
+    date: '2026-08-14',
+    headline: 'The case index opens straight away',
+    detail:
+      'Building sixty cases for the first time used to hold the page blank while it worked. The index is now assembled one case at a time after the screen appears, with a progress line, so nothing is ever frozen. Suspects with two clues now get both squared off on the board instead of only the first.',
+    tag: 'Improvement',
+  },
+  {
+    date: '2026-08-14',
     headline: 'Sixty cases and a new Master tier',
     detail:
       'The case index grew from 27 to 60, including a new Master tier: 8x8 boards, more rooms, and no suspect ever handed a plain "In the Study" — everyone has to be triangulated. The solver behind the generator now searches the most-constrained suspect first, which made the whole catalog quicker to build than the old, smaller one.',

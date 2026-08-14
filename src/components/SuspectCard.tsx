@@ -101,7 +101,7 @@ export default function SuspectCard({
                  Uses danger-text for both the text and border so it reads in
                  light (parchment) as well as dark (obsidian). */
               <span
-                className="text-[8px] font-display font-bold uppercase tracking-[0.22em] px-1 py-[2px] leading-none flex-shrink-0"
+                className="text-[10px] font-display font-bold uppercase tracking-[0.14em] px-1 py-[2px] leading-none flex-shrink-0"
                 style={{
                   color: 'var(--color-danger-text)',
                   border: '1px solid color-mix(in srgb, var(--color-danger-text) 55%, transparent)',
