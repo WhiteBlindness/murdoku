@@ -1,8 +1,8 @@
-import { useState, useEffect, useId, useRef } from 'react'
+import { useState, useEffect, useId, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Undo2, Redo2, Trash2, Lightbulb, X as XIcon, MousePointerClick, Pencil,
-  HelpCircle, Eye, EyeOff, Info, Palette, Wand2,
+  HelpCircle, Eye, EyeOff, Info, Palette, Wand2, MoreHorizontal,
 } from 'lucide-react'
 import type { Puzzle, CellMark, GameMode, Furniture, FurnitureType } from '../core/types'
 import { resolveClueHighlights } from '../core/ux'
@@ -87,6 +87,9 @@ export default function GameScreen(props: Props) {
 
   const [help, setHelp] = useState(false)
   const [legend, setLegend] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuTriggerRef = useRef<HTMLButtonElement>(null)
+  const menuPanelRef = useRef<HTMLDivElement>(null)
   const [confirmClear, setConfirmClear] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
   const leaveTitleId = useId()
@@ -151,8 +154,43 @@ export default function GameScreen(props: Props) {
   // reaching for the toolbar under it on every single change, which is the most
   // repeated action in a solve. Draft is bound only in detective mode, where it
   // is the only mode that has the tool.
+  // Close the mobile overflow menu when focus leaves it entirely.
+  const closeMenu = useCallback(() => {
+    setMenuOpen(false)
+  }, [])
+
+  // Dismiss on outside click.
+  useEffect(() => {
+    if (!menuOpen) return
+    const onPointer = (e: MouseEvent) => {
+      const panel = menuPanelRef.current
+      const trigger = menuTriggerRef.current
+      if (panel && !panel.contains(e.target as Node) && trigger && !trigger.contains(e.target as Node)) {
+        closeMenu()
+      }
+    }
+    document.addEventListener('mousedown', onPointer)
+    return () => document.removeEventListener('mousedown', onPointer)
+  }, [menuOpen, closeMenu])
+
+  // Escape + focus return for the mobile menu.
+  useEffect(() => {
+    if (!menuOpen) return
+    // Move focus into the panel on open.
+    const firstFocusable = menuPanelRef.current?.querySelector<HTMLElement>('button, [href], input, [tabindex]:not([tabindex="-1"])')
+    firstFocusable?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeMenu()
+        menuTriggerRef.current?.focus()
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [menuOpen, closeMenu])
+
   const { onSetTool, onHint, onAssist } = props
-  const modalOpen = help || confirmClear || confirmLeave
+  const modalOpen = help || confirmClear || confirmLeave || menuOpen
   useEffect(() => {
     if (modalOpen) return
     const onKey = (event: KeyboardEvent) => {
@@ -230,68 +268,154 @@ export default function GameScreen(props: Props) {
         Below lg: single scrolling column.
       */}
 
-      {/* ── Header — spans all columns at lg+, full-width at mobile ────────── */}
-      {/*
-        Masthead geometry, one structure from 320px to ultrawide:
-
-          [ 1fr back ][ auto title ][ 1fr controls ]
-
-        The centre track is `auto`, so the title is sized by its own content and
-        sits optically centred; the two `1fr` rails absorb the slack evenly. The
-        previous `minmax(0,1fr)` centre track grew to fill every spare pixel,
-        which at 1920px produced a title stranded in ~1500px of empty band.
-
-        `items-center` + a fixed h-16 (the 64px documented in DESIGN.md) replaces
-        `items-stretch` + `min-h`, so no child can inflate the bar.
+      {/* ── Header — two genuinely different layouts ───────────────────────
+          MOBILE (below lg): compact three-slot bar — back | title+count | ⋯ menu
+          DESKTOP (lg+): mirrors the body's two-column grid exactly so each
+            header region aligns above what it names. col 1 (board) gets the
+            case identity; col 2 (dossier) gets status and controls.
+            Grid def is byte-identical to body's `minmax(0,1fr)_minmax(340px,420px)`
+            with no gap at lg so columns cannot drift from the content below.
       */}
       <header
-        className="case-masthead pt-safe grid grid-cols-[1fr_auto_1fr] items-center gap-1 px-2 sm:px-3 h-16 flex-shrink-0 lg:col-span-full"
+        className="case-masthead pt-safe flex-shrink-0 h-16 items-center
+          grid grid-cols-[auto_1fr_auto] gap-0 px-2
+          lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:px-0 lg:gap-0"
         style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
-        {/* Back — stencil label. `justify-self-start` keeps it pinned left while
-            its 1fr rail absorbs slack. */}
+
+        {/* ── MOBILE: back button ── DESKTOP: hidden (back lives in col-1 below) */}
         <button
           onClick={() => hasProgress ? setConfirmLeave(true) : props.onBack()}
-          className="focus-ring justify-self-start text-text-muted font-mono text-xs px-2 h-11 flex items-center whitespace-nowrap tracking-widest uppercase hover:text-text-secondary transition-colors"
+          className="focus-ring lg:hidden text-text-muted font-mono text-xs px-2 h-11 flex items-center whitespace-nowrap tracking-widest uppercase hover:text-text-secondary transition-colors"
         >
           ← Cases
         </button>
 
-        {/* Case title + metadata — content-sized and capped so a long title
-            truncates instead of shoving the controls off a 320px screen. */}
-        <div className="text-center min-w-0 max-w-[min(60vw,460px)] px-2 flex flex-col justify-center">
-          <h1 className="font-display text-text-primary text-sm sm:text-base font-bold leading-snug uppercase tracking-wide truncate">
-            {puzzle.title}
-          </h1>
-          <div className="flex items-center justify-center gap-2 mt-0.5">
-            <span
-              className="text-[10px] font-mono tracking-[0.18em] whitespace-nowrap"
-              style={{ color: DIFF_COLOR[puzzle.difficulty] }}
-            >
-              {puzzle.difficulty.toUpperCase()}
-            </span>
-            <span className="text-text-muted text-[10px] font-mono whitespace-nowrap tracking-wider">
-              {puzzle.size}×{puzzle.size}
-            </span>
-            <span
-              className="text-[10px] font-mono tracking-[0.15em] px-1.5 whitespace-nowrap"
-              style={{
-                color: detective ? 'var(--color-accent-text)' : 'var(--color-text-muted)',
-                background: detective ? 'color-mix(in srgb, var(--color-accent) 14%, transparent)' : 'transparent',
-              }}
-            >
-              {detective ? 'DETECTIVE' : 'CLASSIC'}
-            </span>
+        {/* ── MOBILE col 2: title + count (centred in remaining space)
+            ── DESKTOP col 1: back + centred title, filling the board column */}
+        {/* The desktop back button inside this cell is `absolute left-0`, so
+            centring here centres the TITLE on the board column rather than on
+            the viewport — the viewport centring is what put the title 210px to
+            the right of the board it names. */}
+        <div className="min-w-0 flex items-center justify-center lg:h-full lg:px-3 lg:relative">
+
+          {/* Back — desktop only, absolute-left so it doesn't push the title off-centre */}
+          <button
+            onClick={() => hasProgress ? setConfirmLeave(true) : props.onBack()}
+            className="focus-ring hidden lg:flex text-text-muted font-mono text-xs px-2 h-11 items-center whitespace-nowrap tracking-widest uppercase hover:text-text-secondary transition-colors absolute left-0"
+          >
+            ← Cases
+          </button>
+
+          {/* Title block — centred within col 1 on desktop, centred in mobile track */}
+          <div className="text-center min-w-0 px-1 flex flex-col justify-center">
+            <h1 className="font-display text-text-primary text-sm sm:text-base font-bold leading-snug uppercase tracking-wide truncate">
+              {puzzle.title}
+            </h1>
+            {/* Badges — visible sm+ on mobile; always visible on desktop */}
+            <div className="hidden sm:flex lg:flex items-center justify-center gap-2 mt-0.5">
+              <span
+                className="text-[10px] font-mono tracking-[0.18em] whitespace-nowrap"
+                style={{ color: DIFF_COLOR[puzzle.difficulty] }}
+              >
+                {puzzle.difficulty.toUpperCase()}
+              </span>
+              <span className="text-text-muted text-[10px] font-mono whitespace-nowrap tracking-wider">
+                {puzzle.size}×{puzzle.size}
+              </span>
+              <span
+                className="text-[10px] font-mono tracking-[0.15em] px-1.5 whitespace-nowrap"
+                style={{
+                  color: detective ? 'var(--color-accent-text)' : 'var(--color-text-muted)',
+                  background: detective ? 'color-mix(in srgb, var(--color-accent) 14%, transparent)' : 'transparent',
+                }}
+              >
+                {detective ? 'DETECTIVE' : 'CLASSIC'}
+              </span>
+            </div>
           </div>
+
+          {/* Placement count — mobile only, inline beside title */}
+          <span
+            className="lg:hidden ml-2 flex-shrink-0 font-mono text-[11px] tabular-nums whitespace-nowrap px-1.5 py-0.5 leading-none"
+            title="Suspects placed"
+            style={{
+              color: 'var(--color-accent-text)',
+              border: '1px solid color-mix(in srgb, var(--color-accent) 42%, transparent)',
+            }}
+          >
+            <span className="sr-only">Suspects placed: </span>{placedCount}/{puzzle.people.length}
+          </span>
         </div>
 
-        {/* Right rail: placement count, timer, controls.
-            "Objective / Reconstruct every alibi" was removed — it is static
-            copy that never changes during a case, and it was the widest thing
-            in the bar. The live count is what the player actually reads, so it
-            is promoted and now survives down to 320px instead of vanishing
-            under `md:`. */}
-        <div className="flex items-center justify-end gap-1 sm:gap-1.5 justify-self-end">
+        {/* ── MOBILE col 3: overflow menu trigger ── DESKTOP: hidden */}
+        <div className="lg:hidden relative flex-shrink-0">
+          <button
+            ref={menuTriggerRef}
+            onClick={() => setMenuOpen(v => !v)}
+            aria-label="More options"
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            className="focus-ring text-text-muted w-11 h-11 flex items-center justify-center hover:text-text-secondary transition-colors"
+          >
+            <MoreHorizontal size={20} />
+          </button>
+
+          {/* Mobile overflow panel — absolutely positioned below trigger.
+              Rendered with a plain conditional, NOT AnimatePresence. Measured
+              in a real 390px viewport: wrapped in AnimatePresence the exit
+              never completed, so the panel stayed in the DOM at opacity 0 with
+              visibility:visible and tabIndex 0 items — invisible, but still
+              focusable and still exposed to screen readers, so tabbing through
+              the header landed on phantom "Hide timer" / "How to play"
+              buttons. A 140ms fade is not worth a keyboard trap. */}
+          {menuOpen && (
+            <div
+                ref={menuPanelRef}
+                role="menu"
+                className="absolute right-0 top-[calc(100%+4px)] z-40 min-w-[200px] border bg-bg-surface py-1"
+                style={{
+                  borderColor: 'var(--color-border-strong)',
+                  boxShadow: 'var(--shadow-elevated)',
+                }}
+              >
+                {/* Timer readout */}
+                <div className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-border-subtle)' }}>
+                  <p className="text-[10px] font-mono text-text-muted tracking-[0.2em] uppercase mb-1">Time elapsed</p>
+                  {!hideTimer ? (
+                    <span className="font-mono text-accent-text text-xl tabular-nums tracking-widest">{timer}</span>
+                  ) : (
+                    <span className="font-mono text-text-muted text-xl tracking-widest">— : — —</span>
+                  )}
+                </div>
+
+                {/* Toggle timer action */}
+                <button
+                  role="menuitem"
+                  onClick={() => { props.onToggleTimer(); closeMenu() }}
+                  aria-label={hideTimer ? 'Show timer' : 'Hide timer'}
+                  className="focus-ring w-full text-left px-4 py-3 flex items-center gap-3 text-[13px] font-mono text-text-secondary hover:text-text-primary hover:bg-bg-elevated transition-colors"
+                >
+                  {hideTimer ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {hideTimer ? 'Show timer' : 'Hide timer'}
+                </button>
+
+                {/* How to play action */}
+                <button
+                  role="menuitem"
+                  onClick={() => { setHelp(true); closeMenu() }}
+                  aria-label="How to play"
+                  className="focus-ring w-full text-left px-4 py-3 flex items-center gap-3 text-[13px] font-mono text-text-secondary hover:text-text-primary hover:bg-bg-elevated transition-colors"
+                >
+                  <HelpCircle size={16} />
+                  How to play
+                </button>
+            </div>
+          )}
+        </div>
+
+        {/* ── DESKTOP col 2: placement count + timer + controls (dossier column) */}
+        <div className="hidden lg:flex items-center justify-end gap-1.5 px-3 h-full border-l" style={{ borderColor: 'var(--color-border-subtle)' }}>
           <span
             className="font-mono text-[11px] tabular-nums whitespace-nowrap px-1.5 py-0.5 leading-none"
             title="Suspects placed"
@@ -303,7 +427,7 @@ export default function GameScreen(props: Props) {
             <span className="sr-only">Suspects placed: </span>{placedCount}/{puzzle.people.length}
           </span>
           {!hideTimer && (
-            <span className="font-mono text-accent-text text-sm tabular-nums tracking-widest hidden sm:inline">
+            <span className="font-mono text-accent-text text-sm tabular-nums tracking-widest">
               {timer}
             </span>
           )}
