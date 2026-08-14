@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-12T23:41:32.445Z",
+  "generatedAt": "2026-08-14T10:16:38.000Z",
   "title": "Design System: Alibi",
   "extensions": {
     "colorMeta": {
@@ -8,156 +8,442 @@
         "role": "neutral",
         "displayName": "Magnetic Ground",
         "canonical": "var(--color-bg-base)",
-        "tonalRamp": ["oklch(from var(--color-bg-base) 0.15 c h)", "oklch(from var(--color-bg-base) 0.27 c h)", "oklch(from var(--color-bg-base) 0.39 c h)", "oklch(from var(--color-bg-base) 0.51 c h)", "oklch(from var(--color-bg-base) 0.63 c h)", "oklch(from var(--color-bg-base) 0.75 c h)", "oklch(from var(--color-bg-base) 0.87 c h)", "oklch(from var(--color-bg-base) 0.95 c h)"]
+        "tonalRamp": [
+          "oklch(from var(--color-bg-base) 0.15 c h)",
+          "oklch(from var(--color-bg-base) 0.27 c h)",
+          "oklch(from var(--color-bg-base) 0.39 c h)",
+          "oklch(from var(--color-bg-base) 0.51 c h)",
+          "oklch(from var(--color-bg-base) 0.63 c h)",
+          "oklch(from var(--color-bg-base) 0.75 c h)",
+          "oklch(from var(--color-bg-base) 0.87 c h)",
+          "oklch(from var(--color-bg-base) 0.95 c h)"
+        ]
       },
       "background-surface": {
         "role": "neutral",
         "displayName": "Instrument Surface",
         "canonical": "var(--color-bg-surface)",
-        "tonalRamp": ["oklch(from var(--color-bg-surface) 0.15 c h)", "oklch(from var(--color-bg-surface) 0.27 c h)", "oklch(from var(--color-bg-surface) 0.39 c h)", "oklch(from var(--color-bg-surface) 0.51 c h)", "oklch(from var(--color-bg-surface) 0.63 c h)", "oklch(from var(--color-bg-surface) 0.75 c h)", "oklch(from var(--color-bg-surface) 0.87 c h)", "oklch(from var(--color-bg-surface) 0.95 c h)"]
+        "tonalRamp": [
+          "oklch(from var(--color-bg-surface) 0.15 c h)",
+          "oklch(from var(--color-bg-surface) 0.27 c h)",
+          "oklch(from var(--color-bg-surface) 0.39 c h)",
+          "oklch(from var(--color-bg-surface) 0.51 c h)",
+          "oklch(from var(--color-bg-surface) 0.63 c h)",
+          "oklch(from var(--color-bg-surface) 0.75 c h)",
+          "oklch(from var(--color-bg-surface) 0.87 c h)",
+          "oklch(from var(--color-bg-surface) 0.95 c h)"
+        ]
       },
       "background-elevated": {
         "role": "neutral",
         "displayName": "Selected Plate",
         "canonical": "var(--color-bg-elevated)",
-        "tonalRamp": ["oklch(from var(--color-bg-elevated) 0.15 c h)", "oklch(from var(--color-bg-elevated) 0.27 c h)", "oklch(from var(--color-bg-elevated) 0.39 c h)", "oklch(from var(--color-bg-elevated) 0.51 c h)", "oklch(from var(--color-bg-elevated) 0.63 c h)", "oklch(from var(--color-bg-elevated) 0.75 c h)", "oklch(from var(--color-bg-elevated) 0.87 c h)", "oklch(from var(--color-bg-elevated) 0.95 c h)"]
+        "tonalRamp": [
+          "oklch(from var(--color-bg-elevated) 0.15 c h)",
+          "oklch(from var(--color-bg-elevated) 0.27 c h)",
+          "oklch(from var(--color-bg-elevated) 0.39 c h)",
+          "oklch(from var(--color-bg-elevated) 0.51 c h)",
+          "oklch(from var(--color-bg-elevated) 0.63 c h)",
+          "oklch(from var(--color-bg-elevated) 0.75 c h)",
+          "oklch(from var(--color-bg-elevated) 0.87 c h)",
+          "oklch(from var(--color-bg-elevated) 0.95 c h)"
+        ]
       },
       "background-inset": {
         "role": "neutral",
         "displayName": "Film Gate",
         "canonical": "var(--color-bg-inset)",
-        "tonalRamp": ["oklch(from var(--color-bg-inset) 0.15 c h)", "oklch(from var(--color-bg-inset) 0.27 c h)", "oklch(from var(--color-bg-inset) 0.39 c h)", "oklch(from var(--color-bg-inset) 0.51 c h)", "oklch(from var(--color-bg-inset) 0.63 c h)", "oklch(from var(--color-bg-inset) 0.75 c h)", "oklch(from var(--color-bg-inset) 0.87 c h)", "oklch(from var(--color-bg-inset) 0.95 c h)"]
+        "tonalRamp": [
+          "oklch(from var(--color-bg-inset) 0.15 c h)",
+          "oklch(from var(--color-bg-inset) 0.27 c h)",
+          "oklch(from var(--color-bg-inset) 0.39 c h)",
+          "oklch(from var(--color-bg-inset) 0.51 c h)",
+          "oklch(from var(--color-bg-inset) 0.63 c h)",
+          "oklch(from var(--color-bg-inset) 0.75 c h)",
+          "oklch(from var(--color-bg-inset) 0.87 c h)",
+          "oklch(from var(--color-bg-inset) 0.95 c h)"
+        ]
       },
       "border-subtle": {
         "role": "neutral",
         "displayName": "Decorative Hairline",
         "canonical": "var(--color-border-subtle)",
-        "tonalRamp": ["oklch(from var(--color-border-subtle) 0.15 c h)", "oklch(from var(--color-border-subtle) 0.27 c h)", "oklch(from var(--color-border-subtle) 0.39 c h)", "oklch(from var(--color-border-subtle) 0.51 c h)", "oklch(from var(--color-border-subtle) 0.63 c h)", "oklch(from var(--color-border-subtle) 0.75 c h)", "oklch(from var(--color-border-subtle) 0.87 c h)", "oklch(from var(--color-border-subtle) 0.95 c h)"]
+        "tonalRamp": [
+          "oklch(from var(--color-border-subtle) 0.15 c h)",
+          "oklch(from var(--color-border-subtle) 0.27 c h)",
+          "oklch(from var(--color-border-subtle) 0.39 c h)",
+          "oklch(from var(--color-border-subtle) 0.51 c h)",
+          "oklch(from var(--color-border-subtle) 0.63 c h)",
+          "oklch(from var(--color-border-subtle) 0.75 c h)",
+          "oklch(from var(--color-border-subtle) 0.87 c h)",
+          "oklch(from var(--color-border-subtle) 0.95 c h)"
+        ]
       },
       "border-strong": {
         "role": "neutral",
         "displayName": "Strong Edge",
         "canonical": "var(--color-border-strong)",
-        "tonalRamp": ["oklch(from var(--color-border-strong) 0.15 c h)", "oklch(from var(--color-border-strong) 0.27 c h)", "oklch(from var(--color-border-strong) 0.39 c h)", "oklch(from var(--color-border-strong) 0.51 c h)", "oklch(from var(--color-border-strong) 0.63 c h)", "oklch(from var(--color-border-strong) 0.75 c h)", "oklch(from var(--color-border-strong) 0.87 c h)", "oklch(from var(--color-border-strong) 0.95 c h)"]
+        "tonalRamp": [
+          "oklch(from var(--color-border-strong) 0.15 c h)",
+          "oklch(from var(--color-border-strong) 0.27 c h)",
+          "oklch(from var(--color-border-strong) 0.39 c h)",
+          "oklch(from var(--color-border-strong) 0.51 c h)",
+          "oklch(from var(--color-border-strong) 0.63 c h)",
+          "oklch(from var(--color-border-strong) 0.75 c h)",
+          "oklch(from var(--color-border-strong) 0.87 c h)",
+          "oklch(from var(--color-border-strong) 0.95 c h)"
+        ]
       },
       "text-primary": {
         "role": "neutral",
         "displayName": "Bone Copy",
         "canonical": "var(--color-text-primary)",
-        "tonalRamp": ["oklch(from var(--color-text-primary) 0.15 c h)", "oklch(from var(--color-text-primary) 0.27 c h)", "oklch(from var(--color-text-primary) 0.39 c h)", "oklch(from var(--color-text-primary) 0.51 c h)", "oklch(from var(--color-text-primary) 0.63 c h)", "oklch(from var(--color-text-primary) 0.75 c h)", "oklch(from var(--color-text-primary) 0.87 c h)", "oklch(from var(--color-text-primary) 0.95 c h)"]
+        "tonalRamp": [
+          "oklch(from var(--color-text-primary) 0.15 c h)",
+          "oklch(from var(--color-text-primary) 0.27 c h)",
+          "oklch(from var(--color-text-primary) 0.39 c h)",
+          "oklch(from var(--color-text-primary) 0.51 c h)",
+          "oklch(from var(--color-text-primary) 0.63 c h)",
+          "oklch(from var(--color-text-primary) 0.75 c h)",
+          "oklch(from var(--color-text-primary) 0.87 c h)",
+          "oklch(from var(--color-text-primary) 0.95 c h)"
+        ]
       },
       "text-secondary": {
         "role": "neutral",
         "displayName": "Evidence Copy",
         "canonical": "var(--color-text-secondary)",
-        "tonalRamp": ["oklch(from var(--color-text-secondary) 0.15 c h)", "oklch(from var(--color-text-secondary) 0.27 c h)", "oklch(from var(--color-text-secondary) 0.39 c h)", "oklch(from var(--color-text-secondary) 0.51 c h)", "oklch(from var(--color-text-secondary) 0.63 c h)", "oklch(from var(--color-text-secondary) 0.75 c h)", "oklch(from var(--color-text-secondary) 0.87 c h)", "oklch(from var(--color-text-secondary) 0.95 c h)"]
+        "tonalRamp": [
+          "oklch(from var(--color-text-secondary) 0.15 c h)",
+          "oklch(from var(--color-text-secondary) 0.27 c h)",
+          "oklch(from var(--color-text-secondary) 0.39 c h)",
+          "oklch(from var(--color-text-secondary) 0.51 c h)",
+          "oklch(from var(--color-text-secondary) 0.63 c h)",
+          "oklch(from var(--color-text-secondary) 0.75 c h)",
+          "oklch(from var(--color-text-secondary) 0.87 c h)",
+          "oklch(from var(--color-text-secondary) 0.95 c h)"
+        ]
       },
       "text-muted": {
         "role": "neutral",
         "displayName": "Metadata Copy",
         "canonical": "var(--color-text-muted)",
-        "tonalRamp": ["oklch(from var(--color-text-muted) 0.15 c h)", "oklch(from var(--color-text-muted) 0.27 c h)", "oklch(from var(--color-text-muted) 0.39 c h)", "oklch(from var(--color-text-muted) 0.51 c h)", "oklch(from var(--color-text-muted) 0.63 c h)", "oklch(from var(--color-text-muted) 0.75 c h)", "oklch(from var(--color-text-muted) 0.87 c h)", "oklch(from var(--color-text-muted) 0.95 c h)"]
+        "tonalRamp": [
+          "oklch(from var(--color-text-muted) 0.15 c h)",
+          "oklch(from var(--color-text-muted) 0.27 c h)",
+          "oklch(from var(--color-text-muted) 0.39 c h)",
+          "oklch(from var(--color-text-muted) 0.51 c h)",
+          "oklch(from var(--color-text-muted) 0.63 c h)",
+          "oklch(from var(--color-text-muted) 0.75 c h)",
+          "oklch(from var(--color-text-muted) 0.87 c h)",
+          "oklch(from var(--color-text-muted) 0.95 c h)"
+        ]
       },
       "projector-amber": {
         "role": "primary",
         "displayName": "Projector Amber",
         "canonical": "var(--color-accent)",
-        "tonalRamp": ["oklch(from var(--color-accent) 0.15 c h)", "oklch(from var(--color-accent) 0.27 c h)", "oklch(from var(--color-accent) 0.39 c h)", "oklch(from var(--color-accent) 0.51 c h)", "oklch(from var(--color-accent) 0.63 c h)", "oklch(from var(--color-accent) 0.75 c h)", "oklch(from var(--color-accent) 0.87 c h)", "oklch(from var(--color-accent) 0.95 c h)"]
+        "tonalRamp": [
+          "oklch(from var(--color-accent) 0.15 c h)",
+          "oklch(from var(--color-accent) 0.27 c h)",
+          "oklch(from var(--color-accent) 0.39 c h)",
+          "oklch(from var(--color-accent) 0.51 c h)",
+          "oklch(from var(--color-accent) 0.63 c h)",
+          "oklch(from var(--color-accent) 0.75 c h)",
+          "oklch(from var(--color-accent) 0.87 c h)",
+          "oklch(from var(--color-accent) 0.95 c h)"
+        ]
       },
       "projector-focus": {
         "role": "primary",
         "displayName": "Projector Focus",
         "canonical": "var(--color-accent-strong)",
-        "tonalRamp": ["oklch(from var(--color-accent-strong) 0.15 c h)", "oklch(from var(--color-accent-strong) 0.27 c h)", "oklch(from var(--color-accent-strong) 0.39 c h)", "oklch(from var(--color-accent-strong) 0.51 c h)", "oklch(from var(--color-accent-strong) 0.63 c h)", "oklch(from var(--color-accent-strong) 0.75 c h)", "oklch(from var(--color-accent-strong) 0.87 c h)", "oklch(from var(--color-accent-strong) 0.95 c h)"]
+        "tonalRamp": [
+          "oklch(from var(--color-accent-strong) 0.15 c h)",
+          "oklch(from var(--color-accent-strong) 0.27 c h)",
+          "oklch(from var(--color-accent-strong) 0.39 c h)",
+          "oklch(from var(--color-accent-strong) 0.51 c h)",
+          "oklch(from var(--color-accent-strong) 0.63 c h)",
+          "oklch(from var(--color-accent-strong) 0.75 c h)",
+          "oklch(from var(--color-accent-strong) 0.87 c h)",
+          "oklch(from var(--color-accent-strong) 0.95 c h)"
+        ]
       },
       "ink-on-amber": {
         "role": "neutral",
         "displayName": "Ink on Amber",
         "canonical": "var(--color-on-accent)",
-        "tonalRamp": ["oklch(from var(--color-on-accent) 0.15 c h)", "oklch(from var(--color-on-accent) 0.27 c h)", "oklch(from var(--color-on-accent) 0.39 c h)", "oklch(from var(--color-on-accent) 0.51 c h)", "oklch(from var(--color-on-accent) 0.63 c h)", "oklch(from var(--color-on-accent) 0.75 c h)", "oklch(from var(--color-on-accent) 0.87 c h)", "oklch(from var(--color-on-accent) 0.95 c h)"]
+        "tonalRamp": [
+          "oklch(from var(--color-on-accent) 0.15 c h)",
+          "oklch(from var(--color-on-accent) 0.27 c h)",
+          "oklch(from var(--color-on-accent) 0.39 c h)",
+          "oklch(from var(--color-on-accent) 0.51 c h)",
+          "oklch(from var(--color-on-accent) 0.63 c h)",
+          "oklch(from var(--color-on-accent) 0.75 c h)",
+          "oklch(from var(--color-on-accent) 0.87 c h)",
+          "oklch(from var(--color-on-accent) 0.95 c h)"
+        ]
       },
       "oxblood": {
         "role": "tertiary",
         "displayName": "Oxblood Conflict",
         "canonical": "var(--color-danger)",
-        "tonalRamp": ["oklch(from var(--color-danger) 0.15 c h)", "oklch(from var(--color-danger) 0.27 c h)", "oklch(from var(--color-danger) 0.39 c h)", "oklch(from var(--color-danger) 0.51 c h)", "oklch(from var(--color-danger) 0.63 c h)", "oklch(from var(--color-danger) 0.75 c h)", "oklch(from var(--color-danger) 0.87 c h)", "oklch(from var(--color-danger) 0.95 c h)"]
+        "tonalRamp": [
+          "oklch(from var(--color-danger) 0.15 c h)",
+          "oklch(from var(--color-danger) 0.27 c h)",
+          "oklch(from var(--color-danger) 0.39 c h)",
+          "oklch(from var(--color-danger) 0.51 c h)",
+          "oklch(from var(--color-danger) 0.63 c h)",
+          "oklch(from var(--color-danger) 0.75 c h)",
+          "oklch(from var(--color-danger) 0.87 c h)",
+          "oklch(from var(--color-danger) 0.95 c h)"
+        ]
       },
       "danger-copy": {
         "role": "tertiary",
         "displayName": "Danger Copy",
         "canonical": "var(--color-danger-text)",
-        "tonalRamp": ["oklch(from var(--color-danger-text) 0.15 c h)", "oklch(from var(--color-danger-text) 0.27 c h)", "oklch(from var(--color-danger-text) 0.39 c h)", "oklch(from var(--color-danger-text) 0.51 c h)", "oklch(from var(--color-danger-text) 0.63 c h)", "oklch(from var(--color-danger-text) 0.75 c h)", "oklch(from var(--color-danger-text) 0.87 c h)", "oklch(from var(--color-danger-text) 0.95 c h)"]
+        "tonalRamp": [
+          "oklch(from var(--color-danger-text) 0.15 c h)",
+          "oklch(from var(--color-danger-text) 0.27 c h)",
+          "oklch(from var(--color-danger-text) 0.39 c h)",
+          "oklch(from var(--color-danger-text) 0.51 c h)",
+          "oklch(from var(--color-danger-text) 0.63 c h)",
+          "oklch(from var(--color-danger-text) 0.75 c h)",
+          "oklch(from var(--color-danger-text) 0.87 c h)",
+          "oklch(from var(--color-danger-text) 0.95 c h)"
+        ]
       },
       "bone-evidence": {
         "role": "secondary",
         "displayName": "Bone Evidence",
         "canonical": "#D8C8A4",
-        "tonalRamp": ["oklch(0.15 0.035 82)", "oklch(0.27 0.035 82)", "oklch(0.39 0.035 82)", "oklch(0.51 0.035 82)", "oklch(0.63 0.035 82)", "oklch(0.75 0.035 82)", "oklch(0.87 0.035 82)", "oklch(0.95 0.035 82)"]
+        "tonalRamp": [
+          "oklch(0.15 0.035 82)",
+          "oklch(0.27 0.035 82)",
+          "oklch(0.39 0.035 82)",
+          "oklch(0.51 0.035 82)",
+          "oklch(0.63 0.035 82)",
+          "oklch(0.75 0.035 82)",
+          "oklch(0.87 0.035 82)",
+          "oklch(0.95 0.035 82)"
+        ]
       },
       "evidence-ink": {
         "role": "neutral",
         "displayName": "Evidence Ink",
         "canonical": "#19150F",
-        "tonalRamp": ["oklch(0.15 0.015 75)", "oklch(0.27 0.015 75)", "oklch(0.39 0.015 75)", "oklch(0.51 0.015 75)", "oklch(0.63 0.015 75)", "oklch(0.75 0.015 75)", "oklch(0.87 0.015 75)", "oklch(0.95 0.015 75)"]
+        "tonalRamp": [
+          "oklch(0.15 0.015 75)",
+          "oklch(0.27 0.015 75)",
+          "oklch(0.39 0.015 75)",
+          "oklch(0.51 0.015 75)",
+          "oklch(0.63 0.015 75)",
+          "oklch(0.75 0.015 75)",
+          "oklch(0.87 0.015 75)",
+          "oklch(0.95 0.015 75)"
+        ]
       },
       "board-wall": {
         "role": "neutral",
         "displayName": "Aubergine Divider",
         "canonical": "var(--board-wall)",
-        "tonalRamp": ["oklch(from var(--board-wall) 0.15 c h)", "oklch(from var(--board-wall) 0.27 c h)", "oklch(from var(--board-wall) 0.39 c h)", "oklch(from var(--board-wall) 0.51 c h)", "oklch(from var(--board-wall) 0.63 c h)", "oklch(from var(--board-wall) 0.75 c h)", "oklch(from var(--board-wall) 0.87 c h)", "oklch(from var(--board-wall) 0.95 c h)"]
+        "tonalRamp": [
+          "oklch(from var(--board-wall) 0.15 c h)",
+          "oklch(from var(--board-wall) 0.27 c h)",
+          "oklch(from var(--board-wall) 0.39 c h)",
+          "oklch(from var(--board-wall) 0.51 c h)",
+          "oklch(from var(--board-wall) 0.63 c h)",
+          "oklch(from var(--board-wall) 0.75 c h)",
+          "oklch(from var(--board-wall) 0.87 c h)",
+          "oklch(from var(--board-wall) 0.95 c h)"
+        ]
       },
       "miniature-contour": {
         "role": "neutral",
         "displayName": "Espresso Illustration Ink",
         "canonical": "#241820",
-        "tonalRamp": ["oklch(0.15 0.025 340)", "oklch(0.27 0.025 340)", "oklch(0.39 0.025 340)", "oklch(0.51 0.025 340)", "oklch(0.63 0.025 340)", "oklch(0.75 0.025 340)", "oklch(0.87 0.025 340)", "oklch(0.95 0.025 340)"]
+        "tonalRamp": [
+          "oklch(0.15 0.025 340)",
+          "oklch(0.27 0.025 340)",
+          "oklch(0.39 0.025 340)",
+          "oklch(0.51 0.025 340)",
+          "oklch(0.63 0.025 340)",
+          "oklch(0.75 0.025 340)",
+          "oklch(0.87 0.025 340)",
+          "oklch(0.95 0.025 340)"
+        ]
       },
       "miniature-contour-deep": {
         "role": "neutral",
         "displayName": "Deep Illustration Ink",
         "canonical": "#1A1A1A",
-        "tonalRamp": ["oklch(0.15 0 0)", "oklch(0.27 0 0)", "oklch(0.39 0 0)", "oklch(0.51 0 0)", "oklch(0.63 0 0)", "oklch(0.75 0 0)", "oklch(0.87 0 0)", "oklch(0.95 0 0)"]
+        "tonalRamp": [
+          "oklch(0.15 0 0)",
+          "oklch(0.27 0 0)",
+          "oklch(0.39 0 0)",
+          "oklch(0.51 0 0)",
+          "oklch(0.63 0 0)",
+          "oklch(0.75 0 0)",
+          "oklch(0.87 0 0)",
+          "oklch(0.95 0 0)"
+        ]
       },
       "miniature-seam": {
         "role": "neutral",
         "displayName": "Mahogany Seam",
         "canonical": "#654246",
-        "tonalRamp": ["oklch(0.15 0.035 15)", "oklch(0.27 0.035 15)", "oklch(0.39 0.035 15)", "oklch(0.51 0.035 15)", "oklch(0.63 0.035 15)", "oklch(0.75 0.035 15)", "oklch(0.87 0.035 15)", "oklch(0.95 0.035 15)"]
+        "tonalRamp": [
+          "oklch(0.15 0.035 15)",
+          "oklch(0.27 0.035 15)",
+          "oklch(0.39 0.035 15)",
+          "oklch(0.51 0.035 15)",
+          "oklch(0.63 0.035 15)",
+          "oklch(0.75 0.035 15)",
+          "oklch(0.87 0.035 15)",
+          "oklch(0.95 0.035 15)"
+        ]
       },
       "miniature-highlight": {
         "role": "secondary",
         "displayName": "Muted Brass Highlight",
         "canonical": "#D8B777",
-        "tonalRamp": ["oklch(0.15 0.08 82)", "oklch(0.27 0.08 82)", "oklch(0.39 0.08 82)", "oklch(0.51 0.08 82)", "oklch(0.63 0.08 82)", "oklch(0.75 0.08 82)", "oklch(0.87 0.08 82)", "oklch(0.95 0.08 82)"]
+        "tonalRamp": [
+          "oklch(0.15 0.08 82)",
+          "oklch(0.27 0.08 82)",
+          "oklch(0.39 0.08 82)",
+          "oklch(0.51 0.08 82)",
+          "oklch(0.63 0.08 82)",
+          "oklch(0.75 0.08 82)",
+          "oklch(0.87 0.08 82)",
+          "oklch(0.95 0.08 82)"
+        ]
       }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "The ALIBI masthead only." },
-      "headline": { "displayName": "Headline", "purpose": "Case titles and evidence subjects." },
-      "action": { "displayName": "Action", "purpose": "Tool and command labels." },
-      "evidence": { "displayName": "Evidence", "purpose": "Clues, notes, timers, counts, and explanatory copy." },
-      "technical-label": { "displayName": "Technical Label", "purpose": "Compact metadata adjacent to a meaningful value or section." },
-      "ui": { "displayName": "UI", "purpose": "Dense utility controls where monospace would become noisy." }
+      "display": {
+        "displayName": "Display",
+        "purpose": "The ALIBI masthead only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Case titles and evidence subjects."
+      },
+      "action": {
+        "displayName": "Action",
+        "purpose": "Tool and command labels."
+      },
+      "evidence": {
+        "displayName": "Evidence",
+        "purpose": "Clues, notes, timers, counts, and explanatory copy."
+      },
+      "technical-label": {
+        "displayName": "Technical Label",
+        "purpose": "Compact uppercase metadata at 10px with wide tracking, used only where the adjacent value or section carries the meaning. 10px is the floor."
+      },
+      "ui": {
+        "displayName": "UI",
+        "purpose": "Dense utility controls where monospace would become noisy."
+      },
+      "subject": {
+        "displayName": "Subject",
+        "purpose": "Suspect names and primary button labels; the smallest size Barlow may name something at."
+      },
+      "copy": {
+        "displayName": "Copy",
+        "purpose": "The case-notes field and evidence paragraphs meant to be read rather than scanned."
+      },
+      "headline-wide": {
+        "displayName": "Headline Wide",
+        "purpose": "The case masthead title once there is room for it; Subject is its narrow-screen step."
+      },
+      "panel-title": {
+        "displayName": "Panel Title",
+        "purpose": "Panel, rail, and modal headings."
+      },
+      "section": {
+        "displayName": "Section",
+        "purpose": "Screen-level section titles and large monospace readouts."
+      },
+      "verdict": {
+        "displayName": "Verdict",
+        "purpose": "The CASE CLOSED stamp. One element, deliberately its own step."
+      },
+      "reveal": {
+        "displayName": "Reveal",
+        "purpose": "The murderer's name on the victory screen and the headline stats beside it."
+      }
     },
     "shadows": [
-      { "name": "cut-edge", "value": "var(--shadow-cut)", "purpose": "Inset physical edge for panels and evidence paper." },
-      { "name": "evidence-lift", "value": "var(--shadow-elevated)", "purpose": "Directional lift for elevated or hovered evidence." },
-      { "name": "projector-field", "value": "var(--projector-glow)", "purpose": "Restrained amber bloom around the active reasoning field." },
-      { "name": "accessible-focus", "value": "var(--focus-ring)", "purpose": "Two-stage base-and-amber focus reinforcement used with a solid outline." }
+      {
+        "name": "cut-edge",
+        "value": "var(--shadow-cut)",
+        "purpose": "Inset physical edge for panels and evidence paper."
+      },
+      {
+        "name": "evidence-lift",
+        "value": "var(--shadow-elevated)",
+        "purpose": "Directional lift for elevated or hovered evidence."
+      },
+      {
+        "name": "projector-field",
+        "value": "var(--projector-glow)",
+        "purpose": "Restrained amber bloom around the active reasoning field."
+      },
+      {
+        "name": "accessible-focus",
+        "value": "var(--focus-ring)",
+        "purpose": "Two-stage base-and-amber focus reinforcement used with a solid outline."
+      }
     ],
     "motion": [
-      { "name": "snap", "value": "120ms", "purpose": "Immediate tool and placement state response." },
-      { "name": "trace", "value": "220ms", "purpose": "Short evidence-selection transitions." },
-      { "name": "aperture", "value": "420ms cubic-bezier(.2, .8, .2, 1)", "purpose": "Authored projector-path reveal." },
-      { "name": "case-lift", "value": "160ms cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Fine-pointer evidence lift." },
-      { "name": "rejection", "value": "400ms cubic-bezier(0.36,0.07,0.19,0.97)", "purpose": "In-place accusation rejection without remounting the focused button." }
+      {
+        "name": "snap",
+        "value": "120ms",
+        "purpose": "Immediate tool and placement state response."
+      },
+      {
+        "name": "trace",
+        "value": "220ms",
+        "purpose": "Short evidence-selection transitions."
+      },
+      {
+        "name": "aperture",
+        "value": "420ms cubic-bezier(.2, .8, .2, 1)",
+        "purpose": "Authored projector-path reveal."
+      },
+      {
+        "name": "case-lift",
+        "value": "160ms cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Fine-pointer evidence lift."
+      },
+      {
+        "name": "rejection",
+        "value": "400ms cubic-bezier(0.36,0.07,0.19,0.97)",
+        "purpose": "In-place accusation rejection without remounting the focused button."
+      }
     ],
     "breakpoints": [
-      { "name": "sm", "value": "640px" },
-      { "name": "md", "value": "768px" },
-      { "name": "lg", "value": "1024px" },
-      { "name": "xl", "value": "1280px" },
-      { "name": "2xl", "value": "1536px" }
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      },
+      {
+        "name": "2xl",
+        "value": "1536px"
+      }
     ]
   },
   "components": [
@@ -246,16 +532,61 @@
       "A dominant square mansion reconstruction built from authored dark materials and thick-contoured illustrated miniatures rather than a full-board raster."
     ],
     "rules": [
-      { "name": "The Amber Evidence Rule", "body": "Projector amber marks the current reasoning path and primary commitment; it is not ambient decoration.", "section": "colors" },
-      { "name": "The Oxblood Exception Rule", "body": "Oxblood is reserved for danger, conflict, victim, destructive confirmation, and rejection.", "section": "colors" },
-      { "name": "The Strong Edge Rule", "body": "A border that is the only visible affordance must use the strong tier; the subtle tier may divide content but never carry interaction alone.", "section": "colors" },
-      { "name": "The Three Voices Rule", "body": "Barlow names the subject, Courier records the evidence, and Hanken operates the chrome; do not swap their jobs.", "section": "typography" },
-      { "name": "The Board-First Rule", "body": "On narrow screens, the board precedes evidence, tools, and accusation because spatial reading starts the solving loop.", "section": "layout" },
-      { "name": "The Directional Depth Rule", "body": "Every shadow must describe paper, steel, or projector light; generic ambient card shadows do not belong on the desk.", "section": "elevation" },
-      { "name": "The Clipped, Not Rounded Rule", "body": "Use clipping, not pills or generous radii, to create tactile silhouettes.", "section": "shapes" },
-      { "name": "The Literal Board Rule", "body": "Every room material and furniture silhouette must remain nameable because clue language points directly to them; projection purity always loses to recognition.", "section": "components" },
-      { "name": "The Taut Connection Rule", "body": "Only the selected literal clue earns the authored amber connector, and the trace must terminate at its actual board target.", "section": "components" },
-      { "name": "The Miniature, Not Pictogram Rule", "body": "Furniture is rendered as fully illustrated overhead or cheated-projection objects: a confident espresso outer silhouette, recognizable construction details, and restrained internal seams. Never collapse it into wireframe symbols or uniform black-outlined clip art.", "section": "components" }
+      {
+        "name": "The Amber Evidence Rule",
+        "body": "Projector amber marks the current reasoning path and primary commitment; it is not ambient decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Oxblood Exception Rule",
+        "body": "Oxblood is reserved for danger, conflict, victim, destructive confirmation, and rejection.",
+        "section": "colors"
+      },
+      {
+        "name": "The Strong Edge Rule",
+        "body": "A border that is the only visible affordance must use the strong tier; the subtle tier may divide content but never carry interaction alone.",
+        "section": "colors"
+      },
+      {
+        "name": "The Three Voices Rule",
+        "body": "Barlow names the subject, Courier records the evidence, and Hanken operates the chrome; do not swap their jobs.",
+        "section": "typography"
+      },
+      {
+        "name": "The Board-First Rule",
+        "body": "On narrow screens, the board precedes evidence, tools, and accusation because spatial reading starts the solving loop.",
+        "section": "layout"
+      },
+      {
+        "name": "The Directional Depth Rule",
+        "body": "Every shadow must describe paper, steel, or projector light; generic ambient card shadows do not belong on the desk.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Clipped, Not Rounded Rule",
+        "body": "Use clipping, not pills or generous radii, to create tactile silhouettes.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Literal Board Rule",
+        "body": "Every room material and furniture silhouette must remain nameable because clue language points directly to them; projection purity always loses to recognition.",
+        "section": "components"
+      },
+      {
+        "name": "The Taut Connection Rule",
+        "body": "Only the selected literal clue earns the authored amber connector, and the trace must terminate at its actual board target.",
+        "section": "components"
+      },
+      {
+        "name": "The Miniature, Not Pictogram Rule",
+        "body": "Furniture is rendered as fully illustrated overhead or cheated-projection objects: a confident espresso outer silhouette, recognizable construction details, and restrained internal seams. Never collapse it into wireframe symbols or uniform black-outlined clip art.",
+        "section": "components"
+      },
+      {
+        "name": "The Closed Ramp Rule",
+        "body": "The thirteen documented steps are the whole type scale: 10, 11, 12, 13, 14, 16, 17, 18, 20, 24, 30 and the display clamp. Every size shipping in the app maps to one of them whether it is written as an arbitrary value, an inline style, or a Tailwind step. A size that is not here is drift, not a decision.",
+        "section": "typography"
+      }
     ],
     "dos": [
       "Do keep theme-aware chrome and fixed evidence/board materials as separate layers.",
