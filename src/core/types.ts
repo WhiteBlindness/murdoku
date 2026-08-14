@@ -9,7 +9,12 @@
 // This module is pure data/logic — no React — so it ports to any runtime.
 // ============================================================================
 
-export type GridSize = 4 | 5 | 6 | 7 | 8
+/**
+ * Board size is no longer the suspect count. A house needs enough cells for
+ * rooms that read as rooms; the number of suspects is tuned separately per
+ * difficulty, so a large board does not force a large cast.
+ */
+export type GridSize = 4 | 5 | 6 | 7 | 8 | 9 | 10
 
 /** A cell coordinate. row 0 = top, col 0 = left. */
 export interface Cell { row: number; col: number }
@@ -21,9 +26,33 @@ export type FurnitureType =
 
 export interface Furniture {
   type: FurnitureType
+  /** Top-left anchor cell of the piece. */
   row: number
   col: number
+  /**
+   * Footprint in cells. A real bed or sofa covers more floor than a lamp, and a
+   * board where every object is exactly one cell reads as a grid of icons
+   * rather than as a room seen from above. Both default to 1 when absent, so
+   * existing data and every single-cell piece stay valid.
+   */
+  w?: number
+  h?: number
   rotation?: 0 | 90 | 180 | 270
+}
+
+/** Footprint of a piece, defaulting to a single cell. */
+export function furnitureFootprint(f: Furniture): { w: number; h: number } {
+  return { w: Math.max(1, f.w ?? 1), h: Math.max(1, f.h ?? 1) }
+}
+
+/** Every cell a piece covers. */
+export function furnitureCells(f: Furniture): Cell[] {
+  const { w, h } = furnitureFootprint(f)
+  const cells: Cell[] = []
+  for (let r = 0; r < h; r++) {
+    for (let c = 0; c < w; c++) cells.push({ row: f.row + r, col: f.col + c })
+  }
+  return cells
 }
 
 export interface Room {

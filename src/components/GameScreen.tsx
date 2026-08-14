@@ -531,7 +531,7 @@ export default function GameScreen(props: Props) {
               <p className="text-[10px] font-mono text-text-muted tracking-[0.25em] uppercase mb-2">Progress</p>
               <p className="font-mono text-text-secondary text-sm">
                 <span className="text-text-primary font-bold">{placedCount}</span>
-                <span className="text-text-muted"> / {puzzle.size}</span>
+                <span className="text-text-muted"> / {puzzle.people.length}</span>
                 <span className="text-text-muted text-[10px] ml-2">suspects placed</span>
               </p>
               <p className="font-mono text-text-secondary text-sm mt-1">
@@ -755,7 +755,7 @@ export default function GameScreen(props: Props) {
                 <p className="text-[10px] font-mono text-text-muted tracking-[0.25em] uppercase">Progress</p>
                 <p className="font-mono text-text-secondary text-sm mt-0.5">
                   <span className="text-text-primary font-bold">{placedCount}</span>
-                  <span className="text-text-muted"> / {puzzle.size}</span>
+                  <span className="text-text-muted"> / {puzzle.people.length}</span>
                   <span className="text-text-muted text-[10px] ml-1.5">placed</span>
                   <span className="text-text-muted text-[10px] ml-2">·</span>
                   <span className="text-text-primary font-bold ml-2">{hintsLeft}</span>
@@ -836,7 +836,10 @@ export default function GameScreen(props: Props) {
                 letterSpacing: '0.15em',
               }}
             >
-              Accuse — Submit Solution ({placedCount}/{puzzle.size})
+              {/* Count the CAST, not the board. These were the same number
+                  while every N x N board had exactly N suspects; now a 10x10
+                  Master case has 6 people and this read "0/10". */}
+              Accuse — Submit Solution ({placedCount}/{puzzle.people.length})
             </motion.button>
 
             {/* ── Feedback message ─────────────────────────────────────────

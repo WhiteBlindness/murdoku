@@ -7,6 +7,12 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./tests/setup.ts'],
     include: ['./tests/**/*.test.{ts,tsx}'],
+    // The first test in a file that touches the catalog pays for generating all
+    // 60 cases, and the boards are now 6x6 through 10x10. That is a real one-off
+    // cost (~5s), not a hang, and it exceeds vitest's 5s default. Raised here
+    // rather than sprinkling per-test timeouts on whichever test happens to run
+    // first in its file.
+    testTimeout: 30000,
     coverage: {
       provider: 'v8',
       include: [

@@ -6,6 +6,7 @@ import { filterCases } from '../core/ux'
 import type { InProgressSummary } from '../core/ux'
 import type { CaseRecord } from '../hooks/useGame'
 import ThemeToggle from './ThemeToggle'
+import BoardPreview from './BoardPreview'
 import { dailyPuzzle, loadStreak, streakIsLive, computeBadges } from '../core/daily'
 
 interface Props {
@@ -159,6 +160,17 @@ export default function HomeScreen({
             A murder-mystery deduction puzzle. Place every suspect on a house map — one per row, one per column — then accuse whoever is left alone with the victim.
           </p>
         </header>
+
+        {/* ── The product shot ──────────────────────────────────────────────
+            A real generated board from the hardest tier with suspects scattered
+            across it. Showing the actual thing beats describing it, and the
+            house map IS the idea. Inert and aria-hidden: the three steps below
+            carry the same information for assistive technology. */}
+        <div className="mb-5 w-full flex justify-center">
+          <div className="w-full max-w-[420px]">
+            <BoardPreview puzzles={puzzles} />
+          </div>
+        </div>
 
         {/* ── How it works (3 steps, scannable) ── */}
         {/* Full column width: a centred island here would give the steps a left

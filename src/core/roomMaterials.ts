@@ -235,13 +235,25 @@ export function roomMaterial(name: string): RoomMaterial {
   return ROOM_MATERIAL_BY_NAME[normalized] ?? 'living-room'
 }
 
+/**
+ * Grain scale.
+ *
+ * The tile used to be stretched to exactly one cell, which made a single
+ * floorboard as wide as a whole room: the board read as giant slabs rather
+ * than as flooring seen from above. Repeating the tile four times per cell
+ * (half width, half height) puts planks, grout and stone courses at furniture
+ * scale instead of room scale, which is what a floor plan actually looks like.
+ * The tiles are authored on a 100x100 viewBox with their pattern running to
+ * the edges, so repeating does not introduce a visible join.
+ */
+const GRAIN = '50% 50%'
+
 export function floorStyle(material: RoomMaterial): CSSProperties {
   return {
     ...ROOM_MATERIALS[material],
-    // One authored tile per cell: no repeat rounding, no half-cut plank.
-    backgroundSize: '100% 100%',
+    backgroundSize: GRAIN,
     backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
+    backgroundRepeat: 'repeat',
   }
 }
 

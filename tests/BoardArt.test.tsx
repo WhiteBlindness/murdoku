@@ -128,7 +128,11 @@ describe('Noire Illustration room materials', () => {
         .toMatch(/<rect|<ellipse|<path|<circle/)
       expect(decodeURIComponent(image), `${material} must not fall back to pure black`)
         .not.toMatch(/#000(?:000)?\b/i)
-      expect(style.backgroundSize, `${material} must land exactly one tile per cell`).toBe('100% 100%')
+      // Grain must stay finer than a cell. One tile stretched per cell made a
+      // single floorboard as wide as a whole room, which is what stopped the
+      // board reading as a floor plan seen from above.
+      expect(style.backgroundSize, `${material} needs floor-scale grain, not room-scale slabs`).toBe('50% 50%')
+      expect(style.backgroundRepeat, `${material} must tile its grain`).toBe('repeat')
       expect(isDarkFloor(material), `${material} should use the light-token contrast treatment`).toBe(true)
     }
   })

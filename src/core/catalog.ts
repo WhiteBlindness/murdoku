@@ -25,7 +25,10 @@ const SPEC: { difficulty: Difficulty; count: number }[] = [
 // v13: the catalog grew from 27 to 60 cases and gained the Master tier, and the
 // generator's directness floor changed which clues Expert boards draw from. A
 // cached v12 list would pin returning players to the old, smaller catalog.
-const KEY = 'murdoku_catalog_v13'
+// v14: boards grew (6x6 through 10x10), the suspect count is no longer tied to
+// the board size, and furniture now carries a w/h footprint. A cached v13 list
+// would pin returning players to small boards full of 1x1 furniture.
+const KEY = 'murdoku_catalog_v14'
 let puzzles: Puzzle[] = []
 
 function slug(s: string) { return s.toLowerCase().replace(/\s+/g, '-') }

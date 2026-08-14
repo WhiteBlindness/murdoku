@@ -1,6 +1,7 @@
 import type {
   Puzzle, Clue, Cell, FurnitureType, Person, Room, GridSize,
 } from './types'
+import { furnitureFootprint } from './types'
 
 // ============================================================================
 // Murdoku engine: clue evaluation + solver.
@@ -17,7 +18,10 @@ export function cellsAdjacent(a: Cell, b: Cell): boolean {
 }
 
 export function furnitureAt(p: Puzzle, row: number, col: number): FurnitureType[] {
-  return p.furniture.filter(f => f.row === row && f.col === col).map(f => f.type)
+  return p.furniture.filter(f => {
+    const { w, h } = furnitureFootprint(f)
+    return row >= f.row && row < f.row + h && col >= f.col && col < f.col + w
+  }).map(f => f.type)
 }
 
 function anyFurnitureAdjacent(p: Puzzle, cell: Cell, types: FurnitureType[]): boolean {

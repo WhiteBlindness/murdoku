@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { X, Lock } from 'lucide-react'
 import type { Puzzle, Cell, CellMark, Furniture, FurnitureType } from '../core/types'
+import { furnitureCells, furnitureFootprint } from '../core/types'
 import { FURNITURE_ICON, FURNITURE_NAME } from '../core/furniture'
 import { floorStyle, isDarkFloor, roomMaterial } from '../core/roomMaterials'
 import Avatar from './Avatar'
@@ -72,15 +73,16 @@ export default function MapGrid({
   const allFurniture: Furniture[] = [...puzzle.furniture, ...extraFurniture]
   const furnByCell: Record<string, Furniture[]> = {}
   for (const f of allFurniture) (furnByCell[`${f.row},${f.col}`] ||= []).push(f)
-  const furnitureCells = new Set(allFurniture.map(f => `${f.row},${f.col}`))
+  // Room labels must dodge the WHOLE footprint, not just the anchor cell.
+  const occupiedCells = new Set(allFurniture.flatMap(f => furnitureCells(f).map(c => `${c.row},${c.col}`)))
 
   const labelAnchors = puzzle.rooms.map(rm => {
     const sorted = [...rm.cells].sort((a, b) => a.row - b.row || a.col - b.col)
-    const anchor = sorted.find(c => !furnitureCells.has(`${c.row},${c.col}`)) ?? sorted[0]
+    const anchor = sorted.find(c => !occupiedCells.has(`${c.row},${c.col}`)) ?? sorted[0]
     let span = 1
     while (span < N
       && rm.cells.some(c => c.row === anchor.row && c.col === anchor.col + span)
-      && !furnitureCells.has(`${anchor.row},${anchor.col + span}`)) span++
+      && !occupiedCells.has(`${anchor.row},${anchor.col + span}`)) span++
     // Abbreviation ladder (used only as a last resort):
     //   multi-word â†’ initials (FRONT YARD â†’ FY), single-word â†’ first 3 chars (KITCHEN â†’ KIT)
     // Prefer wrapping or font-shrink over initials â€” see label render below.
@@ -236,28 +238,9 @@ export default function MapGrid({
                   }}
                 />
 
-                {/* furniture layer â€” illustrated SVGs fill the cell flush.
-                    Full opacity so furniture.tsx's 92 colour fills show clearly. */}
-                {furn.length > 0 && !person && (
-                  <span
-                    className="absolute inset-0 flex items-stretch"
-                    style={{ opacity: mark.kind === 'x' ? 0.18 : 1 }}
-                  >
-                    {furn.slice(0, 2).map((f, i) => {
-                      const Icon = FURNITURE_ICON[f.type]
-                      const rot = f.rotation ?? 0
-                      return (
-                        <span
-                          key={i}
-                          className="flex-1 min-w-0"
-                          style={{ transform: rot ? `rotate(${rot}deg)` : undefined }}
-                        >
-                          <Icon />
-                        </span>
-                      )
-                    })}
-                  </span>
-                )}
+                {/* Furniture is NOT drawn per cell — see the spanning overlay
+                    below the grid. A bed that covers 2x2 cells has to be one
+                    bed, not four. */}
 
                 {/* placement ghost preview */}
                 {showPreview && (() => {
@@ -365,6 +348,58 @@ export default function MapGrid({
             )
           })
         )}
+
+        {/* ── FURNITURE OVERLAY ──────────────────────────────────────────────
+            One layer over the same N x N tracks, so a piece is drawn ONCE at
+            its anchor and spans its real footprint. Rendering per cell made a
+            2x2 bed into four beds, and stretching each icon flush to its cell
+            is what made the board look like a floor plan viewed from 5cm away:
+            in a real plan a chair covers a fraction of a room. Each piece is
+            inset inside its own footprint so floor shows around it and the
+            object reads as sitting ON the floor.
+            `pointer-events-none` keeps every cell button clickable through it. */}
+        <div
+          aria-hidden
+          className="pointer-events-none"
+          style={{
+            gridArea: '1 / 1 / -1 / -1',
+            display: 'grid',
+            gridTemplateColumns: `repeat(${N}, 1fr)`,
+            gridTemplateRows: `repeat(${N}, 1fr)`,
+            zIndex: 1,
+          }}
+        >
+          {allFurniture.map((f, i) => {
+            const Icon = FURNITURE_ICON[f.type]
+            const { w, h } = furnitureFootprint(f)
+            const rot = f.rotation ?? 0
+            // A piece under a suspect token or a struck-out cell steps back
+            // rather than disappearing, so the room keeps its shape.
+            const covered = furnitureCells(f)
+              .filter(cell => cell.row < N && cell.col < N)
+              .map(cell => marks[cell.row][cell.col])
+            const underToken = covered.some(m => m.kind === 'person')
+            const struck = covered.length > 0 && covered.every(m => m.kind === 'x')
+            // Bigger pieces earn proportionally more of their box: a bed really
+            // does fill its footprint, a lamp does not.
+            const inset = Math.max(w, h) > 1 ? '7%' : '15%'
+            return (
+              <span
+                key={`${f.type}-${f.row}-${f.col}-${i}`}
+                style={{
+                  gridColumn: `${f.col + 1} / span ${w}`,
+                  gridRow: `${f.row + 1} / span ${h}`,
+                  padding: inset,
+                  opacity: underToken ? 0.3 : struck ? 0.18 : 1,
+                  transform: rot ? `rotate(${rot}deg)` : undefined,
+                  display: 'block',
+                }}
+              >
+                <Icon />
+              </span>
+            )
+          })}
+        </div>
       </div>
 
       {/* label overlay â€” same grid tracks, anchored corner stamps.

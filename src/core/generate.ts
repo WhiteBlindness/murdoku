@@ -2,6 +2,7 @@ import type {
   Puzzle, GridSize, Difficulty, Room, Cell, Furniture, FurnitureType,
   Person, Clue, ClueText,
 } from './types'
+import { furnitureCells } from './types'
 import { countSolutions, furnitureAt, roomIdAt, findMurderer, cellsAdjacent } from './engine'
 
 // ============================================================================
@@ -82,6 +83,18 @@ const FURNITURE_LABEL: Record<FurnitureType, string> = {
   clock: 'the clock', desk: 'the desk', toilet: 'the toilet', shower: 'the shower',
 }
 
+// --- furniture footprints --------------------------------------------------
+// Pieces that cover more than one cell. Anything not listed is 1×1.
+const FURNITURE_FOOTPRINT: Partial<Record<FurnitureType, { w: number; h: number }>> = {
+  bed: { w: 2, h: 2 },
+  sofa: { w: 2, h: 1 },
+  table: { w: 2, h: 1 },
+  rug: { w: 2, h: 2 },
+  bookshelf: { w: 2, h: 1 },
+  counter: { w: 2, h: 1 },
+  bathtub: { w: 2, h: 1 },
+}
+
 // --- room layout -----------------------------------------------------------
 
 interface Rect { r0: number; c0: number; r1: number; c1: number } // inclusive
@@ -112,7 +125,17 @@ function area(r: Rect) { return (r.r1 - r.r0 + 1) * (r.c1 - r.c0 + 1) }
 function buildRooms(size: number): { rooms: Room[]; roomOf: string[][] } {
   // Room count tracks area: an 8x8 split into 4 rooms gives 16-cell rooms, which
   // makes "In the Kitchen" nearly free information.
-  const target = size <= 4 ? 3 : size <= 5 ? 4 : size <= 7 ? 4 + Math.floor(rand() * 2) : 5 + Math.floor(rand() * 2)
+  // Target room counts tuned to keep typical room size at 6–12 cells.
+  // 6×6=36 cells → 4–5 rooms (7–9 cells each)
+  // 7×7=49 cells → 5–6 rooms (8–10 cells each)
+  // 8×8=64 cells → 6–7 rooms (9–11 cells each)
+  // 9×9=81 cells → 7–8 rooms (10–12 cells each)
+  // 10×10=100 cells → 8–9 rooms (11–13 cells each)
+  const target = size <= 6 ? 4 + Math.floor(rand() * 2)
+    : size <= 7 ? 5 + Math.floor(rand() * 2)
+    : size <= 8 ? 6 + Math.floor(rand() * 2)
+    : size <= 9 ? 7 + Math.floor(rand() * 2)
+    : 8 + Math.floor(rand() * 2)
   const rects = splitRects(size, target)
   const names = shuffle(ROOM_NAMES).slice(0, rects.length)
   const roomOf: string[][] = Array.from({ length: size }, () => new Array(size).fill(''))
@@ -143,8 +166,6 @@ function placeFurniture(
 ): Furniture[] {
   const furniture: Furniture[] = []
   const roomName = (id: string) => rooms.find(r => r.id === id)!.name
-  // How many of each type are already on the board — used to spread variety so
-  // one case never ends up with e.g. four clocks and three boxes.
   const usedCount: Partial<Record<FurnitureType, number>> = {}
   const pickVaried = (pool: FurnitureType[], avoid?: Set<FurnitureType>): FurnitureType => {
     const options = (avoid ? pool.filter(t => !avoid.has(t)) : pool)
@@ -156,38 +177,82 @@ function placeFurniture(
     return t
   }
 
-  // Track furniture-free cells per room so we NEVER fill a whole room — every
-  // room must keep at least one empty cell for its label to sit on.
+  // Track which cells are occupied by furniture (keyed "row,col").
+  const occupiedCells = new Set<string>()
+  // Track furniture-free cells per room — every room must keep ≥1 for its label.
   const freeCells: Record<string, Set<string>> = {}
   for (const room of rooms) freeCells[room.id] = new Set(room.cells.map(c => `${c.row},${c.col}`))
-  const roomIdAtRC = (row: number, col: number) => roomOf[row][col]
-  const canFurnish = (row: number, col: number) => freeCells[roomIdAtRC(row, col)].size > 1
-  const occupy = (row: number, col: number) => freeCells[roomIdAtRC(row, col)].delete(`${row},${col}`)
 
-  // 1) Each room gets a few DISTINCT pieces (never more than cells - 1).
+  const roomIdAtRC = (row: number, col: number) => roomOf[row]?.[col] ?? ''
+
+  /**
+   * Try to place a piece of type `t` anchored at (row, col).
+   * Returns true and mutates state on success; returns false on failure.
+   * Rules: every cell of the footprint must be (a) in-bounds, (b) inside the
+   * SAME room as the anchor, (c) not already occupied by another piece, and
+   * (d) after placement the room still has ≥1 free cell.
+   */
+  const tryPlace = (t: FurnitureType, row: number, col: number, roomId: string): boolean => {
+    const fp = FURNITURE_FOOTPRINT[t] ?? { w: 1, h: 1 }
+    const piece: Furniture = { type: t, row, col, w: fp.w, h: fp.h }
+    const cells = furnitureCells(piece)
+    // Validate all cells
+    for (const { row: r, col: c } of cells) {
+      if (r < 0 || c < 0 || r >= roomOf.length || c >= (roomOf[0]?.length ?? 0)) return false
+      if (roomIdAtRC(r, c) !== roomId) return false
+      if (occupiedCells.has(`${r},${c}`)) return false
+    }
+    // Ensure room keeps ≥1 free label cell after this placement
+    if (freeCells[roomId].size - cells.length < 1) return false
+    // Commit
+    for (const { row: r, col: c } of cells) {
+      occupiedCells.add(`${r},${c}`)
+      freeCells[roomId].delete(`${r},${c}`)
+    }
+    furniture.push(piece)
+    return true
+  }
+
+  // 1) Each room gets a few DISTINCT pieces.
   for (const room of rooms) {
     const pool = ROOM_FURNITURE[room.name] ?? ['box', 'chair', 'plant']
-    const maxN = Math.min(pool.length, room.cells.length - 1) // always leave ≥1 free
-    const n = Math.max(0, Math.min(maxN, 1 + Math.floor(rand() * Math.min(3, room.cells.length))))
-    const cells = shuffle(room.cells).slice(0, n)
+    const maxN = Math.min(pool.length, room.cells.length - 1)
+    const n = Math.max(0, Math.min(maxN, 1 + Math.floor(rand() * Math.min(4, room.cells.length))))
+    const candidates = shuffle(room.cells)
     const inRoom = new Set<FurnitureType>()
-    for (const cell of cells) {
+    let placed = 0
+    for (const cell of candidates) {
+      if (placed >= n) break
+      if (occupiedCells.has(`${cell.row},${cell.col}`)) continue
       const t = pickVaried(pool, inRoom)
-      inRoom.add(t)
-      furniture.push({ type: t, row: cell.row, col: cell.col })
-      occupy(cell.row, cell.col)
+      if (tryPlace(t, cell.row, cell.col, room.id)) {
+        inRoom.add(t)
+        placed++
+      } else {
+        // Fall back to 1×1 if the multi-cell version didn't fit
+        const t1x1 = pickVaried(pool.filter(p => !(FURNITURE_FOOTPRINT[p])), inRoom.size ? inRoom : undefined)
+        if (tryPlace(t1x1, cell.row, cell.col, room.id)) {
+          inRoom.add(t1x1)
+          placed++
+        }
+      }
     }
   }
 
-  // 2) Give most people a piece to sit on/beside (for furniture clues) — but
-  //    never at the cost of a room's last free cell.
+  // 2) Give most people a piece to sit on/beside — but never remove the last
+  //    free cell from a room.
   for (const key of Object.keys(place)) {
     const cell = place[key]
-    const here = furnitureAt({ furniture } as Puzzle, cell.row, cell.col)
-    if (here.length === 0 && canFurnish(cell.row, cell.col) && rand() < 0.7) {
-      const pool = ROOM_FURNITURE[roomName(roomOf[cell.row][cell.col])] ?? ['chair']
-      furniture.push({ type: pickVaried(pool), row: cell.row, col: cell.col })
-      occupy(cell.row, cell.col)
+    if (occupiedCells.has(`${cell.row},${cell.col}`)) continue
+    if (rand() < 0.7) {
+      const rId = roomIdAtRC(cell.row, cell.col)
+      const pool = ROOM_FURNITURE[roomName(rId)] ?? ['chair']
+      const t = pickVaried(pool)
+      // Try preferred (possibly multi-cell), then any 1×1 from the pool
+      if (!tryPlace(t, cell.row, cell.col, rId)) {
+        const small = pool.filter(p => !FURNITURE_FOOTPRINT[p])
+        if (small.length) tryPlace(pickVaried(small), cell.row, cell.col, rId)
+      }
     }
   }
   return furniture
@@ -199,7 +264,10 @@ function candidateClues(p: Puzzle): Clue[] {
   const out: Clue[] = []
   const size = p.size
   for (const person of p.people) {
-    if (person.id === p.victimId) continue
+    // Include the victim in the clue pool so the solver can pin their position.
+    // (When people < size the victim is otherwise a free variable after the
+    //  suspects are placed, making unique solutions impossible to achieve.)
+    // The separate kind:'victim' flavour line is appended in generatePuzzle.
     const cell = p.solution[person.id]
     // room
     out.push({ kind: 'room', person: person.id, roomId: roomIdAt(p, cell) })
@@ -311,13 +379,13 @@ function cap(s: string) { return s.charAt(0).toUpperCase() + s.slice(1) }
  * triangulated from relational statements. Raising the grid size alone only
  * makes a puzzle longer; raising the floor makes it harder.
  */
-const DIFF_CONFIG: Record<Difficulty, { size: GridSize; maxDirectness: number; minDirectness: number }> = {
-  'Very Easy': { size: 4, maxDirectness: 3, minDirectness: 0 },
-  'Easy': { size: 5, maxDirectness: 4, minDirectness: 0 },
-  'Medium': { size: 6, maxDirectness: 5, minDirectness: 0 },
-  'Hard': { size: 6, maxDirectness: 6, minDirectness: 0 },
-  'Expert': { size: 7, maxDirectness: 6, minDirectness: 1 },
-  'Master': { size: 8, maxDirectness: 6, minDirectness: 1 },
+const DIFF_CONFIG: Record<Difficulty, { size: GridSize; people: number; maxDirectness: number; minDirectness: number }> = {
+  'Very Easy': { size: 6, people: 4, maxDirectness: 3, minDirectness: 0 },
+  'Easy':      { size: 7, people: 4, maxDirectness: 4, minDirectness: 0 },
+  'Medium':    { size: 8, people: 5, maxDirectness: 5, minDirectness: 0 },
+  'Hard':      { size: 8, people: 5, maxDirectness: 6, minDirectness: 0 },
+  'Expert':    { size: 9, people: 6, maxDirectness: 6, minDirectness: 1 },
+  'Master':    { size: 10, people: 6, maxDirectness: 6, minDirectness: 1 },
 }
 
 /** Build one full puzzle. Retries internally until a unique one is produced. */
@@ -326,7 +394,7 @@ export function generatePuzzle(difficulty: Difficulty, id: string, caseNumber: s
   const size = cfg.size
 
   for (let attempt = 0; attempt < 60; attempt++) {
-    const names = shuffle(NAMES).slice(0, size)
+    const names = shuffle(NAMES).slice(0, cfg.people)
     const accents = shuffle(ACCENTS)
     const people: Person[] = names.map((name, i) => ({
       id: `p${i}`, name, avatarSeed: `${name}-${seed}-${i}`, accent: accents[i % accents.length],
@@ -355,24 +423,25 @@ export function generatePuzzle(difficulty: Difficulty, id: string, caseNumber: s
     // clues are direct ones still gets a clue rather than failing the whole
     // attempt. Otherwise a Master board with one tiny room could never generate.
     const pool = ceiling.filter(c => clueDirectness(c) >= cfg.minDirectness)
+    // Build clue pools for ALL people including the victim, so the victim's
+    // position can be pinned when people < size (otherwise the victim is a free
+    // variable after the suspects are placed → no unique solution is achievable).
     const byPerson: Record<string, Clue[]> = {}
     for (const person of people) {
-      if (person.id === victim.id) continue
       const indirect = pool.filter(c => c.person === person.id)
       const any = ceiling.filter(c => c.person === person.id)
       byPerson[person.id] = (indirect.length ? indirect : any)
         .sort((a, b) => clueDirectness(a) - clueDirectness(b))
     }
-    const suspects = people.filter(p => p.id !== victim.id)
-    if (suspects.some(s => (byPerson[s.id] ?? []).length === 0)) continue
+    // Every person (including victim) must have at least one available clue.
+    if (people.some(p => (byPerson[p.id] ?? []).length === 0)) continue
 
-    // ---- Preferred: find ONE clue per suspect that already yields a unique
-    // solution. This matches real Murdoku (one clue per card) and keeps cards
-    // clean. Try many random combos, biased toward concrete clues for easy modes.
+    // ---- Preferred: find ONE clue per person that already yields a unique
+    // solution. Try many random combos, biased toward concrete clues for easy modes.
     let chosen: Clue[] | null = null
     const topK = cfg.maxDirectness <= 3 ? 3 : 5
     for (let t = 0; t < 700 && !chosen; t++) {
-      const combo = suspects.map(s => pick(byPerson[s.id].slice(0, Math.min(topK, byPerson[s.id].length))))
+      const combo = people.map(p => pick(byPerson[p.id].slice(0, Math.min(topK, byPerson[p.id].length))))
       base.clues = toClueText(base, combo)
       if (countSolutions(base, 2) === 1) chosen = combo
     }
@@ -380,7 +449,7 @@ export function generatePuzzle(difficulty: Difficulty, id: string, caseNumber: s
     // ---- Fallback: one strong clue each, then greedily add the minimum extra
     // clues needed for uniqueness. (Every clue is still shown to the player.)
     if (!chosen) {
-      const seed2 = suspects.map(s => byPerson[s.id][0])
+      const seed2 = people.map(p => byPerson[p.id][0])
       const acc: Clue[] = [...seed2]
       base.clues = toClueText(base, acc)
       let guard = 0
@@ -428,7 +497,7 @@ function toClueText(p: Puzzle, clues: Clue[]): ClueText[] {
   return clues.map(clue => ({ clue, text: clueToText(p, clue) }))
 }
 
-/** Remove redundant clues while keeping a unique solution and ≥1 clue/suspect. */
+/** Remove redundant clues while keeping a unique solution and ≥1 clue/person. */
 function pruneClues(p: Puzzle, clues: Clue[]): Clue[] {
   let cur = [...clues]
   for (const c of shuffle([...cur])) {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { getAllPuzzles } from '../src/core/catalog'
 import { countSolutions, findMurderer } from '../src/core/engine'
+import { furnitureCells } from '../src/core/types'
 
 const puzzles = getAllPuzzles()
 
@@ -17,9 +18,9 @@ describe('generated puzzle catalog', () => {
   it('escalates board size across the difficulty ladder', () => {
     const sizesFor = (difficulty: string) =>
       new Set(puzzles.filter(p => p.difficulty === difficulty).map(p => p.size))
-    expect(sizesFor('Very Easy')).toEqual(new Set([4]))
-    expect(sizesFor('Expert')).toEqual(new Set([7]))
-    expect(sizesFor('Master')).toEqual(new Set([8]))
+    expect(sizesFor('Very Easy')).toEqual(new Set([6]))
+    expect(sizesFor('Expert')).toEqual(new Set([9]))
+    expect(sizesFor('Master')).toEqual(new Set([10]))
   })
 
   it('never hands a Master suspect a bare room clue', () => {
@@ -37,7 +38,8 @@ describe('generated puzzle catalog', () => {
       expect(countSolutions(puzzle, 5)).toBe(1)
       expect(findMurderer(puzzle)).toBeTruthy()
 
-      const furnished = new Set(puzzle.furniture.map(item => `${item.row},${item.col}`))
+      // Build the set of ALL cells covered by any furniture piece (including multi-cell footprints).
+      const furnished = new Set(puzzle.furniture.flatMap(item => furnitureCells(item).map(c => `${c.row},${c.col}`)))
       const fullyFurnishedRooms = puzzle.rooms.filter(room =>
         room.cells.every(cell => furnished.has(`${cell.row},${cell.col}`)),
       )
