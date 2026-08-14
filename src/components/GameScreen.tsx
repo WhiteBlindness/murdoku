@@ -202,8 +202,8 @@ export default function GameScreen(props: Props) {
         case 'p': onSetTool('place'); break
         case 'x': onSetTool('x'); break
         case 'd': if (detective) onSetTool('draft'); else return; break
-        case 'h': onHint(); break
-        case 'a': if (onAssist) onAssist(); else return; break
+        case 'h': if (!detective) onHint(); else return; break
+        case 'a': if (detective && onAssist) onAssist(); else return; break
         default: return
       }
       event.preventDefault()
@@ -584,8 +584,8 @@ export default function GameScreen(props: Props) {
             ].join(' ')}
           >
             {detective
-              ? 'Place a suspect to cross out their row & column automatically. Use Draft to pencil in candidates. Each person = one row, one column.'
-              : 'Each person is in exactly one row and one column. Read the clues, place everyone, then submit.'}
+              ? 'Place to lock a row & column. Draft to pencil candidates. Assist to cross off provably empty cells. Hints unavailable — every placement must be yours to prove.'
+              : 'Each person is in exactly one row and one column. Read the clues, place everyone, use hints if needed, then submit.'}
           </p>
 
           {/* ── Board slot ────────────────────────────────────────────────
@@ -704,11 +704,17 @@ export default function GameScreen(props: Props) {
               <ToolBtn onClick={props.onUndo} disabled={!props.canUndo} icon={<Undo2 size={16} />} label="Undo" />
               <ToolBtn onClick={props.onRedo} disabled={!props.canRedo} icon={<Redo2 size={16} />} label="Redo" />
               <ToolBtn onClick={() => setConfirmClear(true)} icon={<Trash2 size={16} />} label="Clear" />
-              <ToolBtn onClick={props.onHint} disabled={hintsLeft <= 0} icon={<Lightbulb size={16} />} label={`Hint ×${hintsLeft}`} />
-              {props.onAssist && (
-                /* Assist marks only cells that are provably empty from the rules
-                   the player already has. It never places anyone, so unlike a
-                   hint it is free and unlimited. */
+              {/* Hint — Classic only. Places one suspect correctly (3 per case).
+                  Detective mode's contract is proof-first: an answer dropped by
+                  the game breaks that contract. Use Assist instead. */}
+              {!detective && (
+                <ToolBtn onClick={props.onHint} disabled={hintsLeft <= 0} icon={<Lightbulb size={16} />} label={`Hint ×${hintsLeft}`} />
+              )}
+              {/* Assist — Detective only. Marks cells that are provably empty
+                  from row/column occupancy and unary clues — free and unlimited,
+                  never spoils an undeduced answer. Classic players place freely
+                  and don't need the elimination pass. */}
+              {detective && props.onAssist && (
                 <ToolBtn onClick={props.onAssist} icon={<Wand2 size={16} />} label="Assist" title="Cross off cells that are already impossible" />
               )}
               <ToolBtn
@@ -773,7 +779,9 @@ export default function GameScreen(props: Props) {
 
               {/* Suspects label */}
               <p className="text-[10px] text-text-muted font-mono uppercase tracking-[0.2em]">
-                Suspects · tap to select{detective ? ' · check off solved clues' : ''}
+                {detective
+                  ? 'Suspects · select · draft · check off solved clues'
+                  : 'Suspects · select · place · use hints to nudge'}
               </p>
 
               {/* Suspect cards — single column on all breakpoints in the dossier */}

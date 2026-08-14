@@ -342,7 +342,7 @@ The board is a square collection of real buttons with a heavy espresso frame and
 
 **The Literal Board Rule.** Every room material and furniture silhouette must remain nameable because clue language points directly to them; projection purity always loses to recognition.
 
-**The Taut Connection Rule.** Only the selected literal clue earns the authored amber connector, and the trace must terminate at its actual board target.
+**The Asked-For Help Rule.** The board answers a clue with an amber square around its actual target cells, and only when the player presses that suspect's locate control. Help is requested, never volunteered: selecting a suspect is a placement action and must not light the board. There is deliberately no drawn clue-to-board connector — a line between two independently sized layout regions can only be positioned by guessed percentages, and it pointed into empty space at every viewport it was not tuned on.
 
 **The Miniature, Not Pictogram Rule.** Furniture is rendered as fully illustrated overhead or cheated-projection objects: a confident espresso outer silhouette, recognizable construction details, and restrained internal seams. Never collapse it into wireframe symbols or uniform black-outlined clip art.
 

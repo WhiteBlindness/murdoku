@@ -330,6 +330,12 @@ function reducer(state: GameState, action: Action): GameState {
       // never places anybody and never reveals an answer, so unlike HINT it
       // costs nothing. Marks land as auto X's so the player's own X's stay
       // visually distinct and a single UNDO takes the whole sweep back.
+      //
+      // Assist is a Detective-mode tool: elimination is the core detective
+      // discipline. Classic mode players are not expected to track provable
+      // absences — they place by feel and submit. Gated here (not just in the
+      // view) so tests can assert the rule directly.
+      if (state.mode !== 'detective') return state
       if (!state.puzzle) return state
       const placed: Record<string, { row: number; col: number }> = {}
       for (const person of state.puzzle.people) {
@@ -346,6 +352,13 @@ function reducer(state: GameState, action: Action): GameState {
     }
 
     case 'HINT': {
+      // Hints place a suspect at their correct position — they short-circuit the
+      // deduction the player was supposed to make. Classic mode is forgiving and
+      // uses hints as a nudge toward finishing. Detective mode's contract is that
+      // every placed suspect is provable: a dropped answer would break that
+      // contract, so hints are unavailable. The Assist tool (provable-empty
+      // cell marking) is the detective's substitute.
+      if (state.mode === 'detective') return state
       if (!state.puzzle || state.hintsLeft <= 0) return state
       const target = state.puzzle.people.find(person => {
         const cell = personCell(state.marks, person.id)

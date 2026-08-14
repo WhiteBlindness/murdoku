@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { X, MousePointerClick, Pencil, Lightbulb } from 'lucide-react'
+import { X, MousePointerClick, Pencil, Lightbulb, Wand2 } from 'lucide-react'
 import type { GameMode } from '../core/types'
 
 interface Props {
@@ -74,6 +74,17 @@ export default function HowToPlay({ mode, onClose }: Props) {
           </Step>
         </ol>
 
+        {/* Mode identity line */}
+        <div className="mt-4 mb-1 px-3 py-2 border-l-2"
+          style={{ borderColor: 'var(--color-accent)', background: 'color-mix(in srgb, var(--color-accent) 8%, transparent)' }}
+        >
+          <p className="font-mono text-[11px] text-text-secondary leading-relaxed">
+            {mode === 'detective'
+              ? 'Detective — every placement must be provable. Elimination is first-class; hints are off.'
+              : 'Classic — place freely, use hints if stuck, submit when ready.'}
+          </p>
+        </div>
+
         {/* Tools section */}
         <div className="mt-5 pt-4 border-t border-border-strong">
           <p className="font-mono text-[10px] text-paper-muted tracking-[0.3em] uppercase mb-3">
@@ -100,10 +111,18 @@ export default function HowToPlay({ mode, onClose }: Props) {
               <span className="font-display text-text-primary font-semibold">Mark ✕</span>
               <span className="font-mono text-[12px] text-text-secondary leading-relaxed"> — flag a cell where someone definitely isn&rsquo;t.</span>
             </Tool>
-            <Tool icon={<Lightbulb size={15} aria-hidden="true" />}>
-              <span className="font-display text-text-primary font-semibold">Hint</span>
-              <span className="font-mono text-[12px] text-text-secondary leading-relaxed"> — places one suspect correctly (3 per case).</span>
-            </Tool>
+            {mode === 'detective' && (
+              <Tool icon={<Wand2 size={15} aria-hidden="true" />}>
+                <span className="font-display text-text-primary font-semibold">Assist</span>
+                <span className="font-mono text-[12px] text-text-secondary leading-relaxed"> — crosses off every cell that is provably empty from row &amp; column rules alone. Free and unlimited; never reveals an undeduced answer.</span>
+              </Tool>
+            )}
+            {mode === 'classic' && (
+              <Tool icon={<Lightbulb size={15} aria-hidden="true" />}>
+                <span className="font-display text-text-primary font-semibold">Hint</span>
+                <span className="font-mono text-[12px] text-text-secondary leading-relaxed"> — places one suspect correctly (3 per case). Not available in Detective mode.</span>
+              </Tool>
+            )}
           </ul>
         </div>
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-14T13:33:50.000Z",
+  "generatedAt": "2026-08-14T14:48:07.000Z",
   "title": "Design System: Alibi",
   "extensions": {
     "colorMeta": {
@@ -597,8 +597,8 @@
         "section": "components"
       },
       {
-        "name": "The Taut Connection Rule",
-        "body": "Only the selected literal clue earns the authored amber connector, and the trace must terminate at its actual board target.",
+        "name": "The Asked-For Help Rule",
+        "body": "The board answers a clue with an amber square around its actual target cells, and only when the player presses that suspect's locate control. Help is requested, never volunteered: selecting a suspect is a placement action and must not light the board. There is deliberately no drawn clue-to-board connector.",
         "section": "components"
       },
       {

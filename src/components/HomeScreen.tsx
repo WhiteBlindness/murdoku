@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Users, LayoutGrid, Sparkles, Search, Timer } from 'lucide-react'
+import { Users, LayoutGrid, Sparkles, Search, Timer, ArrowLeft } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import type { Puzzle, Difficulty, GameMode } from '../core/types'
 import { filterCases } from '../core/ux'
@@ -24,10 +24,6 @@ interface Props {
 
 function fmt(s: number) { return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}` }
 
-// Map each difficulty label to its CSS token slug.
-// Two variants are available in theme.css for each slug:
-//   --diff-<slug>       decorative fill (rails, card spine, CSS custom property fed to color-mix hover rules)
-//   --diff-<slug>-text  AA-safe foreground text (>= 4.5:1 contrast in both light and dark themes)
 const DIFF_TOKEN: Record<string, string> = {
   'Very Easy': 'very-easy', Easy: 'easy', Medium: 'medium', Hard: 'hard', Expert: 'expert',
   Master: 'master',
@@ -37,13 +33,20 @@ const diffText = (d: string) => `var(--diff-${DIFF_TOKEN[d]}-text)`
 
 const DIFF_ORDER: Difficulty[] = ['Very Easy', 'Easy', 'Medium', 'Hard', 'Expert', 'Master']
 
-export default function HomeScreen({ puzzles, completedIds, records, mode, onSetMode, onSelect, onOpenReleases, resolvedTheme, onToggleTheme, inProgress = null, onResume }: Props) {
-  const [query, setQuery] = useState('')
-  const [difficulty, setDifficulty] = useState<'All' | Difficulty>('All')
-  const matchingPuzzles = useMemo(() => filterCases(puzzles, query, difficulty), [puzzles, query, difficulty])
-  const solvedCount = completedIds.filter(id => puzzles.some(p => p.id === id)).length
-  const bestTimes = puzzles.map(p => records[p.id]?.bestSeconds).filter((v): v is number => v != null)
-  const fastest = bestTimes.length ? Math.min(...bestTimes) : null
+// Grid sizes associated with each difficulty level; derived at render time from
+// the actual puzzle catalog so this stays accurate if tiers shift.
+function tierGridSize(puzzles: Puzzle[], diff: Difficulty): string {
+  const p = puzzles.find(x => x.difficulty === diff)
+  return p ? `${p.size}×${p.size}` : '—'
+}
+
+export default function HomeScreen({
+  puzzles, completedIds, records, mode, onSetMode, onSelect,
+  onOpenReleases, resolvedTheme, onToggleTheme, inProgress = null, onResume,
+}: Props) {
+  // 'landing' = Screen 1; any Difficulty string = Screen 2 (case list for that tier)
+  const [view, setView] = useState<'landing' | Difficulty>('landing')
+
   const resumablePuzzle = inProgress ? puzzles.find(puzzle => puzzle.id === inProgress.id) : undefined
 
   function resumeCase() {
@@ -52,16 +55,8 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
     else onSelect(inProgress.id)
   }
 
-  return (
-    <motion.div
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className="desk-surface relative flex flex-col min-h-screen"
-    >
-      {/* Atmosphere: a warm pool of light behind the crest falling off into the
-          corners, plus fine grain. Flat near-black read as "unfinished dark
-          theme" rather than "noir". Both layers are inert and theme-aware.
-          These stay full-bleed — they ARE the desk surface behind the files. */}
+  const atmosphereLayers = (
+    <>
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 z-0"
@@ -79,287 +74,439 @@ export default function HomeScreen({ puzzles, completedIds, records, mode, onSet
           )}")`,
         }}
       />
+    </>
+  )
 
-      {/* ── Content column: bounded measure so wide screens stay purposeful ── */}
-      {/* max-w-[1600px] is generous enough for a 5-col card grid at 1920px     */}
-      {/* while keeping the hero text from floating in space. The atmosphere    */}
-      {/* layers above live outside this container so they stay full-bleed.     */}
-      <div className="relative z-10 w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 flex flex-col min-h-screen">
+  if (view !== 'landing') {
+    return (
+      <TierScreen
+        difficulty={view}
+        puzzles={puzzles}
+        completedIds={completedIds}
+        records={records}
+        mode={mode}
+        onSetMode={onSetMode}
+        onSelect={onSelect}
+        onBack={() => setView('landing')}
+        atmosphereLayers={atmosphereLayers}
+      />
+    )
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="desk-surface relative flex flex-col min-h-screen"
+    >
+      {atmosphereLayers}
+
+      {/*
+        The LANDING uses a narrower measure than the case grid, deliberately.
+        Measured at 1526px: the intro copy sat in a ~450px centred column while
+        Today's Case and the tier rows ran nearly edge to edge — three different
+        left edges (532 / 57 / 40) on one screen, which is what made it read as
+        unfinished. One shared column gives every block the same left and right
+        edge and stops a tier row from becoming a 1431px-wide click target.
+        The case grid below keeps its wide measure: it is a grid of cards, not
+        prose, and wants the room.
+      */}
+      <div className="relative z-10 w-full max-w-[860px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col min-h-screen">
+
+        {/* ── Top bar ── */}
         <div className="pt-safe flex items-center justify-between pt-3">
-          <button onClick={onOpenReleases} className="focus-ring min-h-11 text-paper-muted text-xs font-sans tracking-wide hover:text-accent-text transition-colors px-1 py-1" style={{ minHeight: 44 }}>
+          <button
+            onClick={onOpenReleases}
+            className="focus-ring min-h-11 text-paper-muted text-xs font-sans tracking-wide hover:text-accent-text transition-colors px-1 py-1"
+            style={{ minHeight: 44 }}
+          >
             What&rsquo;s new
           </button>
           <ThemeToggle resolved={resolvedTheme} onToggle={onToggleTheme} />
         </div>
 
-      <header className="flex flex-col items-center pt-2 pb-4 px-6 relative">
-        {/* Detective badge / seal */}
-        <div className="relative mb-3">
-          <svg width="58" height="58" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-            {/* outer dashed ring */}
-            <circle cx="40" cy="40" r="37" stroke="var(--color-accent)" strokeOpacity="0.38" strokeWidth="1.5" strokeDasharray="4 3.5"/>
-            {/* inner solid ring */}
-            <circle cx="40" cy="40" r="30" stroke="var(--color-accent)" strokeOpacity="0.55" strokeWidth="1.8"/>
-            {/* magnifying glass */}
-            <circle cx="34" cy="34" r="12" stroke="var(--color-accent)" strokeOpacity="0.85" strokeWidth="3" fill="none"/>
-            <circle cx="34" cy="34" r="7" fill="var(--color-accent)" fillOpacity="0.12"/>
-            <line x1="43" y1="43" x2="54" y2="54" stroke="var(--color-accent)" strokeOpacity="0.85" strokeWidth="4" strokeLinecap="round"/>
-            {/* crosshair inside lens */}
-            <line x1="34" y1="28" x2="34" y2="40" stroke="var(--color-accent)" strokeOpacity="0.45" strokeWidth="1.5" strokeLinecap="round"/>
-            <line x1="28" y1="34" x2="40" y2="34" stroke="var(--color-accent)" strokeOpacity="0.45" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
-          {/* ambient glow */}
-          <div className="absolute inset-0 rounded-full pointer-events-none" style={{ boxShadow: '0 0 40px 8px var(--color-accent)', opacity: 0.08 }}/>
+        {/* ── Hero ── */}
+        <header className="flex flex-col items-center pt-2 pb-4 px-4 relative">
+          <div className="relative mb-3">
+            <svg width="58" height="58" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+              <circle cx="40" cy="40" r="37" stroke="var(--color-accent)" strokeOpacity="0.38" strokeWidth="1.5" strokeDasharray="4 3.5"/>
+              <circle cx="40" cy="40" r="30" stroke="var(--color-accent)" strokeOpacity="0.55" strokeWidth="1.8"/>
+              <circle cx="34" cy="34" r="12" stroke="var(--color-accent)" strokeOpacity="0.85" strokeWidth="3" fill="none"/>
+              <circle cx="34" cy="34" r="7" fill="var(--color-accent)" fillOpacity="0.12"/>
+              <line x1="43" y1="43" x2="54" y2="54" stroke="var(--color-accent)" strokeOpacity="0.85" strokeWidth="4" strokeLinecap="round"/>
+              <line x1="34" y1="28" x2="34" y2="40" stroke="var(--color-accent)" strokeOpacity="0.45" strokeWidth="1.5" strokeLinecap="round"/>
+              <line x1="28" y1="34" x2="40" y2="34" stroke="var(--color-accent)" strokeOpacity="0.45" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+            <div className="absolute inset-0 rounded-full pointer-events-none" style={{ boxShadow: '0 0 40px 8px var(--color-accent)', opacity: 0.08 }}/>
+          </div>
+
+          <h1
+            className="font-display font-bold tracking-tight mt-0.5 leading-none"
+            style={{
+              fontSize: 'clamp(2rem, 5vw, 2.8rem)',
+              color: 'var(--color-text-primary)',
+              textShadow: '0 2px 24px color-mix(in srgb, var(--color-accent) 40%, transparent)',
+            }}
+          >
+            ALIBI
+          </h1>
+
+          {/* One-line product description */}
+          <p
+            className="mt-2 text-center font-mono leading-snug text-text-secondary max-w-md sm:max-w-xl"
+            style={{ fontSize: 12 }}
+          >
+            A murder-mystery deduction puzzle. Place every suspect on a house map — one per row, one per column — then accuse whoever is left alone with the victim.
+          </p>
+        </header>
+
+        {/* ── How it works (3 steps, scannable) ── */}
+        {/* Full column width: a centred island here would give the steps a left
+            edge that matched neither the hero nor the tier rows below. */}
+        <div className="mb-4 w-full">
+          <p
+            className="mb-2 font-display font-bold uppercase tracking-[0.14em] text-text-muted"
+            style={{ fontSize: 11 }}
+          >
+            How it works
+          </p>
+          <ol className="flex flex-col gap-1.5">
+            {[
+              'Read the witness clues — room, furniture, and relationship evidence.',
+              'Place every suspect so each holds exactly one row and one column of the house map.',
+              'Accuse the suspect left alone in the same room as the victim.',
+            ].map((step, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <span
+                  className="shrink-0 font-display font-bold leading-none mt-px"
+                  style={{ fontSize: 13, color: 'var(--color-accent-text)', minWidth: 16 }}
+                  aria-hidden
+                >
+                  {i + 1}
+                </span>
+                <span className="font-mono leading-snug text-text-secondary" style={{ fontSize: 11 }}>
+                  {step}
+                </span>
+              </li>
+            ))}
+          </ol>
         </div>
 
-        <h1
-          className="font-display font-bold tracking-tight mt-0.5 leading-none"
-          style={{
-            fontSize: 'clamp(2rem, 5vw, 2.8rem)',
-            color: 'var(--color-text-primary)',
-            textShadow: '0 2px 24px color-mix(in srgb, var(--color-accent) 40%, transparent)',
-          }}
-        >
-          ALIBI
-        </h1>
+        {/* ── Today's Case (primary CTA) ── */}
+        <DailyPanel puzzles={puzzles} completedIds={completedIds} records={records} onSelect={onSelect} />
 
-        <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">Continuity case index</p>
-      </header>
-
-      {/* Mode selector — bounded to readable width, centred within the column */}
-      <div className="mb-4 w-full max-w-md mx-auto">
-        <div className="flex rounded-none border border-border-strong bg-bg-surface p-1 gap-1">
-          <ModeBtn active={mode === 'classic'} onClick={() => onSetMode('classic')}
-            icon={<Sparkles size={14} />} title="Classic"
-            desc="Place & submit" />
-          <ModeBtn active={mode === 'detective'} onClick={() => onSetMode('detective')}
-            icon={<Search size={14} />} title="Detective"
-            desc="Draft · lock · deduce" />
-        </div>
-      </div>
-
-      {/* ── Daily Case panel ── */}
-      <DailyPanel puzzles={puzzles} completedIds={completedIds} records={records} onSelect={onSelect} />
-
-      {/* ── Badge shelf ── */}
-      <BadgeShelf puzzles={puzzles} completedIds={completedIds} records={records} />
-
-      {/* Case index — uses the full column width purposefully: 3 cols on md,
-          4 on xl, 5 on 2xl. On a 1920 monitor that's ~5 files spread across
-          the desk rather than a thin strip in the centre. */}
-      {resumablePuzzle && inProgress && (
-        <section
-          data-testid="continue-strip"
-          aria-labelledby="continue-reconstruction-heading"
-          className="mb-4 border border-accent-strong bg-bg-surface p-3 sm:p-4"
-          style={{ boxShadow: 'var(--shadow-cut)' }}
-        >
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="min-w-0">
-              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-accent-text">In progress</p>
-              <h2 id="continue-reconstruction-heading" className="mt-1 truncate font-display text-lg font-bold uppercase tracking-[0.04em] text-text-primary">
-                {resumablePuzzle.title}
-              </h2>
-              <p className="mt-1 font-mono text-[11px] text-text-secondary">
-                {inProgress.placedCount} / {resumablePuzzle.people.length} placed · {fmt(inProgress.elapsedSeconds)} · {inProgress.mode === 'detective' ? 'Detective' : 'Classic'}
-              </p>
+        {/* ── Continue strip ── */}
+        {resumablePuzzle && inProgress && (
+          <section
+            data-testid="continue-strip"
+            aria-labelledby="continue-reconstruction-heading"
+            className="mb-4 border border-accent-strong bg-bg-surface p-3 sm:p-4"
+            style={{ boxShadow: 'var(--shadow-cut)' }}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-accent-text">In progress</p>
+                <h2 id="continue-reconstruction-heading" className="mt-1 truncate font-display text-lg font-bold uppercase tracking-[0.04em] text-text-primary">
+                  {resumablePuzzle.title}
+                </h2>
+                <p className="mt-1 font-mono text-[11px] text-text-secondary">
+                  {inProgress.placedCount} / {resumablePuzzle.people.length} placed · {fmt(inProgress.elapsedSeconds)} · {inProgress.mode === 'detective' ? 'Detective' : 'Classic'}
+                </p>
+              </div>
+              <button
+                type="button"
+                data-testid="continue-reconstruction"
+                onClick={resumeCase}
+                className="focus-ring min-h-11 border border-accent-strong bg-accent px-4 font-sans text-xs font-bold uppercase tracking-[0.12em] text-on-accent"
+                style={{ minHeight: 44 }}
+              >
+                Continue reconstruction
+              </button>
             </div>
-            <button
-              type="button"
-              data-testid="continue-reconstruction"
-              onClick={resumeCase}
-              className="focus-ring min-h-11 border border-accent-strong bg-accent px-4 font-sans text-xs font-bold uppercase tracking-[0.12em] text-on-accent"
-              style={{ minHeight: 44 }}
-            >
-              Continue reconstruction
-            </button>
+          </section>
+        )}
+
+        {/* ── Difficulty tiers — main navigation ── */}
+        <section aria-labelledby="tiers-heading" className="mb-4">
+          <h2
+            id="tiers-heading"
+            className="mb-2 font-display font-bold uppercase tracking-[0.14em] text-text-muted"
+            style={{ fontSize: 11 }}
+          >
+            Case tiers
+          </h2>
+          <div className="flex flex-col gap-1.5">
+            {DIFF_ORDER.map(diff => {
+              const tierPuzzles = puzzles.filter(p => p.difficulty === diff)
+              if (!tierPuzzles.length) return null
+              const solvedInTier = tierPuzzles.filter(p => completedIds.includes(p.id)).length
+              const gridSize = tierGridSize(puzzles, diff)
+              return (
+                <button
+                  key={diff}
+                  type="button"
+                  onClick={() => setView(diff)}
+                  className="focus-ring group flex items-center justify-between border border-border-strong bg-bg-surface px-4 transition-colors hover:border-accent-strong"
+                  style={{ minHeight: 52 }}
+                  aria-label={`${diff} cases, ${gridSize} grid, ${solvedInTier} of ${tierPuzzles.length} solved`}
+                >
+                  <div className="flex items-center gap-3">
+                    {/* Difficulty colour swatch — same visual language as card spine */}
+                    <div
+                      className="shrink-0"
+                      style={{ width: 4, height: 32, background: diffFill(diff) }}
+                      aria-hidden
+                    />
+                    <span
+                      className="font-display font-bold uppercase tracking-[0.12em]"
+                      style={{ fontSize: 14, color: diffText(diff) }}
+                    >
+                      {diff}
+                    </span>
+                    <span
+                      className="font-mono text-text-muted"
+                      style={{ fontSize: 11 }}
+                    >
+                      {gridSize}
+                    </span>
+                  </div>
+                  <span className="font-mono text-text-secondary" style={{ fontSize: 11 }}>
+                    {solvedInTier}/{tierPuzzles.length}
+                  </span>
+                </button>
+              )
+            })}
           </div>
         </section>
-      )}
 
-      <section aria-labelledby="case-search-heading" className="mb-5 border border-border-strong bg-bg-surface p-3 sm:p-4">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <h2 id="case-search-heading" className="font-display text-sm font-bold uppercase tracking-[0.14em] text-text-primary">Find a case</h2>
-            <label htmlFor="case-search" className="sr-only">Search cases</label>
-            <div className="relative mt-2">
-              <Search size={16} aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
-              <input
-                id="case-search"
-                data-testid="home-search"
-                type="search"
-                value={query}
-                onChange={event => setQuery(event.currentTarget.value)}
-                placeholder="Search cases, rooms, or suspects"
-                className="h-11 w-full border border-border-strong bg-bg-inset pl-10 pr-3 font-mono text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-accent-strong"
-                style={{ minHeight: 44 }}
-              />
-            </div>
-          </div>
-          <p data-testid="case-result-count" aria-live="polite" className="font-mono text-[11px] uppercase tracking-[0.12em] text-text-muted">
-            {matchingPuzzles.length} matching {matchingPuzzles.length === 1 ? 'case' : 'cases'}
-          </p>
-        </div>
+        {/* ── Achievements shelf ── */}
+        <BadgeShelf puzzles={puzzles} completedIds={completedIds} records={records} />
 
-        <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter cases by difficulty">
-          <DifficultyButton active={difficulty === 'All'} onClick={() => setDifficulty('All')} label="All" />
-          {DIFF_ORDER.map(item => (
-            <DifficultyButton key={item} active={difficulty === item} onClick={() => setDifficulty(item)} label={item} />
-          ))}
-        </div>
-      </section>
-
-      <main className="flex-1 overflow-y-auto pb-8">
-        {matchingPuzzles.length === 0 && (
-          <p className="border border-border-strong bg-bg-surface p-6 text-center font-mono text-sm text-text-secondary" role="status">
-            No cases match that search or difficulty.
-          </p>
-        )}
-        {DIFF_ORDER.map(diff => {
-          const group = matchingPuzzles.filter(p => p.difficulty === diff)
-          if (!group.length) return null
-          const solvedInGroup = group.filter(p => completedIds.includes(p.id)).length
-          return (
-            <section key={diff} className="mb-6">
-              {/* Difficulty divider */}
-              <div className="flex items-center gap-3 mb-3">
-                <div className="h-px flex-1" style={{ background: `linear-gradient(to right, transparent, ${diffFill(diff)})` }} />
-                <h2
-                  className="font-display font-bold text-sm uppercase tracking-[0.18em]"
-                  style={{ color: diffText(diff) }}
-                >
-                  {diff}
-                </h2>
-                <span className="text-paper-muted text-[10px] font-sans">{solvedInGroup}/{group.length}</span>
-                <div className="h-px flex-1" style={{ background: `linear-gradient(to left, transparent, ${diffFill(diff)})` }} />
-              </div>
-
-              {/* Column counts chosen against the DATA, not by eyeballing the
-                  gap: difficulty groups hold 6 cases (Very Easy / Easy /
-                  Medium), then 5 and 4. A 4- or 5-column grid strands a single
-                  orphan card on its own row in every 6-case section. 3 divides
-                  6 cleanly (3+3), and 6 lays a whole section out in one row. */}
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
-                {group.map((p) => {
-                  const solved = completedIds.includes(p.id)
-                  return (
-                    // Plain buttons (no per-card entry animation) so toggling Classic ↔
-                    // Detective never re-triggers a staggered fade/flicker.
-                    // border-border-strong: the card edge IS the interactive affordance
-                    // (bg-surface vs bg-base is near-zero contrast), so it must meet
-                    // WCAG 1.4.11 at 3.5:1 — that's border-strong, not border-subtle.
-                    <button
-                      key={p.id}
-                      onClick={() => onSelect(p.id)}
-                      className="case-card evidence-strip focus-ring group relative text-left rounded-none border border-border-strong overflow-hidden"
-                      style={{ ['--diff' as string]: diffFill(p.difficulty), minHeight: 44 }}
-                    >
-                      {/* Difficulty spine: file-folder tab colour running the
-                          full height of the left edge, like a coloured folder tab
-                          in a physical evidence cabinet. */}
-                      <div className="px-3.5 py-3.5">
-                        <div className="flex items-center justify-between mb-1.5">
-                          {/* Case number: typed evidence reference, font-mono */}
-                          <span
-                            className="text-[10px] tracking-[0.18em] uppercase font-mono"
-                            style={{ color: diffText(p.difficulty) }}
-                          >
-                            {p.caseNumber}
-                          </span>
-                          {solved && (
-                            /* Stamped-ink "CLOSED" — rectangular, no rounding,
-                               slightly rotated to evoke a rubber-stamp over a
-                               case file. Uses accent tokens, not a bright pill. */
-                            <span
-                              className="text-[10px] font-display font-bold uppercase tracking-[0.18em] px-1.5 py-[3px] leading-none"
-                              style={{
-                                color: 'var(--color-accent-text)',
-                                border: '1px solid color-mix(in srgb, var(--color-accent) 60%, transparent)',
-                                background: 'color-mix(in srgb, var(--color-accent) 10%, transparent)',
-                                transform: 'rotate(-1.5deg)',
-                                display: 'inline-block',
-                              }}
-                            >
-                              CLOSED
-                            </span>
-                          )}
-                        </div>
-
-                        <h2 className="font-display text-[17px] font-bold leading-[1.15] tracking-[0.01em] mb-2.5 uppercase" style={{ color: '#19150F' }}>
-                          {p.title}
-                        </h2>
-
-                        <div className="flex items-center gap-3 text-[11px] font-sans" style={{ color: '#4B4232' }}>
-                          <span className="flex items-center gap-1"><LayoutGrid size={12} />{p.size}×{p.size}</span>
-
-                          {/* The cast, as accent dots. Real portraits would be
-                              ~150 DiceBear API requests across the catalog —
-                              these carry the same "who's in this case" signal
-                              for free. Victim dots are desaturated to mark
-                              their role without a separate label. */}
-                          <span className="flex items-center gap-[3px]" title={`${p.people.length} people`}>
-                            <Users size={12} className="mr-0.5" />
-                            {p.people.map(person => (
-                              <span
-                                key={person.id}
-                                className="rounded-none"
-                                style={{
-                                  width: 6, height: 6,
-                                  backgroundColor: person.accent,
-                                  opacity: person.isVictim ? 0.30 : 1,
-                                  boxShadow: person.isVictim ? 'none' : `0 0 3px ${person.accent}55`,
-                                }}
-                              />
-                            ))}
-                          </span>
-
-                          {records[p.id] && (
-                            /* Best time: typewriter readout — case-file data lives in mono */
-                            <span className="flex items-center gap-1 text-accent-text ml-auto tabular-nums font-mono text-[10px]">
-                              <Timer size={11} />{fmt(records[p.id].bestSeconds)}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-            </section>
-          )
-        })}
-      </main>
-
-      <footer className="pb-safe pb-6 flex justify-center gap-4">
-        <span className="text-paper-muted text-[10px] tracking-wider font-sans opacity-70">
-          {solvedCount}/{puzzles.length} cases solved
-        </span>
-        {fastest != null && (
-          <span className="text-paper-muted text-[10px] tracking-wider font-sans opacity-70 flex items-center gap-1">
-            <Timer size={11} /> best {fmt(fastest)}
-          </span>
-        )}
-      </footer>
+        {/* Footer */}
+        <footer className="pb-safe pb-6 flex justify-center gap-4 mt-auto">
+          {(() => {
+            const solvedCount = completedIds.filter(id => puzzles.some(p => p.id === id)).length
+            const bestTimes = puzzles.map(p => records[p.id]?.bestSeconds).filter((v): v is number => v != null)
+            const fastest = bestTimes.length ? Math.min(...bestTimes) : null
+            return (
+              <>
+                <span className="text-paper-muted text-[10px] tracking-wider font-sans opacity-70">
+                  {solvedCount}/{puzzles.length} cases solved
+                </span>
+                {fastest != null && (
+                  <span className="text-paper-muted text-[10px] tracking-wider font-sans opacity-70 flex items-center gap-1">
+                    <Timer size={11} /> best {fmt(fastest)}
+                  </span>
+                )}
+              </>
+            )
+          })()}
+        </footer>
 
       </div>{/* /content column */}
     </motion.div>
   )
 }
 
+// ── Screen 2: Case list for one difficulty tier ─────────────────────────────
+
+interface TierScreenProps {
+  difficulty: Difficulty
+  puzzles: Puzzle[]
+  completedIds: string[]
+  records: Record<string, CaseRecord>
+  mode: GameMode
+  onSetMode: (m: GameMode) => void
+  onSelect: (id: string) => void
+  onBack: () => void
+  atmosphereLayers: React.ReactNode
+}
+
+function TierScreen({
+  difficulty, puzzles, completedIds, records, mode, onSetMode, onSelect, onBack, atmosphereLayers,
+}: TierScreenProps) {
+  const [query, setQuery] = useState('')
+
+  const tierPuzzles = useMemo(() => puzzles.filter(p => p.difficulty === difficulty), [puzzles, difficulty])
+  const matchingPuzzles = useMemo(() => filterCases(tierPuzzles, query), [tierPuzzles, query])
+
+  const solvedInTier = tierPuzzles.filter(p => completedIds.includes(p.id)).length
+  const gridSize = tierPuzzles[0] ? `${tierPuzzles[0].size}×${tierPuzzles[0].size}` : '—'
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      className="desk-surface relative flex flex-col min-h-screen"
+    >
+      {atmosphereLayers}
+
+      <div className="relative z-10 w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 flex flex-col min-h-screen">
+
+        {/* ── Masthead with back ── */}
+        <div className="pt-safe flex items-center gap-3 pt-3 pb-4 border-b border-border-subtle">
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label="Back to landing"
+            className="focus-ring flex items-center gap-1.5 text-text-secondary hover:text-text-primary transition-colors"
+            style={{ minHeight: 44, minWidth: 44 }}
+          >
+            <ArrowLeft size={16} aria-hidden />
+            <span className="font-mono text-[11px] uppercase tracking-[0.12em]">Cases</span>
+          </button>
+
+          <div className="flex-1 min-w-0">
+            <h1
+              className="font-display font-bold uppercase tracking-[0.12em] truncate"
+              style={{ fontSize: 18, color: diffText(difficulty) }}
+            >
+              {difficulty}
+            </h1>
+            <p className="font-mono text-text-muted" style={{ fontSize: 11 }}>
+              {gridSize} · {solvedInTier}/{tierPuzzles.length} solved
+            </p>
+          </div>
+        </div>
+
+        {/* ── Mode toggle — chosen here, just before playing ── */}
+        <div className="mt-4 mb-4 w-full max-w-md">
+          <div className="flex border border-border-strong bg-bg-surface p-1 gap-1">
+            <ModeBtn active={mode === 'classic'} onClick={() => onSetMode('classic')}
+              icon={<Sparkles size={14} aria-hidden />} title="Classic"
+              desc="Place freely · 3 hints" />
+            <ModeBtn active={mode === 'detective'} onClick={() => onSetMode('detective')}
+              icon={<Search size={14} aria-hidden />} title="Detective"
+              desc="Draft &amp; eliminate · no hints" />
+          </div>
+        </div>
+
+        {/* ── Search field (within this tier) ── */}
+        <section aria-labelledby="case-search-heading" className="mb-5 border border-border-strong bg-bg-surface p-3 sm:p-4">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <h2 id="case-search-heading" className="font-display text-sm font-bold uppercase tracking-[0.14em] text-text-primary">Find a case</h2>
+              <label htmlFor="case-search" className="sr-only">Search cases</label>
+              <div className="relative mt-2">
+                <Search size={16} aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+                <input
+                  id="case-search"
+                  data-testid="home-search"
+                  type="search"
+                  value={query}
+                  onChange={event => setQuery(event.currentTarget.value)}
+                  placeholder="Search cases, rooms, or suspects"
+                  className="h-11 w-full border border-border-strong bg-bg-inset pl-10 pr-3 font-mono text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-accent-strong"
+                  style={{ minHeight: 44 }}
+                />
+              </div>
+            </div>
+            <p data-testid="case-result-count" aria-live="polite" className="font-mono text-[11px] uppercase tracking-[0.12em] text-text-muted">
+              {matchingPuzzles.length} matching {matchingPuzzles.length === 1 ? 'case' : 'cases'}
+            </p>
+          </div>
+        </section>
+
+        {/* ── Case grid ── */}
+        <main className="flex-1 overflow-y-auto pb-8">
+          {matchingPuzzles.length === 0 && (
+            <p className="border border-border-strong bg-bg-surface p-6 text-center font-mono text-sm text-text-secondary" role="status">
+              No cases match that search.
+            </p>
+          )}
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
+            {matchingPuzzles.map((p) => {
+              const solved = completedIds.includes(p.id)
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => onSelect(p.id)}
+                  className="case-card evidence-strip focus-ring group relative text-left border border-border-strong overflow-hidden"
+                  style={{ ['--diff' as string]: diffFill(p.difficulty), minHeight: 44 }}
+                >
+                  <div className="px-3.5 py-3.5">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span
+                        className="text-[10px] tracking-[0.18em] uppercase font-mono"
+                        style={{ color: diffText(p.difficulty) }}
+                      >
+                        {p.caseNumber}
+                      </span>
+                      {solved && (
+                        <span
+                          className="text-[10px] font-display font-bold uppercase tracking-[0.18em] px-1.5 py-[3px] leading-none"
+                          style={{
+                            color: 'var(--color-accent-text)',
+                            border: '1px solid color-mix(in srgb, var(--color-accent) 60%, transparent)',
+                            background: 'color-mix(in srgb, var(--color-accent) 10%, transparent)',
+                            transform: 'rotate(-1.5deg)',
+                            display: 'inline-block',
+                          }}
+                        >
+                          CLOSED
+                        </span>
+                      )}
+                    </div>
+
+                    <h2 className="font-display text-[17px] font-bold leading-[1.15] tracking-[0.01em] mb-2.5 uppercase" style={{ color: '#19150F' }}>
+                      {p.title}
+                    </h2>
+
+                    <div className="flex items-center gap-3 text-[11px] font-sans" style={{ color: '#4B4232' }}>
+                      <span className="flex items-center gap-1"><LayoutGrid size={12} aria-hidden />{p.size}×{p.size}</span>
+
+                      <span className="flex items-center gap-[3px]" title={`${p.people.length} people`}>
+                        <Users size={12} className="mr-0.5" aria-hidden />
+                        {p.people.map(person => (
+                          <span
+                            key={person.id}
+                            aria-hidden
+                            style={{
+                              width: 6, height: 6,
+                              backgroundColor: person.accent,
+                              opacity: person.isVictim ? 0.30 : 1,
+                              boxShadow: person.isVictim ? 'none' : `0 0 3px ${person.accent}55`,
+                            }}
+                          />
+                        ))}
+                      </span>
+
+                      {records[p.id] && (
+                        <span className="flex items-center gap-1 text-accent-text ml-auto tabular-nums font-mono text-[10px]">
+                          <Timer size={11} aria-hidden />{fmt(records[p.id].bestSeconds)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </main>
+
+      </div>{/* /content column */}
+    </motion.div>
+  )
+}
+
+// ── ModeBtn ──────────────────────────────────────────────────────────────────
+
 function ModeBtn({ active, onClick, icon, title, desc }: {
   active: boolean; onClick: () => void; icon: React.ReactNode; title: string; desc: string
 }) {
   return (
-    <button onClick={onClick}
-      className="focus-ring flex-1 min-h-11 rounded-none px-3 py-2 flex items-center gap-2 transition-colors"
+    <button
+      onClick={onClick}
+      className="focus-ring flex-1 min-h-11 px-3 py-2 flex items-center gap-2 transition-colors"
       style={{
         background: active ? 'color-mix(in srgb, var(--color-accent) 14%, transparent)' : 'transparent',
         color: active ? 'var(--color-accent-text)' : 'var(--color-text-secondary)',
-        /* border-strong: this is an unfilled button outline = the border IS the affordance */
         boxShadow: active ? 'inset 0 0 0 1px var(--color-border-strong)' : undefined,
         borderBottom: active ? '2px solid var(--color-accent)' : '2px solid transparent',
         minHeight: 44,
-      }}>
+      }}
+    >
       {icon}
       <span className="text-left">
         <span className="block font-display font-bold text-xs leading-tight tracking-wide uppercase">{title}</span>
@@ -369,31 +516,7 @@ function ModeBtn({ active, onClick, icon, title, desc }: {
   )
 }
 
-function DifficultyButton({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className="focus-ring h-11 border px-2.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] whitespace-nowrap transition-colors"
-      style={{
-        // Height stays a 44px touch target, but width follows the label: a hard
-        // 44px square clipped "EXPERT" and "MASTER" mid-word.
-        minHeight: 44,
-        minWidth: 44,
-        height: 44,
-        borderColor: active ? 'var(--color-accent-strong)' : 'var(--color-border-strong)',
-        backgroundColor: active ? 'var(--color-accent)' : 'var(--color-bg-inset)',
-        color: active ? 'var(--color-on-accent)' : 'var(--color-text-secondary)',
-        clipPath: 'polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)',
-      }}
-    >
-      {label}
-    </button>
-  )
-}
-
-// ── Daily Case panel ────────────────────────────────────────────────────────
+// ── DailyPanel ───────────────────────────────────────────────────────────────
 
 function DailyPanel({
   puzzles,
@@ -453,7 +576,7 @@ function DailyPanel({
           </p>
           {records[daily.id] && (
             <p className="mt-1 font-mono text-[10px] text-accent-text flex items-center gap-1">
-              <Timer size={11} /> best {fmt(records[daily.id].bestSeconds)}
+              <Timer size={11} aria-hidden /> best {fmt(records[daily.id].bestSeconds)}
             </p>
           )}
         </div>
@@ -471,7 +594,7 @@ function DailyPanel({
   )
 }
 
-// ── Badge shelf ─────────────────────────────────────────────────────────────
+// ── BadgeShelf ───────────────────────────────────────────────────────────────
 
 function BadgeShelf({
   puzzles,
