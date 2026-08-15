@@ -161,7 +161,8 @@ export default function MapGrid({
             const locked = mark.kind === 'person' && mark.locked
             const isAutoX = mark.kind === 'x' && mark.auto
             const tokenSize = Math.max(26, 340 / N)
-            const material = roomMaterial(room(id)?.name ?? '')
+            const roomLabel = room(id)?.name ?? ''
+            const material = roomMaterial(roomLabel)
             const isOutdoor = material === 'front-yard' || material === 'garden'
             const darkFloor = isDarkFloor(material)
             const draftNames = mark.kind === 'draft'
@@ -195,7 +196,13 @@ export default function MapGrid({
                 onMouseLeave={() => isPlacing && setHoverCell(null)}
                 onKeyDown={(e) => handleCellKey(e, r, c, N)}
                 title={draftNames ? `Maybe: ${draftNames}` : furnNames || undefined}
-                aria-label={`Row ${r + 1}, column ${c + 1}${person ? `, ${person.name}` : draftNames ? `, drafts: ${draftNames}` : furnNames ? `, ${furnNames}` : ''}${isClueTarget && highlightLabel ? `, matches clue: ${highlightLabel}` : ''}`}
+                /* The ROOM NAME is load-bearing in the accessible name. Clues
+                   say "In the Kitchen" and "Beside the rug", so a player using
+                   a screen reader who only hears "Row 1, column 2, Bed" cannot
+                   connect a cell to the clue that references it. Sighted players
+                   read the room off the floor material and the label stamp;
+                   this is the equivalent. */
+                aria-label={`Row ${r + 1}, column ${c + 1}${roomLabel ? `, ${roomLabel}` : ''}${person ? `, ${person.name}` : draftNames ? `, drafts: ${draftNames}` : furnNames ? `, ${furnNames}` : ''}${mark.kind === 'x' ? ', marked empty' : ''}${isClueTarget && highlightLabel ? `, matches clue: ${highlightLabel}` : ''}`}
                 data-clue-target={isClueTarget ? 'true' : undefined}
                 /* Focus ring: SOLID var(--color-accent-strong), never --board-glow.
                    The glow variant is 50% alpha and composites to ~1.8:1 on light

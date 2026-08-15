@@ -31,7 +31,10 @@ const SPEC: { difficulty: Difficulty; count: number }[] = [
 // v15: Hard/Expert/Master cases are now two-floor. Global row/col exclusivity
 // means upstairs suspects block the same rows/cols as downstairs ones. New clue
 // kinds (floor, above, below) added. Cached v14 puzzles lack floor data.
-const KEY = 'murdoku_catalog_v15'
+// v16: Two-floor generation enabled. Information-driven greedy clue selection
+// (Phase A arithmetic scoring + Phase B cap-2 solver). Expert and Master
+// board sizes normalised to 8×8 (two floors × 8×8 ≈ single-floor 10×10 area).
+const KEY = 'murdoku_catalog_v16'
 let puzzles: Puzzle[] = []
 
 function slug(s: string) { return s.toLowerCase().replace(/\s+/g, '-') }

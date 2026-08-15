@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { findMurderer, roomIdAt } from '../src/core/engine'
 import { cellFloor, sameColumnStack } from '../src/core/types'
+import { generatePuzzle, reseed } from '../src/core/generate'
+import { countSolutions } from '../src/core/engine'
 import type { Puzzle } from '../src/core/types'
 
 // ============================================================================
@@ -85,5 +87,30 @@ describe('two-floor engine semantics', () => {
   it('finds the murderer on the victim\'s own floor', () => {
     // Ben is upstairs, so he cannot be the one left alone with the victim.
     expect(findMurderer(puzzle)).toBe('p0')
+  })
+})
+
+describe('generated two-floor cases', () => {
+  // Generation is enabled for Hard/Expert/Master. These guard the two properties
+  // that make a second storey mean anything: it must exist, and it must be USED.
+  // A two-floor board with everybody downstairs is a single-floor board with a
+  // decorative upstairs — floor clues carry no information and "directly above"
+  // can never fire. Measured over real seeds, that degenerate case did occur.
+  for (const tier of ['Hard', 'Expert', 'Master'] as const) {
+    it(`${tier} builds two storeys and puts suspects on both`, () => {
+      reseed(4242)
+      const p = generatePuzzle(tier, `${tier}-floors`, 'No. 1')
+      expect(p.floors).toBe(2)
+      const storeys = new Set(Object.values(p.solution).map(cellFloor))
+      expect(storeys.size, 'both storeys must be occupied').toBe(2)
+      expect(countSolutions(p, 5)).toBe(1)
+      expect(findMurderer(p)).toBeTruthy()
+    })
+  }
+
+  it('keeps single-floor tiers single-floor', () => {
+    reseed(4242)
+    const p = generatePuzzle('Very Easy', 've-floors', 'No. 2')
+    expect(p.floors ?? 1).toBe(1)
   })
 })

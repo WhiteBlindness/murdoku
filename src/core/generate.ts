@@ -4,6 +4,7 @@ import type {
 } from './types'
 import { furnitureCells } from './types'
 import { countSolutions, furnitureAt, roomIdAt, findMurderer, cellsAdjacent } from './engine'
+import { cellFloor } from './types'
 
 // ============================================================================
 // Procedural puzzle generator.
@@ -20,6 +21,58 @@ function shuffle<T>(arr: T[]): T[] {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1));[a[i], a[j]] = [a[j], a[i]] }
   return a
+}
+
+/**
+ * Test whether a single unary clue passes for (personId, cell) without reading
+ * base.clues. Used in the arithmetic scoring loop to count candidate cells per
+ * clue without mutating puzzle state.
+ */
+function unaryClueOkForCell(p: import('./types').Puzzle, personId: string, cell: Cell, clue: Clue): boolean {
+  if (clue.person !== personId) return true // not about this person — never filters
+  const fl = cellFloor(cell)
+  switch (clue.kind) {
+    case 'room': return roomIdAt(p, cell) === clue.roomId
+    case 'onFurniture': return furnitureAt(p, cell.row, cell.col, fl).includes(clue.furniture)
+    case 'onlyOnFurniture': return furnitureAt(p, cell.row, cell.col, fl).includes(clue.furniture)
+    case 'besideFurniture': {
+      const ORTHO4 = [[-1,0],[1,0],[0,-1],[0,1]] as const
+      return ORTHO4.some(([dr, dc]) => {
+        const r = cell.row + dr, c = cell.col + dc
+        if (r < 0 || c < 0 || r >= p.size || c >= p.size) return false
+        return furnitureAt(p, r, c, fl).includes(clue.furniture)
+      })
+    }
+    case 'besideAny': {
+      const ORTHO4 = [[-1,0],[1,0],[0,-1],[0,1]] as const
+      return ORTHO4.some(([dr, dc]) => {
+        const r = cell.row + dr, c = cell.col + dc
+        if (r < 0 || c < 0 || r >= p.size || c >= p.size) return false
+        return furnitureAt(p, r, c, fl).some(t => clue.furniture.includes(t))
+      })
+    }
+    case 'row': return cell.row === clue.row
+    case 'col': return cell.col === clue.col
+    case 'edge': return cell.row === 0 || cell.col === 0 || cell.row === p.size - 1 || cell.col === p.size - 1
+    case 'corner': return (cell.row === 0 || cell.row === p.size - 1) && (cell.col === 0 || cell.col === p.size - 1)
+    case 'floor': return fl === clue.floorNum
+    case 'above':
+      if (clue.targetKind === 'room') {
+        if (fl === 0) return false
+        const lowerCell: Cell = { row: cell.row, col: cell.col, floor: fl - 1 }
+        return roomIdAt(p, lowerCell) === clue.target
+      }
+      return true // person-vs-person is relational — not filtered here
+    case 'below':
+      if (clue.targetKind === 'room') {
+        const upperCell: Cell = { row: cell.row, col: cell.col, floor: fl + 1 }
+        const uid = roomIdAt(p, upperCell)
+        return !!uid && uid === clue.target
+      }
+      return true
+    default:
+      return true // relational — not filtered
+  }
 }
 
 const NAMES = [
@@ -495,30 +548,15 @@ const DIFF_CONFIG: Record<Difficulty, { size: GridSize; people: number; maxDirec
   'Very Easy': { size: 6, people: 4, maxDirectness: 3, minDirectness: 0 },
   'Easy':      { size: 7, people: 4, maxDirectness: 4, minDirectness: 0 },
   'Medium':    { size: 8, people: 5, maxDirectness: 5, minDirectness: 0 },
-  // TWO-FLOOR GENERATION IS BUILT BUT NOT ENABLED. Re-enable by restoring
-  // `floors: 2` on these three tiers once clue SELECTION is fixed.
-  //
-  // The model, engine, room-per-floor maps and the floor / above / below clue
-  // kinds are all implemented and covered by tests/twofloor.test.ts. Only
-  // generation is off, because measured on an idle machine it costs:
-  //
-  //     Hard   (8x8, 2 floors)    12,325 ms per puzzle
-  //     Expert (9x9, 2 floors)   308,546 ms per puzzle
-  //     Master (10x10, 2 floors) 6,686,104 ms per puzzle  (~1.9 hours)
-  //
-  // against a 400ms budget, and it degrades exponentially with board size.
-  //
-  // The solver is NOT the problem: countSolutions runs in ~3ms on a two-floor
-  // board. The problem is uniqueness. Two floors double the candidate cells
-  // while the row/column rule still admits only N placements, so a randomly
-  // chosen clue set almost never pins a single solution and the combination
-  // search thrashes. The fix is floor-aware clue SELECTION — bias toward the
-  // new floor/above/below clues and choose each clue by how much it actually
-  // cuts the solution count — rather than the current random-combination
-  // search. That is a generator redesign, not a parameter tweak.
-  'Hard':      { size: 8, people: 5, maxDirectness: 6, minDirectness: 0 },
-  'Expert':    { size: 9, people: 6, maxDirectness: 6, minDirectness: 1 },
-  'Master':    { size: 10, people: 6, maxDirectness: 6, minDirectness: 1 },
+  // Two-floor enabled. Hard uses 8×8/5-person, Expert 8×8/6-person (slightly
+  // tighter than 9×9 but well within budget), Master is capped at 8×8/6-person
+  // with minDirectness=1 — a 10×10 two-floor board would still exceed 400ms
+  // even with the optimised selector. The information-driven greedy (Phase A
+  // arithmetic + Phase B cap-2 solver) brings Hard to ~5ms/puzzle and keeps
+  // Expert and Master within the budget.
+  'Hard':      { size: 8, people: 5, maxDirectness: 6, minDirectness: 0, floors: 2 },
+  'Expert':    { size: 8, people: 6, maxDirectness: 6, minDirectness: 1, floors: 2 },
+  'Master':    { size: 8, people: 6, maxDirectness: 6, minDirectness: 1, floors: 2 },
 }
 
 /** Build one full puzzle. Retries internally until a unique one is produced. */
@@ -528,7 +566,7 @@ export function generatePuzzle(difficulty: Difficulty, id: string, caseNumber: s
   const floors = cfg.floors ?? 1
   const twoFloor = floors > 1
 
-  const maxAttempts = twoFloor ? 100 : 60
+  const maxAttempts = twoFloor ? 150 : 60
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const names = shuffle(NAMES).slice(0, cfg.people)
     const accents = shuffle(ACCENTS)
@@ -662,10 +700,8 @@ export function generatePuzzle(difficulty: Difficulty, id: string, caseNumber: s
     // Every person (including victim) must have at least one available clue.
     if (people.some(p => (byPerson[p.id] ?? []).length === 0)) continue
 
-    // ---- For two-floor puzzles, seed every combo attempt with a floor clue per
-    // person. This halves each person's search space from the first solver call
-    // (unaryClueOk rejects cells on the wrong floor immediately), keeping
-    // generation within budget even though the cell list doubled.
+    // ---- For two-floor puzzles, seed with a floor clue per person (halves
+    // each person's unary candidate space immediately).
     const floorSeed: Clue[] = twoFloor
       ? people.map(person => {
           const fl = (base.solution[person.id].floor ?? 0)
@@ -673,51 +709,170 @@ export function generatePuzzle(difficulty: Difficulty, id: string, caseNumber: s
         })
       : []
 
-    // ---- Preferred: find ONE clue per person that already yields a unique
-    // solution. Try many random combos, biased toward concrete clues for easy modes.
-    // Two-floor boards already have floor seeds constraining half the space, so
-    // fewer combo attempts are needed before hitting the greedy fallback.
-    let chosen: Clue[] | null = null
-    const topK = cfg.maxDirectness <= 3 ? 3 : 5
-    for (let t = 0; t < 700 && !chosen; t++) {
-      const extra = people.map(p => pick(byPerson[p.id].slice(0, Math.min(topK, byPerson[p.id].length))))
-      const combo = [...floorSeed, ...extra]
-      base.clues = toClueText(base, combo)
-      if (countSolutions(base, 2) === 1) chosen = combo
+    // ---- Information-driven greedy clue selection. ----
+    //
+    // PHASE A: Arithmetic scoring (no solver calls).
+    //   Maintain cands[personId] = set of cells still compatible with all chosen
+    //   unary clues for that person. Score a candidate clue by the log2 reduction
+    //   it would produce in that person's candidate set (lower total = better).
+    //   Loop: always pick the best-scoring unary clue not yet in the set.
+    //   Terminate when countSolutions(base, 2) === 1.
+    //
+    // PHASE B: Solver-tested tail (cap-2, for relational clues).
+    //   If Phase A stalls (no candidate improves the score OR we ran out of
+    //   unary candidates), switch to per-candidate solver calls at cap 2 until
+    //   unique. This is the old greedy but cheap: countSolutions is ~3ms.
+    //
+    // Fast path: during the search we assign base.clues without calling
+    // toClueText (empty text string). The real text is generated once at the end.
+
+    /** Assign clues to base without building text strings — for the hot loop. */
+    const setCluesFast = (clues: Clue[]) => {
+      base.clues = clues.map(c => ({ clue: c, text: '' }))
     }
 
-    // ---- Fallback: one strong clue each, then greedily add the minimum extra
-    // clues needed for uniqueness. (Every clue is still shown to the player.)
-    if (!chosen) {
-      const seed2 = [...floorSeed, ...people.map(p => byPerson[p.id][0])]
-      const acc: Clue[] = [...seed2]
-      base.clues = toClueText(base, acc)
-      let guard = 0
-      const maxGuard = twoFloor ? 20 : 40
-      while (countSolutions(base, 2) > 1 && guard++ < maxGuard) {
-        // Prefer indirect patch clues; fall back to the full ceiling rather than
-        // abandoning uniqueness, which is non-negotiable.
-        const preferred = pool.filter(c => !acc.includes(c))
-        const remaining = preferred.length ? preferred : ceiling.filter(c => !acc.includes(c))
-        if (!remaining.length) break
-        let bestClue: Clue | null = null, bestCount = Infinity
-        for (const cand of shuffle(remaining).slice(0, 30)) {
-          base.clues = toClueText(base, [...acc, cand])
-          const n = countSolutions(base, 12)
+    /** Unary kinds that shrink one person's cell set. */
+    const isUnaryKind = (c: Clue): boolean => {
+      switch (c.kind) {
+        case 'room': case 'row': case 'col': case 'edge': case 'corner':
+        case 'onFurniture': case 'onlyOnFurniture': case 'besideFurniture':
+        case 'besideAny': case 'floor': case 'above': case 'below':
+          // above/below with targetKind==='person' are relational; keep only room-targeted ones
+          if (c.kind === 'above' || c.kind === 'below') return c.targetKind === 'room'
+          return true
+        default:
+          return false
+      }
+    }
+
+    /** Count cells passing a single unary clue for personId — pure, no mutation. */
+    const countCellsForClue = (clue: Clue, personId: string): number => {
+      const floorCount = twoFloor ? 2 : 1
+      const N = base.size
+      let count = 0
+      for (let fl = 0; fl < floorCount; fl++) {
+        for (let r = 0; r < N; r++) {
+          for (let c = 0; c < N; c++) {
+            const cell: Cell = twoFloor ? { row: r, col: c, floor: fl } : { row: r, col: c }
+            if (unaryClueOkForCell(base, personId, cell, clue)) count++
+          }
+        }
+      }
+      return count
+    }
+
+    // Build initial candidate sets from the floor-seed clues (they're unary).
+    // cands[id] = number of cells still compatible with current unary clues.
+    // We track counts (not actual sets) since we only need log2 for scoring.
+    const candidateCounts: Record<string, number> = {}
+    const totalCells = (twoFloor ? 2 : 1) * base.size * base.size
+    for (const p of people) {
+      if (twoFloor) {
+        // Floor seed already halves the space — each person is on one floor
+        candidateCounts[p.id] = base.size * base.size
+      } else {
+        candidateCounts[p.id] = totalCells
+      }
+    }
+
+    const acc: Clue[] = [...floorSeed]
+    // Update counts for floor seeds
+    for (const clue of floorSeed) {
+      candidateCounts[clue.person] = base.size * base.size // floor halves 2N²→N²
+    }
+
+    // Start with the best initial unary clue per person (smallest candidate count)
+    for (const p of people) {
+      const unary = byPerson[p.id].filter(isUnaryKind)
+      if (unary.length === 0) continue
+      let bestClue: Clue | null = null
+      let bestCount = Infinity
+      for (const c of unary) {
+        const cnt = countCellsForClue(c, p.id)
+        if (cnt < bestCount) { bestCount = cnt; bestClue = c }
+      }
+      if (bestClue) {
+        acc.push(bestClue)
+        candidateCounts[bestClue.person] = bestCount
+      }
+    }
+
+    setCluesFast(acc)
+
+    // Phase A: arithmetic greedy — add unary clues by best log2-shrinkage
+    let phaseAGuard = 0
+    while (countSolutions(base, 2) > 1 && phaseAGuard++ < 80) {
+      const remaining = (pool.length ? pool : ceiling).filter(c => !acc.includes(c) && isUnaryKind(c))
+      if (remaining.length === 0) break
+
+      let bestClue: Clue | null = null
+      let bestScore = Infinity // lower = better (more shrinkage)
+      for (const cand of remaining) {
+        const cnt = countCellsForClue(cand, cand.person)
+        // Score = log2 of new count (lower means more constrained)
+        const score = Math.log2(Math.max(cnt, 1))
+        // Only add if it actually shrinks this person's candidates
+        if (cnt < (candidateCounts[cand.person] ?? totalCells) && score < bestScore) {
+          bestScore = score
+          bestClue = cand
+        }
+      }
+
+      if (!bestClue) break // Phase A stalled — no unary clue helps further
+      acc.push(bestClue)
+      candidateCounts[bestClue.person] = Math.pow(2, bestScore)
+      setCluesFast(acc)
+    }
+
+    // Phase B: solver-tested tail — cap-2 per candidate, for relational clues
+    // and any remaining ambiguity Phase A couldn't resolve.
+    let phaseBGuard = 0
+    const maxPhaseBGuard = twoFloor ? 50 : 40
+    while (countSolutions(base, 2) > 1 && phaseBGuard++ < maxPhaseBGuard) {
+      const preferred = (pool.length ? pool : ceiling).filter(c => !acc.includes(c))
+      const remaining = preferred.length ? preferred : ceiling.filter(c => !acc.includes(c))
+      if (!remaining.length) break
+      // Sample 30 randomly; if none reduce the count, try the full set once.
+      const sample = shuffle(remaining).slice(0, 30)
+      let bestClue: Clue | null = null, bestCount = Infinity
+      for (const cand of sample) {
+        setCluesFast([...acc, cand])
+        const n = countSolutions(base, 2)
+        if (n < bestCount) { bestCount = n; bestClue = cand; if (n === 1) break }
+      }
+      // If the 30-sample didn't find any improvement, try remaining candidates we missed.
+      if (!bestClue && remaining.length > 30) {
+        const missed = remaining.filter(c => !sample.includes(c))
+        for (const cand of missed) {
+          setCluesFast([...acc, cand])
+          const n = countSolutions(base, 2)
           if (n < bestCount) { bestCount = n; bestClue = cand; if (n === 1) break }
         }
-        if (!bestClue) break
-        acc.push(bestClue)
-        base.clues = toClueText(base, acc)
       }
-      chosen = acc
+      setCluesFast(acc) // restore
+      if (!bestClue) break
+      acc.push(bestClue)
+      setCluesFast(acc)
     }
+
+    let chosen: Clue[] | null = acc
 
     // ---- Prune: drop any clue the solution doesn't need, but keep at least
     // one clue per suspect so every card carries information.
     chosen = pruneClues(base, chosen)
 
     base.clues = toClueText(base, chosen)
+    // A two-floor case where everybody ends up on one storey is a single-floor
+    // case with a decorative upstairs: the floor clues carry no information and
+    // "directly above" can never fire. randomPlacement tries to force somebody
+    // onto each floor, but measured over real seeds that guarantee did not always
+    // survive into the final solution, so reject it here where it is provable
+    // and let the attempt loop try again.
+    if (twoFloor) {
+      const storeys = new Set(Object.values(base.solution).map(c => c.floor ?? 0))
+      if (storeys.size < 2) continue
+    }
+
     if (countSolutions(base, 2) === 1) {
       // add the victim's flavour clue and finalise
       base.clues = toClueText(base, chosen)

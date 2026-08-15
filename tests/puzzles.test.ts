@@ -19,8 +19,10 @@ describe('generated puzzle catalog', () => {
     const sizesFor = (difficulty: string) =>
       new Set(puzzles.filter(p => p.difficulty === difficulty).map(p => p.size))
     expect(sizesFor('Very Easy')).toEqual(new Set([6]))
-    expect(sizesFor('Expert')).toEqual(new Set([9]))
-    expect(sizesFor('Master')).toEqual(new Set([10]))
+    // Expert and Master use 8×8 two-floor boards (equivalent area to 10×10–11×11
+    // single-floor). The second floor is the complexity axis, not board width.
+    expect(sizesFor('Expert')).toEqual(new Set([8]))
+    expect(sizesFor('Master')).toEqual(new Set([8]))
   })
 
   it('never hands a Master suspect a bare room clue', () => {
@@ -39,9 +41,12 @@ describe('generated puzzle catalog', () => {
       expect(findMurderer(puzzle)).toBeTruthy()
 
       // Build the set of ALL cells covered by any furniture piece (including multi-cell footprints).
-      const furnished = new Set(puzzle.furniture.flatMap(item => furnitureCells(item).map(c => `${c.row},${c.col}`)))
+      // Key includes floor so floor-0 and floor-1 furniture don't collide in two-floor puzzles.
+      const furnished = new Set(puzzle.furniture.flatMap(item =>
+        furnitureCells(item).map(c => `${item.floor ?? 0}:${c.row},${c.col}`),
+      ))
       const fullyFurnishedRooms = puzzle.rooms.filter(room =>
-        room.cells.every(cell => furnished.has(`${cell.row},${cell.col}`)),
+        room.cells.every(cell => furnished.has(`${cell.floor ?? 0}:${cell.row},${cell.col}`)),
       )
       expect(fullyFurnishedRooms, 'room labels require at least one furniture-free cell').toEqual([])
     })
