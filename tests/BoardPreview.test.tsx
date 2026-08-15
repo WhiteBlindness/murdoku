@@ -16,11 +16,16 @@ describe('landing board preview', () => {
     expect(getByTestId('board-preview').querySelector('[data-testid="board"]')).not.toBeNull()
   })
 
-  it('is inert: hidden from assistive tech and not clickable', () => {
+  it('is inert: hidden from assistive tech, unfocusable and not clickable', () => {
     const { getByTestId } = render(<BoardPreview puzzles={puzzles} />)
     const preview = getByTestId('board-preview')
     expect(preview.getAttribute('aria-hidden')).toBe('true')
     expect(preview.className).toContain('pointer-events-none')
+    // MapGrid renders each cell as a real <button>. Without `inert` the landing
+    // would put ~100 focusable controls in the tab order that screen readers
+    // cannot see — focusable content inside aria-hidden is a WCAG violation.
+    expect(preview.hasAttribute('inert')).toBe(true)
+    expect(preview.querySelectorAll('button').length).toBeGreaterThan(0)
   })
 
   it('never shows a suspect standing on their real cell', () => {

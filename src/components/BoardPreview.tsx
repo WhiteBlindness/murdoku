@@ -73,6 +73,12 @@ export default function BoardPreview({ puzzles, seed = 7 }: Props) {
   return (
     <div
       aria-hidden="true"
+      /* `inert` is load-bearing, not decoration. MapGrid renders every cell as a
+         real <button>, so without it the landing puts 100 focusable controls in
+         the tab order that screen readers cannot see — focusable content inside
+         aria-hidden is exactly the combination WCAG forbids. `inert` removes
+         them from focus, hit-testing and the accessibility tree together. */
+      inert
       className="pointer-events-none select-none w-full"
       data-testid="board-preview"
     >
