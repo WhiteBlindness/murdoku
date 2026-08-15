@@ -395,8 +395,13 @@ function TierScreen({
 
         {/* ── Search field (within this tier) ── */}
         <section aria-labelledby="case-search-heading" className="mb-5 border border-border-strong bg-bg-surface p-3 sm:p-4">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div className="min-w-0 flex-1">
+          {/* Stack on mobile, share a row from sm up. Measured at 320px: as a
+              single `justify-between` row the count sat beside the field and
+              `flex-1 min-w-0` let the input collapse to 108px inside a 273px
+              container — the placeholder clipped to "Search cases, ro" while
+              ~150px sat empty beside it. */}
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-3">
+            <div className="min-w-0 w-full sm:w-auto sm:flex-1">
               <h2 id="case-search-heading" className="font-display text-sm font-bold uppercase tracking-[0.14em] text-text-primary">Find a case</h2>
               <label htmlFor="case-search" className="sr-only">Search cases</label>
               <div className="relative mt-2">
