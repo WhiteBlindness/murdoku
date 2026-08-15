@@ -2,6 +2,35 @@ import React from 'react'
 import type { FurnitureType } from './types'
 
 /**
+ * Real-world relative scale for each furniture type.
+ * Each value is the fraction of the cell (0–1) the icon should fill.
+ * A bed is one of the largest; a lamp is clearly the smallest.
+ * Multi-cell pieces (bed, sofa, rug, table, bookshelf, counter, bathtub)
+ * already earn footprint from MapGrid — keep them near 1.0.
+ */
+export const FURNITURE_SCALE: Record<FurnitureType, number> = {
+  rug:       1.00, // flat ground covering — fills its 2×2 cell entirely
+  bed:       0.97, // double bed, largest 3D object on the board
+  sofa:      0.95, // wide upholstered piece, 2×1 footprint
+  bathtub:   0.92, // large porcelain fixture, 2×1 footprint
+  table:     0.92, // dining table, 2×1 footprint
+  counter:   0.91, // kitchen counter run, 2×1 footprint
+  bookshelf: 0.91, // tall full-wall shelf, 2×1 footprint
+  fridge:    0.89, // tall appliance, 1×1
+  desk:      0.87, // writing desk, 1×1
+  shower:    0.84, // shower enclosure, 1×1
+  stove:     0.79, // cooker, 1×1
+  chair:     0.71, // armchair, noticeably smaller than sofa
+  toilet:    0.68, // bathroom fixture, compact
+  tv:        0.60, // cathode-ray set — must never exceed sofa or bathtub
+  box:       0.58, // shipping crate, medium-small
+  clock:     0.57, // grandfather clock, narrow tall 1×1
+  plant:     0.50, // potted plant, clearly small
+  shrub:     0.50, // low succulent, clearly small
+  lamp:      0.33, // table lamp — the smallest object on the board
+}
+
+/**
  * Noire Illustration board miniatures.
  *
  * Drawing rules — oblique ("cabinet") projection, unified 2026 revision:
@@ -99,6 +128,10 @@ const FOOT = { stroke: INK, strokeWidth: 3, strokeLinecap: 'round' as const }
  * One near-flat body tone per piece plus the cast shadow. Two close stops, not a
  * showy ramp: enough to read as a moulded object, never enough to muddy the
  * flat-illustration language.
+ *
+ * Scale is read from FURNITURE_SCALE: artwork is centered and shrunk so each
+ * piece occupies its real-world-proportionate fraction of the cell. The drop
+ * shadow sits outside the scale transform so it reads at consistent strength.
  */
 function Frame({ prefix, size, tone, children }: {
   prefix: string
@@ -106,6 +139,8 @@ function Frame({ prefix, size, tone, children }: {
   tone: [string, string]
   children: React.ReactNode
 }) {
+  const k = FURNITURE_SCALE[prefix as FurnitureType] ?? 1
+  const offset = 50 * (1 - k)
   return (
     <svg
       {...S(size)}
@@ -123,7 +158,11 @@ function Frame({ prefix, size, tone, children }: {
           <feDropShadow dx="1.6" dy="2.6" stdDeviation="1.5" floodColor="#120E0A" floodOpacity="0.55" />
         </filter>
       </defs>
-      <g filter={`url(#${prefix}-shadow)`}>{children}</g>
+      <g filter={`url(#${prefix}-shadow)`}>
+        <g transform={`translate(${offset} ${offset}) scale(${k})`}>
+          {children}
+        </g>
+      </g>
     </svg>
   )
 }
@@ -132,7 +171,7 @@ function Frame({ prefix, size, tone, children }: {
 
 /* CHAIR — low object, top-plane silhouette + 10-unit front-face extrusion below bottom edge */
 const ArmchairIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="chair" size={size} tone={[LEATHER_L, '#8E6B3E']}>
+  <Frame prefix="chair" size={size} tone={[LEATHER_L, LEATHER]}>
     {/* front face extrusion: the forward edge of the seat base */}
     <rect x="13" y="87" width="74" height="10" rx="3" fill={LEATHER} {...OUT} />
     {/* arm front edges */}
@@ -155,7 +194,7 @@ const ArmchairIcon: FurnitureIcon = ({ size }) => (
 
 /* SOFA — low object, top-plane silhouette + 10-unit front-face extrusion */
 const SofaIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="sofa" size={size} tone={[LEATHER_L, '#8A6739']}>
+  <Frame prefix="sofa" size={size} tone={[LEATHER_L, LEATHER]}>
     {/* front face extrusion: forward edge of seat base in darker leather */}
     <rect x="5" y="86" width="90" height="10" rx="3" fill={LEATHER} {...OUT} />
     {/* arm front-face edges */}
@@ -411,17 +450,20 @@ const TvIcon: FurnitureIcon = ({ size }) => (
   <Frame prefix="tv" size={size} tone={[CHAR_L, CHAR]}>
     {/* top slab */}
     <rect x="8" y="8" width="84" height="10" rx="4" fill={CHAR_L} {...OUT} />
-    {/* front face: valve set cabinet */}
+    {/* front face: valve-set cabinet — rounded corners for the period set */}
     <rect x="8" y="18" width="84" height="74" rx="10" fill="url(#tv-tone)" {...OUT} />
-    {/* cathode-ray screen on front face */}
-    <path d="M17 28c11-5 55-5 66 0 4 12 4 26 0 38-11 5-55 5-66 0-4-12-4-26 0-38Z" fill={GLASS} {...OUT_IN} />
-    <path d="M24 34c14-4 38-4 52 0M24 62c14 4 38 4 52 0" {...SHEEN} />
-    {/* speaker grille and controls */}
-    <rect x="18" y="70" width="44" height="16" rx="3" fill={CHAR} {...OUT_IN} />
-    <path d="M24 78h32" stroke={BRASS_D} strokeWidth="2" strokeLinecap="round" />
-    <circle cx="74" cy="78" r="5" fill={BRASS} {...OUT_IN} />
-    <circle cx="84" cy="78" r="3.4" fill={BRASS_D} {...OUT_IN} />
-    <path d="M22 90h56" stroke={INK} strokeWidth="3" strokeLinecap="round" />
+    {/* cathode-ray screen: clean rounded rect, not a warped path */}
+    <rect x="16" y="26" width="68" height="40" rx="6" fill={GLASS} {...OUT_IN} />
+    <path d="M24 32c16-3 36-3 52 0" {...SHEEN} />
+    <path d="M24 60c16 3 36 3 52 0" {...SHEEN} />
+    {/* speaker grille */}
+    <rect x="16" y="70" width="46" height="16" rx="3" fill={CHAR} {...OUT_IN} />
+    <path d="M22 78h34" stroke={BRASS_D} strokeWidth="2" strokeLinecap="round" />
+    {/* channel knob and volume knob */}
+    <circle cx="72" cy="76" r="6" fill={BRASS} {...OUT_IN} />
+    <circle cx="84" cy="76" r="4" fill={BRASS_D} {...OUT_IN} />
+    {/* cabinet foot rail */}
+    <rect x="16" y="88" width="68" height="4" rx="2" fill={CHAR_L} {...OUT_IN} />
   </Frame>
 )
 
@@ -490,7 +532,7 @@ const ClockIcon: FurnitureIcon = ({ size }) => (
     {/* hood finial */}
     <path d="M30 14h40l-6-8H36Z" fill={WOOD_D} {...OUT} />
     {/* main trunk front face */}
-    <path d="M22 14c0-0 6-0 14-0h28c8 0 14 0 14 0v68c0 8-6 12-14 12H36c-8 0-14-4-14-12Z" fill="url(#clock-tone)" {...OUT} />
+    <path d="M22 14h56v68c0 8-6 12-14 12H36c-8 0-14-4-14-12Z" fill="url(#clock-tone)" {...OUT} />
     {/* dial surround */}
     <circle cx="50" cy="36" r="22" fill={WOOD_D} {...OUT_IN} />
     <circle cx="50" cy="36" r="17" fill={LINEN} {...OUT_IN} />
@@ -568,9 +610,11 @@ const ShowerIcon: FurnitureIcon = ({ size }) => (
     <path d="M78 68V22c0-6-4-10-10-10H56" fill="none" stroke={BRASS} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
     <ellipse cx="48" cy="14" rx="15" ry="7" fill={BRASS} {...OUT} />
     <ellipse cx="48" cy="13" rx="9" ry="3.4" fill={BRASS_L} {...OUT_IN} />
-    <circle cx="42" cy="18" r="1.4" fill={INK} /><circle cx="48" cy="19" r="1.4" fill={INK} /><circle cx="54" cy="18" r="1.4" fill={INK} />
-    {/* falling water */}
-    <path d="M40 26c-2 12-3 22-3 34M48 26c0 14-1 24-1 36M56 26c2 12 3 22 4 32" stroke="#BFD3C6" strokeOpacity="0.7" strokeWidth="2.4" strokeLinecap="round" />
+    <circle cx="40" cy="18" r="1.6" fill={SLATE_D} /><circle cx="48" cy="19" r="1.6" fill={SLATE_D} /><circle cx="56" cy="18" r="1.6" fill={SLATE_D} />
+    {/* falling water — muted glass-tinted strokes */}
+    <path d="M38 26c-1 10-2 20-2 32" stroke={GLASS} strokeOpacity="0.55" strokeWidth="2.4" strokeLinecap="round" />
+    <path d="M48 26c0 12-1 22-1 34" stroke={GLASS} strokeOpacity="0.55" strokeWidth="2.4" strokeLinecap="round" />
+    <path d="M58 26c1 10 2 20 3 30" stroke={GLASS} strokeOpacity="0.55" strokeWidth="2.4" strokeLinecap="round" />
     {/* soap niche */}
     <rect x="16" y="52" width="14" height="12" rx="2" fill={LINEN} {...OUT_IN} />
     <rect x="16" y="56" width="14" height="4" rx="1" fill={PORC} {...OUT_IN} />

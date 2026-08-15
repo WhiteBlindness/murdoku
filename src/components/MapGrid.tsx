@@ -43,7 +43,11 @@ function handleCellKey(e: React.KeyboardEvent, r: number, c: number, N: number) 
 
 // Heavy espresso architecture, drawn like the printed rules of a physical board:
 // room divisions are the boldest line on the table, cell divisions are hairlines.
+// WALL_DARK: the thick espresso edge of the room boundary (dark side).
+// WALL_LIGHT: a bone hairline on the bright side of the wall so it reads on
+// dark floors at any board size — a double-rule like a physical board print.
 const WALL = '#1a1a1a'
+const WALL_SEAM = '#D8C8A4'   // bone-evidence token (DESIGN.md fixed material)
 const ESPRESSO = '#241820'
 
 export default function MapGrid({
@@ -200,18 +204,28 @@ export default function MapGrid({
                 style={{
                   // Floor pattern lives on a dedicated child span so marks/tokens
                   // are unaffected by any filter applied to the floor layer.
-                  // Room walls are printed heavy; the grid inside a room is a
-                  // hairline, so a room reads as one continuous floor first.
+                  // Room walls: a 3px espresso block + 1px bone hairline so the
+                  // divider reads on dark floors. Total border = 4px to match the
+                  // existing geometry. Cell-internal lines stay hairline.
                   borderRight: wallR
-                    ? `4px solid ${WALL}`
+                    ? `3px solid ${WALL}`
                     : isOutdoor
                       ? `1px dashed rgba(26, 26, 26, 0.5)`
                       : `1px solid rgba(26, 26, 26, 0.5)`,
                   borderBottom: wallB
-                    ? `4px solid ${WALL}`
+                    ? `3px solid ${WALL}`
                     : isOutdoor
                       ? `1px dashed rgba(26, 26, 26, 0.5)`
                       : `1px solid rgba(26, 26, 26, 0.5)`,
+                  // Bone-highlight stripe on the far side of each room wall so the
+                  // boundary reads on any dark floor. outline-based hairlines don't
+                  // shift layout; box-shadow inset covers the right+bottom edges.
+                  boxShadow: (wallR || wallB)
+                    ? [
+                        wallR ? `inset -1px 0 0 0 ${WALL_SEAM}` : '',
+                        wallB ? `inset 0 -1px 0 0 ${WALL_SEAM}` : '',
+                      ].filter(Boolean).join(', ')
+                    : undefined,
                   cursor: isPlacing ? 'crosshair' : 'pointer',
                   ...(showPreview ? {
                     outline: '2px dashed color-mix(in srgb, var(--color-text-primary) 65%, transparent)',
@@ -350,19 +364,27 @@ export default function MapGrid({
         )}
 
         {/* ── FURNITURE OVERLAY ──────────────────────────────────────────────
-            One layer over the same N x N tracks, so a piece is drawn ONCE at
-            its anchor and spans its real footprint. Rendering per cell made a
-            2x2 bed into four beds, and stretching each icon flush to its cell
-            is what made the board look like a floor plan viewed from 5cm away:
-            in a real plan a chair covers a fraction of a room. Each piece is
-            inset inside its own footprint so floor shows around it and the
-            object reads as sitting ON the floor.
-            `pointer-events-none` keeps every cell button clickable through it. */}
+            IMPORTANT: this is `position:absolute` (not a grid item) so the
+            100 cell buttons auto-place correctly into the N×N explicit tracks.
+            When this div used `gridArea:'1/1/-1/-1'` it occupied all explicit
+            grid cells, forcing the buttons into implicit auto rows at ~1px tall —
+            that is why the floor tiles appeared to vanish (the floor spans were
+            absolute-inset-0 inside a 1px-tall button).
+
+            The overlay uses the same N×N grid internally so `gridColumn` and
+            `gridRow` on each piece still work correctly. It sits above the
+            buttons (z-index 1) but is `pointer-events-none` so cells remain
+            clickable.
+
+            Each piece is flex-centered inside its footprint span so a 2×1 or
+            1×2 piece centers its square SVG correctly. Percentage padding was
+            wrong for non-square footprints because CSS resolves all four sides
+            against the element's WIDTH, so a 2×1 sofa had more left/right
+            padding than top/bottom padding. */}
         <div
           aria-hidden
-          className="pointer-events-none"
+          className="pointer-events-none absolute inset-0"
           style={{
-            gridArea: '1 / 1 / -1 / -1',
             display: 'grid',
             gridTemplateColumns: `repeat(${N}, 1fr)`,
             gridTemplateRows: `repeat(${N}, 1fr)`,
@@ -380,22 +402,34 @@ export default function MapGrid({
               .map(cell => marks[cell.row][cell.col])
             const underToken = covered.some(m => m.kind === 'person')
             const struck = covered.length > 0 && covered.every(m => m.kind === 'x')
-            // Bigger pieces earn proportionally more of their box: a bed really
-            // does fill its footprint, a lamp does not.
-            const inset = Math.max(w, h) > 1 ? '7%' : '15%'
+            // Icon size: bigger pieces fill more of their footprint; lamps/plants
+            // stay small so they read as accessories rather than walls.
+            const iconPct = Math.max(w, h) > 1 ? 82 : 68
             return (
               <span
                 key={`${f.type}-${f.row}-${f.col}-${i}`}
                 style={{
                   gridColumn: `${f.col + 1} / span ${w}`,
                   gridRow: `${f.row + 1} / span ${h}`,
-                  padding: inset,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   opacity: underToken ? 0.3 : struck ? 0.18 : 1,
-                  transform: rot ? `rotate(${rot}deg)` : undefined,
-                  display: 'block',
                 }}
               >
-                <Icon />
+                {/* Explicit square inner box so the SVG is centered regardless
+                    of whether the footprint is 1×1, 2×1, 1×2, or 2×2. */}
+                <span
+                  style={{
+                    display: 'block',
+                    width: `${iconPct}%`,
+                    height: `${iconPct}%`,
+                    transform: rot ? `rotate(${rot}deg)` : undefined,
+                    flexShrink: 0,
+                  }}
+                >
+                  <Icon />
+                </span>
               </span>
             )
           })}

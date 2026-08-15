@@ -109,11 +109,16 @@
     inset: 0;
     z-index: 20;
     pointer-events: none;
+    /* Vignette and key-light over the board.
+       mix-blend-mode:multiply was crushing already-dark floor tiles to near-black
+       (the overlay composited its dark vignette against dark floors and both went
+       to #000). Normal blend at low opacity preserves the floor material hue
+       while still adding cinematic depth at the corners. */
     background:
       radial-gradient(ellipse at 42% 34%, transparent 45%, rgba(24, 14, 19, 0.18) 100%),
       linear-gradient(135deg, rgba(255, 244, 211, 0.08), transparent 42%);
-    mix-blend-mode: multiply;
-    opacity: 0.72;
+    mix-blend-mode: normal;
+    opacity: 0.55;
   }
 
   .evidence-strip {

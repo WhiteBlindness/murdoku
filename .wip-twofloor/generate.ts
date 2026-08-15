@@ -495,27 +495,20 @@ const DIFF_CONFIG: Record<Difficulty, { size: GridSize; people: number; maxDirec
   'Very Easy': { size: 6, people: 4, maxDirectness: 3, minDirectness: 0 },
   'Easy':      { size: 7, people: 4, maxDirectness: 4, minDirectness: 0 },
   'Medium':    { size: 8, people: 5, maxDirectness: 5, minDirectness: 0 },
-  // TWO-FLOOR GENERATION IS BUILT BUT NOT ENABLED. Re-enable by restoring
-  // `floors: 2` on these three tiers once clue SELECTION is fixed.
+  // TWO-FLOOR GENERATION IS DISABLED PENDING A GENERATOR FIX.
   //
-  // The model, engine, room-per-floor maps and the floor / above / below clue
-  // kinds are all implemented and covered by tests/twofloor.test.ts. Only
-  // generation is off, because measured on an idle machine it costs:
+  // The model, engine, clue kinds (floor / above / below) and type support are
+  // all in place and tested — only generation is switched off. Measured: with
+  // two floors the generator needs ~82s PER PUZZLE against a 400ms budget, and
+  // shrinking the per-floor board to 6x6 did not rescue it.
   //
-  //     Hard   (8x8, 2 floors)    12,325 ms per puzzle
-  //     Expert (9x9, 2 floors)   308,546 ms per puzzle
-  //     Master (10x10, 2 floors) 6,686,104 ms per puzzle  (~1.9 hours)
-  //
-  // against a 400ms budget, and it degrades exponentially with board size.
-  //
-  // The solver is NOT the problem: countSolutions runs in ~3ms on a two-floor
-  // board. The problem is uniqueness. Two floors double the candidate cells
-  // while the row/column rule still admits only N placements, so a randomly
-  // chosen clue set almost never pins a single solution and the combination
-  // search thrashes. The fix is floor-aware clue SELECTION — bias toward the
-  // new floor/above/below clues and choose each clue by how much it actually
-  // cuts the solution count — rather than the current random-combination
-  // search. That is a generator redesign, not a parameter tweak.
+  // The cause is not the solver (countSolutions is 3.1ms on a two-floor board).
+  // It is uniqueness: two floors double the candidate cells while the row and
+  // column rule still admits only N placements, so a random clue set almost
+  // never pins a single solution and the search thrashes. Fixing it needs
+  // floor-aware clue SELECTION (bias toward floor/above/below clues, and pick
+  // clues that measurably cut the solution count) rather than the current
+  // random-combination search. Re-enable by restoring `floors: 2` here.
   'Hard':      { size: 8, people: 5, maxDirectness: 6, minDirectness: 0 },
   'Expert':    { size: 9, people: 6, maxDirectness: 6, minDirectness: 1 },
   'Master':    { size: 10, people: 6, maxDirectness: 6, minDirectness: 1 },
