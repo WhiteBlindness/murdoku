@@ -6,6 +6,7 @@ import type {
   FurnitureType,
   GameMode,
   Puzzle,
+  ClueText,
 } from './types'
 
 export const IN_PROGRESS_KEY = 'murdoku_play_v1'
@@ -274,3 +275,34 @@ export const parseNoteStore = parseCaseNotes
 export const serializeNoteStore = serializeCaseNotes
 export const parseNotes = parseCaseNotes
 export const serializeNotes = serializeCaseNotes
+
+// --- Accusation diagnostics -------------------------------------------------
+
+/**
+ * Which clues the player's current arrangement actually breaks.
+ *
+ * A rejected accusation used to say only "wrong". In a deduction game that is
+ * the least useful thing you can say: the player has a chain of reasoning and
+ * no way to find the link that snapped, so the only recovery is to re-derive
+ * the whole board. Naming the broken RULE points at the flaw without revealing
+ * where anyone belongs — the player still has to work out why it broke.
+ *
+ * Deliberately reports the clue text, never a cell. Victim flavour clues are
+ * skipped because they assert nothing testable about placement.
+ */
+export function findFailingClues(
+  puzzle: Puzzle,
+  placed: Record<string, Cell>,
+  holds: (puzzle: Puzzle, clue: Clue, place: Record<string, Cell>) => boolean,
+): ClueText[] {
+  // Only judge a clue once every person it mentions is on the board; an unmet
+  // clue about a suspect who has not been placed yet is not a mistake.
+  const isPlaced = (id: string) => !!placed[id]
+  return puzzle.clues.filter(({ clue }) => {
+    if (clue.kind === 'victim') return false
+    if (!isPlaced(clue.person)) return false
+    const other = (clue as { other?: string }).other
+    if (other && !isPlaced(other)) return false
+    return !holds(puzzle, clue, placed)
+  })
+}
