@@ -145,6 +145,81 @@ describe('Noire Illustration room materials', () => {
   })
 })
 
+describe('Colour-blind-safe suspect token', () => {
+  it('renders a text initial on the token when a suspect is placed', () => {
+    const puzzle: Puzzle = {
+      ...boardPuzzle(),
+      people: [
+        { id: 'p0', name: 'Nadia Voss', avatarSeed: 'nadia', accent: '#6E8CA0' },
+      ],
+      solution: { p0: { row: 0, col: 0 } },
+      victimId: '',
+      murdererId: 'p0',
+    }
+    const marks: CellMark[][] = Array.from({ length: 4 }, (_, r) =>
+      Array.from({ length: 4 }, (_, c) =>
+        r === 0 && c === 0
+          ? ({ kind: 'person' as const, person: 'p0' })
+          : ({ kind: 'empty' as const }),
+      ),
+    )
+    const { container } = render(
+      <MapGrid puzzle={puzzle} marks={marks} conflicts={new Set()} onCellClick={() => undefined} />,
+    )
+    // The initial 'N' (for Nadia) must appear inside the token as a text node.
+    // aria-hidden so it does not double-speak the cell's accessible name.
+    const initials = Array.from(container.querySelectorAll('[aria-hidden="true"]'))
+      .filter(el => el.textContent?.trim() === 'N')
+    expect(initials.length).toBeGreaterThan(0)
+    initials.forEach(el => {
+      expect(el).toHaveAttribute('aria-hidden', 'true')
+    })
+  })
+
+  it('uses luminance to assign per-token ink — dark accent gets light ink, light accent gets dark ink', () => {
+    // steel blue #6E8CA0 luminance ≈ 0.245 → light enough to get dark ink
+    // dark brown #3A2010 luminance ≈ 0.02 → dark, gets light ink
+    const puzzleLight: Puzzle = {
+      ...boardPuzzle(),
+      people: [{ id: 'p0', name: 'Ava Fox', avatarSeed: 'ava', accent: '#E0C080' }],
+      solution: { p0: { row: 0, col: 0 } },
+      victimId: '', murdererId: 'p0',
+    }
+    const puzzleDark: Puzzle = {
+      ...boardPuzzle(),
+      people: [{ id: 'p0', name: 'Zev Marsh', avatarSeed: 'zev', accent: '#2A1810' }],
+      solution: { p0: { row: 0, col: 0 } },
+      victimId: '', murdererId: 'p0',
+    }
+    const placed: CellMark[][] = Array.from({ length: 4 }, (_, r) =>
+      Array.from({ length: 4 }, (_, c) =>
+        r === 0 && c === 0
+          ? ({ kind: 'person' as const, person: 'p0' })
+          : ({ kind: 'empty' as const }),
+      ),
+    )
+
+    const { container: lightContainer, unmount: ul } = render(
+      <MapGrid puzzle={puzzleLight} marks={placed} conflicts={new Set()} onCellClick={() => undefined} />,
+    )
+    const lightInitial = Array.from(lightContainer.querySelectorAll('[aria-hidden="true"]'))
+      .find(el => el.textContent?.trim() === 'A')
+    expect(lightInitial).toBeDefined()
+    // Light accent → dark ink (CSS var containing 'contour' or '1A1A1A')
+    expect((lightInitial as HTMLElement).style.color).toMatch(/1a1a1a|contour/i)
+    ul()
+
+    const { container: darkContainer } = render(
+      <MapGrid puzzle={puzzleDark} marks={placed} conflicts={new Set()} onCellClick={() => undefined} />,
+    )
+    const darkInitial = Array.from(darkContainer.querySelectorAll('[aria-hidden="true"]'))
+      .find(el => el.textContent?.trim() === 'Z')
+    expect(darkInitial).toBeDefined()
+    // Dark accent → light ink (CSS var containing 'numeral' or 'F1E8CE')
+    expect((darkInitial as HTMLElement).style.color).toMatch(/numeral|f1e8ce/i)
+  })
+})
+
 describe('Noire Illustration board frame', () => {
   it('uses a heavy espresso frame while leaving the interactive grid intact', () => {
     const marks: CellMark[][] = Array.from({ length: 4 }, () =>

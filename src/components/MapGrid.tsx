@@ -41,6 +41,20 @@ function handleCellKey(e: React.KeyboardEvent, r: number, c: number, N: number) 
   ;(grid?.querySelector(`[data-cell="${nr}-${nc}"]`) as HTMLElement)?.focus()
 }
 
+/**
+ * Relative luminance of an sRGB hex colour (WCAG 2.x formula).
+ * Returns 0 (black) .. 1 (white). Used to pick token ink that meets AA
+ * contrast against the muted suspect accent fill.
+ */
+function hexLuminance(hex: string): number {
+  const h = hex.replace('#', '')
+  const r = parseInt(h.slice(0, 2), 16) / 255
+  const g = parseInt(h.slice(2, 4), 16) / 255
+  const b = parseInt(h.slice(4, 6), 16) / 255
+  const toLinear = (c: number) => c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+  return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b)
+}
+
 // Heavy espresso architecture, drawn like the printed rules of a physical board:
 // room divisions are the boldest line on the table, cell divisions are hairlines.
 // WALL_DARK: the thick espresso edge of the room boundary (dark side).
@@ -336,6 +350,41 @@ export default function MapGrid({
                     }}
                   >
                     <Avatar seed={person.avatarSeed} accent={person.accent} size={tokenSize} dead={person.isVictim} name={person.name} />
+                    {/* Colour-independent initial — legible under any form of
+                        colour-vision deficiency because it is a printed letter,
+                        not a colour cue. aria-hidden: the cell aria-label already
+                        carries the person's name.
+                        Threshold: hide below 32px where it blurs; at 32–39px use
+                        10px (ramp floor); at 40px+ use 11px. */}
+                    {tokenSize >= 32 && (() => {
+                      const lum = hexLuminance(person.accent)
+                      // Contrast against accent fill: >0.36 luminance → dark ink, else white ink
+                      // (0.36 ≈ the mid-point where both light and dark achieve AA 3:1 threshold)
+                      const inkColor = lum > 0.18
+                        ? 'var(--color-miniature-contour-deep, #1A1A1A)'
+                        : 'var(--color-step-numeral, #F1E8CE)'
+                      const fontSize = tokenSize >= 40 ? 11 : 10
+                      return (
+                        <span
+                          aria-hidden="true"
+                          className="absolute bottom-0 right-0 flex items-center justify-center font-display font-bold leading-none pointer-events-none select-none"
+                          style={{
+                            fontSize,
+                            color: inkColor,
+                            width: Math.round(tokenSize * 0.42),
+                            height: Math.round(tokenSize * 0.42),
+                            borderRadius: 2,
+                            background: person.accent,
+                            // Fine espresso halo so the chip reads on any floor
+                            boxShadow: '0 0 0 1px rgba(36,24,32,0.55)',
+                            // Step back slightly so it doesn't obscure the portrait
+                            opacity: 0.92,
+                          }}
+                        >
+                          {person.name.trim().charAt(0).toUpperCase()}
+                        </span>
+                      )
+                    })()}
                     {conflicted && (
                       <span
                         className="absolute -top-1.5 -left-1.5 w-4 h-4 flex items-center justify-center font-bold text-[11px] leading-none"

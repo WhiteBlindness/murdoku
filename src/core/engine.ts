@@ -132,6 +132,12 @@ export function clueHolds(p: Puzzle, clue: Clue, place: Placement): boolean {
       const upperCell: Cell = { row: self.row, col: self.col, floor: myFloor + 1 }
       return roomIdAt(p, upperCell) === clue.target
     }
+    case 'notRoom':
+      return !!self && roomIdAt(p, self) !== clue.roomId
+    case 'notSameRoomAs': {
+      const o = place[clue.other]
+      return !!self && !!o && roomIdAt(p, self) !== roomIdAt(p, o)
+    }
   }
 }
 
@@ -179,6 +185,8 @@ function unaryClueOk(p: Puzzle, personId: string, cell: Cell): boolean {
         }
         break
       }
+      case 'notRoom': if (roomIdAt(p, cell) === clue.roomId) return false; break
+      // notSameRoomAs is relational — cannot be pruned without knowing the other person's cell
     }
   }
   return true

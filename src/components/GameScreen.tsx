@@ -5,7 +5,8 @@ import {
   HelpCircle, Eye, EyeOff, Info, Palette, Wand2, MoreHorizontal,
 } from 'lucide-react'
 import type { Puzzle, CellMark, GameMode, Furniture, FurnitureType } from '../core/types'
-import { resolveClueHighlights } from '../core/ux'
+import { findFailingClues, resolveClueHighlights } from '../core/ux'
+import { clueHolds } from '../core/engine'
 import type { Tool } from '../hooks/useGame'
 import MapGrid from './MapGrid'
 import SuspectCard from './SuspectCard'
@@ -127,9 +128,143 @@ export default function GameScreen(props: Props) {
     props.onSubmit()
   }
 
+  // ── Aria-live announcement region ─────────────────────────────────────────
+  // One polite status region owned by GameScreen. It fires a concise message
+  // whenever the board state changes in a way the player needs confirmed:
+  //   • a suspect placed or lifted
+  //   • a cell manually marked or unmarked empty
+  //   • Assist crossed off cells (auto-X sweep)
+  //   • accusation outcome (incomplete / rejected)
+  // Solved is not announced here — a correct submit transitions to the victory
+  // screen, so GameScreen is no longer mounted when that happens.
+  //
+  // Implementation: a useRef snapshot of the previous render's props lets us
+  // diff exactly what changed without duplicating game logic. On the very first
+  // effect run we seed the ref WITHOUT announcing, so the full initial board
+  // state is never read aloud.
+  const [liveMsg, setLiveMsg] = useState('')
+  const prevPlacedOf = useRef<Record<string, { row: number; col: number; locked?: boolean }> | null>(null)
+  const prevMarks = useRef<CellMark[][] | null>(null)
+  const prevFeedback = useRef<'none' | 'incomplete' | 'wrong' | 'blocked'>('none')
+  const prevSubmitNonce = useRef(0)
+
+  // Build a fast lookup: person id → room name at (row, col)
+  const roomName = useCallback((row: number, col: number): string => {
+    const rid = puzzle.roomOf[row]?.[col]
+    return puzzle.rooms.find(r => r.id === rid)?.name ?? ''
+  }, [puzzle])
+
+  useEffect(() => {
+    // First render: seed refs without announcing
+    if (prevPlacedOf.current === null) {
+      prevPlacedOf.current = placedOf
+      prevMarks.current = marks
+      prevFeedback.current = feedback
+      prevSubmitNonce.current = submitNonce
+      return
+    }
+
+    const prev = prevPlacedOf.current
+    const prevMk = prevMarks.current!
+
+    // ── 1. Placement / lift ───────────────────────────────────────────────
+    // Check placedOf before marks so the mass auto-X that follows a placement
+    // is NOT mis-reported as Assist.
+    const placedNow = Object.keys(placedOf)
+    const placedBefore = Object.keys(prev)
+    if (placedNow.length !== placedBefore.length ||
+        placedNow.some(id => !prev[id] || prev[id].row !== placedOf[id].row || prev[id].col !== placedOf[id].col)) {
+
+      // Find what changed
+      const added = placedNow.filter(id => !prev[id] ||
+        prev[id].row !== placedOf[id].row || prev[id].col !== placedOf[id].col)
+      const removed = placedBefore.filter(id => !placedOf[id])
+
+      let msg = ''
+      if (added.length > 0) {
+        const id = added[0]
+        const p = puzzle.people.find(p => p.id === id)
+        const cell = placedOf[id]
+        const room = roomName(cell.row, cell.col)
+        msg = `${p?.name ?? id} placed${room ? ` in the ${room}` : ''}, row ${cell.row + 1} column ${cell.col + 1}`
+      } else if (removed.length > 0) {
+        const id = removed[0]
+        const p = puzzle.people.find(p => p.id === id)
+        msg = `${p?.name ?? id} lifted`
+      }
+      if (msg) setLiveMsg(msg)
+
+      // Update refs and skip further checks — placement may auto-X cells
+      prevPlacedOf.current = placedOf
+      prevMarks.current = marks
+      prevFeedback.current = feedback
+      prevSubmitNonce.current = submitNonce
+      return
+    }
+
+    // ── 2. Assist sweep (many new auto-X's in one go) ─────────────────────
+    let newAutoX = 0
+    let newManualX = 0
+    let unmarked = 0
+    for (let r = 0; r < puzzle.size; r++) {
+      for (let c = 0; c < puzzle.size; c++) {
+        const was = prevMk[r][c]
+        const now = marks[r][c]
+        if (was.kind === 'empty' && now.kind === 'x') {
+          if (now.auto) newAutoX++; else newManualX++
+        } else if (was.kind === 'x' && now.kind === 'empty') {
+          unmarked++
+        }
+      }
+    }
+
+    if (newAutoX > 1) {
+      setLiveMsg(`Assist crossed off ${newAutoX} cell${newAutoX === 1 ? '' : 's'}`)
+      prevPlacedOf.current = placedOf
+      prevMarks.current = marks
+      prevFeedback.current = feedback
+      prevSubmitNonce.current = submitNonce
+      return
+    }
+
+    // ── 3. Single manual mark / unmark ───────────────────────────────────
+    if (newManualX === 1 || unmarked === 1) {
+      setLiveMsg(newManualX === 1 ? 'Cell marked empty' : 'Cell mark removed')
+      prevPlacedOf.current = placedOf
+      prevMarks.current = marks
+      prevFeedback.current = feedback
+      prevSubmitNonce.current = submitNonce
+      return
+    }
+
+    // ── 4. Accusation outcome ─────────────────────────────────────────────
+    if (submitNonce !== prevSubmitNonce.current && feedback !== 'none') {
+      const msg =
+        feedback === 'incomplete' ? 'Accusation incomplete — place every person first' :
+        feedback === 'blocked' ? 'Accusation blocked — that row or column is already taken' :
+        feedback === 'wrong' ? `Accusation rejected — ${correctCount} of ${puzzle.people.length} in the right spot` :
+        ''
+      if (msg) setLiveMsg(msg)
+    }
+
+    prevPlacedOf.current = placedOf
+    prevMarks.current = marks
+    prevFeedback.current = feedback
+    prevSubmitNonce.current = submitNonce
+  })
+
   // A miss or an illegal placement is a real rejection and earns the shake.
   // "You haven't finished yet" is guidance, not a mistake, so it only surfaces
   // the message — shaking there would scold the player for doing nothing wrong.
+  // A rejected accusation used to say only how many were right, which tells the
+  // player nothing about WHERE the reasoning went wrong. Naming the first rule
+  // their arrangement breaks points at the flaw without giving away a position:
+  // they still have to work out why it broke. Only clues whose people are all
+  // placed are eligible, so it never blames an unplaced suspect.
+  const brokenRule = feedback === 'wrong'
+    ? findFailingClues(puzzle, placedOf, clueHolds)[0]?.text ?? null
+    : null
+
   const hardReject = feedback === 'wrong' || feedback === 'blocked'
 
   // Replay the shake by restarting the animation IN PLACE rather than by
@@ -240,6 +375,18 @@ export default function GameScreen(props: Props) {
       transition={{ duration: 0.25 }}
       className="desk-surface bg-bg-base flex flex-col min-h-[100dvh] lg:h-[100dvh] lg:overflow-hidden"
     >
+      {/* ── Screen-reader live region — always mounted so the first announcement
+          is not swallowed. aria-atomic so partial text updates are read in full.
+          aria-live="polite" defers until the user is idle. */}
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {liveMsg}
+      </div>
+
       <AnimatePresence>{help && <HowToPlay mode={mode} onClose={() => setHelp(false)} />}</AnimatePresence>
 
       {/*
@@ -866,6 +1013,8 @@ export default function GameScreen(props: Props) {
                     ? 'Place every person first.'
                     : feedback === 'blocked'
                     ? 'That row or column is already taken by another suspect.'
+                    : brokenRule
+                    ? `${correctCount} of ${puzzle.people.length} in the right spot. This is broken: "${brokenRule}"`
                     : `Not quite — ${correctCount} of ${puzzle.people.length} are in the right spot. Keep deducing.`}
                 </motion.button>
               )}

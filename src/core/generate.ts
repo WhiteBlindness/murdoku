@@ -70,6 +70,8 @@ function unaryClueOkForCell(p: import('./types').Puzzle, personId: string, cell:
         return !!uid && uid === clue.target
       }
       return true
+    case 'notRoom': return roomIdAt(p, cell) !== clue.roomId
+    // notSameRoomAs is relational — not filtered here
     default:
       return true // relational — not filtered
   }
@@ -435,6 +437,12 @@ function candidateClues(p: Puzzle): Clue[] {
       const roomAbove = roomIdAt(p, upperCell)
       if (roomAbove) out.push({ kind: 'below', person: person.id, target: roomAbove, targetKind: 'room' })
     }
+    // negation: rooms the person was NOT in (one per foreign room)
+    for (const room of p.rooms) {
+      if (room.id !== roomIdAt(p, cell)) {
+        out.push({ kind: 'notRoom', person: person.id, roomId: room.id })
+      }
+    }
     // relations to others
     for (const other of p.people) {
       if (other.id === person.id) continue
@@ -442,6 +450,9 @@ function candidateClues(p: Puzzle): Clue[] {
       if (cellsAdjacent(cell, oc)) out.push({ kind: 'besidePerson', person: person.id, other: other.id })
       if (roomIdAt(p, cell) === roomIdAt(p, oc) && other.id !== p.victimId)
         out.push({ kind: 'sameRoomAs', person: person.id, other: other.id })
+      // negation: not in the same room — skip when other is the victim (would leak murderer identity)
+      if (roomIdAt(p, cell) !== roomIdAt(p, oc) && other.id !== p.victimId && person.id !== p.victimId)
+        out.push({ kind: 'notSameRoomAs', person: person.id, other: other.id })
       // exact-step directions (more informative) — same floor only
       if ((cell.floor ?? 0) === (oc.floor ?? 0)) {
         if (cell.col === oc.col && cell.row === oc.row - 1) out.push({ kind: 'direction', person: person.id, other: other.id, dir: 'N', steps: 1 })
@@ -475,6 +486,8 @@ function clueDirectness(c: Clue): number {
     case 'sameRoomAs': return 4
     case 'above': case 'below': return 4  // relational, like besidePerson
     case 'direction': return 5
+    case 'notRoom': return 5        // weak: excludes 1 of many rooms
+    case 'notSameRoomAs': return 5  // weak: relational exclusion
     default: return 6
   }
 }
@@ -530,6 +543,12 @@ function clueToText(p: Puzzle, c: Clue): string {
       }
       return `Directly below ${nameOf(c.target)}.`
     }
+    case 'notRoom': {
+      const room = p.rooms.find(r => r.id === c.roomId)
+      return `Never set foot in the ${room?.name ?? c.roomId}.`
+    }
+    case 'notSameRoomAs':
+      return `Was not in the same room as ${nameOf(c.other)}.`
   }
 }
 function cap(s: string) { return s.charAt(0).toUpperCase() + s.slice(1) }
@@ -560,14 +579,28 @@ const DIFF_CONFIG: Record<Difficulty, { size: GridSize; people: number; maxDirec
 }
 
 /** Build one full puzzle. Retries internally until a unique one is produced. */
-export function generatePuzzle(difficulty: Difficulty, id: string, caseNumber: string): Puzzle {
+export function generatePuzzle(
+  difficulty: Difficulty,
+  id: string,
+  caseNumber: string,
+  /** Internal: forces a single storey after the two-floor attempts are spent. */
+  forceSingleFloor = false,
+): Puzzle {
   const cfg = DIFF_CONFIG[difficulty]
   const size = cfg.size
-  const floors = cfg.floors ?? 1
+  const floors = forceSingleFloor ? 1 : (cfg.floors ?? 1)
   const twoFloor = floors > 1
 
-  const maxAttempts = twoFloor ? 150 : 60
+  const maxAttempts = twoFloor ? 250 : 60
+  // The last fifth of the attempts drop the directness FLOOR. That floor is a
+  // difficulty dial — it bans the most direct clue kinds so suspects must be
+  // triangulated — but it is also the main reason a seed can run out of
+  // attempts, because two-floor boards are already hard to pin uniquely.
+  // A slightly easier case beats throwing: `makeRandomPuzzle` has no retry,
+  // and in the catalog a throw silently drops a case from the list.
+  const relaxFrom = Math.floor(maxAttempts * 0.8)
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const relaxed = attempt >= relaxFrom
     const names = shuffle(NAMES).slice(0, cfg.people)
     const accents = shuffle(ACCENTS)
     const people: Person[] = names.map((name, i) => ({
@@ -686,7 +719,8 @@ export function generatePuzzle(difficulty: Difficulty, id: string, caseNumber: s
     // The floor is a preference, not a hard gate: a suspect whose only available
     // clues are direct ones still gets a clue rather than failing the whole
     // attempt. Otherwise a Master board with one tiny room could never generate.
-    const pool = ceiling.filter(c => clueDirectness(c) >= cfg.minDirectness)
+    const floorLevel = relaxed ? 0 : cfg.minDirectness
+    const pool = ceiling.filter(c => clueDirectness(c) >= floorLevel)
     // Build clue pools for ALL people including the victim, so the victim's
     // position can be pinned when people < size (otherwise the victim is a free
     // variable after the suspects are placed → no unique solution is achievable).
@@ -737,6 +771,7 @@ export function generatePuzzle(difficulty: Difficulty, id: string, caseNumber: s
         case 'room': case 'row': case 'col': case 'edge': case 'corner':
         case 'onFurniture': case 'onlyOnFurniture': case 'besideFurniture':
         case 'besideAny': case 'floor': case 'above': case 'below':
+        case 'notRoom':
           // above/below with targetKind==='person' are relational; keep only room-targeted ones
           if (c.kind === 'above' || c.kind === 'below') return c.targetKind === 'room'
           return true
@@ -868,7 +903,10 @@ export function generatePuzzle(difficulty: Difficulty, id: string, caseNumber: s
     // onto each floor, but measured over real seeds that guarantee did not always
     // survive into the final solution, so reject it here where it is provable
     // and let the attempt loop try again.
-    if (twoFloor) {
+    // Quality bar, not a hard gate: rejecting outright starved generation and
+    // made some seeds throw. Enforced for the first 80% of attempts, then
+    // dropped so a puzzle always gets produced.
+    if (twoFloor && !relaxed) {
       const storeys = new Set(Object.values(base.solution).map(c => c.floor ?? 0))
       if (storeys.size < 2) continue
     }
@@ -886,6 +924,13 @@ export function generatePuzzle(difficulty: Difficulty, id: string, caseNumber: s
       return base
     }
   }
+  // Two floors roughly double the candidate cells while the row/column rule
+  // still admits only N placements, so a minority of seeds cannot be pinned to
+  // a unique solution however the clues are chosen. Degrade to a single-storey
+  // house for that seed rather than throwing: a throw silently drops a case
+  // from the catalog (buildOne swallows it) and has no retry at all behind
+  // `makeRandomPuzzle`, so the player would simply get no puzzle.
+  if (twoFloor) return generatePuzzle(difficulty, id, caseNumber, true)
   throw new Error('Failed to generate a unique puzzle')
 }
 

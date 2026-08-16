@@ -107,6 +107,9 @@ export type Clue =
   | { kind: 'floor'; person: string; floorNum: number }             // "Upstairs." / "On the ground floor."
   | { kind: 'above'; person: string; target: string; targetKind: 'room' | 'person' } // "Directly above the Kitchen." / "Directly above Marco."
   | { kind: 'below'; person: string; target: string; targetKind: 'room' | 'person' } // "Directly below the Kitchen." / "Directly below Marco."
+  // Negation clues — exclude rather than pin
+  | { kind: 'notRoom'; person: string; roomId: string }             // "Never set foot in the Kitchen."
+  | { kind: 'notSameRoomAs'; person: string; other: string }        // "Was not in the same room as Marco."
 
 /** Human-readable rendering data lives alongside the logical clue. */
 export interface ClueText {

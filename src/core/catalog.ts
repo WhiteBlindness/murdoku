@@ -34,7 +34,8 @@ const SPEC: { difficulty: Difficulty; count: number }[] = [
 // v16: Two-floor generation enabled. Information-driven greedy clue selection
 // (Phase A arithmetic scoring + Phase B cap-2 solver). Expert and Master
 // board sizes normalised to 8×8 (two floors × 8×8 ≈ single-floor 10×10 area).
-const KEY = 'murdoku_catalog_v16'
+// v17: Added notRoom and notSameRoomAs negation clue kinds.
+const KEY = 'murdoku_catalog_v17'
 let puzzles: Puzzle[] = []
 
 function slug(s: string) { return s.toLowerCase().replace(/\s+/g, '-') }
