@@ -148,19 +148,42 @@ const FOOT = { stroke: INK, strokeWidth: 3, strokeLinecap: 'round' as const }
  * (~0.92) so each piece nearly fills its footprint. Real-world size is carried
  * by FURNITURE_FOOTPRINT (cells occupied), not by glyph scale. The drop shadow
  * sits outside the scale transform so it reads at consistent strength.
+ *
+ * `vb` controls the SVG viewBox. Default "0 0 100 100" for 1×1 and 2×2 pieces;
+ * 2×1 pieces pass "0 0 200 100" so their canvas aspect matches the footprint and
+ * preserveAspectRatio="xMidYMid meet" has nothing left to letterbox.
+ *
+ * Centring maths: the scale transform must centre on the viewBox, not assume a
+ * 100×100 canvas. offsetX = (vbW/2)*(1−k), offsetY = (vbH/2)*(1−k). For the
+ * default 100×100 this reduces to 50*(1−k) — identical to the old formula.
  */
-function Frame({ prefix, size, tone, children }: {
+
+/** Parse a "0 0 W H" viewBox string into { w, h }. */
+function parseVB(vb: string): { w: number; h: number } {
+  const parts = vb.split(/\s+/)
+  return { w: Number(parts[2]) ?? 100, h: Number(parts[3]) ?? 100 }
+}
+
+/** Centring offset for the scale transform on each axis. */
+export function frameOffset(vb: string, k: number): { x: number; y: number } {
+  const { w, h } = parseVB(vb)
+  return { x: (w / 2) * (1 - k), y: (h / 2) * (1 - k) }
+}
+
+function Frame({ prefix, size, tone, vb = '0 0 100 100', children }: {
   prefix: string
   size?: number
   tone: [string, string]
+  /** SVG viewBox string. Default "0 0 100 100". Pass "0 0 200 100" for 2×1 pieces. */
+  vb?: string
   children: React.ReactNode
 }) {
   const k = FURNITURE_SCALE[prefix as FurnitureType] ?? 1
-  const offset = 50 * (1 - k)
+  const { x: ox, y: oy } = frameOffset(vb, k)
   return (
     <svg
       {...S(size)}
-      viewBox="0 0 100 100"
+      viewBox={vb}
       preserveAspectRatio="xMidYMid meet"
       aria-hidden="true"
       data-furniture-icon={prefix}
@@ -175,7 +198,7 @@ function Frame({ prefix, size, tone, children }: {
         </filter>
       </defs>
       <g filter={`url(#${prefix}-shadow)`}>
-        <g transform={`translate(${offset} ${offset}) scale(${k})`}>
+        <g transform={`translate(${ox} ${oy}) scale(${k})`}>
           {children}
         </g>
       </g>
@@ -208,29 +231,31 @@ const ArmchairIcon: FurnitureIcon = ({ size }) => (
   </Frame>
 )
 
-/* SOFA — low object, top-plane silhouette + 10-unit front-face extrusion */
+/* SOFA — wide 2×1: three-seater with three seat cushions and three back pillows */
 const SofaIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="sofa" size={size} tone={[LEATHER_L, LEATHER]}>
-    {/* front face extrusion: forward edge of seat base in darker leather */}
-    <rect x="5" y="86" width="90" height="10" rx="3" fill={LEATHER} {...OUT} />
+  <Frame prefix="sofa" size={size} tone={[LEATHER_L, LEATHER]} vb="0 0 200 100">
+    {/* front face extrusion: the forward edge of the seat base */}
+    <rect x="5" y="86" width="190" height="10" rx="3" fill={LEATHER} {...OUT} />
     {/* arm front-face edges */}
-    <rect x="5" y="86" width="10" height="10" rx="2" fill={WOOD_D} {...OUT_IN} />
-    <rect x="85" y="86" width="10" height="10" rx="2" fill={WOOD_D} {...OUT_IN} />
+    <rect x="5" y="86" width="14" height="10" rx="2" fill={WOOD_D} {...OUT_IN} />
+    <rect x="181" y="86" width="14" height="10" rx="2" fill={WOOD_D} {...OUT_IN} />
     {/* foot pegs */}
-    <path d="M12 86v10M88 86v10" {...FOOT} />
-    {/* main body */}
-    <path d="M5 86V36c0-13 9-22 22-22h46c13 0 22 9 22 22v50H85V46H15v40Z" fill="url(#sofa-tone)" {...OUT} />
-    {/* two back pillows */}
-    <rect x="17" y="19" width="31" height="24" rx="7" fill={LEATHER_L} {...OUT_IN} />
-    <rect x="52" y="19" width="31" height="24" rx="7" fill={LEATHER_L} {...OUT_IN} />
-    {/* two seat cushions */}
-    <rect x="16" y="47" width="32" height="37" rx="6" fill={LEATHER_L} {...OUT_IN} />
-    <rect x="52" y="47" width="32" height="37" rx="6" fill={LEATHER_L} {...OUT_IN} />
+    <path d="M16 86v10M184 86v10" {...FOOT} />
+    {/* main body: horseshoe seen from above-front, 190 units wide */}
+    <path d="M5 86V36c0-13 9-22 22-22h146c13 0 22 9 22 22v50h-15V46H20v40Z" fill="url(#sofa-tone)" {...OUT} />
+    {/* three back pillows */}
+    <rect x="22" y="19" width="48" height="24" rx="7" fill={LEATHER_L} {...OUT_IN} />
+    <rect x="76" y="19" width="48" height="24" rx="7" fill={LEATHER_L} {...OUT_IN} />
+    <rect x="130" y="19" width="48" height="24" rx="7" fill={LEATHER_L} {...OUT_IN} />
+    {/* three seat cushions */}
+    <rect x="21" y="47" width="51" height="37" rx="6" fill={LEATHER_L} {...OUT_IN} />
+    <rect x="75" y="47" width="50" height="37" rx="6" fill={LEATHER_L} {...OUT_IN} />
+    <rect x="128" y="47" width="51" height="37" rx="6" fill={LEATHER_L} {...OUT_IN} />
     {/* arm caps */}
-    <rect x="6" y="40" width="10" height="44" rx="5" fill={LEATHER} {...OUT_IN} />
-    <rect x="84" y="40" width="10" height="44" rx="5" fill={LEATHER} {...OUT_IN} />
-    <path d="M22 65h20M58 65h20" {...SEAM} />
-    <path d="M22 25h20M58 25h20" {...SHEEN} />
+    <rect x="6" y="40" width="14" height="44" rx="5" fill={LEATHER} {...OUT_IN} />
+    <rect x="180" y="40" width="14" height="44" rx="5" fill={LEATHER} {...OUT_IN} />
+    <path d="M28 65h36M82 65h36M136 65h36" {...SEAM} />
+    <path d="M28 25h36M82 25h36M136 25h36" {...SHEEN} />
   </Frame>
 )
 
@@ -258,26 +283,42 @@ const BedIcon: FurnitureIcon = ({ size }) => (
   </Frame>
 )
 
-/* TABLE — low object, legs visible below, top plane + front-face extrusion */
+/* TABLE — wide 2×1: dining table with legs near ends, four place settings */
 const TableIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="table" size={size} tone={[WOOD_L, WOOD]}>
-    {/* front face: forward apron in dark wood, 10 units deep */}
-    <rect x="7" y="77" width="86" height="10" rx="3" fill={WOOD_D} {...OUT} />
-    {/* legs visible below the top */}
-    <rect x="12" y="12" width="12" height="75" rx="3" fill={WOOD_D} {...OUT_IN} />
-    <rect x="76" y="12" width="12" height="75" rx="3" fill={WOOD_D} {...OUT_IN} />
+  <Frame prefix="table" size={size} tone={[WOOD_L, WOOD]} vb="0 0 200 100">
+    {/* front face: forward apron across full width */}
+    <rect x="7" y="77" width="186" height="10" rx="3" fill={WOOD_D} {...OUT} />
+    {/* four legs: two back legs visible through the top, two front legs below apron */}
+    <rect x="12" y="12" width="14" height="75" rx="3" fill={WOOD_D} {...OUT_IN} />
+    <rect x="174" y="12" width="14" height="75" rx="3" fill={WOOD_D} {...OUT_IN} />
     {/* front legs exposed below apron */}
-    <rect x="12" y="77" width="12" height="9" rx="2" fill={WOOD_D} {...OUT_IN} />
-    <rect x="76" y="77" width="12" height="9" rx="2" fill={WOOD_D} {...OUT_IN} />
-    {/* top */}
-    <rect x="7" y="17" width="86" height="60" rx="9" fill="url(#table-tone)" {...OUT} />
-    <rect x="15" y="25" width="70" height="44" rx="5" fill={WOOD_L} {...OUT_IN} />
-    <path d="M22 34h56M22 47h56M22 60h56" {...SEAM} />
-    {/* a laid place setting: plate, glass, folded napkin */}
-    <ellipse cx="38" cy="47" rx="10" ry="8" fill={PORC} {...OUT_IN} />
-    <ellipse cx="38" cy="47" rx="5" ry="4" fill={PORC_D} />
-    <circle cx="64" cy="40" r="5" fill={BRASS_L} {...OUT_IN} />
-    <path d="M58 57h14l-2 6H60Z" fill={LINEN} {...OUT_IN} />
+    <rect x="12" y="77" width="14" height="9" rx="2" fill={WOOD_D} {...OUT_IN} />
+    <rect x="174" y="77" width="14" height="9" rx="2" fill={WOOD_D} {...OUT_IN} />
+    {/* tabletop spans full width */}
+    <rect x="7" y="17" width="186" height="60" rx="9" fill="url(#table-tone)" {...OUT} />
+    {/* inner surface lighter wood */}
+    <rect x="18" y="25" width="164" height="44" rx="5" fill={WOOD_L} {...OUT_IN} />
+    {/* plank grain lines across the full length */}
+    <path d="M26 34h148M26 47h148M26 60h148" {...SEAM} />
+    {/* four place settings: two left, two right */}
+    {/* top-left: plate */}
+    <ellipse cx="52" cy="41" rx="10" ry="8" fill={PORC} {...OUT_IN} />
+    <ellipse cx="52" cy="41" rx="5" ry="4" fill={PORC_D} />
+    {/* top-left: glass */}
+    <circle cx="70" cy="36" r="5" fill={BRASS_L} {...OUT_IN} />
+    {/* top-left: napkin */}
+    <path d="M30 56h14l-2 6H32Z" fill={LINEN} {...OUT_IN} />
+    {/* top-right: plate */}
+    <ellipse cx="148" cy="41" rx="10" ry="8" fill={PORC} {...OUT_IN} />
+    <ellipse cx="148" cy="41" rx="5" ry="4" fill={PORC_D} />
+    {/* top-right: glass */}
+    <circle cx="130" cy="36" r="5" fill={BRASS_L} {...OUT_IN} />
+    {/* top-right: napkin */}
+    <path d="M156 56h14l-2 6H158Z" fill={LINEN} {...OUT_IN} />
+    {/* candle centrepiece */}
+    <rect x="96" y="33" width="8" height="20" rx="2" fill={LINEN} {...OUT_IN} />
+    <ellipse cx="100" cy="33" rx="4" ry="2" fill={LINEN} {...OUT_IN} />
+    <circle cx="100" cy="31" r="2" fill={BRASS_L} {...OUT_IN} />
   </Frame>
 )
 
@@ -394,27 +435,33 @@ const LampIcon: FurnitureIcon = ({ size }) => (
 
 /* ------------------------------------------------------------------ kitchen */
 
-/* COUNTER — tall standing object: front elevation with detail, shallow top slab */
+/* COUNTER — wide 2×1: long kitchen run with drawers left, sink centre, cupboards right */
 const CounterIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="counter" size={size} tone={[WOOD_L, WOOD_D]}>
-    {/* top slab (8-unit shallow rectangle in lighter tone) */}
-    <rect x="8" y="8" width="84" height="10" rx="3" fill={SLATE_L} {...OUT} />
-    {/* front face carries all the detail */}
-    <rect x="8" y="18" width="84" height="74" rx="4" fill="url(#counter-tone)" {...OUT} />
+  <Frame prefix="counter" size={size} tone={[WOOD_L, WOOD_D]} vb="0 0 200 100">
+    {/* top slab across full width */}
+    <rect x="8" y="8" width="184" height="10" rx="3" fill={SLATE_L} {...OUT} />
+    {/* front face: the panel carrying all detail */}
+    <rect x="8" y="18" width="184" height="74" rx="4" fill="url(#counter-tone)" {...OUT} />
     {/* stone worktop stripe at top of front face */}
-    <rect x="8" y="18" width="84" height="14" rx="3" fill={SLATE} {...OUT_IN} />
-    <path d="M14 23h72" {...SHEEN} />
-    {/* sunk sink on front face */}
-    <rect x="47" y="36" width="38" height="28" rx="4" fill={SLATE_D} {...OUT_IN} />
-    <rect x="52" y="41" width="28" height="18" rx="3" fill={GLASS} {...OUT_IN} />
-    <circle cx="66" cy="50" r="4" fill={SLATE_L} {...OUT_IN} />
-    {/* mixer tap */}
-    <path d="M66 36V26c0-4 4-6 8-6h6" fill="none" stroke={INK} strokeWidth="5" strokeLinecap="round" />
-    <path d="M66 36V26c0-4 4-6 8-6h6" fill="none" stroke={BRASS} strokeWidth="2.4" strokeLinecap="round" />
-    {/* drawer stack on front face */}
-    <rect x="15" y="36" width="26" height="18" rx="3" fill={WOOD_L} {...OUT_IN} />
-    <rect x="15" y="59" width="26" height="28" rx="3" fill={WOOD_L} {...OUT_IN} />
-    <path d="M21 45h14M21 73h14" stroke={BRASS_L} strokeWidth="2.6" strokeLinecap="round" />
+    <rect x="8" y="18" width="184" height="14" rx="3" fill={SLATE} {...OUT_IN} />
+    <path d="M16 23h168" {...SHEEN} />
+    {/* left section: three-drawer stack */}
+    <rect x="14" y="36" width="36" height="16" rx="3" fill={WOOD_L} {...OUT_IN} />
+    <rect x="14" y="56" width="36" height="16" rx="3" fill={WOOD_L} {...OUT_IN} />
+    <rect x="14" y="76" width="36" height="14" rx="3" fill={WOOD_L} {...OUT_IN} />
+    <path d="M22 44h20M22 64h20M22 83h20" stroke={BRASS_L} strokeWidth="2.6" strokeLinecap="round" />
+    {/* centre section: double sink */}
+    <rect x="62" y="34" width="76" height="54" rx="4" fill={SLATE_D} {...OUT_IN} />
+    <rect x="67" y="39" width="30" height="44" rx="3" fill={GLASS} {...OUT_IN} />
+    <rect x="103" y="39" width="30" height="44" rx="3" fill={GLASS} {...OUT_IN} />
+    <circle cx="100" cy="83" r="4" fill={SLATE_L} {...OUT_IN} />
+    {/* mixer tap above centre of double sink */}
+    <path d="M100 34V22c0-4 4-6 8-6h8" fill="none" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+    <path d="M100 34V22c0-4 4-6 8-6h8" fill="none" stroke={BRASS} strokeWidth="2.4" strokeLinecap="round" />
+    {/* right section: two cupboard doors */}
+    <rect x="150" y="36" width="34" height="30" rx="3" fill={WOOD_L} {...OUT_IN} />
+    <rect x="150" y="70" width="34" height="20" rx="3" fill={WOOD_L} {...OUT_IN} />
+    <path d="M158 51h18M158 80h18" stroke={BRASS_L} strokeWidth="2.6" strokeLinecap="round" />
   </Frame>
 )
 
@@ -483,36 +530,65 @@ const TvIcon: FurnitureIcon = ({ size }) => (
   </Frame>
 )
 
-/* BOOKSHELF — tall standing object: front elevation with spines on shelves, top slab */
+/* BOOKSHELF — wide 2×1: long case with two bays, three shelves each, globe + stacked books */
 const BookshelfIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="bookshelf" size={size} tone={[WOOD_L, WOOD_D]}>
-    {/* top slab */}
-    <rect x="7" y="4" width="86" height="10" rx="3" fill={WOOD_L} {...OUT} />
+  <Frame prefix="bookshelf" size={size} tone={[WOOD_L, WOOD_D]} vb="0 0 200 100">
+    {/* top slab spanning full width */}
+    <rect x="7" y="4" width="186" height="10" rx="3" fill={WOOD_L} {...OUT} />
     {/* front face body */}
-    <rect x="7" y="14" width="86" height="80" rx="4" fill="url(#bookshelf-tone)" {...OUT} />
-    <rect x="14" y="20" width="72" height="68" rx="2" fill={WOOD_D} {...OUT_IN} />
-    {/* three shelf boards */}
-    <path d="M14 42h72M14 64h72" stroke={WOOD_L} strokeWidth="4" strokeLinecap="round" />
-    <path d="M14 42h72M14 64h72" stroke={INK} strokeWidth="1.4" strokeLinecap="round" />
-    {/* upper row of spines */}
+    <rect x="7" y="14" width="186" height="80" rx="4" fill="url(#bookshelf-tone)" {...OUT} />
+    {/* inner dark recess */}
+    <rect x="14" y="20" width="172" height="68" rx="2" fill={WOOD_D} {...OUT_IN} />
+    {/* centre divider */}
+    <rect x="97" y="20" width="6" height="68" rx="1" fill={WOOD_L} {...OUT_IN} />
+    {/* three shelf boards — left bay */}
+    <path d="M14 42h83M14 64h83" stroke={WOOD_L} strokeWidth="4" strokeLinecap="round" />
+    <path d="M14 42h83M14 64h83" stroke={INK} strokeWidth="1.4" strokeLinecap="round" />
+    {/* three shelf boards — right bay */}
+    <path d="M103 42h83M103 64h83" stroke={WOOD_L} strokeWidth="4" strokeLinecap="round" />
+    <path d="M103 42h83M103 64h83" stroke={INK} strokeWidth="1.4" strokeLinecap="round" />
+    {/* left bay — upper shelf spines */}
     <rect x="18" y="23" width="8" height="18" fill={BLOOD} {...OUT_IN} />
     <rect x="28" y="21" width="7" height="20" fill={BRASS} {...OUT_IN} />
     <rect x="37" y="24" width="9" height="17" fill={OLIVE} {...OUT_IN} />
     <rect x="48" y="22" width="8" height="19" fill={LINEN} {...OUT_IN} />
     <rect x="58" y="23" width="9" height="18" fill={BLOOD_D} {...OUT_IN} />
     <rect x="69" y="21" width="7" height="20" fill={BRASS_L} {...OUT_IN} />
-    {/* lower row of spines */}
+    <rect x="78" y="24" width="8" height="17" fill={OLIVE_D} {...OUT_IN} />
+    {/* left bay — lower shelf spines */}
     <rect x="18" y="46" width="9" height="17" fill={OLIVE_L} {...OUT_IN} />
     <rect x="29" y="44" width="7" height="19" fill={BLOOD} {...OUT_IN} />
     <rect x="38" y="47" width="9" height="16" fill={BRASS} {...OUT_IN} />
     <rect x="49" y="45" width="8" height="18" fill={LINEN} {...OUT_IN} />
     <rect x="59" y="46" width="9" height="17" fill={OLIVE} {...OUT_IN} />
     <rect x="70" y="44" width="7" height="19" fill={BLOOD_D} {...OUT_IN} />
-    {/* bottom shelf: stacked flat books and a globe */}
-    <rect x="18" y="68" width="34" height="7" rx="1.5" fill={BRASS_D} {...OUT_IN} />
-    <rect x="21" y="75" width="30" height="5" rx="1.5" fill={LINEN} {...OUT_IN} />
-    <circle cx="70" cy="74" r="9" fill={GLASS} {...OUT_IN} />
-    <path d="M62 74h16M70 65v18" {...SEAM} />
+    <rect x="79" y="47" width="8" height="16" fill={BRASS_L} {...OUT_IN} />
+    {/* left bay — bottom shelf: stacked flat books + inkwell */}
+    <rect x="18" y="68" width="36" height="7" rx="1.5" fill={BRASS_D} {...OUT_IN} />
+    <rect x="21" y="75" width="32" height="5" rx="1.5" fill={LINEN} {...OUT_IN} />
+    <circle cx="76" cy="74" r="7" fill={GLASS} {...OUT_IN} />
+    <path d="M70 74h12M76 67v14" {...SEAM} />
+    {/* right bay — upper shelf spines */}
+    <rect x="107" y="23" width="8" height="18" fill={BLOOD_D} {...OUT_IN} />
+    <rect x="117" y="21" width="7" height="20" fill={OLIVE} {...OUT_IN} />
+    <rect x="126" y="24" width="9" height="17" fill={BRASS_L} {...OUT_IN} />
+    <rect x="137" y="22" width="8" height="19" fill={BLOOD} {...OUT_IN} />
+    <rect x="147" y="23" width="9" height="18" fill={LINEN} {...OUT_IN} />
+    <rect x="158" y="21" width="7" height="20" fill={BRASS} {...OUT_IN} />
+    <rect x="167" y="24" width="8" height="17" fill={OLIVE_L} {...OUT_IN} />
+    {/* right bay — lower shelf spines */}
+    <rect x="107" y="46" width="9" height="17" fill={BRASS} {...OUT_IN} />
+    <rect x="118" y="44" width="7" height="19" fill={LINEN} {...OUT_IN} />
+    <rect x="127" y="47" width="9" height="16" fill={BLOOD_D} {...OUT_IN} />
+    <rect x="138" y="45" width="8" height="18" fill={OLIVE_D} {...OUT_IN} />
+    <rect x="148" y="46" width="9" height="17" fill={BRASS_L} {...OUT_IN} />
+    <rect x="159" y="44" width="7" height="19" fill={OLIVE} {...OUT_IN} />
+    <rect x="168" y="47" width="8" height="16" fill={BLOOD} {...OUT_IN} />
+    {/* right bay — bottom shelf: stacked flat books + globe */}
+    <rect x="107" y="68" width="36" height="7" rx="1.5" fill={WOOD_D} {...OUT_IN} />
+    <rect x="110" y="75" width="32" height="5" rx="1.5" fill={BRASS_D} {...OUT_IN} />
+    <circle cx="165" cy="74" r="9" fill={GLASS} {...OUT_IN} />
+    <path d="M157 74h16M165 65v18" {...SEAM} />
   </Frame>
 )
 
@@ -566,23 +642,32 @@ const ClockIcon: FurnitureIcon = ({ size }) => (
 
 /* ----------------------------------------------------------------- bathroom */
 
-/* BATHTUB — low object: top-plane basin detail + 10-unit front-face extrusion */
+/* BATHTUB — wide 2×1: genuinely elongated basin seen from above-front */
 const BathtubIcon: FurnitureIcon = ({ size }) => (
-  <Frame prefix="bathtub" size={size} tone={[PORC, PORC_D]}>
-    {/* front face extrusion: forward rim of tub */}
-    <rect x="8" y="80" width="84" height="10" rx="6" fill={PORC_D} {...OUT} />
-    {/* tub body: oval from above-front */}
-    <rect x="8" y="16" width="84" height="64" rx="22" fill="url(#bathtub-tone)" {...OUT} />
-    <rect x="16" y="22" width="68" height="52" rx="16" fill={PORC_D} {...OUT_IN} />
-    <rect x="21" y="27" width="58" height="42" rx="13" fill={GLASS} {...OUT_IN} />
-    <path d="M28 38c12-5 32-5 44 0" {...SHEEN} />
-    {/* mixer tap and two taps at the head end */}
-    <path d="M50 16V8c0-3 3-5 6-5h6" fill="none" stroke={INK} strokeWidth="5" strokeLinecap="round" />
-    <path d="M50 16V8c0-3 3-5 6-5h6" fill="none" stroke={BRASS} strokeWidth="2.4" strokeLinecap="round" />
-    <circle cx="34" cy="10" r="4.5" fill={BRASS_L} {...OUT_IN} />
-    <circle cx="70" cy="10" r="4.5" fill={BRASS_L} {...OUT_IN} />
-    {/* drain */}
-    <ellipse cx="50" cy="62" rx="6" ry="4" fill={SLATE_D} {...OUT_IN} />
+  <Frame prefix="bathtub" size={size} tone={[PORC, PORC_D]} vb="0 0 200 100">
+    {/* front face extrusion: forward rim across full width */}
+    <rect x="8" y="80" width="184" height="10" rx="6" fill={PORC_D} {...OUT} />
+    {/* outer tub body: wide oval with tight radius ends */}
+    <rect x="8" y="16" width="184" height="64" rx="22" fill="url(#bathtub-tone)" {...OUT} />
+    {/* inner porcelain rim */}
+    <rect x="16" y="22" width="168" height="52" rx="16" fill={PORC_D} {...OUT_IN} />
+    {/* basin interior — water fill colour */}
+    <rect x="22" y="27" width="156" height="42" rx="13" fill={GLASS} {...OUT_IN} />
+    {/* water sheen across the long basin */}
+    <path d="M30 38c30-5 110-5 140 0" {...SHEEN} />
+    {/* chrome soap rail running along the inside rim near the head end */}
+    <path d="M24 50h28" fill="none" stroke={BRASS_L} strokeWidth="3" strokeLinecap="round" />
+    {/* mixer tap assembly at head end (left) */}
+    <path d="M40 16V8c0-3 3-5 6-5h6" fill="none" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+    <path d="M40 16V8c0-3 3-5 6-5h6" fill="none" stroke={BRASS} strokeWidth="2.4" strokeLinecap="round" />
+    {/* hot and cold tap handles flanking the spout */}
+    <circle cx="24" cy="10" r="4.5" fill={BRASS_L} {...OUT_IN} />
+    <circle cx="60" cy="10" r="4.5" fill={BRASS_L} {...OUT_IN} />
+    {/* overflow cover near head end */}
+    <ellipse cx="40" cy="23" rx="5" ry="3" fill={PORC} {...OUT_IN} />
+    {/* drain at foot end */}
+    <ellipse cx="168" cy="62" rx="7" ry="4.5" fill={SLATE_D} {...OUT_IN} />
+    <circle cx="168" cy="62" r="2.5" fill={SLATE_L} />
   </Frame>
 )
 

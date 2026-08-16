@@ -127,11 +127,28 @@ export default function MapGrid({
   // single-floor boards keep exactly the labels they have today.
   const labelAnchors = puzzle.rooms.filter(rm => (rm.floor ?? 0) === floor).map(rm => {
     const sorted = [...rm.cells].sort((a, b) => a.row - b.row || a.col - b.col)
-    const anchor = sorted.find(c => !occupiedCells.has(`${c.row},${c.col}`)) ?? sorted[0]
-    let span = 1
-    while (span < N
-      && rm.cells.some(c => c.row === anchor.row && c.col === anchor.col + span)
-      && !occupiedCells.has(`${anchor.row},${anchor.col + span}`)) span++
+    const free = (c: { row: number; col: number }) => !occupiedCells.has(`${c.row},${c.col}`)
+    // How many unobstructed cells run to the right of this one, inside the room.
+    const runFrom = (c: { row: number; col: number }) => {
+      let n = 1
+      while (n < N
+        && rm.cells.some(x => x.row === c.row && x.col === c.col + n)
+        && free({ row: c.row, col: c.col + n })) n++
+      return n
+    }
+    // Anchor on the WIDEST free run, not merely the first free cell in reading
+    // order. A label only abbreviates when its anchor has no room to spread, and
+    // taking the first free cell stranded KITCHEN and HALLWAY at one-cell-wide
+    // spots — they printed as "KIT" and "HAL" on a live board while roomier
+    // neighbours showed their full names. Ties keep the top-most/left-most cell
+    // so labels stay in a predictable corner.
+    let anchor = sorted.find(free) ?? sorted[0]
+    let span = free(anchor) ? runFrom(anchor) : 1
+    for (const c of sorted) {
+      if (!free(c)) continue
+      const run = runFrom(c)
+      if (run > span) { anchor = c; span = run }
+    }
     // Abbreviation ladder (used only as a last resort):
     //   multi-word â†’ initials (FRONT YARD â†’ FY), single-word â†’ first 3 chars (KITCHEN â†’ KIT)
     // Prefer wrapping or font-shrink over initials â€” see label render below.

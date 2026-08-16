@@ -35,7 +35,11 @@ const SPEC: { difficulty: Difficulty; count: number }[] = [
 // (Phase A arithmetic scoring + Phase B cap-2 solver). Expert and Master
 // board sizes normalised to 8×8 (two floors × 8×8 ≈ single-floor 10×10 area).
 // v17: Added notRoom and notSameRoomAs negation clue kinds.
-const KEY = 'murdoku_catalog_v17'
+// v18: Rooms are now far larger — an explicit per-tier room count replaces the
+// size-derived ladder, taking two-floor tiers from ~9.8 to 16.0 cells per room
+// so a board reads as a floor plan rather than a grid of cubicles. Cached v17
+// puzzles have the old cramped room layouts.
+const KEY = 'murdoku_catalog_v18'
 let puzzles: Puzzle[] = []
 
 function slug(s: string) { return s.toLowerCase().replace(/\s+/g, '-') }

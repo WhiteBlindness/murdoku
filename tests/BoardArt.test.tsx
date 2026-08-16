@@ -16,19 +16,21 @@ const roomNames = [
 ]
 
 const minimumShapeCount: Record<FurnitureType, number> = {
-  sofa: 8,
+  // 2×1 pieces: redrawn with genuine 2:1 canvas — higher counts reflect wider art
+  sofa:      15, // three-seater: 3 back pillows, 3 seat cushions, arms, foot pegs
+  table:     19, // dining table: 4 legs, 4 place settings, candle centrepiece
+  bookshelf: 44, // long case: two bays × 3 shelves, 14 spines per bay, globe, stacked books
+  counter:   17, // kitchen run: 3-drawer stack, double sink, cupboards
+  bathtub:   13, // elongated oval basin: chrome rail, twin taps, overflow, drain
+  // 1×1 and 2×2 pieces — unchanged
   chair: 7,
   bed: 8,
-  table: 8,
   box: 8,
   rug: 7,
   plant: 10,
   shrub: 9,
   lamp: 9,
-  counter: 9,
   tv: 7,
-  bathtub: 8,
-  bookshelf: 14,
   stove: 10,
   fridge: 7,
   clock: 10,

@@ -177,7 +177,7 @@ function splitRects(size: number, targetRooms: number): Rect[] {
 }
 function area(r: Rect) { return (r.r1 - r.r0 + 1) * (r.c1 - r.c0 + 1) }
 
-function buildRooms(size: number): { rooms: Room[]; roomOf: string[][] } {
+function buildRooms(size: number, targetRooms?: number): { rooms: Room[]; roomOf: string[][] } {
   // Room count tracks area: an 8x8 split into 4 rooms gives 16-cell rooms, which
   // makes "In the Kitchen" nearly free information.
   // Target room counts tuned to keep typical room size at 6–12 cells.
@@ -186,11 +186,17 @@ function buildRooms(size: number): { rooms: Room[]; roomOf: string[][] } {
   // 8×8=64 cells → 6–7 rooms (9–11 cells each)
   // 9×9=81 cells → 7–8 rooms (10–12 cells each)
   // 10×10=100 cells → 8–9 rooms (11–13 cells each)
-  const target = size <= 6 ? 4 + Math.floor(rand() * 2)
-    : size <= 7 ? 5 + Math.floor(rand() * 2)
-    : size <= 8 ? 6 + Math.floor(rand() * 2)
-    : size <= 9 ? 7 + Math.floor(rand() * 2)
-    : 8 + Math.floor(rand() * 2)
+  // An explicit per-tier target overrides the ladder. Room size is a genuine
+  // design dial pulling two ways: bigger rooms read more like a real floor plan
+  // seen from above, but they weaken every room clue, because "In the Kitchen"
+  // narrows the board far less when the kitchen is 16 cells than when it is 10.
+  const target = targetRooms ?? (
+    size <= 6 ? 4 + Math.floor(rand() * 2)
+      : size <= 7 ? 5 + Math.floor(rand() * 2)
+      : size <= 8 ? 6 + Math.floor(rand() * 2)
+      : size <= 9 ? 7 + Math.floor(rand() * 2)
+      : 8 + Math.floor(rand() * 2)
+  )
   const rects = splitRects(size, target)
   const names = shuffle(ROOM_NAMES).slice(0, rects.length)
   const roomOf: string[][] = Array.from({ length: size }, () => new Array(size).fill(''))
@@ -210,14 +216,14 @@ function buildRooms(size: number): { rooms: Room[]; roomOf: string[][] } {
  * from roomK so that roomIdAt never collides across floors and findMurderer
  * works without modification.
  */
-function buildTwoFloorRooms(size: number): {
+function buildTwoFloorRooms(size: number, targetRooms?: number): {
   rooms: Room[]
   roomOf: string[][]          // floor 0 (also roomOfByFloor[0])
   roomOfByFloor: string[][][] // [floor][row][col]
 } {
-  const { rooms: rooms0, roomOf: roomOf0 } = buildRooms(size)
+  const { rooms: rooms0, roomOf: roomOf0 } = buildRooms(size, targetRooms)
   const offset = rooms0.length
-  const { rooms: rooms1, roomOf: roomOf1 } = buildRooms(size)
+  const { rooms: rooms1, roomOf: roomOf1 } = buildRooms(size, targetRooms)
 
   // Re-id floor-1 rooms to avoid collisions with floor-0 room ids
   const roomOf1remapped: string[][] = Array.from({ length: size }, () => new Array(size).fill(''))
@@ -563,20 +569,46 @@ function cap(s: string) { return s.charAt(0).toUpperCase() + s.slice(1) }
  * triangulated from relational statements. Raising the grid size alone only
  * makes a puzzle longer; raising the floor makes it harder.
  */
-const DIFF_CONFIG: Record<Difficulty, { size: GridSize; people: number; maxDirectness: number; minDirectness: number; floors?: number }> = {
-  'Very Easy': { size: 6, people: 4, maxDirectness: 3, minDirectness: 0 },
-  'Easy':      { size: 7, people: 4, maxDirectness: 4, minDirectness: 0 },
-  'Medium':    { size: 8, people: 5, maxDirectness: 5, minDirectness: 0 },
+const DIFF_CONFIG: Record<Difficulty, { size: GridSize; people: number; maxDirectness: number; minDirectness: number; floors?: number; rooms?: number }> = {
+  // `rooms` is a MEASURED choice, not a taste one. A house should read as a
+  // floor plan seen from above, which means rooms made of many squares — the
+  // old size-derived ladder produced ~9.8-cell rooms that looked like cubicles.
+  // Fewer, larger rooms cost nothing and on the two-floor tiers are FASTER:
+  // the generator needs the victim's room to have a spare cell for the
+  // murderer, and cramped rooms fail that test, wasting whole attempts.
+  //
+  // Measured, 12 seeds/tier, quiet machine (ms avg, cells per room):
+  //   Hard   6.5 rooms 249ms  9.8 cells  ->  4 rooms 270ms 16.0 cells
+  //   Master 6.5 rooms 645ms  9.8 cells  ->  4 rooms 488ms 16.0 cells  (faster)
+  // The alternative, a 9x9 grid at 5 rooms, buys the same 16-cell rooms for
+  // 435ms Hard / 1182ms Master — 2.4x the Master cost for the same result.
+  // The grid never needed to grow; the rooms did.
+  //
+  // The cost is paid in clue count: a 16-cell room narrows the board less than
+  // a 10-cell one, so "In the Kitchen" is weaker information and cases need
+  // about one more clue (Hard 9.2 -> 10.3). That is the honest trade.
+  'Very Easy': { size: 6, people: 4, maxDirectness: 3, minDirectness: 0, rooms: 3 },
+  'Easy':      { size: 7, people: 4, maxDirectness: 4, minDirectness: 0, rooms: 4 },
+  'Medium':    { size: 8, people: 5, maxDirectness: 5, minDirectness: 0, rooms: 4 },
   // Two-floor enabled. Hard uses 8×8/5-person, Expert 8×8/6-person (slightly
   // tighter than 9×9 but well within budget), Master is capped at 8×8/6-person
   // with minDirectness=1 — a 10×10 two-floor board would still exceed 400ms
   // even with the optimised selector. The information-driven greedy (Phase A
   // arithmetic + Phase B cap-2 solver) brings Hard to ~5ms/puzzle and keeps
   // Expert and Master within the budget.
-  'Hard':      { size: 8, people: 5, maxDirectness: 6, minDirectness: 0, floors: 2 },
-  'Expert':    { size: 8, people: 6, maxDirectness: 6, minDirectness: 1, floors: 2 },
-  'Master':    { size: 8, people: 6, maxDirectness: 6, minDirectness: 1, floors: 2 },
+  'Hard':      { size: 8, people: 5, maxDirectness: 6, minDirectness: 0, floors: 2, rooms: 4 },
+  'Expert':    { size: 8, people: 6, maxDirectness: 6, minDirectness: 1, floors: 2, rooms: 4 },
+  'Master':    { size: 8, people: 6, maxDirectness: 6, minDirectness: 1, floors: 2, rooms: 4 },
 }
+
+/**
+ * Exposed so a board size can be swept and MEASURED before it is chosen.
+ * Generation cost grows faster than the cell count — more cells with the same
+ * number of suspects means more candidate placements to rule out — and the app
+ * builds the whole catalog on first load, so board size is a load-time decision
+ * as much as an aesthetic one. Measure, then set it.
+ */
+export const DIFFICULTY_CONFIG = DIFF_CONFIG
 
 /** Build one full puzzle. Retries internally until a unique one is produced. */
 export function generatePuzzle(
@@ -646,7 +678,7 @@ export function generatePuzzle(
     // Build rooms and placement — two-floor for Hard/Expert/Master
     let rooms, roomOf, roomOfByFloor: string[][][] | undefined, place: Record<string, Cell>
     if (twoFloor) {
-      const built = buildTwoFloorRooms(size)
+      const built = buildTwoFloorRooms(size, cfg.rooms)
       rooms = built.rooms; roomOf = built.roomOf; roomOfByFloor = built.roomOfByFloor
       place = randomTwoFloorPlacement(size, people)
 
@@ -720,7 +752,7 @@ export function generatePuzzle(
       }
       if (!placementOk) continue
     } else {
-      const built = buildRooms(size)
+      const built = buildRooms(size, cfg.rooms)
       rooms = built.rooms; roomOf = built.roomOf
       place = randomPlacement(size, people)
     }

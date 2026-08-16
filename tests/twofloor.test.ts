@@ -115,4 +115,18 @@ describe('generated two-floor cases', () => {
     const p = generatePuzzle('Very Easy', 've-floors', 'No. 2')
     expect(p.floors ?? 1).toBe(1)
   })
+
+  it('builds rooms large enough to read as a floor plan, not a grid of cubicles', () => {
+    // The room count is a measured design choice (see DIFF_CONFIG). Guard the
+    // property that motivated it: a two-floor board's rooms must be substantial.
+    // Before the change these averaged 9.8 cells; the target is ~16.
+    reseed(4242)
+    const p = generatePuzzle('Hard', 'room-size', 'No. 3')
+    const groundRooms = p.rooms.filter(r => (r.floor ?? 0) === 0)
+    const avgCells = groundRooms.reduce((a, r) => a + r.cells.length, 0) / groundRooms.length
+    expect(avgCells, `rooms averaged ${avgCells.toFixed(1)} cells — too cramped`).toBeGreaterThanOrEqual(12)
+    // Sanity in the other direction: one room swallowing a whole storey would
+    // make every room clue worthless.
+    expect(groundRooms.length).toBeGreaterThanOrEqual(3)
+  })
 })

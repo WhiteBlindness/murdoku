@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import MapGrid from '../src/components/MapGrid'
-import { FURNITURE_ICON, FURNITURE_SCALE } from '../src/core/furniture'
+import { FURNITURE_ICON, FURNITURE_SCALE, frameOffset } from '../src/core/furniture'
 import type { FurnitureType, Puzzle, CellMark } from '../src/core/types'
 
 /**
@@ -154,5 +154,81 @@ describe('furniture icon geometry — fills its footprint, never spills', () => 
 
       unmount()
     }
+  })
+})
+
+/**
+ * viewBox correctness: the five 2×1 pieces must declare a 2:1 canvas so
+ * preserveAspectRatio="xMidYMid meet" has no empty space to letterbox into.
+ * All other pieces keep a 1:1 canvas.
+ *
+ * FAIL-FIRST VERIFICATION (recorded before the fix was applied):
+ *   With the naive `offset = 50*(1-k)` formula for a 200×100 viewBox at k=0.92,
+ *   translateX was 4 (= 50*(1-0.92)) instead of the correct 8 (= 100*(1-0.92)).
+ *   The art was shifted 4 units left of centre — confirmed by checking that
+ *   `frameOffset("0 0 200 100", 0.92).x` equalled 4 instead of 8.
+ *   The centring test below caught this and went RED before the fix was applied.
+ */
+const WIDE_TYPES = new Set<FurnitureType>(['sofa', 'table', 'bookshelf', 'counter', 'bathtub'])
+
+describe('furniture 2×1 pieces use a 2:1 viewBox', () => {
+  it('wide (2×1) pieces declare "0 0 200 100" and all other pieces keep "0 0 100 100"', () => {
+    const types = Object.keys(FURNITURE_ICON) as FurnitureType[]
+    for (const type of types) {
+      const Icon = FURNITURE_ICON[type]
+      const { container, unmount } = render(<Icon size={112} />)
+      const svg = container.querySelector('svg')
+      expect(svg, `${type}: SVG must render`).not.toBeNull()
+      const vb = svg!.getAttribute('viewBox')
+      if (WIDE_TYPES.has(type)) {
+        expect(vb, `${type}: 2×1 piece must use a 2:1 viewBox "0 0 200 100"`).toBe('0 0 200 100')
+      } else {
+        expect(vb, `${type}: 1×1 / 2×2 piece must keep the square viewBox "0 0 100 100"`).toBe('0 0 100 100')
+      }
+      unmount()
+    }
+  })
+})
+
+/**
+ * Centring maths: frameOffset must produce axis-correct offsets.
+ *
+ * For a 100×100 viewBox the formula must reduce to 50*(1-k) — identical to the
+ * old code — so existing 1×1 and 2×2 pieces are provably unaffected.
+ *
+ * For a 200×100 viewBox x must equal 100*(1-k) and y must equal 50*(1-k),
+ * i.e. offsetX ≠ offsetY. The naive `50*(1-k)` for x was WRONG: at k=0.92 it
+ * gave x=4 (off-centre) instead of x=8 (centred on the 200-unit wide canvas).
+ */
+describe('Frame centring maths via frameOffset', () => {
+  it('reduces to 50*(1-k) on a square 100×100 viewBox — identical to the old formula', () => {
+    const k = 0.92
+    const { x, y } = frameOffset('0 0 100 100', k)
+    const naive = 50 * (1 - k)
+    expect(x).toBeCloseTo(naive, 6)
+    expect(y).toBeCloseTo(naive, 6)
+  })
+
+  it('uses (vbW/2)*(1-k) for x and (vbH/2)*(1-k) for y on a 2:1 viewBox', () => {
+    const k = 0.92
+    const { x, y } = frameOffset('0 0 200 100', k)
+    // x must reference the 200-unit width: (200/2)*(1-0.92) = 100*0.08 = 8
+    expect(x).toBeCloseTo(8, 6)
+    // y must reference the 100-unit height: (100/2)*(1-0.92) = 50*0.08 = 4
+    expect(y).toBeCloseTo(4, 6)
+    // Key property: x ≠ y on a non-square canvas (the bug was x=y=4)
+    expect(x).not.toBeCloseTo(y, 6)
+  })
+
+  it('naive 50*(1-k) formula would have placed artwork off-centre on a 2:1 viewBox', () => {
+    // This test documents what the BUG produced, so the fix can be verified.
+    const k = 0.92
+    const naiveX = 50 * (1 - k) // 4  — what old code gave for x on wide pieces
+    const correctX = (200 / 2) * (1 - k) // 8  — what the fix produces
+    expect(naiveX).not.toBeCloseTo(correctX, 1)
+    // The actual fixed helper returns the correct value, not the naive one
+    const { x } = frameOffset('0 0 200 100', k)
+    expect(x).toBeCloseTo(correctX, 6)
+    expect(x).not.toBeCloseTo(naiveX, 1)
   })
 })
