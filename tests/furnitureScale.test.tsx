@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import MapGrid from '../src/components/MapGrid'
-import { FURNITURE_ICON, FURNITURE_SCALE, frameOffset } from '../src/core/furniture'
+import { FURNITURE_ICON, FURNITURE_OVERHANG, FURNITURE_SCALE, frameOffset } from '../src/core/furniture'
 import type { FurnitureType, Puzzle, CellMark } from '../src/core/types'
 
 /**
@@ -72,6 +72,42 @@ describe('furniture fill-factor (uniform high-fill model)', () => {
  *      sofa, table, bathtub, bookshelf and counter all spilled downward.
  * A test that only checked "is aspectRatio set" would have passed for case 2.
  */
+/**
+ * DEPTH. A tall piece is drawn larger than its square with its base still on
+ * that square, so it rises over the cell behind it. Overhang is a separate axis
+ * from fill: fill is how much FLOOR a piece covers, overhang is how TALL it
+ * stands. A rug covers a lot of floor and rises not at all.
+ *
+ * Implemented as a bottom-anchored scale. It must not become a translate (that
+ * lifts a piece off its own floor) and must not become a taller BOX: the SVGs
+ * use preserveAspectRatio="meet" over a square viewBox, so enlarging the box
+ * re-centres the same-size drawing instead of enlarging it — measured live, the
+ * box rose 0.37 cells while the ink rose 0.02.
+ */
+describe('furniture overhang — depth without leaving the floor', () => {
+  it('gives every type an overhang inside the sane range', () => {
+    for (const type of Object.keys(FURNITURE_ICON) as FurnitureType[]) {
+      const v = FURNITURE_OVERHANG[type]
+      expect(v, `${type} has no overhang value`).toBeTypeOf('number')
+      expect(v, `${type} overhang must not be negative — pieces rise, never sink`).toBeGreaterThanOrEqual(0)
+      expect(v, `${type} overhang above ~0.45 collides with the row behind it`).toBeLessThanOrEqual(0.45)
+    }
+  })
+
+  it('keeps flat things flat and tall things tall', () => {
+    // A rug is painted on the floor; it cannot rise.
+    expect(FURNITURE_OVERHANG.rug).toBe(0)
+    // The tall pieces are the ones that should occlude the cell behind them.
+    for (const tall of ['bookshelf', 'fridge', 'clock', 'plant', 'shower'] as const) {
+      expect(FURNITURE_OVERHANG[tall], `${tall} should stand tall`).toBeGreaterThanOrEqual(0.3)
+    }
+    // ...and they must out-rank the things that sit low.
+    for (const low of ['rug', 'toilet', 'box', 'bathtub'] as const) {
+      expect(FURNITURE_OVERHANG.bookshelf).toBeGreaterThan(FURNITURE_OVERHANG[low])
+    }
+  })
+})
+
 describe('furniture icon geometry — fills its footprint, never spills', () => {
   function makePuzzle(type: FurnitureType): Puzzle {
     const cells = [0, 1, 2, 3].flatMap(row => [0, 1, 2, 3].map(col => ({ row, col })))

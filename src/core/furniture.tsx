@@ -23,6 +23,52 @@ import type { FurnitureType } from './types'
  * a breath of padding (e.g. the rug's woven border reads better at 0.94 than
  * flush at 0.97). They must never encode real-world size.
  */
+/**
+ * How far a piece rises ABOVE its footprint, as a fraction of one cell height.
+ *
+ * This is the board's main depth cue, and it is deliberately separate from FILL.
+ * Fill says how much FLOOR a piece covers; overhang says how TALL it stands. A
+ * rug covers a lot of floor and rises not at all; a bookshelf covers one square
+ * and towers over it. Without this every piece is clipped to its own square and
+ * the board reads as a spreadsheet however well each icon is drawn — the
+ * reference the user gave has a tree breaking out of its square and past the
+ * board frame, and that overflow IS the three-dimensionality.
+ *
+ * Overhang goes UPWARD ONLY. A piece must keep standing on its own footprint;
+ * growing sideways or downward would cover the floor it occupies and, worse,
+ * would obscure the cell in FRONT of it — the cell nearest the player and the
+ * one they are most likely to be reading.
+ *
+ * Values are ordered by real-world height, which is the one place real-world
+ * scale legitimately belongs (FURNITURE_SCALE explains why it does not belong
+ * in fill). Past roughly 0.45 a piece starts colliding with the row behind it.
+ */
+export const FURNITURE_OVERHANG: Record<FurnitureType, number> = {
+  // Floor level — nothing stands above the footprint.
+  rug:       0.00,
+  // Low pieces: a shallow lift separates them from the floor material.
+  toilet:    0.12,
+  box:       0.12,
+  bathtub:   0.14,
+  bed:       0.14,
+  chair:     0.16,
+  sofa:      0.16,
+  table:     0.16,
+  desk:      0.18,
+  counter:   0.20,
+  tv:        0.22,
+  stove:     0.22,
+  // Waist to shoulder.
+  shrub:     0.26,
+  lamp:      0.30,
+  // Tall: these should visibly occlude the cell behind them.
+  fridge:    0.38,
+  shower:    0.38,
+  clock:     0.40,
+  plant:     0.40,
+  bookshelf: 0.44,
+}
+
 export const FURNITURE_SCALE: Record<FurnitureType, number> = {
   rug:       0.94, // flat woven border benefits from slight inset
   bed:       0.92,

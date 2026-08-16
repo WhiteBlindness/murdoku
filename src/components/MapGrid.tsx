@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { X, Lock } from 'lucide-react'
 import type { Puzzle, Cell, CellMark, Furniture, FurnitureType } from '../core/types'
 import { furnitureCells, furnitureFootprint } from '../core/types'
-import { FURNITURE_ICON, FURNITURE_NAME } from '../core/furniture'
+import { FURNITURE_ICON, FURNITURE_NAME, FURNITURE_OVERHANG } from '../core/furniture'
 import { floorStyle, isDarkFloor, roomMaterial } from '../core/roomMaterials'
 import Avatar from './Avatar'
 
@@ -269,7 +269,7 @@ export default function MapGrid({
                 /* Focus ring: SOLID var(--color-accent-strong), never --board-glow.
                    The glow variant is 50% alpha and composites to ~1.8:1 on light
                    floors â€” fails WCAG 2.4.11. This is the only focus indicator. */
-                className="relative flex items-center justify-center focus:outline-none focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-[var(--color-accent-strong)] transition-transform active:scale-[0.97]"
+                className="group relative flex items-center justify-center focus:outline-none focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-[var(--color-accent-strong)] transition-transform active:scale-[0.97]"
                 style={{
                   // Floor pattern lives on a dedicated child span so marks/tokens
                   // are unaffected by any filter applied to the floor layer.
@@ -305,6 +305,23 @@ export default function MapGrid({
                 {isClueTarget && (
                   <span aria-hidden className="clue-projector-trace absolute inset-[3px] z-[2] pointer-events-none" />
                 )}
+                {/* Hover ring.
+                    On a CHILD rather than the button because the button already
+                    carries an inline boxShadow for room-wall seams, and an inline
+                    style beats a class — cells on a wall would silently lose the
+                    effect while their neighbours kept it.
+                    INSET, so pointing at a cell never nudges the board by a pixel
+                    the way an outline or border would.
+                    Behind `@media (hover: hover)` so it cannot stick to the last
+                    tapped cell on a touch screen, which is what a JS-tracked
+                    hover does. It also sits BELOW the focus ring's z-10, so a
+                    keyboard user can still see where focus is while the mouse
+                    rests somewhere else. */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 z-[3] hidden [@media(hover:hover)]:group-hover:block"
+                  style={{ boxShadow: 'inset 0 0 0 3px var(--color-accent-strong)' }}
+                />
                 {/* floor layer â€” SVG material tile, behind all marks and avatars.
                     Rendered first so it sits behind everything without z-index tricks.
                     The preview brightness boost only touches the floor, not tokens. */}
@@ -537,6 +554,14 @@ export default function MapGrid({
             // not from shrinking the glyph. 94% on both 1×1 and multi-cell
             // footprints gives a consistent near-flush fill with a thin margin.
             const iconPct = 94
+            // How far this piece rises above its footprint, in cell heights.
+            // Clamped on the back row: a piece on row 0 would otherwise lift out
+            // through the board's frame. The reference art lets a tree do exactly
+            // that, but our board draws a heavy frame and the overflow would be
+            // sliced by it, which reads as a rendering fault rather than depth.
+            const overhangCells = f.row === 0
+              ? Math.min(FURNITURE_OVERHANG[f.type] ?? 0, 0.12)
+              : (FURNITURE_OVERHANG[f.type] ?? 0)
             return (
               <span
                 key={`${f.type}-${f.row}-${f.col}-${i}`}
@@ -546,6 +571,13 @@ export default function MapGrid({
                   gridRow: `${f.row + 1} / span ${h}`,
                   position: 'relative',
                   opacity: underToken ? 0.3 : struck ? 0.18 : 1,
+                  // Stacking follows the board's own perspective: rows further
+                  // down are nearer the viewer, so a piece must be drawn OVER
+                  // anything behind it and UNDER anything in front. Without an
+                  // explicit z-index this falls back to DOM order, which is the
+                  // generator's placement order — i.e. random-looking overlaps
+                  // once pieces start rising out of their footprint below.
+                  zIndex: f.row + 1,
                 }}
               >
                 {/* The icon box is inset from the footprint on BOTH axes.
@@ -567,7 +599,32 @@ export default function MapGrid({
                   style={{
                     position: 'absolute',
                     inset: `${(100 - iconPct) / 2}%`,
-                    transform: rot ? `rotate(${rot}deg)` : undefined,
+                    // DEPTH — a tall piece is drawn BIGGER than its square with
+                    // its base still planted, so it rises over the cell behind
+                    // it. That is how the reference art works: the tree is not
+                    // shifted upward, it is simply taller than the square it
+                    // stands in.
+                    //
+                    // Bottom-anchored scale, not a translate. Translating would
+                    // lift the piece off its own floor and make it float; growing
+                    // from the bottom edge keeps it standing where it belongs.
+                    //
+                    // MEASURED DEAD END — do not "simplify" this back to moving
+                    // `top` upward. The SVGs use preserveAspectRatio="meet" with
+                    // a square viewBox, so enlarging the BOX does not enlarge the
+                    // art: it re-centres the same-size drawing inside a taller
+                    // box. Measured on the live board, the box rose 0.37 cells
+                    // while the ink rose 0.02.
+                    //
+                    // Scale maths: the box is h*iconPct cells tall, and the piece
+                    // must end up (h*iconPct + overhang) cells tall.
+                    transformOrigin: 'bottom center',
+                    transform: [
+                      overhangCells > 0
+                        ? `scale(${1 + overhangCells / (h * (iconPct / 100))})`
+                        : null,
+                      rot ? `rotate(${rot}deg)` : null,
+                    ].filter(Boolean).join(' ') || undefined,
                   }}
                 >
                   <Icon />

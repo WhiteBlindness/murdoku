@@ -113,16 +113,14 @@ export default function HomeScreen({
       {atmosphereLayers}
 
       {/*
-        The LANDING uses a narrower measure than the case grid, deliberately.
-        Measured at 1526px: the intro copy sat in a ~450px centred column while
-        Today's Case and the tier rows ran nearly edge to edge — three different
-        left edges (532 / 57 / 40) on one screen, which is what made it read as
-        unfinished. One shared column gives every block the same left and right
-        edge and stops a tier row from becoming a 1431px-wide click target.
-        The case grid below keeps its wide measure: it is a grid of cards, not
-        prose, and wants the room.
+        Content column — widened to 1200px at large viewports so the landing
+        can use horizontal space deliberately instead of leaving a narrow ribbon.
+        Below lg it stays a single scrolling column, same as before.
       */}
-      <div className="relative z-10 w-full max-w-[860px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col min-h-screen">
+      <div
+        data-testid="home-content-cap"
+        className="relative z-10 w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col min-h-screen"
+      >
 
         {/* ── Top bar ── */}
         <div className="pt-safe flex items-center justify-between pt-3">
@@ -136,86 +134,113 @@ export default function HomeScreen({
           <ThemeToggle resolved={resolvedTheme} onToggle={onToggleTheme} />
         </div>
 
-        {/* ── Hero ── */}
-        <header className="flex flex-col items-center pt-2 pb-4 px-4 relative">
-          <div className="relative mb-3">
-            <svg width="58" height="58" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-              <circle cx="40" cy="40" r="37" stroke="var(--color-accent)" strokeOpacity="0.38" strokeWidth="1.5" strokeDasharray="4 3.5"/>
-              <circle cx="40" cy="40" r="30" stroke="var(--color-accent)" strokeOpacity="0.55" strokeWidth="1.8"/>
-              <circle cx="34" cy="34" r="12" stroke="var(--color-accent)" strokeOpacity="0.85" strokeWidth="3" fill="none"/>
-              <circle cx="34" cy="34" r="7" fill="var(--color-accent)" fillOpacity="0.12"/>
-              <line x1="43" y1="43" x2="54" y2="54" stroke="var(--color-accent)" strokeOpacity="0.85" strokeWidth="4" strokeLinecap="round"/>
-              <line x1="34" y1="28" x2="34" y2="40" stroke="var(--color-accent)" strokeOpacity="0.45" strokeWidth="1.5" strokeLinecap="round"/>
-              <line x1="28" y1="34" x2="40" y2="34" stroke="var(--color-accent)" strokeOpacity="0.45" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-            <div className="absolute inset-0 rounded-full pointer-events-none" style={{ boxShadow: '0 0 40px 8px var(--color-accent)', opacity: 0.08 }}/>
-          </div>
+        {/*
+          ── Above-the-fold: two-column at lg, single column below ────────────
+          Left column: identity (logo, title, pitch) + How it works + Today's Case
+          Right column: the board preview
 
-          <h1
-            className="font-display font-bold tracking-tight mt-0.5 leading-none"
-            style={{
-              fontSize: 'clamp(2rem, 5vw, 2.8rem)',
-              color: 'var(--color-text-primary)',
-              textShadow: '0 2px 24px color-mix(in srgb, var(--color-accent) 40%, transparent)',
-            }}
+          This arrangement puts the two things that communicate the game's idea
+          side by side: the text that describes it and the board that shows it.
+          On mobile the board appears between the pitch and the steps, same as
+          before — no mobile regression.
+
+          DOM order: header → board → steps → daily, so heading order is sane
+          and the board appears after the title on mobile without reordering.
+        */}
+        <div className="lg:grid lg:grid-cols-[1fr_auto] lg:gap-8 lg:items-start">
+
+          {/* Left column — identity + pitch + steps + daily */}
+          <div className="flex flex-col">
+
+            {/* ── Hero ── */}
+            <header className="flex flex-col items-center lg:items-start pt-2 pb-4 px-4 lg:px-0 relative">
+              <div className="relative mb-3">
+                <svg width="58" height="58" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                  <circle cx="40" cy="40" r="37" stroke="var(--color-accent)" strokeOpacity="0.38" strokeWidth="1.5" strokeDasharray="4 3.5"/>
+                  <circle cx="40" cy="40" r="30" stroke="var(--color-accent)" strokeOpacity="0.55" strokeWidth="1.8"/>
+                  <circle cx="34" cy="34" r="12" stroke="var(--color-accent)" strokeOpacity="0.85" strokeWidth="3" fill="none"/>
+                  <circle cx="34" cy="34" r="7" fill="var(--color-accent)" fillOpacity="0.12"/>
+                  <line x1="43" y1="43" x2="54" y2="54" stroke="var(--color-accent)" strokeOpacity="0.85" strokeWidth="4" strokeLinecap="round"/>
+                  <line x1="34" y1="28" x2="34" y2="40" stroke="var(--color-accent)" strokeOpacity="0.45" strokeWidth="1.5" strokeLinecap="round"/>
+                  <line x1="28" y1="34" x2="40" y2="34" stroke="var(--color-accent)" strokeOpacity="0.45" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+                <div className="absolute inset-0 rounded-full pointer-events-none" style={{ boxShadow: '0 0 40px 8px var(--color-accent)', opacity: 0.08 }}/>
+              </div>
+
+              <h1
+                className="font-display font-bold tracking-tight mt-0.5 leading-none"
+                style={{
+                  fontSize: 'clamp(2rem, 5vw, 2.8rem)',
+                  color: 'var(--color-text-primary)',
+                  textShadow: '0 2px 24px color-mix(in srgb, var(--color-accent) 40%, transparent)',
+                }}
+              >
+                ALIBI
+              </h1>
+
+              {/* One-line product description */}
+              <p
+                className="mt-2 text-center lg:text-left font-mono leading-snug text-text-secondary max-w-md sm:max-w-xl"
+                style={{ fontSize: 12 }}
+              >
+                A murder-mystery deduction puzzle. Place every suspect on a house map — one per row, one per column — then accuse whoever is left alone with the victim.
+              </p>
+            </header>
+
+            {/* ── The product shot — mobile only (below lg) ─────────────────
+                On lg+ it lives in the right column. The preview is inert and
+                aria-hidden; the steps below carry the same info for AT. */}
+            <div className="lg:hidden mb-5 w-full flex justify-center">
+              <div className="w-full max-w-[420px]">
+                <BoardPreview puzzles={puzzles} />
+              </div>
+            </div>
+
+            {/* ── How it works (3 steps, scannable) ── */}
+            <div className="mb-4 w-full">
+              <p
+                className="mb-2 font-display font-bold uppercase tracking-[0.14em] text-text-muted"
+                style={{ fontSize: 11 }}
+              >
+                How it works
+              </p>
+              <ol className="flex flex-col gap-1.5">
+                {[
+                  'Read the witness clues — room, furniture, and relationship evidence.',
+                  'Place every suspect so each holds exactly one row and one column of the house map.',
+                  'Accuse the suspect left alone in the same room as the victim.',
+                ].map((step, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span
+                      className="shrink-0 font-display font-bold leading-none mt-px"
+                      style={{ fontSize: 13, color: 'var(--color-accent-text)', minWidth: 16 }}
+                      aria-hidden
+                    >
+                      {i + 1}
+                    </span>
+                    <span className="font-mono leading-snug text-text-secondary" style={{ fontSize: 11 }}>
+                      {step}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            {/* ── Today's Case (primary CTA) ── */}
+            <DailyPanel puzzles={puzzles} completedIds={completedIds} records={records} onSelect={onSelect} />
+
+          </div>{/* end left column */}
+
+          {/* Right column — board preview (lg+ only) */}
+          <div
+            className="hidden lg:block lg:sticky lg:top-4"
+            data-testid="board-preview-desktop"
+            style={{ width: 'clamp(340px, 38%, 480px)' }}
           >
-            ALIBI
-          </h1>
-
-          {/* One-line product description */}
-          <p
-            className="mt-2 text-center font-mono leading-snug text-text-secondary max-w-md sm:max-w-xl"
-            style={{ fontSize: 12 }}
-          >
-            A murder-mystery deduction puzzle. Place every suspect on a house map — one per row, one per column — then accuse whoever is left alone with the victim.
-          </p>
-        </header>
-
-        {/* ── The product shot ──────────────────────────────────────────────
-            A real generated board from the hardest tier with suspects scattered
-            across it. Showing the actual thing beats describing it, and the
-            house map IS the idea. Inert and aria-hidden: the three steps below
-            carry the same information for assistive technology. */}
-        <div className="mb-5 w-full flex justify-center">
-          <div className="w-full max-w-[420px]">
             <BoardPreview puzzles={puzzles} />
           </div>
-        </div>
 
-        {/* ── How it works (3 steps, scannable) ── */}
-        {/* Full column width: a centred island here would give the steps a left
-            edge that matched neither the hero nor the tier rows below. */}
-        <div className="mb-4 w-full">
-          <p
-            className="mb-2 font-display font-bold uppercase tracking-[0.14em] text-text-muted"
-            style={{ fontSize: 11 }}
-          >
-            How it works
-          </p>
-          <ol className="flex flex-col gap-1.5">
-            {[
-              'Read the witness clues — room, furniture, and relationship evidence.',
-              'Place every suspect so each holds exactly one row and one column of the house map.',
-              'Accuse the suspect left alone in the same room as the victim.',
-            ].map((step, i) => (
-              <li key={i} className="flex items-start gap-2">
-                <span
-                  className="shrink-0 font-display font-bold leading-none mt-px"
-                  style={{ fontSize: 13, color: 'var(--color-accent-text)', minWidth: 16 }}
-                  aria-hidden
-                >
-                  {i + 1}
-                </span>
-                <span className="font-mono leading-snug text-text-secondary" style={{ fontSize: 11 }}>
-                  {step}
-                </span>
-              </li>
-            ))}
-          </ol>
-        </div>
-
-        {/* ── Today's Case (primary CTA) ── */}
-        <DailyPanel puzzles={puzzles} completedIds={completedIds} records={records} onSelect={onSelect} />
+        </div>{/* end above-the-fold two-column */}
 
         {/* ── Continue strip ── */}
         {resumablePuzzle && inProgress && (

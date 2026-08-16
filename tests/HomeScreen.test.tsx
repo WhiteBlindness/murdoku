@@ -256,3 +256,60 @@ describe('HomeScreen search, filters, and resume', () => {
     expect(screen.getByText(/no cases match/i)).toBeInTheDocument()
   })
 })
+
+// ── Landing page layout / proportion tests ───────────────────────────────────
+// jsdom cannot measure pixels, so these assert structural classes and DOM
+// invariants that encode the composition intent. A regression here means the
+// layout was accidentally reverted, not that a pixel shifted.
+
+describe('HomeScreen landing layout', () => {
+  it('renders the content cap with its testid', () => {
+    renderHome()
+    expect(screen.getByTestId('home-content-cap')).toBeInTheDocument()
+  })
+
+  it('content cap carries the wider max-width class', () => {
+    renderHome()
+    const cap = screen.getByTestId('home-content-cap')
+    // max-w-[1200px] replaces the former max-w-[860px] so the landing uses
+    // horizontal space on wide monitors rather than a narrow centred ribbon.
+    expect(cap.className).toMatch(/max-w-\[1200px\]/)
+  })
+
+  it('board preview on landing is inert and aria-hidden (never focusable)', () => {
+    renderHome()
+    // There may be two BoardPreview instances (mobile + desktop) — both must
+    // carry inert and aria-hidden so no cell enters the tab order.
+    const previews = screen.queryAllByTestId('board-preview')
+    // At least one preview must exist.
+    expect(previews.length).toBeGreaterThan(0)
+    previews.forEach(preview => {
+      expect(preview).toHaveAttribute('aria-hidden', 'true')
+      // `inert` is a boolean attribute — presence is what matters.
+      expect(preview.hasAttribute('inert')).toBe(true)
+    })
+  })
+
+  it('renders every required landing section', () => {
+    renderHome()
+    // Title
+    expect(screen.getByRole('heading', { name: /alibi/i })).toBeInTheDocument()
+    // How it works heading (text content)
+    expect(screen.getByText(/how it works/i)).toBeInTheDocument()
+    // Case tiers section heading
+    expect(screen.getByRole('heading', { name: /case tiers/i })).toBeInTheDocument()
+    // Achievements shelf
+    expect(screen.getByTestId('badge-shelf')).toBeInTheDocument()
+    // Cases-solved counter in footer
+    expect(screen.getByText(/cases solved/i)).toBeInTheDocument()
+  })
+
+  it('board preview desktop wrapper is hidden on mobile (lg:block)', () => {
+    renderHome()
+    const desktopWrapper = screen.getByTestId('board-preview-desktop')
+    // The desktop preview wrapper uses `hidden lg:block` so it is invisible
+    // below lg — screen readers and mobile users do not encounter a duplicate.
+    expect(desktopWrapper.className).toMatch(/hidden/)
+    expect(desktopWrapper.className).toMatch(/lg:block/)
+  })
+})

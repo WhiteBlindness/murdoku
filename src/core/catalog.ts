@@ -39,7 +39,13 @@ const SPEC: { difficulty: Difficulty; count: number }[] = [
 // size-derived ladder, taking two-floor tiers from ~9.8 to 16.0 cells per room
 // so a board reads as a floor plan rather than a grid of cubicles. Cached v17
 // puzzles have the old cramped room layouts.
-const KEY = 'murdoku_catalog_v18'
+// v19: Room names are now assigned by fit (outdoor-on-edge rule, size bands,
+// floor preferences). splitRects is balanced (MIN_ROOM_DIM=2, centred cuts).
+// Furniture gets wall-based rotation: wall-huggers face inward, seating faces
+// the room centroid with anti-adjacency guard. 2×1 wall-huggers may swap to
+// 1×2 footprint when placed on a vertical wall. Cached v18 boards have old
+// random names, no rotation, and occasional 1-cell slivers.
+const KEY = 'murdoku_catalog_v19'
 let puzzles: Puzzle[] = []
 
 function slug(s: string) { return s.toLowerCase().replace(/\s+/g, '-') }

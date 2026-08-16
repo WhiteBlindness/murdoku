@@ -426,18 +426,29 @@ export default function GameScreen(props: Props) {
         At lg+: wrappers become `flex flex-col` grid cells — each column scrolls
         (or not) independently. The SCENE column is non-scrolling by design.
 
-        Three-column grid starts at xl (1280px+):
-          col 1: Case File rail  — minmax(260px,320px)
-          col 2: The Scene       — minmax(0,1fr)
-          col 3: Dossier         — minmax(340px,420px)
-
-        Two-column grid at lg–xl (1024–1280px):
+        Two-column grid at lg (1024px+):
           col 1: The Scene       — minmax(0,1fr)
-          col 2: Dossier         — minmax(320px,420px)
-          The case-file rail content folds into the dossier column top.
+          col 2: Dossier         — minmax(340px,420px)
 
         Below lg: single scrolling column.
+
+        At desktop widths the whole header+body is capped at 1400px and centered,
+        so the board and dossier read as one composed unit rather than being flung
+        to opposite edges of a 1920px viewport. The cap is gated behind lg: so
+        mobile stays an ordinary scrolling column.
       */}
+
+      {/*
+        ── Shared desktop content cap ───────────────────────────────────────
+        Wraps BOTH header and body so the grid columns are identical in width
+        and the title always centers over the board it names. `lg:flex-1
+        lg:min-h-0` preserves the height chain that lets the board fill the
+        available vertical space without overflowing.
+      */}
+      <div
+        data-testid="game-content-cap"
+        className="flex flex-col flex-1 min-h-0 lg:max-w-[1400px] lg:w-full lg:mx-auto"
+      >
 
       {/* ── Header — two genuinely different layouts ───────────────────────
           MOBILE (below lg): compact three-slot bar — back | title+count | ⋯ menu
@@ -1079,6 +1090,8 @@ export default function GameScreen(props: Props) {
         </div>{/* end dossier column */}
 
       </div>{/* end body grid */}
+
+      </div>{/* end shared desktop content cap */}
 
       {/* ── Leave confirmation ── classified dossier dialog ─────────────── */}
       <AnimatePresence>

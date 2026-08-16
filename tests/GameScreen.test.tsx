@@ -229,3 +229,36 @@ describe('GameScreen aria-live region', () => {
     expect(region.textContent).toBe('')
   })
 })
+
+// ── Layout / proportion tests ─────────────────────────────────────────────────
+// jsdom cannot measure pixels, so these tests assert structural classes rather
+// than computed dimensions. They verify the composition intent: a shared
+// max-width wrapper that keeps board and dossier as one unit, and a square
+// board div that sizes itself via CSS container queries.
+
+describe('GameScreen layout composition', () => {
+  it('renders the shared desktop content cap with its testid', () => {
+    localStorage.setItem('murdoku_seen_help', '1')
+    renderGame()
+    expect(screen.getByTestId('game-content-cap')).toBeInTheDocument()
+  })
+
+  it('content cap carries the max-width centering class', () => {
+    localStorage.setItem('murdoku_seen_help', '1')
+    renderGame()
+    const cap = screen.getByTestId('game-content-cap')
+    // lg:max-w-[1400px] gates the cap at desktop widths so board + dossier
+    // read as one unit instead of spanning a 1920px viewport.
+    expect(cap.className).toMatch(/lg:max-w-\[1400px\]/)
+    expect(cap.className).toMatch(/lg:mx-auto/)
+  })
+
+  it('board square div carries aspect-square so it stays square on mobile', () => {
+    localStorage.setItem('murdoku_seen_help', '1')
+    renderGame()
+    // The MapGrid container uses aspect-square on mobile and min(cqw,cqh) on
+    // desktop — both derived from a single div. Find it by its stable classes.
+    const squareDiv = document.querySelector('.aspect-square')
+    expect(squareDiv).not.toBeNull()
+  })
+})

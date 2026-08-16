@@ -103,10 +103,45 @@ const ACCENTS = [
   '#9C7F6E', // warm sepia brown
 ]
 
-const ROOM_NAMES = [
-  'Bedroom', 'Kitchen', 'Dining Room', 'Living Room', 'Bathroom',
-  'Porch', 'Front Yard', 'Study', 'Hallway', 'Pantry', 'Garden', 'Office',
-]
+// ── Room name specs ──────────────────────────────────────────────────────────
+// Each entry carries:
+//   outdoor   – must appear on ground floor only AND on an edge-touching rect
+//   floors    – allowed floors (absent = any); 0 = ground-preferred, 1 = upper-preferred
+//   minCells  – smallest plausible room area for this name
+//   maxCells  – largest plausible room area for this name
+//   narrow    – true if the room is naturally elongated (Hallway)
+//
+// Assignment is a weighted best-fit: a name can only be used once per floor,
+// outdoor names are hard-filtered when the rect doesn't qualify, and within
+// the remaining candidates we pick the name whose size band covers the rect area.
+// If no name fits perfectly we degrade to closest fit rather than throwing.
+interface RoomSpec {
+  outdoor?: boolean
+  preferFloor?: 0 | 1   // 0 = ground-preferred, 1 = upper-preferred
+  minCells: number
+  maxCells: number
+  narrow?: boolean       // expects aspect ratio > 2:1
+}
+
+const ROOM_SPECS: Record<string, RoomSpec> = {
+  'Bedroom':     { preferFloor: 1, minCells: 8,  maxCells: 32 },
+  'Kitchen':     { preferFloor: 0, minCells: 8,  maxCells: 28 },
+  'Dining Room': { preferFloor: 0, minCells: 8,  maxCells: 28 },
+  'Living Room': { preferFloor: 0, minCells: 10, maxCells: 36 },
+  'Bathroom':    { preferFloor: 1, minCells: 4,  maxCells: 14 },
+  'Porch':       { outdoor: true,  minCells: 3,  maxCells: 12 },
+  'Front Yard':  { outdoor: true,  minCells: 4,  maxCells: 20 },
+  'Study':       { preferFloor: 1, minCells: 6,  maxCells: 20 },
+  'Hallway':     { minCells: 3,  maxCells: 14, narrow: true },
+  'Pantry':      { preferFloor: 0, minCells: 3,  maxCells: 10 },
+  'Garden':      { outdoor: true,  minCells: 6,  maxCells: 24 },
+  'Office':      { preferFloor: 0, minCells: 6,  maxCells: 20 },
+}
+
+// Ordered pool — the assignment loop tries names in this order so common rooms
+// are assigned before rare ones.
+const ROOM_NAMES = Object.keys(ROOM_SPECS)
+
 const ROOM_HUES: Record<string, number> = {
   Bedroom: 45, Kitchen: 25, 'Dining Room': 200, 'Living Room': 265,
   Bathroom: 190, Porch: 108, 'Front Yard': 112, Study: 150, Hallway: 210,
@@ -171,22 +206,56 @@ const CELLS_PER_PIECE = 6
 
 interface Rect { r0: number; c0: number; r1: number; c1: number } // inclusive
 
+/**
+ * Minimum dimension a room side must have. A room that is only 1 cell wide
+ * is a corridor — only a Hallway should ever be that narrow, and we handle
+ * that through naming, not by generating arbitrarily thin slivers everywhere.
+ * Set to 2: ensures every non-hallway room is at least 2×2 = 4 cells.
+ */
+const MIN_ROOM_DIM = 2
+
+/**
+ * Split the board into `targetRooms` rectangles.
+ *
+ * Improvements over the old code:
+ * 1. After choosing a split axis we bias the cut AWAY from the edges so both
+ *    halves are at least MIN_ROOM_DIM wide on that axis. Old code used
+ *    `c0 + 1 + rand*(w-2)` which could produce 1-cell slivers.
+ * 2. We allow a split only when BOTH resulting halves would be >= MIN_ROOM_DIM
+ *    on the cut axis. If no such split is possible in either direction we stop.
+ * 3. The cut point is biased toward the centre (golden-ratio jitter) rather
+ *    than uniformly random, which reduces wildly unequal siblings without
+ *    removing variety.
+ */
 function splitRects(size: number, targetRooms: number): Rect[] {
   let rects: Rect[] = [{ r0: 0, c0: 0, r1: size - 1, c1: size - 1 }]
   let guard = 0
-  while (rects.length < targetRooms && guard++ < 50) {
-    // split the largest rectangle
+  while (rects.length < targetRooms && guard++ < 60) {
     rects.sort((a, b) => area(b) - area(a))
     const rect = rects.shift()!
     const h = rect.r1 - rect.r0 + 1, w = rect.c1 - rect.c0 + 1
-    const canV = w >= 4, canH = h >= 4
+    // A valid vertical split needs at least 2*MIN on the width axis
+    const canV = w >= MIN_ROOM_DIM * 2
+    // A valid horizontal split needs at least 2*MIN on the height axis
+    const canH = h >= MIN_ROOM_DIM * 2
     if (!canV && !canH) { rects.push(rect); break }
     const vertical = canV && (!canH || rand() < 0.5)
     if (vertical) {
-      const cut = rect.c0 + 1 + Math.floor(rand() * (w - 2))
+      // Cut range: [c0+MIN_ROOM_DIM-1 .. c1-MIN_ROOM_DIM]
+      // so the smaller half is at least MIN_ROOM_DIM cells wide.
+      // Single rand() call mapped to a centred range (25%–75% of span)
+      // avoids the extra rand() the golden-ratio variant required.
+      const lo = rect.c0 + MIN_ROOM_DIM - 1
+      const hi = rect.c1 - MIN_ROOM_DIM
+      const span = hi - lo + 1
+      // Map rand() [0,1) to the middle 50% of the valid range
+      const cut = lo + Math.floor((0.25 + rand() * 0.5) * span)
       rects.push({ ...rect, c1: cut }, { ...rect, c0: cut + 1 })
     } else {
-      const cut = rect.r0 + 1 + Math.floor(rand() * (h - 2))
+      const lo = rect.r0 + MIN_ROOM_DIM - 1
+      const hi = rect.r1 - MIN_ROOM_DIM
+      const span = hi - lo + 1
+      const cut = lo + Math.floor((0.25 + rand() * 0.5) * span)
       rects.push({ ...rect, r1: cut }, { ...rect, r0: cut + 1 })
     }
   }
@@ -194,7 +263,99 @@ function splitRects(size: number, targetRooms: number): Rect[] {
 }
 function area(r: Rect) { return (r.r1 - r.r0 + 1) * (r.c1 - r.c0 + 1) }
 
-function buildRooms(size: number, targetRooms?: number): { rooms: Room[]; roomOf: string[][] } {
+/**
+ * True when a rect touches any board edge. Outdoor rooms (Front Yard, Garden,
+ * Porch) should only appear at the perimeter — a garden on a floating interior
+ * rect is nonsensical.
+ */
+function rectIsEdge(rect: Rect, size: number): boolean {
+  return rect.r0 === 0 || rect.c0 === 0 || rect.r1 === size - 1 || rect.c1 === size - 1
+}
+
+/**
+ * Assign a plausible room name to each rect.
+ *
+ * Rules (hard):
+ *   1. Outdoor names (Front Yard, Garden, Porch) are only assignable on floor 0
+ *      AND to a rect touching a board edge. Never upstairs.
+ *   2. Names are unique within a floor call. (Cross-floor duplication is fine —
+ *      a house can have a Bedroom on each storey.)
+ *
+ * Rules (soft, scored):
+ *   3. Names carry a preferred floor (0 = ground, 1 = upper). A name used on
+ *      the wrong floor loses score but is not banned.
+ *   4. Names carry a size band [minCells..maxCells]. The closer the rect area
+ *      to the band, the higher the score. Outside the band the score degrades
+ *      gracefully — we never throw or leave a room unnamed.
+ *   5. Narrow names (Hallway) prefer rects with aspect ratio > 2:1.
+ *
+ * Degrades gracefully: if the greedy assignment gets stuck (all remaining names
+ * are hard-banned for remaining rects), it falls back to whichever name has the
+ * best soft score among the full remaining pool (ignoring hard bans), then as
+ * a last resort picks any remaining name at random.
+ */
+function assignRoomNames(rects: Rect[], size: number, floorNum: number): string[] {
+  const available = shuffle([...ROOM_NAMES])
+  const result: string[] = new Array(rects.length).fill('')
+
+  // Sort rects largest-first so big rooms get first pick of well-fitting names.
+  const order = [...rects.keys()].sort((a, b) => area(rects[b]) - area(rects[a]))
+
+  for (const ri of order) {
+    const rect = rects[ri]
+    const a = area(rect)
+    const h = rect.r1 - rect.r0 + 1, w = rect.c1 - rect.c0 + 1
+    const aspectRatio = Math.max(h, w) / Math.min(h, w)
+    const isEdge = rectIsEdge(rect, size)
+
+    // Score a candidate name for this rect (higher = better fit).
+    const score = (name: string): number => {
+      const spec = ROOM_SPECS[name]
+      if (!spec) return 0
+      // Hard ban: outdoor on wrong floor or non-edge rect
+      if (spec.outdoor && (floorNum !== 0 || !isEdge)) return -Infinity
+      let s = 100
+      // Floor preference penalty
+      if (spec.preferFloor !== undefined && spec.preferFloor !== floorNum) s -= 20
+      // Size band: zero penalty inside band, scaled penalty outside
+      if (a < spec.minCells) s -= (spec.minCells - a) * 8
+      else if (a > spec.maxCells) s -= (a - spec.maxCells) * 4
+      // Narrow preference bonus
+      if (spec.narrow && aspectRatio > 2) s += 15
+      else if (spec.narrow && aspectRatio <= 2) s -= 10
+      return s
+    }
+
+    // Best available name by score (hard bans have score -Infinity → skipped)
+    let best: string | null = null, bestScore = -Infinity
+    for (const name of available) {
+      const sc = score(name)
+      if (sc > -Infinity && sc > bestScore) { bestScore = sc; best = name }
+    }
+
+    if (best === null) {
+      // All remaining names are hard-banned — degrade: ignore hard bans
+      let fallbackBest: string | null = null, fbScore = -Infinity
+      for (const name of available) {
+        // Score ignoring the hard ban (outdoor check)
+        const spec = ROOM_SPECS[name]
+        let s = 100
+        if (spec?.preferFloor !== undefined && spec.preferFloor !== floorNum) s -= 20
+        if (a < (spec?.minCells ?? 4)) s -= ((spec?.minCells ?? 4) - a) * 8
+        else if (a > (spec?.maxCells ?? 30)) s -= (a - (spec?.maxCells ?? 30)) * 4
+        if (s > fbScore) { fbScore = s; fallbackBest = name }
+      }
+      best = fallbackBest ?? available[0]
+    }
+
+    result[ri] = best!
+    available.splice(available.indexOf(best!), 1)
+  }
+
+  return result
+}
+
+function buildRooms(size: number, targetRooms?: number, floorNum = 0): { rooms: Room[]; roomOf: string[][] } {
   // Room count tracks area: an 8x8 split into 4 rooms gives 16-cell rooms, which
   // makes "In the Kitchen" nearly free information.
   // Target room counts tuned to keep typical room size at 6–12 cells.
@@ -215,7 +376,8 @@ function buildRooms(size: number, targetRooms?: number): { rooms: Room[]; roomOf
       : 8 + Math.floor(rand() * 2)
   )
   const rects = splitRects(size, target)
-  const names = shuffle(ROOM_NAMES).slice(0, rects.length)
+  // Assign names by fit: size band + floor preference + outdoor-edge rule
+  const names = assignRoomNames(rects, size, floorNum)
   const roomOf: string[][] = Array.from({ length: size }, () => new Array(size).fill(''))
   const rooms: Room[] = rects.map((rect, i) => {
     const id = `room${i}`
@@ -238,9 +400,9 @@ function buildTwoFloorRooms(size: number, targetRooms?: number): {
   roomOf: string[][]          // floor 0 (also roomOfByFloor[0])
   roomOfByFloor: string[][][] // [floor][row][col]
 } {
-  const { rooms: rooms0, roomOf: roomOf0 } = buildRooms(size, targetRooms)
+  const { rooms: rooms0, roomOf: roomOf0 } = buildRooms(size, targetRooms, 0)
   const offset = rooms0.length
-  const { rooms: rooms1, roomOf: roomOf1 } = buildRooms(size, targetRooms)
+  const { rooms: rooms1, roomOf: roomOf1 } = buildRooms(size, targetRooms, 1)
 
   // Re-id floor-1 rooms to avoid collisions with floor-0 room ids
   const roomOf1remapped: string[][] = Array.from({ length: size }, () => new Array(size).fill(''))
@@ -301,6 +463,68 @@ function randomTwoFloorPlacement(size: number, people: Person[]): Record<string,
 
 // --- furniture -------------------------------------------------------------
 
+/**
+ * Pieces that should NOT be rotated — rotation is either meaningless for them
+ * (a rug looks the same rotated) or would look broken (an asymmetric plant icon
+ * that reads fine at 0° looks odd rotated). Keep this list short and principled.
+ */
+const NO_ROTATE: Set<FurnitureType> = new Set([
+  'rug', 'plant', 'shrub', 'lamp', 'clock', 'box',
+])
+
+/**
+ * Wall-huggers: pieces that belong against a room wall and face into the room.
+ * These get rotation computed from their wall position. The 2×1 ones may also
+ * be stored as 1×2 when placed on a vertical wall — see tryPlaceWallHugger.
+ *
+ * Pieces NOT in this set (chair, sofa — freestanding seating) get their
+ * rotation from the open-space heuristic instead.
+ */
+const WALL_HUGGERS: Set<FurnitureType> = new Set([
+  'bed', 'bookshelf', 'counter', 'fridge', 'stove', 'desk', 'toilet', 'shower', 'bathtub',
+])
+
+/**
+ * Seating types — these face INTO the room rather than against a wall.
+ */
+const SEATING: Set<FurnitureType> = new Set(['chair', 'sofa'])
+
+/**
+ * For a wall-hugger anchored at (row, col) inside `roomId`, figure out which
+ * board edges the cell touches (all four walls of the room boundary, not just
+ * the outer board edge). Returns the best rotation so the piece faces the room
+ * interior.
+ *
+ * Rotation semantics (matches MapGrid renderer):
+ *   0   = faces toward the viewer (bottom / south) — default SVG orientation
+ *   90  = faces left (west)
+ *   180 = faces away from viewer (north)
+ *   270 = faces right (east)
+ *
+ * Wall-hugger convention:
+ *   top wall  → rotation 0   (piece faces down / into room)
+ *   right wall → rotation 270 (piece faces left / into room)
+ *   bottom wall → rotation 180 (piece faces up / into room)
+ *   left wall  → rotation 90  (piece faces right / into room)
+ */
+function wallRotation(
+  row: number, col: number, roomId: string,
+  roomOf: string[][], boardSize: number,
+): 0 | 90 | 180 | 270 {
+  const rid = (r: number, c: number) => roomOf[r]?.[c] ?? ''
+  const atTop    = row === 0 || rid(row - 1, col) !== roomId
+  const atBottom = row === boardSize - 1 || rid(row + 1, col) !== roomId
+  const atLeft   = col === 0 || rid(row, col - 1) !== roomId
+  const atRight  = col === boardSize - 1 || rid(row, col + 1) !== roomId
+
+  // Prefer the wall that would place the piece most visibly (top/bottom > sides)
+  if (atTop)    return 0    // top wall  → face south (into room)
+  if (atBottom) return 180  // bottom wall → face north (into room)
+  if (atLeft)   return 90   // left wall → face east (into room)
+  if (atRight)  return 270  // right wall → face west (into room)
+  return 0 // interior cell: default
+}
+
 function placeFurniture(
   rooms: Room[], roomOf: string[][], place: Record<string, Cell>,
   floorNum = 0,
@@ -327,34 +551,117 @@ function placeFurniture(
   const freeCells: Record<string, Set<string>> = {}
   for (const room of rooms) freeCells[room.id] = new Set(room.cells.map(c => cellKey(c.row, c.col)))
 
+  const boardSize = roomOf.length
   const roomIdAtRC = (row: number, col: number) => roomOf[row]?.[col] ?? ''
 
   /**
-   * Try to place a piece of type `t` anchored at (row, col).
+   * Try to place a piece of type `t` anchored at (row, col) with given w/h.
    * Returns true and mutates state on success; returns false on failure.
    * Rules: every cell of the footprint must be (a) in-bounds, (b) inside the
    * SAME room as the anchor, (c) not already occupied by another piece, and
    * (d) after placement the room still has ≥1 free cell.
+   *
+   * The rotation field is purely visual and does NOT affect the footprint used
+   * here — w and h are the authoritative physical footprint. When a 2×1 piece
+   * is placed on a vertical wall we call this with w=1, h=2 so the footprint
+   * cells are correct and furnitureCells() produces the right answer.
    */
-  const tryPlace = (t: FurnitureType, row: number, col: number, roomId: string): boolean => {
-    const fp = FURNITURE_FOOTPRINT[t] ?? { w: 1, h: 1 }
-    const piece: Furniture = { type: t, row, col, w: fp.w, h: fp.h, floor: floorNum }
+  const tryPlaceWithDims = (
+    t: FurnitureType, row: number, col: number, roomId: string,
+    w: number, h: number, rotation: 0 | 90 | 180 | 270,
+  ): boolean => {
+    const piece: Furniture = { type: t, row, col, w, h, floor: floorNum, rotation }
     const cells = furnitureCells(piece)
-    // Validate all cells
     for (const { row: r, col: c } of cells) {
-      if (r < 0 || c < 0 || r >= roomOf.length || c >= (roomOf[0]?.length ?? 0)) return false
+      if (r < 0 || c < 0 || r >= boardSize || c >= (roomOf[0]?.length ?? 0)) return false
       if (roomIdAtRC(r, c) !== roomId) return false
       if (ownedOccupied.has(cellKey(r, c))) return false
     }
-    // Ensure room keeps ≥1 free label cell after this placement
     if (freeCells[roomId].size - cells.length < 1) return false
-    // Commit
     for (const { row: r, col: c } of cells) {
       ownedOccupied.add(cellKey(r, c))
       freeCells[roomId].delete(cellKey(r, c))
     }
     furniture.push(piece)
     return true
+  }
+
+  /**
+   * Choose rotation and possibly swap w/h for wall-huggers.
+   *
+   * For a 2×1 wall-hugger (sofa, counter, bathtub, bookshelf):
+   *   - On a TOP or BOTTOM wall: keep w=2, h=1, rotation=0/180 (horizontal run).
+   *   - On a LEFT or RIGHT wall: swap to w=1, h=2, rotation=90/270 (vertical run).
+   *     The footprint swap is correct: furnitureCells will produce a vertical 2-cell
+   *     strip that the solver and the renderer both see consistently.
+   *
+   * For 1×1 wall-huggers and the 2×2 bed: rotation from wallRotation(), no swap needed.
+   */
+  const tryPlaceWallHugger = (
+    t: FurnitureType, row: number, col: number, roomId: string,
+  ): boolean => {
+    const rot = wallRotation(row, col, roomId, roomOf, boardSize)
+    const baseFP = FURNITURE_FOOTPRINT[t] ?? { w: 1, h: 1 }
+    // 2×1 pieces on a vertical wall: swap footprint to 1×2
+    if (baseFP.h === 1 && baseFP.w === 2 && (rot === 90 || rot === 270)) {
+      return tryPlaceWithDims(t, row, col, roomId, 1, 2, rot)
+    }
+    return tryPlaceWithDims(t, row, col, roomId, baseFP.w, baseFP.h, rot)
+  }
+
+  /**
+   * For non-wall-huggers (seating, etc.): try the default footprint with the
+   * given rotation. For seating we just use rotation 0 initially; the anti-stack
+   * logic below may override it.
+   */
+  const tryPlace = (t: FurnitureType, row: number, col: number, roomId: string): boolean => {
+    const fp = FURNITURE_FOOTPRINT[t] ?? { w: 1, h: 1 }
+    const rot: 0 | 90 | 180 | 270 = NO_ROTATE.has(t) ? 0 : 0
+    return tryPlaceWithDims(t, row, col, roomId, fp.w, fp.h, rot)
+  }
+
+  /**
+   * Seating placement with anti-adjacency guard.
+   *
+   * Problem on the live board: two porch chairs placed at adjacent cells both
+   * with rotation 0 looked stacked, facing the same direction side by side.
+   *
+   * Solution: when placing seating, check if an identical piece already sits
+   * at an orthogonally adjacent cell. If so, rotate the new piece 180° (face
+   * the other way) or pick a non-adjacent cell instead. Also pick rotation
+   * toward the room's centroid so seating faces inward.
+   */
+  const placeSeating = (
+    t: FurnitureType, row: number, col: number, roomId: string,
+  ): boolean => {
+    const fp = FURNITURE_FOOTPRINT[t] ?? { w: 1, h: 1 }
+    // Compute rotation toward centroid of room
+    const roomCells = rooms.find(r => r.id === roomId)?.cells ?? []
+    const centRow = roomCells.reduce((s, c) => s + c.row, 0) / (roomCells.length || 1)
+    const centCol = roomCells.reduce((s, c) => s + c.col, 0) / (roomCells.length || 1)
+    const dr = centRow - row, dc = centCol - col
+    // MapGrid rotation: 0=faces south (down), 90=faces west (left), 180=faces north (up), 270=faces east (right)
+    // To face toward centroid: if centroid is below (dr>0) face south (0); above (dr<0) face north (180)
+    //                          if centroid is right (dc>0) face east (270); left (dc<0) face west (90)
+    let rot: 0 | 90 | 180 | 270
+    if (Math.abs(dr) >= Math.abs(dc)) {
+      rot = dr > 0 ? 0 : 180
+    } else {
+      rot = dc > 0 ? 270 : 90
+    }
+
+    // Check adjacent cells for an identical piece facing the same direction
+    const ORTHO4 = [[-1,0],[1,0],[0,-1],[0,1]] as const
+    const adjacentSame = ORTHO4.some(([dr2, dc2]) => {
+      const ar = row + dr2, ac = col + dc2
+      return furniture.some(f =>
+        f.type === t && f.row === ar && f.col === ac &&
+        (f.rotation ?? 0) === rot && (f.floor ?? 0) === floorNum
+      )
+    })
+    if (adjacentSame) rot = ((rot + 180) % 360) as 0 | 90 | 180 | 270
+
+    return tryPlaceWithDims(t, row, col, roomId, fp.w, fp.h, rot)
   }
 
   // 1) Furnish each room in proportion to its FLOOR AREA.
@@ -365,35 +672,68 @@ function placeFurniture(
   // looking abandoned — a 20-cell pantry holding one box, an 18-cell yard with
   // two plants. Furniture has to scale with the space it decorates.
   //
-  // Roughly one piece per four cells, so a 16-cell room gets ~4 and a 24-cell
-  // room ~6, with a little jitter so houses do not feel stamped out. Repeats are
+  // Roughly one piece per six cells, so a 16-cell room gets ~3 and a 24-cell
+  // room ~4, with a little jitter so houses do not feel stamped out. Repeats are
   // allowed once a room's distinct types run out: a real kitchen has two chairs,
   // and refusing to repeat is what pinned the old count to the pool size.
+  //
+  // WALL-HUGGER STRATEGY: sort the room's cells so perimeter cells come first.
+  // This means wall-hugging pieces (bed, bookshelf, desk, …) get a chance to
+  // land on the wall before interior pieces fill up the edges. The cells are
+  // shuffled WITHIN the perimeter group (and within the interior group) so the
+  // distribution stays varied across seeds.
   for (const room of rooms) {
     const pool = ROOM_FURNITURE[room.name] ?? ['box', 'chair', 'plant']
     const byArea = Math.round(room.cells.length / CELLS_PER_PIECE)
-    // Always leave the room at least one free cell — tryPlace enforces this too,
-    // but asking for fewer pieces up front avoids burning attempts on refusals.
     const maxN = Math.max(1, Math.min(room.cells.length - 1, byArea + 1))
     const n = Math.max(1, Math.min(maxN, byArea + (rand() < 0.5 ? 0 : 1)))
-    const candidates = shuffle(room.cells)
+
+    // Shuffle cells once (same rand() count as old code), then stable-sort so
+    // perimeter cells float to the front. Wall-huggers get a chance to land on
+    // the edge before interior cells fill those spots.
+    const isPerimeter = (c: { row: number; col: number }) => {
+      const ORTHO4 = [[-1,0],[1,0],[0,-1],[0,1]] as const
+      return ORTHO4.some(([dr, dc]) => roomIdAtRC(c.row + dr, c.col + dc) !== room.id)
+    }
+    const candidates = shuffle(room.cells).sort((a, b) =>
+      (isPerimeter(b) ? 1 : 0) - (isPerimeter(a) ? 1 : 0)
+    )
+
     const inRoom = new Set<FurnitureType>()
     let placed = 0
     for (const cell of candidates) {
       if (placed >= n) break
       if (ownedOccupied.has(cellKey(cell.row, cell.col))) continue
-      // Prefer a type the room does not have yet; once every type is used, drop
-      // the avoid-set so pickVaried may repeat.
       const t = pickVaried(pool, inRoom.size < pool.length ? inRoom : undefined)
-      if (tryPlace(t, cell.row, cell.col, room.id)) {
+      let ok: boolean
+      if (NO_ROTATE.has(t)) {
+        ok = tryPlace(t, cell.row, cell.col, room.id)
+      } else if (WALL_HUGGERS.has(t)) {
+        ok = tryPlaceWallHugger(t, cell.row, cell.col, room.id)
+        if (!ok) {
+          // Retry: maybe the multi-cell footprint didn't fit with wall orientation;
+          // try default footprint with any available rotation
+          ok = tryPlace(t, cell.row, cell.col, room.id)
+        }
+      } else if (SEATING.has(t)) {
+        ok = placeSeating(t, cell.row, cell.col, room.id)
+      } else {
+        ok = tryPlace(t, cell.row, cell.col, room.id)
+      }
+
+      if (ok) {
         inRoom.add(t)
         placed++
       } else {
-        // Fall back to 1×1 if the multi-cell version didn't fit
+        // Fall back to 1×1 if the multi-cell version didn't fit.
+        // Respect the seating anti-adjacency guard for seating fallbacks.
         const small = pool.filter(p => !(FURNITURE_FOOTPRINT[p]))
         if (!small.length) continue
         const t1x1 = pickVaried(small, inRoom.size < small.length ? inRoom : undefined)
-        if (tryPlace(t1x1, cell.row, cell.col, room.id)) {
+        const placed1x1 = SEATING.has(t1x1)
+          ? placeSeating(t1x1, cell.row, cell.col, room.id)
+          : tryPlace(t1x1, cell.row, cell.col, room.id)
+        if (placed1x1) {
           inRoom.add(t1x1)
           placed++
         }
@@ -412,8 +752,16 @@ function placeFurniture(
       const rId = roomIdAtRC(cell.row, cell.col)
       const pool = ROOM_FURNITURE[roomName(rId)] ?? ['chair']
       const t = pickVaried(pool)
-      // Try preferred (possibly multi-cell), then any 1×1 from the pool
-      if (!tryPlace(t, cell.row, cell.col, rId)) {
+      let ok: boolean
+      if (WALL_HUGGERS.has(t)) {
+        ok = tryPlaceWallHugger(t, cell.row, cell.col, rId)
+        if (!ok) ok = tryPlace(t, cell.row, cell.col, rId)
+      } else if (SEATING.has(t)) {
+        ok = placeSeating(t, cell.row, cell.col, rId)
+      } else {
+        ok = tryPlace(t, cell.row, cell.col, rId)
+      }
+      if (!ok) {
         const small = pool.filter(p => !FURNITURE_FOOTPRINT[p])
         if (small.length) tryPlace(pickVaried(small), cell.row, cell.col, rId)
       }
@@ -787,7 +1135,7 @@ export function generatePuzzle(
       }
       if (!placementOk) continue
     } else {
-      const built = buildRooms(size, cfg.rooms)
+      const built = buildRooms(size, cfg.rooms, 0)
       rooms = built.rooms; roomOf = built.roomOf
       place = randomPlacement(size, people)
     }
