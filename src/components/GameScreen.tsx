@@ -821,6 +821,7 @@ export default function GameScreen(props: Props) {
                   ghostMarks={ghostMarks}
                   blockedRows={blockedRows}
                   blockedCols={blockedCols}
+                  floor={activeFloor}
                 />
               </div>
             </div>

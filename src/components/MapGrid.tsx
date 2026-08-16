@@ -34,6 +34,12 @@ interface Props {
    */
   blockedRows?: ReadonlySet<number>
   blockedCols?: ReadonlySet<number>
+  /**
+   * Which floor to render. 0 = ground (default), 1 = upstairs.
+   * When puzzle.roomOfByFloor exists, rooms are resolved per floor.
+   * Furniture is filtered to only pieces whose floor matches.
+   */
+  floor?: 0 | 1
 }
 
 // Room finishes are authored in core/roomMaterials.ts so every room has a
@@ -81,9 +87,12 @@ export default function MapGrid({
   extraFurniture = [], placingFurniture, placingRotation = 0, onPlaceFurniture,
   highlight = null, highlightLabel,
   ghostMarks = null, blockedRows, blockedCols,
+  floor = 0,
 }: Props) {
   const N = puzzle.size
-  const roomOf = puzzle.roomOf
+  // Per-floor room map: when roomOfByFloor is present use the correct storey;
+  // fall back to roomOf so single-floor puzzles are pixel-identical to before.
+  const roomOf = puzzle.roomOfByFloor?.[floor] ?? puzzle.roomOf
   const room = (id: string) => puzzle.rooms.find(r => r.id === id)
   const personById = (id: string) => puzzle.people.find(p => p.id === id)
   const [hoverCell, setHoverCell] = useState<string | null>(null)
@@ -101,13 +110,22 @@ export default function MapGrid({
         transition: { type: 'spring' as const, bounce: 0.35, duration: 0.42 },
       }
 
+  // Only render furniture on the active floor. Pieces with no floor field
+  // default to 0 (ground). extraFurniture (custom decorator pieces) also
+  // follow the same rule so they stay on the storey the player added them on.
   const allFurniture: Furniture[] = [...puzzle.furniture, ...extraFurniture]
+    .filter(f => (f.floor ?? 0) === floor)
   const furnByCell: Record<string, Furniture[]> = {}
   for (const f of allFurniture) (furnByCell[`${f.row},${f.col}`] ||= []).push(f)
   // Room labels must dodge the WHOLE footprint, not just the anchor cell.
   const occupiedCells = new Set(allFurniture.flatMap(f => furnitureCells(f).map(c => `${c.row},${c.col}`)))
 
-  const labelAnchors = puzzle.rooms.map(rm => {
+  // Label stamps follow the same storey rule as the rooms and furniture under
+  // them. Without this filter a two-floor board draws BOTH storeys' room names
+  // into the same corners — on the live board "HAL" and "ONT YARD" were printed
+  // over one another. Rooms with no floor field default to ground, so
+  // single-floor boards keep exactly the labels they have today.
+  const labelAnchors = puzzle.rooms.filter(rm => (rm.floor ?? 0) === floor).map(rm => {
     const sorted = [...rm.cells].sort((a, b) => a.row - b.row || a.col - b.col)
     const anchor = sorted.find(c => !occupiedCells.has(`${c.row},${c.col}`)) ?? sorted[0]
     let span = 1
@@ -503,6 +521,7 @@ export default function MapGrid({
             return (
               <span
                 key={`${f.type}-${f.row}-${f.col}-${i}`}
+                data-furniture-icon={f.type}
                 style={{
                   gridColumn: `${f.col + 1} / span ${w}`,
                   gridRow: `${f.row + 1} / span ${h}`,
