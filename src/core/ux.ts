@@ -306,3 +306,32 @@ export function findFailingClues(
     return !holds(puzzle, clue, placed)
   })
 }
+
+/**
+ * Which of a person's clues the CURRENT arrangement already satisfies.
+ *
+ * Parallel to the clue text order used by the suspect card, so index i of the
+ * result describes clue i of that card. Derived on every call and never cached:
+ * a clue satisfied now becomes unsatisfied after an undo, and a stale tick
+ * would be worse than no tick at all.
+ *
+ * A clue is only counted once every person it mentions is on the board. An
+ * unmet clue about a suspect who has not been placed yet is not a failure and
+ * must not read as one.
+ */
+export function satisfiedClueFlags(
+  puzzle: Puzzle,
+  personId: string,
+  placed: Record<string, Cell>,
+  holds: (puzzle: Puzzle, clue: Clue, place: Record<string, Cell>) => boolean,
+): boolean[] {
+  return puzzle.clues
+    .filter(({ clue }) => clue.person === personId)
+    .map(({ clue }) => {
+      if (clue.kind === 'victim') return false
+      if (!placed[clue.person]) return false
+      const other = (clue as { other?: string }).other
+      if (other && !placed[other]) return false
+      return holds(puzzle, clue, placed)
+    })
+}

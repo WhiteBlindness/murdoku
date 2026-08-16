@@ -15,6 +15,14 @@ interface Props {
   located?: boolean
   /** False when the clue has no drawable board target (e.g. a pure row clue with no cells). */
   canLocate?: boolean
+  /**
+   * Parallel to `clues`: true when the current board arrangement satisfies
+   * that clue. Optional and always derived from the caller's board state —
+   * never cached here. Absent index = unsatisfied (no change from before).
+   * GameScreen will pass this once it reads the prop; existing call sites
+   * that omit it compile and behave exactly as now.
+   */
+  satisfiedClues?: boolean[]
   onSelect: () => void
   onToggleResolved?: () => void
   onToggleLocate?: () => void
@@ -22,7 +30,7 @@ interface Props {
 
 export default function SuspectCard({
   person, clues, selected, placed, locked, conflicted, resolved, showCheck,
-  located, canLocate, onSelect, onToggleResolved, onToggleLocate,
+  located, canLocate, satisfiedClues, onSelect, onToggleResolved, onToggleLocate,
 }: Props) {
   const portraitIndex = [...person.id].reduce((sum, character) => sum + character.charCodeAt(0), 0) % 8
   const portraitColumn = portraitIndex % 4
@@ -114,15 +122,30 @@ export default function SuspectCard({
               </span>
             )}
           </div>
-          {clues.map((c, i) => (
+          {clues.map((c, i) => {
             /* Clue text: font-mono — typed evidence on the case file.
                This is the signature move of the redesign: clues read as
-               a detective's typewritten notes, not UI body copy. */
-            <p key={i} className={`text-[11px] leading-snug mt-0.5 font-mono flex gap-1 ${resolved ? 'line-through' : ''}`} style={{ color: '#30291D' }}>
-              {clues.length > 1 && <span className="flex-shrink-0 opacity-60" aria-hidden>—</span>}
-              <span>{c}</span>
-            </p>
-          ))}
+               a detective's typewritten notes, not UI body copy.
+               satisfied = the current board arrangement already meets this clue;
+               we lift the text to evidence-ink (declared fixed material color)
+               and show a small tick. This is a progress cue only — quiet,
+               never amber (Amber Evidence Rule), never shouts "solved". */
+            const satisfied = satisfiedClues?.[i] === true
+            return (
+              <p
+                key={i}
+                className={`text-[11px] leading-snug mt-0.5 font-mono flex gap-1 items-baseline ${resolved ? 'line-through' : ''}`}
+                style={{ color: satisfied ? '#19150F' : '#30291D' }}
+              >
+                {satisfied
+                  ? <Check size={9} strokeWidth={3} className="flex-shrink-0 mt-[1px]" aria-label="clue satisfied" style={{ color: '#19150F' }} />
+                  : clues.length > 1
+                    ? <span className="flex-shrink-0 opacity-60" aria-hidden>—</span>
+                    : null}
+                <span>{c}</span>
+              </p>
+            )
+          })}
         </div>
       </button>
 

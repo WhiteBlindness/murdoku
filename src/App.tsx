@@ -89,6 +89,8 @@ function AppInner() {
           puzzle={game.puzzle}
           mode={game.mode}
           marks={game.marks}
+          marksPerFloor={game.marksPerFloor}
+          activeFloor={game.activeFloor}
           conflicts={game.conflicts}
           placedOf={game.placedOf}
           selectedPerson={game.selectedPerson}
@@ -114,6 +116,7 @@ function AppInner() {
           onSubmit={game.submit}
           onDismissFeedback={game.dismissFeedback}
           onBack={() => game.navigate('home')}
+          onSwitchFloor={game.switchFloor}
         />
       </div>
     )

@@ -22,6 +22,18 @@ interface Props {
   /** One target, or every target a suspect's clues point at. */
   highlight?: ClueTarget | ClueTarget[] | null
   highlightLabel?: string
+  /**
+   * The OTHER storey, drawn faintly through the same cells so the player can
+   * see that something is up there and roughly where. Never interactive.
+   */
+  ghostMarks?: CellMark[][] | null
+  /**
+   * Rows and columns consumed by a suspect on the other storey. Rows and
+   * columns are shared across floors — that is the whole mechanic — so a cell
+   * blocked from upstairs must read as blocked down here too.
+   */
+  blockedRows?: ReadonlySet<number>
+  blockedCols?: ReadonlySet<number>
 }
 
 // Room finishes are authored in core/roomMaterials.ts so every room has a
@@ -68,6 +80,7 @@ export default function MapGrid({
   puzzle, marks, conflicts, onCellClick,
   extraFurniture = [], placingFurniture, placingRotation = 0, onPlaceFurniture,
   highlight = null, highlightLabel,
+  ghostMarks = null, blockedRows, blockedCols,
 }: Props) {
   const N = puzzle.size
   const roomOf = puzzle.roomOf
@@ -272,6 +285,32 @@ export default function MapGrid({
                     ].filter(Boolean).join(' '),
                   }}
                 />
+
+                {/* Ghost of the other storey: shows THAT someone is stacked
+                    above or below this cell without competing with the active
+                    floor. aria-hidden and non-interactive — the live region and
+                    the floor switcher carry this for assistive tech. */}
+                {ghostMarks?.[r]?.[c]?.kind === 'person' && mark.kind === 'empty' && (
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-[22%] rounded-full"
+                    style={{
+                      border: '1px dashed color-mix(in srgb, var(--color-text-primary) 38%, transparent)',
+                      opacity: 0.5,
+                    }}
+                  />
+                )}
+
+                {/* A row or column spent on the other storey is spent here too. */}
+                {(blockedRows?.has(r) || blockedCols?.has(c)) && mark.kind === 'empty' && (
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0"
+                    style={{
+                      background: 'color-mix(in srgb, var(--color-bg-inset) 46%, transparent)',
+                    }}
+                  />
+                )}
 
                 {/* Furniture is NOT drawn per cell — see the spanning overlay
                     below the grid. A bed that covers 2x2 cells has to be one

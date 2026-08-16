@@ -13,11 +13,16 @@ interface GameState {
   screen: Screen
   mode: GameMode
   puzzle: Puzzle | null
+  /** Active floor's 2D marks — exposed as `marks` for backward compat. */
   marks: CellMark[][]
+  /** Per-floor 3D marks. marks === marksPerFloor[activeFloor] always. */
+  marksPerFloor: CellMark[][][]
+  activeFloor: 0 | 1
   selectedPerson: string | null
   tool: Tool
-  history: CellMark[][][]
-  future: CellMark[][][]     // redo stack
+  /** History entries store the full marksPerFloor snapshot. */
+  history: CellMark[][][][]
+  future: CellMark[][][][]   // redo stack
   hintsLeft: number
   elapsedSeconds: number
   completed: boolean
@@ -47,6 +52,7 @@ type Action =
   | { type: 'TOGGLE_TIMER' }
   | { type: 'TICK' }
   | { type: 'ASSIST' }
+  | { type: 'SWITCH_FLOOR'; floor: 0 | 1 }
 
 const HINTS_START = 3
 const STORAGE_KEY = 'murdoku_solved_v2'
@@ -58,6 +64,16 @@ function emptyMarks(n: number): CellMark[][] {
 }
 function cloneMarks(m: CellMark[][]): CellMark[][] {
   return m.map(row => row.map(c => c.kind === 'draft' ? { kind: 'draft' as const, persons: [...c.persons] } : { ...c }))
+}
+function cloneMarksPerFloor(mpf: CellMark[][][]): CellMark[][][] {
+  return mpf.map(floor => cloneMarks(floor))
+}
+function emptyMarksPerFloor(n: number, floors: number): CellMark[][][] {
+  return Array.from({ length: floors }, () => emptyMarks(n))
+}
+/** Derive the active floor's 2D slice from the per-floor 3D array. */
+function activeFloorMarks(mpf: CellMark[][][], floor: 0 | 1): CellMark[][] {
+  return mpf[floor] ?? mpf[0]
 }
 
 function loadSolved(): string[] { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]') } catch { return [] } }
@@ -83,8 +99,11 @@ function loadHideTimer(): boolean { try { return localStorage.getItem(TIMER_KEY)
 // too so existing installs retain their resume behavior and compatibility.
 const PLAY_KEY = IN_PROGRESS_KEY
 const LEGACY_PLAY_KEY = LEGACY_IN_PROGRESS_KEY
+// NEW key: stores upper floor marks for two-floor puzzles only.
+// MUST NOT be renamed — it is a new key, not a rename of existing keys.
+const UPPER_FLOOR_KEY = 'murdoku_floor_marks_v1'
 interface SavedPlay { id: string; mode: GameMode; marks: CellMark[][]; elapsed: number; hints: number; selected: string | null }
-function loadPlay(puzzle?: Puzzle): SavedPlay | null {
+function loadPlay(puzzle?: Puzzle): { play: SavedPlay; marksPerFloor: CellMark[][][] } | null {
   for (const key of [PLAY_KEY, LEGACY_PLAY_KEY]) {
     try {
       const raw = localStorage.getItem(key)
@@ -97,22 +116,41 @@ function loadPlay(puzzle?: Puzzle): SavedPlay | null {
         && Number.isFinite(parsed.hints)
         && parsed.hints >= 0
         && (!puzzle || parseInProgress(raw, [puzzle]))
-      ) return parsed
+      ) {
+        // Reconstruct marksPerFloor: floor 0 = saved marks; floor 1 = new key if present
+        const mpf: CellMark[][][] = [parsed.marks]
+        try {
+          const upperRaw = localStorage.getItem(UPPER_FLOOR_KEY)
+          if (upperRaw) {
+            const upper = JSON.parse(upperRaw) as { id: string; marks: CellMark[][] }
+            if (upper?.id === parsed.id && Array.isArray(upper.marks)) {
+              mpf.push(upper.marks)
+            }
+          }
+        } catch { /* upper floor save absent or corrupt — single-floor resume */ }
+        return { play: parsed, marksPerFloor: mpf }
+      }
     } catch { /* try the compatibility key */ }
   }
   return null
 }
-function savePlay(p: SavedPlay) {
+function savePlay(p: SavedPlay, upperFloorMarks?: CellMark[][]) {
   try {
     const raw = JSON.stringify(p)
     localStorage.setItem(PLAY_KEY, raw)
     localStorage.setItem(LEGACY_PLAY_KEY, raw)
+    if (upperFloorMarks) {
+      localStorage.setItem(UPPER_FLOOR_KEY, JSON.stringify({ id: p.id, marks: upperFloorMarks }))
+    } else {
+      localStorage.removeItem(UPPER_FLOOR_KEY)
+    }
   } catch { /* ignore */ }
 }
 function clearPlay() {
   try {
     localStorage.removeItem(PLAY_KEY)
     localStorage.removeItem(LEGACY_PLAY_KEY)
+    localStorage.removeItem(UPPER_FLOOR_KEY)
   } catch { /* ignore */ }
 }
 function loadInProgressSummary(puzzles: readonly Puzzle[]): InProgressSummary | null {
@@ -124,8 +162,8 @@ function loadInProgressSummary(puzzles: readonly Puzzle[]): InProgressSummary | 
   }
   return null
 }
-function hasAnyPlacement(marks: CellMark[][]): boolean {
-  return marks.some(row => row.some(c => c.kind === 'person' || c.kind === 'draft' || c.kind === 'x'))
+function hasAnyPlacement(marksPerFloor: CellMark[][][]): boolean {
+  return marksPerFloor.some(floor => floor.some(row => row.some(c => c.kind === 'person' || c.kind === 'draft' || c.kind === 'x')))
 }
 
 function clearPerson(marks: CellMark[][], personId: string) {
@@ -136,61 +174,89 @@ function clearPerson(marks: CellMark[][], personId: string) {
   }
 }
 
-function personCell(marks: CellMark[][], personId: string) {
-  for (let r = 0; r < marks.length; r++) for (let c = 0; c < marks[r].length; c++) {
-    const m = marks[r][c]
-    if (m.kind === 'person' && m.person === personId) return { row: r, col: c }
+/** Clear a person from ALL floors. */
+function clearPersonAllFloors(mpf: CellMark[][][], personId: string) {
+  for (const floor of mpf) clearPerson(floor, personId)
+}
+
+/** Find a person's cell across all floors. Returns {row, col, floor}. */
+function personCellAcrossFloors(mpf: CellMark[][][], personId: string): { row: number; col: number; floor: number } | null {
+  for (let f = 0; f < mpf.length; f++) {
+    const floor = mpf[f]
+    for (let r = 0; r < floor.length; r++) for (let c = 0; c < floor[r].length; c++) {
+      const m = floor[r][c]
+      if (m.kind === 'person' && m.person === personId) return { row: r, col: c, floor: f }
+    }
   }
   return null
 }
 
+
 /**
  * Detective mode: placing a suspect immediately crosses their whole row and
- * column (nobody else can be there). So auto-✕ is derived from EVERY placed
- * suspect — there is no separate "lock" step. Classic mode does no crossing.
+ * column (nobody else can be there). Rows and columns are GLOBAL across floors —
+ * a suspect on floor 1 in row 3 eliminates row 3 on floor 0 too.
+ * So auto-X is applied per-floor using placed suspects from ALL floors.
  */
-function withAutoX(marks: CellMark[][], mode: GameMode): CellMark[][] {
-  const N = marks.length
-  // start by clearing any existing auto-✕ back to empty
-  const m = marks.map(row => row.map(c => (c.kind === 'x' && c.auto) ? { kind: 'empty' as const } : (c.kind === 'draft' ? { kind: 'draft' as const, persons: [...c.persons] } : { ...c })))
-  if (mode !== 'detective') return m
+function withAutoXPerFloor(mpf: CellMark[][][], mode: GameMode): CellMark[][][] {
+  // Clone first
+  const result = mpf.map(floor =>
+    floor.map(row => row.map(c => (c.kind === 'x' && c.auto) ? { kind: 'empty' as const } : (c.kind === 'draft' ? { kind: 'draft' as const, persons: [...c.persons] } : { ...c })))
+  )
+  if (mode !== 'detective') return result
+  const N = result[0]?.length ?? 0
+  // Collect all placed suspects across ALL floors with their row/col
   const placed: { r: number; c: number }[] = []
-  for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
-    if (m[r][c].kind === 'person') placed.push({ r, c })
+  for (const floor of result) {
+    for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
+      if (floor[r][c].kind === 'person') placed.push({ r, c })
+    }
   }
-  for (const { r, c } of placed) {
-    for (let k = 0; k < N; k++) {
-      for (const [rr, cc] of [[r, k], [k, c]] as const) {
-        if (rr === r && cc === c) continue
-        const cell = m[rr][cc]
-        if (cell.kind === 'empty' || cell.kind === 'draft') m[rr][cc] = { kind: 'x', auto: true }
+  // Apply cross-floor eliminations to every floor
+  for (const floor of result) {
+    for (const { r, c } of placed) {
+      for (let k = 0; k < N; k++) {
+        for (const [rr, cc] of [[r, k], [k, c]] as const) {
+          const cell = floor[rr]?.[cc]
+          if (!cell) continue
+          if (cell.kind === 'person') continue  // never auto-X a placed person
+          if (cell.kind === 'empty' || cell.kind === 'draft') floor[rr][cc] = { kind: 'x', auto: true }
+        }
       }
     }
   }
-  return m
+  return result
 }
 
-/** Is there ANOTHER placed suspect sharing this row or column? (blocks placement) */
-function occupiedRowOrCol(marks: CellMark[][], row: number, col: number, except: string): boolean {
-  const N = marks.length
-  for (let k = 0; k < N; k++) {
-    for (const [r, c] of [[row, k], [k, col]] as const) {
-      const m = marks[r][c]
-      if (m.kind === 'person' && m.person !== except) return true
+/**
+ * Is there ANOTHER placed suspect sharing this row or column across ALL floors?
+ * Rows and columns are shared globally, so upstairs placements block downstairs too.
+ */
+function occupiedRowOrColAllFloors(mpf: CellMark[][][], row: number, col: number, except: string): boolean {
+  const N = mpf[0]?.length ?? 0
+  for (const floor of mpf) {
+    for (let k = 0; k < N; k++) {
+      for (const [r, c] of [[row, k], [k, col]] as const) {
+        const m = floor[r]?.[c]
+        if (m && m.kind === 'person' && m.person !== except) return true
+      }
     }
   }
   return false
 }
 
+
 const initial: GameState = {
-  screen: 'home', mode: loadMode(), puzzle: null, marks: [], selectedPerson: null, tool: 'place',
+  screen: 'home', mode: loadMode(), puzzle: null,
+  marks: [], marksPerFloor: [[]], activeFloor: 0,
+  selectedPerson: null, tool: 'place',
   history: [], future: [], hintsLeft: HINTS_START, elapsedSeconds: 0, completed: false,
   murderer: null, feedback: 'none', correctCount: 0, hideTimer: loadHideTimer(),
   resolvedClues: [], completedIds: loadSolved(),
 }
 
-function pushHistory(state: GameState): CellMark[][][] {
-  return [...state.history.slice(-80), cloneMarks(state.marks)]
+function pushHistory(state: GameState): CellMark[][][][] {
+  return [...state.history.slice(-80), cloneMarksPerFloor(state.marksPerFloor)]
 }
 
 function reducer(state: GameState, action: Action): GameState {
@@ -208,12 +274,24 @@ function reducer(state: GameState, action: Action): GameState {
       if (!puzzle) return state
       try { localStorage.setItem(MODE_KEY, action.mode) } catch { /* ignore */ }
       // Resume an unsubmitted attempt on this exact case + mode, if one exists.
-      const saved = loadPlay(puzzle)
+      const savedResult = loadPlay(puzzle)
+      const saved = savedResult?.play
       const resume = saved && saved.id === action.puzzleId && saved.mode === action.mode
         && Array.isArray(saved.marks) && saved.marks.length === puzzle.size
+      const floors = puzzle.floors ?? 1
+      let marksPerFloor: CellMark[][][]
+      if (resume) {
+        // Loaded floor 0 from saved.marks; upper floors from savedResult.marksPerFloor if present
+        marksPerFloor = savedResult!.marksPerFloor.length >= floors
+          ? savedResult!.marksPerFloor.slice(0, floors)
+          : [...savedResult!.marksPerFloor, ...Array.from({ length: floors - savedResult!.marksPerFloor.length }, () => emptyMarks(puzzle.size))]
+      } else {
+        marksPerFloor = emptyMarksPerFloor(puzzle.size, floors)
+      }
       return {
-        ...state, screen: 'game', mode: action.mode, puzzle,
-        marks: resume ? saved!.marks : emptyMarks(puzzle.size),
+        ...state, screen: 'game', mode: action.mode, puzzle, activeFloor: 0,
+        marksPerFloor,
+        marks: marksPerFloor[0],
         selectedPerson: resume ? (saved!.selected ?? puzzle.people[0]?.id ?? null) : (puzzle.people[0]?.id ?? null),
         tool: 'place', history: [], future: [], hintsLeft: resume ? saved!.hints : HINTS_START,
         elapsedSeconds: resume ? saved!.elapsed : 0,
@@ -232,13 +310,16 @@ function reducer(state: GameState, action: Action): GameState {
       const { row, col } = action
       const cur = state.marks[row][col]
       const history = pushHistory(state)
-      let marks = cloneMarks(state.marks)
+      let mpf = cloneMarksPerFloor(state.marksPerFloor)
+      let activeFloorMarksRef = mpf[state.activeFloor]
 
       if (state.tool === 'x') {
         if (cur.kind === 'person' && cur.locked) return state       // can't ✕ a locked answer
         if (cur.kind === 'x' && cur.auto) return { ...state, feedback: 'blocked' }
-        marks[row][col] = cur.kind === 'x' ? { kind: 'empty' } : { kind: 'x' }
-        return { ...state, marks: withAutoX(marks, state.mode), history, future: [], feedback: 'none' }
+        activeFloorMarksRef[row][col] = cur.kind === 'x' ? { kind: 'empty' } : { kind: 'x' }
+        mpf = withAutoXPerFloor(mpf, state.mode)
+        const activeMarks = activeFloorMarks(mpf, state.activeFloor)
+        return { ...state, marksPerFloor: mpf, marks: activeMarks, history, future: [], feedback: 'none' }
       }
 
       if (state.tool === 'draft') {
@@ -247,43 +328,47 @@ function reducer(state: GameState, action: Action): GameState {
         const persons = cur.kind === 'draft' ? [...cur.persons] : []
         const i = persons.indexOf(state.selectedPerson)
         if (i >= 0) persons.splice(i, 1); else persons.push(state.selectedPerson)
-        marks[row][col] = persons.length ? { kind: 'draft', persons } : { kind: 'empty' }
-        return { ...state, marks: withAutoX(marks, state.mode), history, future: [], feedback: 'none' }
+        activeFloorMarksRef[row][col] = persons.length ? { kind: 'draft', persons } : { kind: 'empty' }
+        mpf = withAutoXPerFloor(mpf, state.mode)
+        const activeMarks = activeFloorMarks(mpf, state.activeFloor)
+        return { ...state, marksPerFloor: mpf, marks: activeMarks, history, future: [], feedback: 'none' }
       }
 
       // place mode
       if (!state.selectedPerson) return state
-      const existing = personCell(state.marks, state.selectedPerson)
+      const existing = personCellAcrossFloors(state.marksPerFloor, state.selectedPerson)
 
-      // tap the selected suspect's own cell to lift them
+      // tap the selected suspect's own cell (on active floor) to lift them
       if (cur.kind === 'person' && cur.person === state.selectedPerson) {
-        marks[row][col] = { kind: 'empty' }
-        marks = withAutoX(marks, state.mode)
-        return { ...state, marks, history, future: [], feedback: 'none' }
+        activeFloorMarksRef[row][col] = { kind: 'empty' }
+        mpf = withAutoXPerFloor(mpf, state.mode)
+        const activeMarks = activeFloorMarks(mpf, state.activeFloor)
+        return { ...state, marksPerFloor: mpf, marks: activeMarks, history, future: [], feedback: 'none' }
       }
 
       if (state.mode === 'detective') {
-        // Placing auto-crosses the row & column, so you may only place where no
-        // OTHER suspect already sits in that row or column. Blocked clicks give
-        // explicit feedback instead of doing nothing silently.
-        if (occupiedRowOrCol(state.marks, row, col, state.selectedPerson)) {
+        // Placing auto-crosses the row & column across ALL floors — block if occupied.
+        if (occupiedRowOrColAllFloors(state.marksPerFloor, row, col, state.selectedPerson)) {
           return { ...state, feedback: 'blocked' }
         }
-        clearPerson(marks, state.selectedPerson)
-        marks[row][col] = { kind: 'person', person: state.selectedPerson }
-        marks = withAutoX(marks, state.mode)
-        return { ...state, marks, history, future: [], feedback: 'none' }
+        clearPersonAllFloors(mpf, state.selectedPerson)
+        mpf[state.activeFloor][row][col] = { kind: 'person', person: state.selectedPerson }
+        mpf = withAutoXPerFloor(mpf, state.mode)
+        const activeMarks = activeFloorMarks(mpf, state.activeFloor)
+        return { ...state, marksPerFloor: mpf, marks: activeMarks, history, future: [], feedback: 'none' }
       }
 
       // classic mode: free placement. If the target holds another suspect, swap
       // them to the mover's old cell rather than silently deleting them.
       const occupant = cur.kind === 'person' ? cur.person : null
-      clearPerson(marks, state.selectedPerson)
-      marks[row][col] = { kind: 'person', person: state.selectedPerson }
+      clearPersonAllFloors(mpf, state.selectedPerson)
+      mpf[state.activeFloor][row][col] = { kind: 'person', person: state.selectedPerson }
       if (occupant && occupant !== state.selectedPerson && existing) {
-        marks[existing.row][existing.col] = { kind: 'person', person: occupant }
+        // Swap occupant back to the person's old cell on the floor they came from
+        mpf[existing.floor][existing.row][existing.col] = { kind: 'person', person: occupant }
       }
-      return { ...state, marks, history, future: [], feedback: 'none' }
+      const activeMarks = activeFloorMarks(mpf, state.activeFloor)
+      return { ...state, marksPerFloor: mpf, marks: activeMarks, history, future: [], feedback: 'none' }
     }
 
     case 'TOGGLE_CLUE': {
@@ -296,26 +381,38 @@ function reducer(state: GameState, action: Action): GameState {
       if (cur.kind === 'person' && cur.locked) return state
       if (cur.kind === 'x' && cur.auto) return state
       const history = pushHistory(state)
-      const marks = cloneMarks(state.marks)
-      marks[action.row][action.col] = { kind: 'empty' }
-      return { ...state, marks: withAutoX(marks, state.mode), history, future: [], feedback: 'none' }
+      const mpf = cloneMarksPerFloor(state.marksPerFloor)
+      mpf[state.activeFloor][action.row][action.col] = { kind: 'empty' }
+      const updated = withAutoXPerFloor(mpf, state.mode)
+      return { ...state, marksPerFloor: updated, marks: activeFloorMarks(updated, state.activeFloor), history, future: [], feedback: 'none' }
     }
 
     case 'CLEAR_ALL': {
       if (!state.puzzle) return state
-      return { ...state, history: pushHistory(state), future: [], marks: emptyMarks(state.puzzle.size), resolvedClues: [], feedback: 'none' }
+      const floors = state.puzzle.floors ?? 1
+      const mpf = emptyMarksPerFloor(state.puzzle.size, floors)
+      return { ...state, history: pushHistory(state), future: [], marksPerFloor: mpf, marks: mpf[0], activeFloor: 0, resolvedClues: [], feedback: 'none' }
     }
 
     case 'UNDO': {
       if (!state.history.length) return state
       const prev = state.history[state.history.length - 1]
-      return { ...state, marks: cloneMarks(prev), history: state.history.slice(0, -1), future: [cloneMarks(state.marks), ...state.future].slice(0, 80), feedback: 'none' }
+      const mpf = cloneMarksPerFloor(prev)
+      const activeF = Math.min(state.activeFloor, mpf.length - 1) as 0 | 1
+      return { ...state, marksPerFloor: mpf, marks: activeFloorMarks(mpf, activeF), history: state.history.slice(0, -1), future: [cloneMarksPerFloor(state.marksPerFloor), ...state.future].slice(0, 80), feedback: 'none' }
     }
 
     case 'REDO': {
       if (!state.future.length) return state
       const next = state.future[0]
-      return { ...state, marks: cloneMarks(next), future: state.future.slice(1), history: [...state.history, cloneMarks(state.marks)], feedback: 'none' }
+      const mpf = cloneMarksPerFloor(next)
+      const activeF = Math.min(state.activeFloor, mpf.length - 1) as 0 | 1
+      return { ...state, marksPerFloor: mpf, marks: activeFloorMarks(mpf, activeF), future: state.future.slice(1), history: [...state.history, cloneMarksPerFloor(state.marksPerFloor)], feedback: 'none' }
+    }
+
+    case 'SWITCH_FLOOR': {
+      if (!state.puzzle || (state.puzzle.floors ?? 1) < 2) return state
+      return { ...state, activeFloor: action.floor, marks: activeFloorMarks(state.marksPerFloor, action.floor) }
     }
 
     case 'TOGGLE_TIMER': {
@@ -335,20 +432,28 @@ function reducer(state: GameState, action: Action): GameState {
       // discipline. Classic mode players are not expected to track provable
       // absences — they place by feel and submit. Gated here (not just in the
       // view) so tests can assert the rule directly.
+      //
+      // Note: deriveEliminations takes {row,col} without floor — Assist on
+      // two-floor puzzles applies only to floor-0 semantics (core limitation;
+      // tracked for future fix in core/engine.ts).
       if (state.mode !== 'detective') return state
       if (!state.puzzle) return state
       const placed: Record<string, { row: number; col: number }> = {}
       for (const person of state.puzzle.people) {
-        const cell = personCell(state.marks, person.id)
-        if (cell) placed[person.id] = cell
+        const cell = personCellAcrossFloors(state.marksPerFloor, person.id)
+        if (cell) placed[person.id] = { row: cell.row, col: cell.col }
       }
       const eliminations = deriveEliminations(state.puzzle, placed)
       const fresh = eliminations.filter(({ row, col }) => state.marks[row][col].kind === 'empty')
       if (!fresh.length) return state
       const history = pushHistory(state)
-      const marks = cloneMarks(state.marks)
-      for (const { row, col } of fresh) marks[row][col] = { kind: 'x', auto: true }
-      return { ...state, marks, history, future: [] }
+      const mpf = cloneMarksPerFloor(state.marksPerFloor)
+      for (const { row, col } of fresh) mpf[state.activeFloor][row][col] = { kind: 'x', auto: true }
+      // Deliberately NOT running withAutoXPerFloor here. That pass wipes every
+      // auto mark and regenerates them from the placed suspects, which would
+      // erase the eliminations Assist just wrote. Assist changes no placement,
+      // so the derived auto-X set is already correct.
+      return { ...state, marksPerFloor: mpf, marks: activeFloorMarks(mpf, state.activeFloor), history, future: [] }
     }
 
     case 'HINT': {
@@ -361,33 +466,39 @@ function reducer(state: GameState, action: Action): GameState {
       if (state.mode === 'detective') return state
       if (!state.puzzle || state.hintsLeft <= 0) return state
       const target = state.puzzle.people.find(person => {
-        const cell = personCell(state.marks, person.id)
+        const cell = personCellAcrossFloors(state.marksPerFloor, person.id)
         const sol = state.puzzle!.solution[person.id]
-        return !cell || cell.row !== sol.row || cell.col !== sol.col
+        return !cell || cell.row !== sol.row || cell.col !== sol.col || cell.floor !== (sol.floor ?? 0)
       })
       if (!target) return state
       const history = pushHistory(state)
-      let marks = cloneMarks(state.marks)
+      let mpf = cloneMarksPerFloor(state.marksPerFloor)
       // don't disturb locked correct answers
-      const targetCellNow = personCell(marks, target.id)
-      if (targetCellNow) { const tm = marks[targetCellNow.row][targetCellNow.col]; if (tm.kind === 'person' && tm.locked) return state }
-      clearPerson(marks, target.id)
+      const targetCellNow = personCellAcrossFloors(mpf, target.id)
+      if (targetCellNow) {
+        const tm = mpf[targetCellNow.floor][targetCellNow.row][targetCellNow.col]
+        if (tm.kind === 'person' && tm.locked) return state
+      }
+      clearPersonAllFloors(mpf, target.id)
       const sol = state.puzzle.solution[target.id]
-      const occ = marks[sol.row][sol.col]
-      if (occ.kind === 'person') { if (occ.locked) return state; clearPerson(marks, occ.person) }
-      marks[sol.row][sol.col] = { kind: 'person', person: target.id }
-      marks = withAutoX(marks, state.mode)
-      return checkWin({ ...state, marks, history, future: [], hintsLeft: state.hintsLeft - 1 })
+      const solFloor = sol.floor ?? 0
+      const occ = mpf[solFloor][sol.row][sol.col]
+      if (occ.kind === 'person') { if (occ.locked) return state; clearPersonAllFloors(mpf, occ.person) }
+      mpf[solFloor][sol.row][sol.col] = { kind: 'person', person: target.id }
+      mpf = withAutoXPerFloor(mpf, state.mode)
+      const activeMarks = activeFloorMarks(mpf, state.activeFloor)
+      return checkWin({ ...state, marksPerFloor: mpf, marks: activeMarks, history, future: [], hintsLeft: state.hintsLeft - 1 })
     }
 
     case 'SUBMIT': {
       if (!state.puzzle) return state
-      const allPlaced = state.puzzle.people.every(p => personCell(state.marks, p.id))
+      const allPlaced = state.puzzle.people.every(p => personCellAcrossFloors(state.marksPerFloor, p.id))
       if (!allPlaced) return { ...state, feedback: 'incomplete' }
       const correctCount = state.puzzle.people.reduce((n, p) => {
-        const cell = personCell(state.marks, p.id)!
+        const cell = personCellAcrossFloors(state.marksPerFloor, p.id)!
         const sol = state.puzzle!.solution[p.id]
-        return n + (cell.row === sol.row && cell.col === sol.col ? 1 : 0)
+        // Must match row, col AND floor — right position wrong storey is wrong
+        return n + (cell.row === sol.row && cell.col === sol.col && cell.floor === (sol.floor ?? 0) ? 1 : 0)
       }, 0)
       if (correctCount !== state.puzzle.people.length) return { ...state, feedback: 'wrong', correctCount }
       return win(state)
@@ -408,9 +519,9 @@ function reducer(state: GameState, action: Action): GameState {
 function checkWin(state: GameState): GameState {
   if (!state.puzzle) return state
   const done = state.puzzle.people.every(p => {
-    const cell = personCell(state.marks, p.id)
+    const cell = personCellAcrossFloors(state.marksPerFloor, p.id)
     const sol = state.puzzle!.solution[p.id]
-    return cell && cell.row === sol.row && cell.col === sol.col
+    return cell && cell.row === sol.row && cell.col === sol.col && cell.floor === (sol.floor ?? 0)
   })
   return done ? win(state) : state
 }
@@ -464,31 +575,39 @@ export function useGame() {
 
   // Autosave the in-progress attempt so backing out (or a tab close) never
   // loses mid-solve placements. Cleared automatically on solve.
+  // Floor 0 marks go to the existing PLAY_KEY (compat). Upper floors go to the
+  // new UPPER_FLOOR_KEY so old clients still resume from floor 0 correctly.
   useEffect(() => {
     if (state.screen === 'game' && state.puzzle && !state.completed) {
-      if (hasAnyPlacement(state.marks)) {
-        savePlay({
-          id: state.puzzle.id, mode: state.mode, marks: state.marks,
-          elapsed: state.elapsedSeconds, hints: state.hintsLeft, selected: state.selectedPerson,
-        })
+      if (hasAnyPlacement(state.marksPerFloor)) {
+        const floor0 = state.marksPerFloor[0]
+        const upperFloor = state.marksPerFloor.length > 1 ? state.marksPerFloor[1] : undefined
+        savePlay(
+          { id: state.puzzle.id, mode: state.mode, marks: floor0, elapsed: state.elapsedSeconds, hints: state.hintsLeft, selected: state.selectedPerson },
+          upperFloor,
+        )
       } else {
         clearPlay()
       }
     }
-  }, [state.marks, state.elapsedSeconds, state.screen, state.completed, state.puzzle, state.mode, state.hintsLeft, state.selectedPerson])
+  }, [state.marksPerFloor, state.elapsedSeconds, state.screen, state.completed, state.puzzle, state.mode, state.hintsLeft, state.selectedPerson])
 
   const daily = useMemo(() => dailyPuzzle(puzzles), [puzzles])
 
   const placedOf = useMemo(() => {
-    const map: Record<string, { row: number; col: number; locked?: boolean }> = {}
-    state.marks.forEach((row, r) => row.forEach((m, c) => {
-      if (m.kind === 'person') map[m.person] = { row: r, col: c, locked: m.locked }
-    }))
+    // Scan all floors; the last-placed wins (each person can only appear once).
+    const map: Record<string, { row: number; col: number; floor: number; locked?: boolean }> = {}
+    state.marksPerFloor.forEach((floor, f) => {
+      floor.forEach((row, r) => row.forEach((m, c) => {
+        if (m.kind === 'person') map[m.person] = { row: r, col: c, floor: f, locked: m.locked }
+      }))
+    })
     return map
-  }, [state.marks])
+  }, [state.marksPerFloor])
 
   const conflicts = useMemo(() => {
     if (!state.puzzle) return new Set<string>()
+    // Rows and columns are GLOBAL across floors — conflict if same row/col regardless of floor.
     const byRow: Record<number, string[]> = {}, byCol: Record<number, string[]> = {}
     for (const [pid, cell] of Object.entries(placedOf)) {
       ; (byRow[cell.row] ||= []).push(pid); (byCol[cell.col] ||= []).push(pid)
@@ -528,6 +647,7 @@ export function useGame() {
     assist: useCallback(() => dispatch({ type: 'ASSIST' }), []),
     submit: useCallback(() => dispatch({ type: 'SUBMIT' }), []),
     dismissFeedback: useCallback(() => dispatch({ type: 'DISMISS_FEEDBACK' }), []),
+    switchFloor: useCallback((floor: 0 | 1) => dispatch({ type: 'SWITCH_FLOOR', floor }), []),
   }
 }
 

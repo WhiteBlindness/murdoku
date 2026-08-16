@@ -5,7 +5,7 @@ import {
   HelpCircle, Eye, EyeOff, Info, Palette, Wand2, MoreHorizontal,
 } from 'lucide-react'
 import type { Puzzle, CellMark, GameMode, Furniture, FurnitureType } from '../core/types'
-import { findFailingClues, resolveClueHighlights } from '../core/ux'
+import { findFailingClues, resolveClueHighlights, satisfiedClueFlags } from '../core/ux'
 import { clueHolds } from '../core/engine'
 import type { Tool } from '../hooks/useGame'
 import MapGrid from './MapGrid'
@@ -19,8 +19,12 @@ interface Props {
   puzzle: Puzzle
   mode: GameMode
   marks: CellMark[][]
+  /** Per-floor marks — index 0 = ground, index 1 = upstairs. */
+  marksPerFloor?: CellMark[][][]
+  /** Active floor index. Only relevant when puzzle.floors === 2. */
+  activeFloor?: 0 | 1
   conflicts: Set<string>
-  placedOf: Record<string, { row: number; col: number; locked?: boolean }>
+  placedOf: Record<string, { row: number; col: number; floor?: number; locked?: boolean }>
   selectedPerson: string | null
   tool: Tool
   hintsLeft: number
@@ -44,6 +48,8 @@ interface Props {
   onSubmit: () => void
   onDismissFeedback: () => void
   onBack: () => void
+  /** Switch active floor — only called when puzzle.floors === 2. */
+  onSwitchFloor?: (floor: 0 | 1) => void
 }
 
 const DIFF_COLOR: Record<string, string> = {
@@ -264,6 +270,24 @@ export default function GameScreen(props: Props) {
   const brokenRule = feedback === 'wrong'
     ? findFailingClues(puzzle, placedOf, clueHolds)[0]?.text ?? null
     : null
+
+  // ── Two-floor derivation ────────────────────────────────────────────────
+  // Rows and columns are shared across storeys: a suspect upstairs consumes
+  // that row and column for the ground floor too. The board has to SHOW that,
+  // otherwise the rule is invisible and the second storey is just scenery.
+  const floors = props.puzzle.floors ?? 1
+  const twoFloor = floors > 1 && !!props.marksPerFloor
+  const activeFloor = props.activeFloor ?? 0
+  const otherFloor = activeFloor === 0 ? 1 : 0
+  const ghostMarks = twoFloor ? (props.marksPerFloor?.[otherFloor] ?? null) : null
+
+  const blockedRows = new Set<number>()
+  const blockedCols = new Set<number>()
+  if (ghostMarks) {
+    ghostMarks.forEach((row, r) => row.forEach((cell, c) => {
+      if (cell.kind === 'person') { blockedRows.add(r); blockedCols.add(c) }
+    }))
+  }
 
   const hardReject = feedback === 'wrong' || feedback === 'blocked'
 
@@ -757,6 +781,32 @@ export default function GameScreen(props: Props) {
                     the same smaller value, preserving square cells at any
                     centre-column width or viewport height. */}
               <div className="aspect-square w-full lg:w-[min(100cqw,100cqh)] lg:h-[min(100cqw,100cqh)]">
+                {/* Floor switcher — only for two-storey houses. Single-floor
+                    cases render exactly as before, with no extra chrome. */}
+                {twoFloor && props.onSwitchFloor && (
+                  <div
+                    className="mb-2 flex items-center gap-1"
+                    role="group"
+                    aria-label="Choose which floor to view"
+                  >
+                    {([0, 1] as const).map(f => (
+                      <button
+                        key={f}
+                        onClick={() => props.onSwitchFloor?.(f)}
+                        aria-pressed={activeFloor === f}
+                        className="focus-ring flex-1 min-h-[44px] border px-3 font-display text-[13px] font-medium uppercase tracking-[0.08em] transition-colors"
+                        style={{
+                          borderColor: activeFloor === f ? 'var(--color-accent-strong)' : 'var(--color-border-strong)',
+                          background: activeFloor === f ? 'var(--color-accent)' : 'transparent',
+                          color: activeFloor === f ? 'var(--color-on-accent)' : 'var(--color-text-secondary)',
+                        }}
+                      >
+                        {f === 0 ? 'Ground floor' : 'Upstairs'}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 <MapGrid
                   puzzle={puzzle}
                   marks={marks}
@@ -768,6 +818,9 @@ export default function GameScreen(props: Props) {
                   placingFurniture={showDecor ? placingFurniture : null}
                   placingRotation={placingRotation}
                   onPlaceFurniture={showDecor ? handlePlaceFurniture : undefined}
+                  ghostMarks={ghostMarks}
+                  blockedRows={blockedRows}
+                  blockedCols={blockedCols}
                 />
               </div>
             </div>
@@ -938,6 +991,7 @@ export default function GameScreen(props: Props) {
                     key={person.id}
                     person={person}
                     clues={cluesOf[person.id] ?? []}
+                    satisfiedClues={satisfiedClueFlags(puzzle, person.id, placedOf, clueHolds)}
                     selected={selectedPerson === person.id}
                     placed={!!placedOf[person.id]}
                     locked={!!placedOf[person.id]?.locked}

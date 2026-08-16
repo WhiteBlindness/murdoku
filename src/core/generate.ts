@@ -591,6 +591,19 @@ export function generatePuzzle(
   const floors = forceSingleFloor ? 1 : (cfg.floors ?? 1)
   const twoFloor = floors > 1
 
+  // Attempt budget for the two-floor path.
+  //
+  // MEASURED, do not "optimise" this downward without re-measuring: lowering it
+  // to 90 made things WORSE — average rose to 593ms and two-floor retention fell
+  // from 6/6 to 5/6 — because a seed that fails the two-floor path then pays for
+  // a full single-floor regeneration on top. Fewer attempts simply pushes more
+  // seeds into that second, more expensive path.
+  //
+  // The remaining cost is the genuinely unpinnable seed, which pays all 250
+  // attempts before degrading (worst case ~700ms against a ~400ms target).
+  // Fixing that properly means detecting up front that a seed cannot be pinned,
+  // rather than discovering it by exhaustion — a real piece of work, not a
+  // constant to tweak.
   const maxAttempts = twoFloor ? 250 : 60
   // The last fifth of the attempts drop the directness FLOOR. That floor is a
   // difficulty dial — it bans the most direct clue kinds so suspects must be
@@ -895,6 +908,32 @@ export function generatePuzzle(
     // ---- Prune: drop any clue the solution doesn't need, but keep at least
     // one clue per suspect so every card carries information.
     chosen = pruneClues(base, chosen)
+
+    // Reserve a slot for a NEGATION clue at the top tiers.
+    //
+    // notRoom and notSameRoomAs were implemented, tested, and then chosen zero
+    // times out of 142 generated clues: the selector ranks candidates by how
+    // much they shrink a person's candidate set, and a negation clue is weak by
+    // construction (it excludes one room out of many), so it always lost. A
+    // clue kind that never fires is worse than one that does not exist.
+    //
+    // Adding a clue that is TRUE of the solution can only remove rival
+    // solutions, never add one, so uniqueness is preserved by construction and
+    // this cannot make a case unsolvable. Capped at one per case: negation is
+    // interesting once and tedious in bulk.
+    if (difficulty === 'Expert' || difficulty === 'Master') {
+      const alreadyNegated = (chosen ?? []).some(c => c.kind === 'notRoom' || c.kind === 'notSameRoomAs')
+      if (!alreadyNegated) {
+        const negations = ceiling.filter(c => c.kind === 'notRoom' || c.kind === 'notSameRoomAs')
+        // Prefer a suspect who is not already carrying several clues, so one
+        // card does not become a wall of text.
+        const load = (id: string) => (chosen ?? []).filter(c => c.person === id).length
+        const best = negations
+          .filter(c => c.person !== victim.id)
+          .sort((a, b) => load(a.person) - load(b.person))[0]
+        if (best) chosen = [...(chosen ?? []), best]
+      }
+    }
 
     base.clues = toClueText(base, chosen)
     // A two-floor case where everybody ends up on one storey is a single-floor
