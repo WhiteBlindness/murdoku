@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { getAllPuzzles } from '../src/core/catalog'
 import { deriveEliminations } from '../src/core/engine'
+import { cellFloor } from '../src/core/types'
 import { advanceStreak, computeBadges, dailyPuzzle, todayStamp } from '../src/core/daily'
 import type { StreakState } from '../src/core/daily'
 import { buildShareText } from '../src/core/share'
@@ -150,5 +151,75 @@ describe('logic assistant eliminations', () => {
     }
     // The occupied cell itself is not an elimination — somebody is standing there.
     expect(keys.has(`${seat.row},${seat.col}`)).toBe(false)
+  })
+
+  it('never crosses off a two-floor cell the real solution uses', () => {
+    const twoFloorPuzzles = puzzles.filter(p => (p.floors ?? 1) >= 2)
+    // Guard: if the catalog produces no two-floor puzzles, the test would silently
+    // pass without checking anything — fail loudly instead.
+    expect(twoFloorPuzzles.length).toBeGreaterThan(0)
+
+    for (const puzzle of twoFloorPuzzles) {
+      const people = puzzle.people
+      // Place the first half of suspects at their true cells WITH floor.
+      const placed: Record<string, { row: number; col: number; floor?: number }> = {}
+      for (const person of people.slice(0, Math.floor(people.length / 2))) {
+        placed[person.id] = puzzle.solution[person.id]
+      }
+
+      const eliminated = new Set(
+        deriveEliminations(puzzle, placed).map(cell => `${cellFloor(cell)},${cell.row},${cell.col}`),
+      )
+      for (const person of people) {
+        if (placed[person.id]) continue
+        const truth = puzzle.solution[person.id]
+        const key = `${cellFloor(truth)},${truth.row},${truth.col}`
+        expect(
+          eliminated.has(key),
+          `${puzzle.caseNumber}: eliminated ${person.name}'s real cell {floor:${cellFloor(truth)},row:${truth.row},col:${truth.col}}`,
+        ).toBe(false)
+      }
+    }
+  })
+
+  it('row/col exclusivity is global across floors — a floor-0 placement blocks the same row and col on floor 1', () => {
+    // Find a two-floor puzzle to work with.
+    const puzzle = puzzles.find(p => (p.floors ?? 1) >= 2)
+    expect(puzzle).toBeDefined()
+    if (!puzzle) return
+
+    const first = puzzle.people[0]
+    // Place the first suspect on floor 0 at an arbitrary (well-defined) cell.
+    // We use their true solution cell but the rule is geometric — it would hold
+    // for any arbitrary placement.
+    const seat = puzzle.solution[first.id]
+    const floor0Seat = { row: seat.row, col: seat.col, floor: 0 as const }
+
+    const eliminated = new Set(
+      deriveEliminations(puzzle, { [first.id]: floor0Seat })
+        .map(cell => `${cellFloor(cell)},${cell.row},${cell.col}`),
+    )
+
+    const N = puzzle.size
+    // Every cell on floor 1 sharing the same row or column must be eliminated.
+    for (let k = 0; k < N; k++) {
+      // Same row, different col — eliminated on floor 1.
+      if (k !== seat.col) {
+        expect(
+          eliminated.has(`1,${seat.row},${k}`),
+          `floor 1 row ${seat.row} col ${k} should be eliminated by floor-0 placement`,
+        ).toBe(true)
+      }
+      // Same col, different row — eliminated on floor 1.
+      if (k !== seat.row) {
+        expect(
+          eliminated.has(`1,${k},${seat.col}`),
+          `floor 1 row ${k} col ${seat.col} should be eliminated by floor-0 placement`,
+        ).toBe(true)
+      }
+    }
+    // The stacked cell on floor 1 ({floor:1, row:seat.row, col:seat.col}) is also
+    // eliminated because both its row and col are taken — confirm it appears.
+    expect(eliminated.has(`1,${seat.row},${seat.col}`)).toBe(true)
   })
 })

@@ -1,5 +1,6 @@
 import { useReducer, useEffect, useCallback, useMemo, useState } from 'react'
 import type { Puzzle, CellMark, Screen, GameMode } from '../core/types'
+import { cellFloor } from '../core/types'
 import { getAllPuzzles, getPuzzleById, initCatalogAsync } from '../core/catalog'
 import { deriveEliminations, findMurderer } from '../core/engine'
 import { advanceStreak, dailyPuzzle, loadStreak, saveStreak, todayStamp } from '../core/daily'
@@ -432,23 +433,26 @@ function reducer(state: GameState, action: Action): GameState {
       // discipline. Classic mode players are not expected to track provable
       // absences — they place by feel and submit. Gated here (not just in the
       // view) so tests can assert the rule directly.
-      //
-      // Note: deriveEliminations takes {row,col} without floor — Assist on
-      // two-floor puzzles applies only to floor-0 semantics (core limitation;
-      // tracked for future fix in core/engine.ts).
       if (state.mode !== 'detective') return state
       if (!state.puzzle) return state
-      const placed: Record<string, { row: number; col: number }> = {}
+      // Build placed WITH floor so deriveEliminations can reason across both storeys.
+      const placed: Record<string, { row: number; col: number; floor?: number }> = {}
       for (const person of state.puzzle.people) {
         const cell = personCellAcrossFloors(state.marksPerFloor, person.id)
-        if (cell) placed[person.id] = { row: cell.row, col: cell.col }
+        if (cell) placed[person.id] = cell
       }
       const eliminations = deriveEliminations(state.puzzle, placed)
-      const fresh = eliminations.filter(({ row, col }) => state.marks[row][col].kind === 'empty')
+      // Filter each elimination against the marks of ITS OWN floor.
+      const fresh = eliminations.filter(cell => {
+        const fl = cellFloor(cell)
+        const floorMarks = state.marksPerFloor[fl]
+        return floorMarks && floorMarks[cell.row]?.[cell.col]?.kind === 'empty'
+      })
       if (!fresh.length) return state
       const history = pushHistory(state)
       const mpf = cloneMarksPerFloor(state.marksPerFloor)
-      for (const { row, col } of fresh) mpf[state.activeFloor][row][col] = { kind: 'x', auto: true }
+      // Write each elimination into its own floor's marks.
+      for (const cell of fresh) mpf[cellFloor(cell)][cell.row][cell.col] = { kind: 'x', auto: true }
       // Deliberately NOT running withAutoXPerFloor here. That pass wipes every
       // auto mark and regenerates them from the placed suspects, which would
       // erase the eliminations Assist just wrote. Assist changes no placement,

@@ -276,24 +276,37 @@ export function countSolutions(p: Puzzle, cap = 2): number {
  */
 export function deriveEliminations(p: Puzzle, placed: Placement): Cell[] {
   const N = p.size
+  const floors = p.floors ?? 1
+  // usedRow and usedCol are GLOBAL across floors — a placed suspect blocks
+  // that row and column on every storey.
   const usedRow = new Set<number>()
   const usedCol = new Set<number>()
+  // taken is per-floor: key is `${floor},${row},${col}`.
   const taken = new Set<string>()
   for (const cell of Object.values(placed)) {
     if (!cell) continue
     usedRow.add(cell.row)
     usedCol.add(cell.col)
-    taken.add(`${cell.row},${cell.col}`)
+    taken.add(`${cellFloor(cell)},${cell.row},${cell.col}`)
   }
 
   const remaining = p.people.filter(person => !placed[person.id])
   const out: Cell[] = []
-  for (let row = 0; row < N; row++) {
-    for (let col = 0; col < N; col++) {
-      if (taken.has(`${row},${col}`)) continue
-      if (usedRow.has(row) || usedCol.has(col)) { out.push({ row, col }); continue }
-      const cell = { row, col }
-      if (!remaining.some(person => unaryClueOk(p, person.id, cell))) out.push(cell)
+  for (let fl = 0; fl < floors; fl++) {
+    for (let row = 0; row < N; row++) {
+      for (let col = 0; col < N; col++) {
+        if (taken.has(`${fl},${row},${col}`)) continue
+        // Row/col exclusivity is global — any placed suspect claims this row/col
+        // on every floor.
+        if (usedRow.has(row) || usedCol.has(col)) {
+          out.push(floors > 1 ? { row, col, floor: fl } : { row, col })
+          continue
+        }
+        // Unary legality must be evaluated at this specific cell INCLUDING its floor,
+        // so a 'floor' clue ("Upstairs.") correctly eliminates the other storey.
+        const cell: Cell = floors > 1 ? { row, col, floor: fl } : { row, col }
+        if (!remaining.some(person => unaryClueOk(p, person.id, cell))) out.push(cell)
+      }
     }
   }
   return out
