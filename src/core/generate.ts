@@ -150,6 +150,23 @@ const FURNITURE_FOOTPRINT: Partial<Record<FurnitureType, { w: number; h: number 
   bathtub: { w: 2, h: 1 },
 }
 
+/**
+ * One furniture piece per this many cells of room floor area.
+ *
+ * MEASURED — this is a load-time dial, not a taste one. Furniture is not free:
+ * every piece multiplies the onFurniture / besideFurniture clue candidates the
+ * selector must score, and crowds the placements the solver must rule out.
+ *
+ * 12 seeds per tier (avg ms, pieces per case):
+ *   4 cells/piece  Hard 342  Master 1085  38.5 pieces  -> 25.6s first load
+ *   5 cells/piece  Hard 524  Master  669  31.7 pieces
+ *   6 cells/piece  Hard 364  Master  551  27.2 pieces  <- chosen
+ * A denser 4 doubled Master and pushed the first-load catalog build past the
+ * ~20s it cost before any of this work, which is the single worst thing about
+ * opening the app. Six fills the larger rooms without paying that.
+ */
+const CELLS_PER_PIECE = 6
+
 // --- room layout -----------------------------------------------------------
 
 interface Rect { r0: number; c0: number; r1: number; c1: number } // inclusive
@@ -340,24 +357,42 @@ function placeFurniture(
     return true
   }
 
-  // 1) Each room gets a few DISTINCT pieces.
+  // 1) Furnish each room in proportion to its FLOOR AREA.
+  //
+  // This used to be a flat 1–4 pieces per room, capped by the number of distinct
+  // types in the room's pool. That was invisible while rooms averaged ~10 cells,
+  // but rooms are now 16–24 cells and the same handful of pieces left them
+  // looking abandoned — a 20-cell pantry holding one box, an 18-cell yard with
+  // two plants. Furniture has to scale with the space it decorates.
+  //
+  // Roughly one piece per four cells, so a 16-cell room gets ~4 and a 24-cell
+  // room ~6, with a little jitter so houses do not feel stamped out. Repeats are
+  // allowed once a room's distinct types run out: a real kitchen has two chairs,
+  // and refusing to repeat is what pinned the old count to the pool size.
   for (const room of rooms) {
     const pool = ROOM_FURNITURE[room.name] ?? ['box', 'chair', 'plant']
-    const maxN = Math.min(pool.length, room.cells.length - 1)
-    const n = Math.max(0, Math.min(maxN, 1 + Math.floor(rand() * Math.min(4, room.cells.length))))
+    const byArea = Math.round(room.cells.length / CELLS_PER_PIECE)
+    // Always leave the room at least one free cell — tryPlace enforces this too,
+    // but asking for fewer pieces up front avoids burning attempts on refusals.
+    const maxN = Math.max(1, Math.min(room.cells.length - 1, byArea + 1))
+    const n = Math.max(1, Math.min(maxN, byArea + (rand() < 0.5 ? 0 : 1)))
     const candidates = shuffle(room.cells)
     const inRoom = new Set<FurnitureType>()
     let placed = 0
     for (const cell of candidates) {
       if (placed >= n) break
       if (ownedOccupied.has(cellKey(cell.row, cell.col))) continue
-      const t = pickVaried(pool, inRoom)
+      // Prefer a type the room does not have yet; once every type is used, drop
+      // the avoid-set so pickVaried may repeat.
+      const t = pickVaried(pool, inRoom.size < pool.length ? inRoom : undefined)
       if (tryPlace(t, cell.row, cell.col, room.id)) {
         inRoom.add(t)
         placed++
       } else {
         // Fall back to 1×1 if the multi-cell version didn't fit
-        const t1x1 = pickVaried(pool.filter(p => !(FURNITURE_FOOTPRINT[p])), inRoom.size ? inRoom : undefined)
+        const small = pool.filter(p => !(FURNITURE_FOOTPRINT[p]))
+        if (!small.length) continue
+        const t1x1 = pickVaried(small, inRoom.size < small.length ? inRoom : undefined)
         if (tryPlace(t1x1, cell.row, cell.col, room.id)) {
           inRoom.add(t1x1)
           placed++

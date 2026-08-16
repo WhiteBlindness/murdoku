@@ -116,6 +116,19 @@ describe('generated two-floor cases', () => {
     expect(p.floors ?? 1).toBe(1)
   })
 
+  it('furnishes rooms in proportion to their area, so big rooms do not look abandoned', () => {
+    // Rooms are now 16–24 cells. A flat 1–4 pieces per room left a 20-cell
+    // pantry holding a single box. Guard the density that fixed it.
+    reseed(4242)
+    const p = generatePuzzle('Hard', 'furn-density', 'No. 4')
+    const ground = p.rooms.filter(r => (r.floor ?? 0) === 0)
+    const cells = ground.reduce((a, r) => a + r.cells.length, 0)
+    const pieces = p.furniture.filter(f => (f.floor ?? 0) === 0).length
+    expect(pieces, `only ${pieces} pieces across ${cells} cells`).toBeGreaterThanOrEqual(Math.floor(cells / 12))
+    // And not so crowded there is nowhere left to stand.
+    expect(pieces).toBeLessThan(cells / 2)
+  })
+
   it('builds rooms large enough to read as a floor plan, not a grid of cubicles', () => {
     // The room count is a measured design choice (see DIFF_CONFIG). Guard the
     // property that motivated it: a two-floor board's rooms must be substantial.
