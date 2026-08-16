@@ -30,14 +30,27 @@ function hashStamp(stamp: string): number {
 /**
  * The case everyone gets today.
  *
- * Chosen by hashing the date over a STABLE ORDER (sorted by case id) rather
- * than over the array as delivered, so growing the catalog cannot silently
- * reshuffle which puzzle a given date maps to.
+ * Hard/Expert/Master cases are two-storey (floors >= 2) and the daily is
+ * always drawn from that pool — it is the most complete expression of the
+ * puzzle. The three load-bearing guarantees are preserved:
+ *
+ *   1. Everyone gets the same case on the same date — the stamp is hashed
+ *      deterministically and the same stamp always yields the same index.
+ *   2. The pool is sorted by id (STABLE ORDER) before hashing so adding new
+ *      cases to the catalog cannot silently reshuffle past dates.
+ *   3. The stamp is local, not UTC — `todayStamp` uses the player's clock so
+ *      the case rolls over at their midnight, not at 01:00 for GMT+1 players.
+ *
+ * Fallback: if the catalog contains no two-storey puzzles at all (possible in
+ * tests and in a degraded catalog), the full ordered list is used so a daily
+ * case always exists. This is distinct from an empty catalog, which returns null.
  */
 export function dailyPuzzle(puzzles: Puzzle[], stamp: string = todayStamp()): Puzzle | null {
   if (!puzzles.length) return null
   const ordered = [...puzzles].sort((a, b) => a.id.localeCompare(b.id))
-  return ordered[hashStamp(stamp) % ordered.length]
+  const twoStorey = ordered.filter(p => (p.floors ?? 1) >= 2)
+  const pool = twoStorey.length ? twoStorey : ordered
+  return pool[hashStamp(stamp) % pool.length]
 }
 
 export interface StreakState {

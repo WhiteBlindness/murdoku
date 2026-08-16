@@ -4,6 +4,10 @@ import HomeScreen from '../src/components/HomeScreen'
 import type { InProgressSummary } from '../src/core/ux'
 import { makePuzzle } from './fixtures'
 
+// Two-floor override — Easy difficulty with floors:2 proves we derive from
+// data, not from a hardcoded difficulty list.
+const TWO_FLOOR = { floors: 2 as const }
+
 function renderHome(overrides: Partial<React.ComponentProps<typeof HomeScreen>> = {}) {
   // Two Easy puzzles + one Hard puzzle, so clicking the Easy tier gives us
   // two cases to search/filter within.
@@ -32,6 +36,153 @@ function renderHome(overrides: Partial<React.ComponentProps<typeof HomeScreen>> 
 function drillInto(tierLabel: string) {
   fireEvent.click(screen.getByRole('button', { name: new RegExp(tierLabel, 'i') }))
 }
+
+// ── Storey filter tests ──────────────────────────────────────────────────────
+
+describe('storey filter on landing page', () => {
+  function renderWithMixedTiers() {
+    const puzzles = [
+      makePuzzle({ id: 'easy-1', title: 'One Floor Case', difficulty: 'Easy' }),
+      makePuzzle({ id: 'hard-1', title: 'Two Floor Case', difficulty: 'Hard', ...TWO_FLOOR }),
+    ]
+    return render(
+      <HomeScreen
+        puzzles={puzzles}
+        completedIds={[]}
+        records={{}}
+        mode="classic"
+        onSetMode={vi.fn()}
+        onSelect={vi.fn()}
+        onOpenReleases={vi.fn()}
+        resolvedTheme="dark"
+        onToggleTheme={vi.fn()}
+      />
+    )
+  }
+
+  it('shows all tiers by default', () => {
+    renderWithMixedTiers()
+    expect(screen.getByRole('button', { name: /Easy cases/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Hard cases/i })).toBeInTheDocument()
+  })
+
+  it('with "2 floors" filter active, only two-storey tiers are listed', () => {
+    renderWithMixedTiers()
+    // Target specifically the filter button that carries aria-pressed (the
+    // group control), not the tier row that also contains "2 floors" text.
+    const filterButtons = screen.getAllByRole('button', { name: /2 floors/i })
+    const filterBtn = filterButtons.find(b => b.hasAttribute('aria-pressed'))!
+    fireEvent.click(filterBtn)
+    expect(screen.getByRole('button', { name: /Hard cases/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Easy cases/i })).not.toBeInTheDocument()
+  })
+
+  it('with "1 floor" filter active, only single-storey tiers are listed', () => {
+    renderWithMixedTiers()
+    const filterButtons = screen.getAllByRole('button', { name: /1 floor/i })
+    const filterBtn = filterButtons.find(b => b.hasAttribute('aria-pressed'))!
+    fireEvent.click(filterBtn)
+    expect(screen.getByRole('button', { name: /Easy cases/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Hard cases/i })).not.toBeInTheDocument()
+  })
+
+  it('filter buttons carry aria-pressed indicating which is active', () => {
+    renderWithMixedTiers()
+    const allBtn = screen.getByRole('button', { name: /^all$/i })
+    expect(allBtn).toHaveAttribute('aria-pressed', 'true')
+    // The filter button group — use aria-pressed presence to distinguish the
+    // group control from tier row elements.
+    const twoFloorBtns = screen.getAllByRole('button', { name: /2 floors/i })
+    const twoBtn = twoFloorBtns.find(b => b.hasAttribute('aria-pressed'))!
+    expect(twoBtn).toHaveAttribute('aria-pressed', 'false')
+    fireEvent.click(twoBtn)
+    expect(twoBtn).toHaveAttribute('aria-pressed', 'true')
+    expect(allBtn).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('renders an empty state rather than a blank gap when filter matches nothing', () => {
+    // Single-storey only catalog — "2 floors" filter leaves nothing.
+    const puzzles = [
+      makePuzzle({ id: 'easy-1', difficulty: 'Easy' }),
+    ]
+    render(
+      <HomeScreen
+        puzzles={puzzles}
+        completedIds={[]}
+        records={{}}
+        mode="classic"
+        onSetMode={vi.fn()}
+        onSelect={vi.fn()}
+        onOpenReleases={vi.fn()}
+        resolvedTheme="dark"
+        onToggleTheme={vi.fn()}
+      />
+    )
+    const filterBtns = screen.getAllByRole('button', { name: /2 floors/i })
+    const filterBtn = filterBtns.find(b => b.hasAttribute('aria-pressed'))!
+    fireEvent.click(filterBtn)
+    expect(screen.getByText(/no tiers match/i)).toBeInTheDocument()
+  })
+
+  it('storey count is present as text on a two-storey tier row (not colour-only)', () => {
+    renderWithMixedTiers()
+    // The Hard tier row must contain the text "2 floors" so the information
+    // is not conveyed by colour or icon alone.
+    const hardBtn = screen.getByRole('button', { name: /Hard cases/i })
+    expect(hardBtn).toHaveTextContent(/2 floors/i)
+  })
+})
+
+// ── Storey chip on case cards ────────────────────────────────────────────────
+
+describe('storey chip on tier-screen case cards', () => {
+  it('shows "2 floors" text on a two-storey card (not colour-only)', () => {
+    const puzzles = [
+      makePuzzle({ id: 'hard-1', title: 'Upstairs Murder', difficulty: 'Hard', ...TWO_FLOOR }),
+    ]
+    render(
+      <HomeScreen
+        puzzles={puzzles}
+        completedIds={[]}
+        records={{}}
+        mode="classic"
+        onSetMode={vi.fn()}
+        onSelect={vi.fn()}
+        onOpenReleases={vi.fn()}
+        resolvedTheme="dark"
+        onToggleTheme={vi.fn()}
+      />
+    )
+    // Drill into Hard tier.
+    fireEvent.click(screen.getByRole('button', { name: /Hard cases/i }))
+    // The case card must contain "2 floors" as text.
+    expect(screen.getByRole('button', { name: /upstairs murder/i })).toHaveTextContent(/2 floors/i)
+  })
+
+  it('single-storey cards do not show a floor count', () => {
+    const puzzles = [
+      makePuzzle({ id: 'easy-1', title: 'Ground Level', difficulty: 'Easy' }),
+    ]
+    render(
+      <HomeScreen
+        puzzles={puzzles}
+        completedIds={[]}
+        records={{}}
+        mode="classic"
+        onSetMode={vi.fn()}
+        onSelect={vi.fn()}
+        onOpenReleases={vi.fn()}
+        resolvedTheme="dark"
+        onToggleTheme={vi.fn()}
+      />
+    )
+    fireEvent.click(screen.getByRole('button', { name: /Easy cases/i }))
+    const card = screen.getByRole('button', { name: /ground level/i })
+    expect(card).not.toHaveTextContent(/floor/i)
+  })
+})
+
+// ── Original search/filters/resume tests ────────────────────────────────────
 
 describe('HomeScreen search, filters, and resume', () => {
   it('filters visible cases from the accessible search field within a tier', () => {

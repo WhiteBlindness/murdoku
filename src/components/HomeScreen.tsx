@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Users, LayoutGrid, Sparkles, Search, Timer, ArrowLeft } from 'lucide-react'
+import { Users, LayoutGrid, Sparkles, Search, Timer, ArrowLeft, Building2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import type { Puzzle, Difficulty, GameMode } from '../core/types'
 import { filterCases } from '../core/ux'
@@ -41,12 +41,22 @@ function tierGridSize(puzzles: Puzzle[], diff: Difficulty): string {
   return p ? `${p.size}×${p.size}` : '—'
 }
 
+// Floor count for a tier; derived from the catalog, never hardcoded per
+// difficulty — the generator decides difficulty-to-floors, not this view.
+function tierFloors(puzzles: Puzzle[], diff: Difficulty): number {
+  const p = puzzles.find(x => x.difficulty === diff)
+  return p ? (p.floors ?? 1) : 1
+}
+
+type StoreyFilter = 'all' | 'one' | 'two'
+
 export default function HomeScreen({
   puzzles, completedIds, records, mode, onSetMode, onSelect,
   onOpenReleases, resolvedTheme, onToggleTheme, inProgress = null, onResume,
 }: Props) {
   // 'landing' = Screen 1; any Difficulty string = Screen 2 (case list for that tier)
   const [view, setView] = useState<'landing' | Difficulty>('landing')
+  const [storeyFilter, setStoreyFilter] = useState<StoreyFilter>('all')
 
   const resumablePuzzle = inProgress ? puzzles.find(puzzle => puzzle.id === inProgress.id) : undefined
 
@@ -240,54 +250,126 @@ export default function HomeScreen({
 
         {/* ── Difficulty tiers — main navigation ── */}
         <section aria-labelledby="tiers-heading" className="mb-4">
-          <h2
-            id="tiers-heading"
-            className="mb-2 font-display font-bold uppercase tracking-[0.14em] text-text-muted"
-            style={{ fontSize: 11 }}
-          >
-            Case tiers
-          </h2>
+          <div className="mb-2 flex items-center justify-between gap-3 flex-wrap">
+            <h2
+              id="tiers-heading"
+              className="font-display font-bold uppercase tracking-[0.14em] text-text-muted"
+              style={{ fontSize: 11 }}
+            >
+              Case tiers
+            </h2>
+            {/* Storey filter — three-state button group. Matches the ModeBtn
+                interaction pattern: no native radio, each button carries
+                aria-pressed so assistive technology reads the active state.
+                Touch targets are 44px minimum. */}
+            <div
+              role="group"
+              aria-label="Filter tiers by storey count"
+              className="flex border border-border-strong bg-bg-surface p-0.5 gap-0.5"
+            >
+              {([
+                { value: 'all', label: 'All' },
+                { value: 'one', label: '1 floor' },
+                { value: 'two', label: '2 floors' },
+              ] as { value: StoreyFilter; label: string }[]).map(({ value, label }) => {
+                const active = storeyFilter === value
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setStoreyFilter(value)}
+                    className="focus-ring px-2.5 font-mono uppercase tracking-[0.08em] transition-colors"
+                    style={{
+                      fontSize: 10,
+                      minHeight: 44,
+                      background: active ? 'color-mix(in srgb, var(--color-accent) 14%, transparent)' : 'transparent',
+                      color: active ? 'var(--color-accent-text)' : 'var(--color-text-secondary)',
+                      boxShadow: active ? 'inset 0 0 0 1px var(--color-border-strong)' : undefined,
+                      borderBottom: active ? '2px solid var(--color-accent)' : '2px solid transparent',
+                    }}
+                  >
+                    {label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
           <div className="flex flex-col gap-1.5">
-            {DIFF_ORDER.map(diff => {
-              const tierPuzzles = puzzles.filter(p => p.difficulty === diff)
-              if (!tierPuzzles.length) return null
-              const solvedInTier = tierPuzzles.filter(p => completedIds.includes(p.id)).length
-              const gridSize = tierGridSize(puzzles, diff)
-              return (
-                <button
-                  key={diff}
-                  type="button"
-                  onClick={() => setView(diff)}
-                  className="focus-ring group flex items-center justify-between border border-border-strong bg-bg-surface px-4 transition-colors hover:border-accent-strong"
-                  style={{ minHeight: 52 }}
-                  aria-label={`${diff} cases, ${gridSize} grid, ${solvedInTier} of ${tierPuzzles.length} solved`}
-                >
-                  <div className="flex items-center gap-3">
-                    {/* Difficulty colour swatch — same visual language as card spine */}
-                    <div
-                      className="shrink-0"
-                      style={{ width: 4, height: 32, background: diffFill(diff) }}
-                      aria-hidden
-                    />
-                    <span
-                      className="font-display font-bold uppercase tracking-[0.12em]"
-                      style={{ fontSize: 14, color: diffText(diff) }}
-                    >
-                      {diff}
+            {(() => {
+              const visibleDiffs = DIFF_ORDER.filter(diff => {
+                const tierPuzzles = puzzles.filter(p => p.difficulty === diff)
+                if (!tierPuzzles.length) return false
+                const floors = tierFloors(puzzles, diff)
+                if (storeyFilter === 'one') return floors < 2
+                if (storeyFilter === 'two') return floors >= 2
+                return true
+              })
+              if (!visibleDiffs.length) {
+                return (
+                  <p
+                    className="border border-border-strong bg-bg-surface p-4 text-center font-mono text-text-secondary"
+                    style={{ fontSize: 11 }}
+                    role="status"
+                  >
+                    No tiers match that filter.
+                  </p>
+                )
+              }
+              return visibleDiffs.map(diff => {
+                const tierPuzzles = puzzles.filter(p => p.difficulty === diff)
+                const solvedInTier = tierPuzzles.filter(p => completedIds.includes(p.id)).length
+                const gridSize = tierGridSize(puzzles, diff)
+                const floors = tierFloors(puzzles, diff)
+                const storeyLabel = floors >= 2 ? '2 floors' : '1 floor'
+                return (
+                  <button
+                    key={diff}
+                    type="button"
+                    onClick={() => setView(diff)}
+                    className="focus-ring group flex items-center justify-between border border-border-strong bg-bg-surface px-4 transition-colors hover:border-accent-strong"
+                    style={{ minHeight: 52 }}
+                    aria-label={`${diff} cases, ${gridSize} grid, ${storeyLabel}, ${solvedInTier} of ${tierPuzzles.length} solved`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {/* Difficulty colour swatch — same visual language as card spine */}
+                      <div
+                        className="shrink-0"
+                        style={{ width: 4, height: 32, background: diffFill(diff) }}
+                        aria-hidden
+                      />
+                      <span
+                        className="font-display font-bold uppercase tracking-[0.12em]"
+                        style={{ fontSize: 14, color: diffText(diff) }}
+                      >
+                        {diff}
+                      </span>
+                      <span
+                        className="font-mono text-text-muted"
+                        style={{ fontSize: 11 }}
+                      >
+                        {gridSize}
+                      </span>
+                      {/* Storey chip — text carries meaning, icon is decorative.
+                          Only shown when there are two storeys to avoid noise on
+                          every single-storey row. */}
+                      {floors >= 2 && (
+                        <span
+                          className="flex items-center gap-1 font-mono text-text-muted"
+                          style={{ fontSize: 11 }}
+                        >
+                          <Building2 size={11} aria-hidden />
+                          {storeyLabel}
+                        </span>
+                      )}
+                    </div>
+                    <span className="font-mono text-text-secondary" style={{ fontSize: 11 }}>
+                      {solvedInTier}/{tierPuzzles.length}
                     </span>
-                    <span
-                      className="font-mono text-text-muted"
-                      style={{ fontSize: 11 }}
-                    >
-                      {gridSize}
-                    </span>
-                  </div>
-                  <span className="font-mono text-text-secondary" style={{ fontSize: 11 }}>
-                    {solvedInTier}/{tierPuzzles.length}
-                  </span>
-                </button>
-              )
-            })}
+                  </button>
+                )
+              })
+            })()}
           </div>
         </section>
 
@@ -473,6 +555,13 @@ function TierScreen({
                     <div className="flex items-center gap-3 text-[11px] font-sans" style={{ color: '#4B4232' }}>
                       <span className="flex items-center gap-1"><LayoutGrid size={12} aria-hidden />{p.size}×{p.size}</span>
 
+                      {(p.floors ?? 1) >= 2 && (
+                        <span className="flex items-center gap-1">
+                          <Building2 size={12} aria-hidden />
+                          {(p.floors ?? 1)} floors
+                        </span>
+                      )}
+
                       <span className="flex items-center gap-[3px]" title={`${p.people.length} people`}>
                         <Users size={12} className="mr-0.5" aria-hidden />
                         {p.people.map(person => (
@@ -576,6 +665,11 @@ function DailyPanel({
           </h2>
           <p className="mt-1 font-mono text-[11px] text-text-secondary">
             {daily.caseNumber} · {daily.difficulty} · {daily.size}×{daily.size}
+            {/* The daily is always drawn from the two-storey pool, so say so
+                here as well as on the tier rows and case cards — otherwise the
+                one case most players open is the single place the second floor
+                goes unannounced. Derived from the puzzle, never hardcoded. */}
+            {(daily.floors ?? 1) >= 2 && <> · {daily.floors} floors</>}
             {solved && (
               <span
                 className="ml-2 text-[10px] font-display font-bold uppercase tracking-[0.18em] px-1.5 py-[3px] leading-none"

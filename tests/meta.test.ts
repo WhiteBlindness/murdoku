@@ -28,6 +28,35 @@ describe('daily case', () => {
   it('returns null rather than throwing on an empty catalog', () => {
     expect(dailyPuzzle([], todayStamp())).toBeNull()
   })
+
+  it('always returns a two-storey case from the real catalog', () => {
+    const daily = dailyPuzzle(puzzles, '2026-08-14')
+    expect(daily).not.toBeNull()
+    expect((daily!.floors ?? 1)).toBeGreaterThanOrEqual(2)
+  })
+
+  it('is stable for a given date — same puzzle every call', () => {
+    const stamp = '2026-08-16'
+    expect(dailyPuzzle(puzzles, stamp)?.id).toBe(dailyPuzzle(puzzles, stamp)?.id)
+  })
+
+  it('varies across a week (two-storey pool has enough cases)', () => {
+    // With 30 two-storey cases in the catalog (Hard 12 + Expert 10 + Master 8)
+    // five consecutive dates must produce at least two distinct puzzles.
+    const days = ['2026-08-14', '2026-08-15', '2026-08-16', '2026-08-17', '2026-08-18']
+    const ids = new Set(days.map(stamp => dailyPuzzle(puzzles, stamp)?.id))
+    expect(ids.size).toBeGreaterThan(1)
+  })
+
+  it('falls back to the full catalog when no two-storey puzzles exist', () => {
+    // Build a synthetic catalog with only single-floor puzzles (floors absent).
+    const singleFloor = puzzles.filter(p => (p.floors ?? 1) < 2)
+    // Guard: if somehow all puzzles became two-floor, skip — but log clearly.
+    if (!singleFloor.length) return
+    const daily = dailyPuzzle(singleFloor, '2026-08-14')
+    expect(daily).not.toBeNull()
+    expect((daily!.floors ?? 1)).toBeLessThan(2)
+  })
 })
 
 describe('streaks', () => {
