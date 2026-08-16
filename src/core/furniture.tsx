@@ -2,32 +2,47 @@ import React from 'react'
 import type { FurnitureType } from './types'
 
 /**
- * Real-world relative scale for each furniture type.
- * Each value is the fraction of the cell (0–1) the icon should fill.
- * A bed is one of the largest; a lamp is clearly the smallest.
- * Multi-cell pieces (bed, sofa, rug, table, bookshelf, counter, bathtub)
- * already earn footprint from MapGrid — keep them near 1.0.
+ * Uniform fill factor for each furniture type.
+ *
+ * RULE (2026): This value is a UNIFORM FILL FACTOR, not a size signifier.
+ * Every piece nearly fills its footprint cell (~0.92). Real-world size
+ * differences are communicated by HOW MANY SQUARES a piece occupies
+ * (FURNITURE_FOOTPRINT) and by rooms being made of more squares — NOT by
+ * shrinking the glyph inside a fixed square.
+ *
+ * A lamp is small because it is 1×1; a bed is large because it is 2×2.
+ * At any scale value below 0.90 the icon reads as a toy on the board.
+ *
+ * REJECTED MODEL — do not reintroduce:
+ * The previous code used scale as a "real-world size" signal: lamp 0.33,
+ * plant 0.50, tv 0.60, sofa 0.95. The user explicitly rejected this:
+ * "objects should be centered in the square and should occupy almost all of
+ * the square; the perspective part is that the rooms should have more squares,
+ * not the squares stay the same but objects are smaller."
+ * Small variations (±0.03) are allowed only when a specific silhouette needs
+ * a breath of padding (e.g. the rug's woven border reads better at 0.94 than
+ * flush at 0.97). They must never encode real-world size.
  */
 export const FURNITURE_SCALE: Record<FurnitureType, number> = {
-  rug:       1.00, // flat ground covering — fills its 2×2 cell entirely
-  bed:       0.97, // double bed, largest 3D object on the board
-  sofa:      0.95, // wide upholstered piece, 2×1 footprint
-  bathtub:   0.92, // large porcelain fixture, 2×1 footprint
-  table:     0.92, // dining table, 2×1 footprint
-  counter:   0.91, // kitchen counter run, 2×1 footprint
-  bookshelf: 0.91, // tall full-wall shelf, 2×1 footprint
-  fridge:    0.89, // tall appliance, 1×1
-  desk:      0.87, // writing desk, 1×1
-  shower:    0.84, // shower enclosure, 1×1
-  stove:     0.79, // cooker, 1×1
-  chair:     0.71, // armchair, noticeably smaller than sofa
-  toilet:    0.68, // bathroom fixture, compact
-  tv:        0.60, // cathode-ray set — must never exceed sofa or bathtub
-  box:       0.58, // shipping crate, medium-small
-  clock:     0.57, // grandfather clock, narrow tall 1×1
-  plant:     0.50, // potted plant, clearly small
-  shrub:     0.50, // low succulent, clearly small
-  lamp:      0.33, // table lamp — the smallest object on the board
+  rug:       0.94, // flat woven border benefits from slight inset
+  bed:       0.92,
+  sofa:      0.92,
+  bathtub:   0.92,
+  table:     0.92,
+  counter:   0.92,
+  bookshelf: 0.92,
+  fridge:    0.92,
+  desk:      0.92,
+  shower:    0.92,
+  stove:     0.92,
+  chair:     0.92,
+  toilet:    0.92,
+  tv:        0.92,
+  box:       0.92,
+  clock:     0.92,
+  plant:     0.92,
+  shrub:     0.92,
+  lamp:      0.92,
 }
 
 /**
@@ -129,9 +144,10 @@ const FOOT = { stroke: INK, strokeWidth: 3, strokeLinecap: 'round' as const }
  * showy ramp: enough to read as a moulded object, never enough to muddy the
  * flat-illustration language.
  *
- * Scale is read from FURNITURE_SCALE: artwork is centered and shrunk so each
- * piece occupies its real-world-proportionate fraction of the cell. The drop
- * shadow sits outside the scale transform so it reads at consistent strength.
+ * Scale is read from FURNITURE_SCALE: artwork is centered at a uniform high fill
+ * (~0.92) so each piece nearly fills its footprint. Real-world size is carried
+ * by FURNITURE_FOOTPRINT (cells occupied), not by glyph scale. The drop shadow
+ * sits outside the scale transform so it reads at consistent strength.
  */
 function Frame({ prefix, size, tone, children }: {
   prefix: string

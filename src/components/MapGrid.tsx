@@ -515,9 +515,11 @@ export default function MapGrid({
               .map(cell => marks[cell.row][cell.col])
             const underToken = covered.some(m => m.kind === 'person')
             const struck = covered.length > 0 && covered.every(m => m.kind === 'x')
-            // Icon size: bigger pieces fill more of their footprint; lamps/plants
-            // stay small so they read as accessories rather than walls.
-            const iconPct = Math.max(w, h) > 1 ? 82 : 68
+            // Icon size: all pieces fill nearly their entire footprint.
+            // Size differences come from how many cells the piece occupies,
+            // not from shrinking the glyph. 94% on both 1×1 and multi-cell
+            // footprints gives a consistent near-flush fill with a thin margin.
+            const iconPct = 94
             return (
               <span
                 key={`${f.type}-${f.row}-${f.col}-${i}`}
@@ -525,21 +527,30 @@ export default function MapGrid({
                 style={{
                   gridColumn: `${f.col + 1} / span ${w}`,
                   gridRow: `${f.row + 1} / span ${h}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  position: 'relative',
                   opacity: underToken ? 0.3 : struck ? 0.18 : 1,
                 }}
               >
-                {/* Explicit square inner box so the SVG is centered regardless
-                    of whether the footprint is 1×1, 2×1, 1×2, or 2×2. */}
+                {/* The icon box is inset from the footprint on BOTH axes.
+                    Inset percentages resolve per-axis — left/right against the
+                    footprint's width, top/bottom against its height — so the box
+                    always matches the footprint minus a thin margin, whether that
+                    footprint is 1×1, 2×1, 1×2 or 2×2, and can never spill into a
+                    neighbouring cell.
+
+                    Two earlier attempts failed here, both measured on the live
+                    board. `height: N%` did not resolve against the grid row, so
+                    plant and toilet fell back to their SVG's intrinsic ratio and
+                    rendered 112% of a cell tall. Replacing it with
+                    `aspectRatio: 1/1` fixed those but broke every 2×1 piece
+                    (sofa, table, bathtub, bookshelf, counter): 94% of a 2-cell
+                    width forced to a 1:1 ratio is 1.88 cells TALL in a 1-cell
+                    row. Insets have neither failure mode. */}
                 <span
                   style={{
-                    display: 'block',
-                    width: `${iconPct}%`,
-                    height: `${iconPct}%`,
+                    position: 'absolute',
+                    inset: `${(100 - iconPct) / 2}%`,
                     transform: rot ? `rotate(${rot}deg)` : undefined,
-                    flexShrink: 0,
                   }}
                 >
                   <Icon />
