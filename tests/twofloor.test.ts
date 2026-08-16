@@ -8,15 +8,17 @@ import type { Puzzle } from '../src/core/types'
 // ============================================================================
 // Two-floor support.
 //
-// The MODEL, the engine and the clue kinds are implemented and covered here.
-// GENERATION of two-floor cases is currently switched off in generate.ts: it
-// needs ~82s per puzzle against a 400ms budget, because doubling the candidate
-// cells while keeping only N row/column slots means a random clue set almost
-// never pins a unique solution. See the comment on DIFF_CONFIG.
+// The MODEL, the engine, the clue kinds and GENERATION are all implemented.
+// Generation is live for Hard/Expert/Master — see DIFF_CONFIG in generate.ts.
+// (An earlier revision of this comment said generation was switched off and cost
+// ~82s per puzzle. That figure was measured on a machine loaded with stray
+// vitest processes and is wrong; the information-driven selector generates a
+// two-floor case in a fraction of a second.)
 //
-// These tests therefore build a two-floor puzzle BY HAND rather than generating
-// one. That keeps the engine's floor semantics honest and fast to verify, so
-// the day generation is fixed the foundation is already proven.
+// The engine tests below still build a two-floor puzzle BY HAND rather than
+// generating one, so floor semantics are verified against a fixture whose answer
+// is known by construction rather than against whatever the generator happened
+// to produce. Generated cases are covered separately at the end.
 // ============================================================================
 
 /** A 2x2 house with two floors: one room per floor. */

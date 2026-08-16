@@ -599,11 +599,32 @@ export function generatePuzzle(
   // a full single-floor regeneration on top. Fewer attempts simply pushes more
   // seeds into that second, more expensive path.
   //
-  // The remaining cost is the genuinely unpinnable seed, which pays all 250
-  // attempts before degrading (worst case ~700ms against a ~400ms target).
-  // Fixing that properly means detecting up front that a seed cannot be pinned,
-  // rather than discovering it by exhaustion — a real piece of work, not a
-  // constant to tweak.
+  // TRIED AND REJECTED — do not re-attempt without reading this.
+  //
+  // The obvious next idea is to detect up front that a board cannot be pinned.
+  // It rests on a true property: uniqueness is MONOTONE in clue addition (every
+  // candidate clue is true of the solution, so adding one can only remove rival
+  // solutions), therefore if the full clue ceiling leaves >1 solution, no subset
+  // can ever pin that board. Implemented, measured, reverted. Two placements,
+  // 12 seeds per tier, same machine, strays killed (avg/worst ms):
+  //
+  //                        Hard        Expert       Master      fallbacks
+  //   no check          240 / 465    703 / 1485   688 / 1461     0/1/1
+  //   before phase A    ~+7%         792 / ~1900  787 / ~1840    0/1/1
+  //   between A and B   334 / 834    792 / 1902   787 / 1841     0/1/1
+  //
+  // Both placements are SLOWER and neither changes two-floor retention or the
+  // fallback count. The population it insures against barely exists: Phase A
+  // rarely pins a board alone, so nearly every attempt reaches the check and
+  // pays a full-ceiling solve (~500 clues over 128 cells just to build the MRV
+  // candidate lists), while Phase B — the expensive half the check exists to
+  // skip — almost always SUCCEEDS. Insurance nobody claims.
+  //
+  // Note also that each attempt builds a FRESH board, so a doomed board never
+  // costs more than one attempt. An earlier version of this comment implied 250
+  // attempts were spent on one bad seed; they are not, and that misreading is
+  // what made the idea look valuable. The real worst case (~1.5s) is attempts
+  // that legitimately churn, not seeds that cannot be pinned.
   const maxAttempts = twoFloor ? 250 : 60
   // The last fifth of the attempts drop the directness FLOOR. That floor is a
   // difficulty dial — it bans the most direct clue kinds so suspects must be
