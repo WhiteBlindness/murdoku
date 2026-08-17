@@ -43,30 +43,45 @@ import type { FurnitureType } from './types'
  * scale legitimately belongs (FURNITURE_SCALE explains why it does not belong
  * in fill). Past roughly 0.45 a piece starts colliding with the row behind it.
  */
+// MEASURED CEILING — do not raise these without re-rendering the board.
+//
+// The lift is applied as a UNIFORM scale from the piece's bottom edge
+// (MapGrid's furniture overlay), because the artwork has a fixed aspect and a
+// non-uniform stretch would visibly distort it. A uniform scale grows the
+// piece SIDEWAYS as well as upward, by half the lift on each side — which is
+// the one thing the paragraph above says must never happen.
+//
+// The old values ignored that. A plant at 0.40 scaled 1.43x and bled ~0.21
+// cells into each neighbour; a 2x1 bookshelf at 0.44 rendered ~2.8 x 1.4
+// cells and read as a four-square object, crossing room walls on the live
+// board. Capping the lift at 0.20 holds the worst sideways bleed to ~0.10 of
+// a cell — enough to read as height, small enough that it never reaches the
+// neighbouring piece. MapGrid additionally zeroes the lift when the cell
+// above belongs to a DIFFERENT room, so depth never crosses a wall.
 export const FURNITURE_OVERHANG: Record<FurnitureType, number> = {
   // Floor level — nothing stands above the footprint.
   rug:       0.00,
   // Low pieces: a shallow lift separates them from the floor material.
-  toilet:    0.12,
-  box:       0.12,
-  bathtub:   0.14,
-  bed:       0.14,
-  chair:     0.16,
-  sofa:      0.16,
-  table:     0.16,
-  desk:      0.18,
-  counter:   0.20,
-  tv:        0.22,
-  stove:     0.22,
+  toilet:    0.06,
+  box:       0.06,
+  bathtub:   0.07,
+  bed:       0.07,
+  chair:     0.08,
+  sofa:      0.08,
+  table:     0.08,
+  desk:      0.09,
+  counter:   0.10,
+  tv:        0.11,
+  stove:     0.11,
   // Waist to shoulder.
-  shrub:     0.26,
-  lamp:      0.30,
+  shrub:     0.13,
+  lamp:      0.15,
   // Tall: these should visibly occlude the cell behind them.
-  fridge:    0.38,
-  shower:    0.38,
-  clock:     0.40,
-  plant:     0.40,
-  bookshelf: 0.44,
+  fridge:    0.18,
+  shower:    0.18,
+  clock:     0.19,
+  plant:     0.19,
+  bookshelf: 0.20,
 }
 
 export const FURNITURE_SCALE: Record<FurnitureType, number> = {

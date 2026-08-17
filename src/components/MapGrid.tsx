@@ -559,9 +559,32 @@ export default function MapGrid({
             // through the board's frame. The reference art lets a tree do exactly
             // that, but our board draws a heavy frame and the overflow would be
             // sliced by it, which reads as a rendering fault rather than depth.
-            const overhangCells = f.row === 0
-              ? Math.min(FURNITURE_OVERHANG[f.type] ?? 0, 0.12)
-              : (FURNITURE_OVERHANG[f.type] ?? 0)
+            //
+            // A piece whose footprint is non-square and which is rotated a
+            // quarter turn must be LAID OUT in its unrotated aspect and then
+            // rotated, or the artwork letterboxes to the narrow axis. The 2x1
+            // pieces carry a 200x100 viewBox, so dropping one into a 1-wide,
+            // 2-tall box fits it to the WIDTH and renders it at half a cell
+            // tall — a tiny sofa marooned in a tall gap, which is what the
+            // live board showed. Swapping the box back to landscape and
+            // rotating it lands the art flush inside the real footprint.
+            const rotSwap = (rot === 90 || rot === 270) && w !== h
+            const overhangBase = FURNITURE_OVERHANG[f.type] ?? 0
+            // Depth must not cross a room wall. The lift is a uniform scale, so
+            // it grows sideways as well as up; letting that spill past a
+            // boundary is what made a bookshelf look like it was climbing out
+            // of the Office. Rotated pieces opt out entirely: "up" in their
+            // local frame is sideways on screen, so a lift would push them into
+            // a neighbour rather than away from the viewer.
+            const roomHere = roomOf[f.row]?.[f.col]
+            const roomAbove = f.row > 0 ? roomOf[f.row - 1]?.[f.col] : undefined
+            const overhangCells = rotSwap
+              ? 0
+              : f.row === 0
+                ? Math.min(overhangBase, 0.12)
+                : roomAbove !== roomHere
+                  ? 0
+                  : overhangBase
             return (
               <span
                 key={`${f.type}-${f.row}-${f.col}-${i}`}
@@ -598,7 +621,19 @@ export default function MapGrid({
                 <span
                   style={{
                     position: 'absolute',
-                    inset: `${(100 - iconPct) / 2}%`,
+                    // Rotated non-square piece: lay the box out LANDSCAPE (the
+                    // artwork's own aspect) and let the rotation below stand it
+                    // upright, so it fills the portrait footprint instead of
+                    // letterboxing to half a cell. The box is centred on the
+                    // footprint so the quarter-turn pivots about the middle.
+                    ...(rotSwap ? {
+                      left: '50%',
+                      top: '50%',
+                      width: `${(h / w) * iconPct}%`,
+                      height: `${(w / h) * iconPct}%`,
+                    } : {
+                      inset: `${(100 - iconPct) / 2}%`,
+                    }),
                     // DEPTH — a tall piece is drawn BIGGER than its square with
                     // its base still planted, so it rises over the cell behind
                     // it. That is how the reference art works: the tree is not
@@ -618,16 +653,52 @@ export default function MapGrid({
                     //
                     // Scale maths: the box is h*iconPct cells tall, and the piece
                     // must end up (h*iconPct + overhang) cells tall.
-                    transformOrigin: 'bottom center',
+                    // ONLY the lift lives on this element, because it is the
+                    // only transform that may use a bottom origin. Rotation is
+                    // applied to a child with a CENTRE origin — see below.
+                    transformOrigin: rotSwap ? 'center center' : 'bottom center',
                     transform: [
+                      // Centre the landscape box on the footprint before it is
+                      // stood upright by the rotation.
+                      rotSwap ? 'translate(-50%, -50%)' : null,
+                      // scaleY, NOT scale. The board is read as if viewed from
+                      // a shallow angle, so height is the only axis that may
+                      // grow — a uniform scale widened the piece by half the
+                      // lift on each side, which is how a bookshelf ended up
+                      // reaching past the board frame and into the room next
+                      // door. Vertical-only growth also matches the
+                      // foreshortening of a low viewing angle: a taller object
+                      // covers more of the wall behind it without covering more
+                      // floor.
                       overhangCells > 0
-                        ? `scale(${1 + overhangCells / (h * (iconPct / 100))})`
+                        ? `scaleY(${1 + overhangCells / (h * (iconPct / 100))})`
                         : null,
-                      rot ? `rotate(${rot}deg)` : null,
                     ].filter(Boolean).join(' ') || undefined,
                   }}
                 >
-                  <Icon />
+                  {/* Rotation MUST pivot about the centre, and therefore cannot
+                      share the parent's bottom origin.
+                      Rotating about a bottom edge does not merely turn a piece,
+                      it TRANSLATES it off its own footprint: 180deg lands it a
+                      full row below where it belongs, 90/270deg shifts it half a
+                      cell diagonally. Measured on the live board, a 180deg
+                      bookshelf anchored in the Office rendered at rows
+                      2.97-4.10 — entirely inside the Garden below it — and a
+                      270deg desk sat half a cell down and to the left of its
+                      own square. Every rotated piece on every board was
+                      affected, which is what made the rooms look like their
+                      furniture was sliding out of them. */}
+                  <span
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      height: '100%',
+                      transformOrigin: 'center center',
+                      transform: rot ? `rotate(${rot}deg)` : undefined,
+                    }}
+                  >
+                    <Icon />
+                  </span>
                 </span>
               </span>
             )

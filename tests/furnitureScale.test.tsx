@@ -98,12 +98,89 @@ describe('furniture overhang — depth without leaving the floor', () => {
     // A rug is painted on the floor; it cannot rise.
     expect(FURNITURE_OVERHANG.rug).toBe(0)
     // The tall pieces are the ones that should occlude the cell behind them.
+    //
+    // The bar was 0.3 when the lift was applied as a UNIFORM scale, which grew
+    // a piece sideways by half the lift on each side — a 0.44 bookshelf drew
+    // ~2.8 cells wide from a 2-cell footprint and crossed into the next room.
+    // The lift is now scaleY (MapGrid), so height no longer costs width, and
+    // the values are capped at 0.20. What this test is really protecting is the
+    // ORDERING below — that tall things out-rank low things — not any absolute
+    // number, so the floor moves with the cap rather than pinning the old one.
     for (const tall of ['bookshelf', 'fridge', 'clock', 'plant', 'shower'] as const) {
-      expect(FURNITURE_OVERHANG[tall], `${tall} should stand tall`).toBeGreaterThanOrEqual(0.3)
+      expect(FURNITURE_OVERHANG[tall], `${tall} should stand tall`).toBeGreaterThanOrEqual(0.15)
     }
     // ...and they must out-rank the things that sit low.
     for (const low of ['rug', 'toilet', 'box', 'bathtub'] as const) {
       expect(FURNITURE_OVERHANG.bookshelf).toBeGreaterThan(FURNITURE_OVERHANG[low])
+    }
+  })
+})
+
+// ============================================================================
+// A rotated piece must TURN, not TRAVEL.
+//
+// The renderer put the lift and the rotation on one element with
+// `transform-origin: bottom center`. A rotation about a bottom edge is also a
+// translation: measured on the live board, a 180deg bookshelf anchored in the
+// Office drew at rows 2.97-4.10 — wholly inside the Garden below it — and a
+// 270deg desk sat half a cell down and to the left of its own square. Every
+// rotated piece on every board was displaced, and no data-level test could see
+// it, because the puzzle data was correct the whole time.
+//
+// The fix splits the transforms: the lift keeps the bottom origin on the icon
+// box, the rotation moves to a child with a CENTRE origin. These tests pin that
+// split so the two can never be recombined onto one origin again.
+// ============================================================================
+describe('furniture rotation pivots about the centre, never the bottom edge', () => {
+  function rotatedPuzzle(type: FurnitureType, rotation: 0 | 90 | 180 | 270, w = 1, h = 1): Puzzle {
+    const cells = [0, 1, 2, 3].flatMap(row => [0, 1, 2, 3].map(col => ({ row, col })))
+    return {
+      id: 'rot-test', title: 'Rotation test', caseNumber: '00', difficulty: 'Easy', size: 4,
+      rooms: [{ id: 'r', name: 'Study', hue: 0, cells }],
+      roomOf: Array.from({ length: 4 }, () => Array.from({ length: 4 }, () => 'r')),
+      furniture: [{ type, row: 1, col: 1, w, h, rotation }],
+      people: [], clues: [], solution: {}, victimId: '', murdererId: '', flavor: '',
+    }
+  }
+  const marks: CellMark[][] = Array.from({ length: 4 }, () =>
+    Array.from({ length: 4 }, () => ({ kind: 'empty' as const })),
+  )
+
+  function iconBox(p: Puzzle) {
+    const { container } = render(
+      <MapGrid puzzle={p} marks={marks} conflicts={new Set()} onCellClick={() => undefined} />,
+    )
+    const outer = container.querySelectorAll<HTMLElement>('[aria-hidden] > span[data-furniture-icon]')[0]
+    return outer.querySelector<HTMLElement>('span')!
+  }
+
+  it('never applies a rotation on an element whose origin is the bottom edge', () => {
+    for (const rotation of [90, 180, 270] as const) {
+      const box = iconBox(rotatedPuzzle('desk', rotation))
+      const origin = box.style.transformOrigin
+      if (box.style.transform.includes('rotate')) {
+        expect(
+          origin,
+          `desk @${rotation}deg: rotation sits on an element with origin "${origin}". ` +
+          'Rotating about a bottom edge translates the piece off its own footprint.',
+        ).not.toContain('bottom')
+      }
+      // The rotation must exist somewhere beneath the box, on a centre origin.
+      const spinner = box.querySelector<HTMLElement>('span')
+      expect(spinner, `desk @${rotation}deg: no child element carries the rotation`).not.toBeNull()
+      expect(spinner!.style.transform, `desk @${rotation}deg: child does not rotate`).toContain(`rotate(${rotation}deg)`)
+      expect(spinner!.style.transformOrigin, `desk @${rotation}deg: rotation must pivot about the centre`).toContain('center')
+    }
+  })
+
+  it('lifts height only — a taller piece never grows wider (no sideways bleed into the next room)', () => {
+    // scaleY, not scale: a uniform scale widened a piece by half its lift on
+    // each side, which is how a bookshelf reached past the board frame.
+    const box = iconBox(rotatedPuzzle('bookshelf', 0, 2, 1))
+    const t = box.style.transform
+    if (t.includes('scale')) {
+      expect(t, 'the lift must be scaleY — a uniform scale grows the piece sideways too').toMatch(/scaleY\(/)
+      expect(t.replace(/scaleY\([^)]*\)/g, ''), 'no uniform scale() may remain on the icon box').not.toMatch(/(^|\s)scale\(/)
     }
   })
 })
