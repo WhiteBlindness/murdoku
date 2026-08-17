@@ -1,4 +1,6 @@
 import { generatePuzzle, reseed } from './generate'
+import { buildAuthoredPuzzle } from './authored'
+import { AUTHORED_CASES } from '../data/cases'
 import type { Puzzle, Difficulty } from './types'
 
 // ============================================================================
@@ -45,7 +47,10 @@ const SPEC: { difficulty: Difficulty; count: number }[] = [
 // the room centroid with anti-adjacency guard. 2×1 wall-huggers may swap to
 // 1×2 footprint when placed on a vertical wall. Cached v18 boards have old
 // random names, no rotation, and occasional 1-cell slivers.
-const KEY = 'murdoku_catalog_v19'
+// v20: very-easy-2 ("The Empty Chair") is now hand-authored instead of
+// procedurally generated — the pilot for src/data/cases/. Cached v19 lists
+// still hold the old generated version.
+const KEY = 'murdoku_catalog_v20'
 let puzzles: Puzzle[] = []
 
 function slug(s: string) { return s.toLowerCase().replace(/\s+/g, '-') }
@@ -93,13 +98,14 @@ function plan(): { difficulty: Difficulty; index: number; caseNumber: number }[]
 }
 
 function buildOne(spec: { difficulty: Difficulty; index: number; caseNumber: number }): Puzzle | null {
-  reseed(hash(spec.difficulty) + spec.index * 7919 + 13)
+  const caseSlug = `${slug(spec.difficulty)}-${spec.index + 1}`
+  const caseNo = `Case No. ${roman(spec.caseNumber)}`
   try {
-    const p = generatePuzzle(
-      spec.difficulty,
-      `${slug(spec.difficulty)}-${spec.index + 1}`,
-      `Case No. ${roman(spec.caseNumber)}`,
-    )
+    const authored = AUTHORED_CASES[caseSlug]
+    const p = authored ? buildAuthoredPuzzle(authored, caseNo) : (() => {
+      reseed(hash(spec.difficulty) + spec.index * 7919 + 13)
+      return generatePuzzle(spec.difficulty, caseSlug, caseNo)
+    })()
     // Guarantee distinct titles. Case numbers come from the plan, so a rare
     // failed seed leaves a gap rather than renumbering everything after it.
     p.title = UNIQUE_TITLES[(spec.caseNumber - 1) % UNIQUE_TITLES.length]

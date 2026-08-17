@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { generatePuzzle, reseed } from '../src/core/generate'
-import { cellFloor } from '../src/core/types'
+import { cellFloor, furnitureCells, furnitureFootprint } from '../src/core/types'
 
 // ============================================================================
 // Realism invariants — the properties that make a board read as a house, not
@@ -192,6 +192,50 @@ describe('furniture rotation realism', () => {
     expect(total, 'no wall-huggers were placed at all').toBeGreaterThan(0)
     // At least 40% should have non-zero rotation (i.e. right/bottom/left walls)
     expect(nonZero / total).toBeGreaterThan(0.4)
+  })
+})
+
+describe('furniture placement integrity', () => {
+  it('no two furniture pieces occupy the same cell (any tier/seed)', () => {
+    const tiers = ['Very Easy', 'Easy', 'Medium', 'Hard', 'Expert', 'Master'] as const
+    for (const tier of tiers) {
+      for (const s of SEEDS) {
+        reseed(s)
+        const p = generatePuzzle(tier, 'test', 'No.1')
+        const seen = new Set<string>()
+        for (const f of p.furniture) {
+          for (const c of furnitureCells(f)) {
+            const key = `${f.floor ?? 0}:${c.row},${c.col}`
+            expect(seen.has(key), `seed ${s} ${tier}: two pieces both claim cell ${key}`).toBe(false)
+            seen.add(key)
+          }
+        }
+      }
+    }
+  })
+
+  it('a non-square footprint rotated 90/270 has its bounding box swapped to match (no visual overflow into the next row/col)', () => {
+    // A 2×1 piece facing east/west visually turns to portrait; if its grid
+    // bounding box stays landscape (w=2,h=1) the rotated icon spills out of
+    // its own row into the neighbouring row, visually overlapping whatever
+    // furniture sits there (regression: sofa rendered on top of the TV above it).
+    const tiers = ['Very Easy', 'Easy', 'Medium', 'Hard', 'Expert', 'Master'] as const
+    for (const tier of tiers) {
+      for (const s of SEEDS) {
+        reseed(s)
+        const p = generatePuzzle(tier, 'test', 'No.1')
+        for (const f of p.furniture) {
+          const { w, h } = furnitureFootprint(f)
+          if (w === h) continue // square footprints can't mismatch
+          const rot = f.rotation ?? 0
+          const shouldBePortrait = rot === 90 || rot === 270
+          expect(
+            shouldBePortrait ? h > w : w > h,
+            `seed ${s} ${tier}: ${f.type} at (${f.row},${f.col}) has w=${w} h=${h} rotation=${rot} — bounding box does not match visual orientation`,
+          ).toBe(true)
+        }
+      }
+    }
   })
 })
 

@@ -92,7 +92,7 @@ const NAMES = [
 // glance — this is an identity function, not decoration.
 // NOTE: changing these changes generated puzzle data. Bump the catalog cache
 // key in catalog.ts or returning players keep the old palette from localStorage.
-const ACCENTS = [
+export const ACCENTS = [
   '#B08D57', // aged brass
   '#6E8CA0', // steel blue
   '#8A7CA8', // dusty violet
@@ -661,6 +661,14 @@ function placeFurniture(
     })
     if (adjacentSame) rot = ((rot + 180) % 360) as 0 | 90 | 180 | 270
 
+    // A non-square footprint (sofa) rotated to face east/west visually turns
+    // 90° in place, but its grid bounding box stayed w×h (landscape) — the
+    // rotated icon then spilled out of its own row into the row above/below,
+    // overlapping whatever furniture sat there. Wall-huggers already swap w/h
+    // for this case (see tryPlaceWallHugger); seating needs the same swap.
+    if ((rot === 90 || rot === 270) && fp.w !== fp.h) {
+      return tryPlaceWithDims(t, row, col, roomId, fp.h, fp.w, rot)
+    }
     return tryPlaceWithDims(t, row, col, roomId, fp.w, fp.h, rot)
   }
 
@@ -772,7 +780,7 @@ function placeFurniture(
 
 // --- candidate clues -------------------------------------------------------
 
-function candidateClues(p: Puzzle): Clue[] {
+export function candidateClues(p: Puzzle): Clue[] {
   const out: Clue[] = []
   const size = p.size
   const twoFloor = (p.floors ?? 1) > 1
@@ -860,7 +868,7 @@ function candidateClues(p: Puzzle): Clue[] {
 }
 
 // how "direct"/easy a clue is — lower = easier/more concrete
-function clueDirectness(c: Clue): number {
+export function clueDirectness(c: Clue): number {
   switch (c.kind) {
     case 'room': return 0
     case 'onFurniture': return 1
@@ -1414,7 +1422,7 @@ function toClueText(p: Puzzle, clues: Clue[]): ClueText[] {
 }
 
 /** Remove redundant clues while keeping a unique solution and ≥1 clue/person. */
-function pruneClues(p: Puzzle, clues: Clue[]): Clue[] {
+export function pruneClues(p: Puzzle, clues: Clue[]): Clue[] {
   let cur = [...clues]
   for (const c of shuffle([...cur])) {
     const trial = cur.filter(x => x !== c)
