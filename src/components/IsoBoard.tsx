@@ -78,6 +78,31 @@ const ROOM_TINT: Record<string, string> = {
   Porch: 'rgba(220,200,150,0.20)',
 }
 
+/**
+ * DOLLHOUSE PALETTE — the daylight direction, declared in one place.
+ *
+ * DESIGN.md still documents the noire board (espresso floors, bone marks, brass
+ * accents), and none of these values belong to it. That is a real divergence,
+ * not a false positive: this branch deliberately replaces the art direction to
+ * suit artwork lit for bright rooms, so DESIGN.md needs rewriting before this
+ * merges anywhere. Collecting the values here rather than scattering literals
+ * through the component keeps that rewrite to a single reviewable surface.
+ */
+const SKIN = {
+  /** Token plate — white so a portrait reads against any floor. */
+  tokenPlate: '#FFFFFF',
+  tokenPlateConflict: '#E14B4B',
+  tokenShadow: 'rgba(20,15,10,0.45)',
+  contactShadow: 'rgba(20,15,10,0.35)',
+  /** Marks are DARK now: the floors are light, inverting the noire treatment. */
+  markInk: '#3A2A18',
+  markHalo: 'rgba(255,255,255,0.8)',
+  draftPlate: '#FFF8E6',
+  draftInk: '#2A1D10',
+  ghostRing: 'rgba(80,60,40,0.55)',
+  seam: 'rgba(60,45,30,0.22)',
+}
+
 /** Lane palette. Selection is the loudest thing on the board, by design. */
 // MEASURED against the artwork, not picked by eye. A 50%-alpha amber wash over
 // Kenney's orange floorboards is very nearly invisible, and a cyan wash over the
@@ -262,7 +287,7 @@ export default function IsoBoard({
                   key={`t${r}-${c}`}
                   points={diamond(r, c)}
                   fill={ROOM_TINT[roomName(r, c)] ?? 'transparent'}
-                  stroke="rgba(60,45,30,0.22)"
+                  stroke={SKIN.seam}
                   strokeWidth={1}
                 />
               )),
@@ -412,12 +437,12 @@ export default function IsoBoard({
                   >
                     <div style={{
                       position: 'absolute', left: 18, top: 116, width: 64, height: 22,
-                      borderRadius: '50%', background: 'rgba(20,15,10,0.35)', filter: 'blur(3px)',
+                      borderRadius: '50%', background: SKIN.contactShadow, filter: 'blur(3px)',
                     }} />
                     <div style={{
                       width: 100, borderRadius: 12, padding: 5,
-                      background: bad ? '#E14B4B' : '#FFFFFF',
-                      boxShadow: '0 8px 16px rgba(20,15,10,0.45)',
+                      background: bad ? SKIN.tokenPlateConflict : SKIN.tokenPlate,
+                      boxShadow: `0 8px 16px ${SKIN.tokenShadow}`,
                     }}>
                       <Avatar seed={p.avatarSeed} accent={p.accent} size={90} dead={p.isVictim} name={p.name} />
                     </div>
@@ -433,7 +458,7 @@ export default function IsoBoard({
                       position: 'absolute', left: cx - 18, top: cy - 22,
                       zIndex: 880 + (r + c) * 2, pointerEvents: 'none',
                       fontSize: 38, fontWeight: 800, lineHeight: 1,
-                      color: '#3A2A18', textShadow: '0 1px 0 rgba(255,255,255,0.8)',
+                      color: SKIN.markInk, textShadow: `0 1px 0 ${SKIN.markHalo}`,
                     }}
                   >×</div>
                 )
@@ -453,8 +478,8 @@ export default function IsoBoard({
                       const p = personById(pid)
                       return p ? (
                         <span key={pid} style={{
-                          width: 24, height: 24, borderRadius: 5, background: '#FFF8E6',
-                          border: `2px solid ${p.accent}`, color: '#2A1D10',
+                          width: 24, height: 24, borderRadius: 5, background: SKIN.draftPlate,
+                          border: `2px solid ${p.accent}`, color: SKIN.draftInk,
                           fontSize: 13, fontWeight: 800, display: 'grid', placeItems: 'center',
                         }}>{p.name[0]}</span>
                       ) : null
@@ -470,7 +495,7 @@ export default function IsoBoard({
                     style={{
                       position: 'absolute', left: cx - 18, top: cy - 18,
                       width: 36, height: 36, borderRadius: '50%',
-                      border: '2px dashed rgba(80,60,40,0.55)',
+                      border: `2px dashed ${SKIN.ghostRing}`,
                       zIndex: 860 + (r + c) * 2, pointerEvents: 'none',
                     }}
                   />
