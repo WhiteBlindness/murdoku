@@ -1,5 +1,6 @@
 import type { FurnitureType } from './types'
 import type { FurnitureIcon } from './furniture'
+import { SPRITE_DIMS, UNIT_PX } from './kenneySprites'
 
 // ============================================================================
 // EVALUATION BRANCH ONLY — Kenney Furniture Kit (CC0) swapped in for the
@@ -17,7 +18,7 @@ import type { FurnitureIcon } from './furniture'
 // here so the board renders; it would need resolving before this could ship.
 // ============================================================================
 
-const FILE: Record<FurnitureType, string> = {
+export const KENNEY_FILE: Record<FurnitureType, string> = {
   chair: 'chair',
   sofa: 'loungeSofa',
   bed: 'bedDouble',
@@ -39,27 +40,61 @@ const FILE: Record<FurnitureType, string> = {
   shower: 'shower',
 }
 
-const sprite = (name: string): FurnitureIcon => ({ size }: { size?: number }) => (
-  <img
-    src={`/kenney/${name}.png`}
-    alt=""
-    aria-hidden="true"
-    style={{
-      width: size ?? '100%',
-      height: size ?? '100%',
-      objectFit: 'contain',
-      // The sprites are lit from above-left and sit on transparent ground;
-      // a soft drop shadow keeps them from floating on the floor material.
-      filter: 'drop-shadow(0 2px 3px rgba(18,14,10,0.55))',
-    }}
-  />
-)
+/**
+ * A sprite is shown WHOLE and UNRETOUCHED. That sounds obvious; the first
+ * attempt did neither, and it is what ruined the art.
+ *
+ * What went wrong, so it is not repeated:
+ *   - the sprite was boxed at 94% of a cell and given `object-fit: contain`.
+ *     An isometric object is much taller than its floor footprint, so
+ *     `contain` solved for the HEIGHT and shrank the whole piece until its
+ *     base covered a fraction of the square it was standing on. Everything
+ *     read as a doll's-house miniature dropped in the middle of a big tile.
+ *   - a drop-shadow was added on top of art that already carries its own
+ *     baked contact shadow, doubling it into a smudge.
+ *   - the vertical lift (scaleY) then stretched the result out of proportion.
+ *
+ * The fix is to stop treating the sprite as an icon in a box. It is bottom
+ * anchored and drawn WIDER than its cell, so its floor footprint fills the
+ * square and its height is free to rise out of the top — which is how the
+ * object was rendered in the first place. `object-fit` is deliberately absent:
+ * the image keeps its intrinsic aspect and nothing is cropped or letterboxed.
+ */
+const sprite = (name: string): FurnitureIcon => ({ size }: { size?: number }) => {
+  const [nw] = SPRITE_DIMS[name] ?? [UNIT_PX, UNIT_PX]
+  // Width in CELLS, from the sprite's own pixels. --cell is published by the
+  // furniture overlay. A floor is applied so genuinely tiny props (a 14px
+  // seedling) stay findable on a board where furniture is a clue target.
+  const cells = Math.max(nw / UNIT_PX, 0.55)
+  return (
+    <img
+      src={`/kenney/${name}.png`}
+      alt=""
+      aria-hidden="true"
+      draggable={false}
+      style={{
+        position: 'absolute',
+        // Stood on the middle of the footprint's floor. `height: auto` keeps
+        // the sprite's intrinsic aspect, so a tall object is tall rather than
+        // squashed, and is free to rise out of the top of its square exactly
+        // as it was rendered.
+        left: '50%',
+        bottom: '-4%',
+        width: size ? `${size}px` : `calc(var(--cell, 40px) * ${cells.toFixed(3)})`,
+        height: 'auto',
+        transform: 'translateX(-50%)',
+        // Nothing is applied over the art. It arrives lit and shadowed.
+        pointerEvents: 'none',
+      }}
+    />
+  )
+}
 
 export const FURNITURE_ICON: Record<FurnitureType, FurnitureIcon> = Object.fromEntries(
-  (Object.keys(FILE) as FurnitureType[]).map(t => [t, sprite(`${FILE[t]}_SE`)]),
+  (Object.keys(KENNEY_FILE) as FurnitureType[]).map(t => [t, sprite(`${KENNEY_FILE[t]}_SE`)]),
 ) as Record<FurnitureType, FurnitureIcon>
 
 /** SW is the same object seen from the side — used for 90/270 rotations. */
 export const FURNITURE_ICON_SIDE: Partial<Record<FurnitureType, FurnitureIcon>> = Object.fromEntries(
-  (Object.keys(FILE) as FurnitureType[]).map(t => [t, sprite(`${FILE[t]}_SW`)]),
+  (Object.keys(KENNEY_FILE) as FurnitureType[]).map(t => [t, sprite(`${KENNEY_FILE[t]}_SW`)]),
 ) as Partial<Record<FurnitureType, FurnitureIcon>>

@@ -131,7 +131,12 @@ describe('furniture overhang — depth without leaving the floor', () => {
 // box, the rotation moves to a child with a CENTRE origin. These tests pin that
 // split so the two can never be recombined onto one origin again.
 // ============================================================================
-describe('furniture rotation pivots about the centre, never the bottom edge', () => {
+// BRANCH NOTE: the sprite board has NO CSS rotation to test. Kenney ships four
+// pre-rendered facings per object, so a turned piece is real artwork rather
+// than a spun copy — which is strictly better than the invariant these tests
+// were protecting. They remain correct and active on main, where the hand-drawn
+// SVGs are still rotated.
+describe.skip('furniture rotation pivots about the centre, never the bottom edge', () => {
   function rotatedPuzzle(type: FurnitureType, rotation: 0 | 90 | 180 | 270, w = 1, h = 1): Puzzle {
     const cells = [0, 1, 2, 3].flatMap(row => [0, 1, 2, 3].map(col => ({ row, col })))
     return {
@@ -185,7 +190,10 @@ describe('furniture rotation pivots about the centre, never the bottom edge', ()
   })
 })
 
-describe('furniture icon geometry — fills its footprint, never spills', () => {
+// BRANCH NOTE: the icon-box/inset machinery this asserts is exactly what
+// letterboxed the Kenney sprites into miniatures; the sprite path removed it and
+// sizes from intrinsic pixels instead. Active on main.
+describe.skip('furniture icon geometry — fills its footprint, never spills', () => {
   function makePuzzle(type: FurnitureType): Puzzle {
     const cells = [0, 1, 2, 3].flatMap(row => [0, 1, 2, 3].map(col => ({ row, col })))
     return {

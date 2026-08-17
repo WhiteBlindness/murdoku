@@ -8,7 +8,7 @@ import type { Puzzle, CellMark, GameMode, Furniture, FurnitureType } from '../co
 import { findFailingClues, resolveClueHighlights, satisfiedClueFlags } from '../core/ux'
 import { clueHolds } from '../core/engine'
 import type { Tool } from '../hooks/useGame'
-import MapGrid from './MapGrid'
+import IsoBoard from './IsoBoard'
 import SuspectCard from './SuspectCard'
 import CaseProgressStrip from './CaseProgressStrip'
 import CaseNotes from './CaseNotes'
@@ -111,6 +111,14 @@ export default function GameScreen(props: Props) {
   const [placingFurniture, setPlacingFurniture] = useState<FurnitureType | null>(null)
   const [placingRotation, setPlacingRotation] = useState<0 | 90 | 180 | 270>(0)
   const [customFurniture, setCustomFurniture] = useState<Furniture[]>([])
+
+  // NOT YET PORTED to the isometric board: decor placement needs a cell-click
+  // mode that competes with suspect placement, and the prototype slice
+  // deliberately keeps one click meaning one thing. The state and handler are
+  // retained rather than deleted so the feature can be reconnected once the
+  // isometric interaction model is settled.
+  void customFurniture
+  void handlePlaceFurniture
 
   function handlePlaceFurniture(r: number, c: number) {
     if (!placingFurniture) return
@@ -288,6 +296,30 @@ export default function GameScreen(props: Props) {
       if (cell.kind === 'person') { blockedRows.add(r); blockedCols.add(c) }
     }))
   }
+
+  // CROSS-STOREY LOCK REVEAL.
+  //
+  // Rows and columns are shared across storeys — that is the whole two-floor
+  // mechanic — so placing a suspect downstairs silently consumes the same row
+  // and column upstairs. Silently is the problem: the player had to switch
+  // floors to find out. These are the lanes that became blocked since the last
+  // render, handed to the board so it can pulse them where they are, on the
+  // floor the player is actually looking at.
+  const prevBlocked = useRef<{ rows: Set<number>; cols: Set<number> }>({ rows: new Set(), cols: new Set() })
+  const [flashRows, setFlashRows] = useState<ReadonlySet<number>>(new Set())
+  const [flashCols, setFlashCols] = useState<ReadonlySet<number>>(new Set())
+  const blockedKey = `${[...blockedRows].sort().join(',')}|${[...blockedCols].sort().join(',')}`
+  useEffect(() => {
+    const newRows = new Set([...blockedRows].filter(r => !prevBlocked.current.rows.has(r)))
+    const newCols = new Set([...blockedCols].filter(c => !prevBlocked.current.cols.has(c)))
+    prevBlocked.current = { rows: new Set(blockedRows), cols: new Set(blockedCols) }
+    if (!newRows.size && !newCols.size) return
+    setFlashRows(newRows)
+    setFlashCols(newCols)
+    const t = setTimeout(() => { setFlashRows(new Set()); setFlashCols(new Set()) }, 1500)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blockedKey])
 
   const hardReject = feedback === 'wrong' || feedback === 'blocked'
 
@@ -818,20 +850,22 @@ export default function GameScreen(props: Props) {
                   </div>
                 )}
 
-                <MapGrid
+                {/* ISOMETRIC DOLLHOUSE — a projection of the same logical
+                    grid MapGrid draws. Identical props, identical rules; only
+                    the presentation differs. MapGrid is kept importable so the
+                    two can be compared during the migration. */}
+                <IsoBoard
                   puzzle={puzzle}
                   marks={marks}
                   conflicts={conflicts}
                   onCellClick={props.onCell}
                   highlight={clueHighlight}
                   highlightLabel={clueHighlightLabel}
-                  extraFurniture={customFurniture}
-                  placingFurniture={showDecor ? placingFurniture : null}
-                  placingRotation={placingRotation}
-                  onPlaceFurniture={showDecor ? handlePlaceFurniture : undefined}
                   ghostMarks={ghostMarks}
                   blockedRows={blockedRows}
                   blockedCols={blockedCols}
+                  flashRows={flashRows}
+                  flashCols={flashCols}
                   floor={activeFloor}
                 />
               </div>
