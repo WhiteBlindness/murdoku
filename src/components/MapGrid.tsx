@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { X, Lock } from 'lucide-react'
 import type { Puzzle, Cell, CellMark, Furniture, FurnitureType } from '../core/types'
 import { furnitureCells, furnitureFootprint } from '../core/types'
-import { FURNITURE_ICON, FURNITURE_NAME, FURNITURE_OVERHANG } from '../core/furniture'
+import { FURNITURE_ICON, FURNITURE_ICON_SIDE, FURNITURE_NAME, FURNITURE_OVERHANG } from '../core/furniture'
 import { floorStyle, isDarkFloor, roomMaterial } from '../core/roomMaterials'
 import Avatar from './Avatar'
 
@@ -539,9 +539,18 @@ export default function MapGrid({
           }}
         >
           {allFurniture.map((f, i) => {
-            const Icon = FURNITURE_ICON[f.type]
             const { w, h } = furnitureFootprint(f)
             const rot = f.rotation ?? 0
+            // A piece with purpose-drawn side artwork is never spun by CSS: the
+            // turned view is DRAWN, so its top plane and light stay put. 270deg
+            // is the same drawing mirrored, which a cabinet projection survives
+            // (a mirror keeps the top plane on top and the front face forward).
+            const sideIcon = FURNITURE_ICON_SIDE[f.type]
+            const useSideArt = (rot === 90 || rot === 270) && !!sideIcon
+            const Icon = useSideArt ? sideIcon! : FURNITURE_ICON[f.type]
+            const artTransform = useSideArt
+              ? (rot === 270 ? 'scaleX(-1)' : undefined)
+              : (rot ? `rotate(${rot}deg)` : undefined)
             // A piece under a suspect token or a struck-out cell steps back
             // rather than disappearing, so the room keeps its shape.
             const covered = furnitureCells(f)
@@ -568,7 +577,9 @@ export default function MapGrid({
             // tall — a tiny sofa marooned in a tall gap, which is what the
             // live board showed. Swapping the box back to landscape and
             // rotating it lands the art flush inside the real footprint.
-            const rotSwap = (rot === 90 || rot === 270) && w !== h
+            // Side artwork is already drawn portrait, so it needs no box swap —
+            // only the rotate-the-drawing fallback does.
+            const rotSwap = (rot === 90 || rot === 270) && w !== h && !useSideArt
             const overhangBase = FURNITURE_OVERHANG[f.type] ?? 0
             // Depth must not cross a room wall. The lift is a uniform scale, so
             // it grows sideways as well as up; letting that spill past a
@@ -694,7 +705,7 @@ export default function MapGrid({
                       width: '100%',
                       height: '100%',
                       transformOrigin: 'center center',
-                      transform: rot ? `rotate(${rot}deg)` : undefined,
+                      transform: artTransform,
                     }}
                   >
                     <Icon />
