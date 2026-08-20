@@ -50,7 +50,17 @@ const SPEC: { difficulty: Difficulty; count: number }[] = [
 // v20: very-easy-2 ("The Empty Chair") is now hand-authored instead of
 // procedurally generated — the pilot for src/data/cases/. Cached v19 lists
 // still hold the old generated version.
-const KEY = 'murdoku_catalog_v20'
+// v21: very-easy-1 ("Midnight Delivery") is now hand-authored — the vertical
+// slice the isometric-dollhouse presentation is designed and screenshotted
+// against. Cached v20 lists still hold the old procedural version.
+// v22: very-easy-1's furniture density increased (19 pieces, 3+ per room)
+// after an art review called the rooms under-furnished. Cached v21 lists
+// still hold the sparser version.
+// v23: very-easy-1's rugs removed — at Kenney's native sprite size a rug
+// covers far more than its cell and is the most saturated thing on the
+// board, which is why the scene read as "giant red squares" rather than a
+// room. Cached v22 lists still hold them.
+const KEY = 'murdoku_catalog_v23'
 let puzzles: Puzzle[] = []
 
 function slug(s: string) { return s.toLowerCase().replace(/\s+/g, '-') }

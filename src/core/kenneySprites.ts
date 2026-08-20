@@ -157,10 +157,14 @@ export const SPRITE_DIMS: Record<string, [number, number]> = {
 
 /** One isometric cell, in sprite pixels — the width of floorFull. */
 export const TILE_W = 208
-/** Height of the diamond's top face. Kenney's projection is 2:1. */
-export const TILE_H = 104
-/** Slab thickness drawn below the diamond face (floorFull is 152 tall). */
-export const TILE_THICK = 48
+/**
+ * Height of the diamond's top face. The PNG canvas is about 152px high:
+ * 148px belong to the projected floor plane and only 4–5px to its lip.
+ * Treating that canvas as 104px + 48px compressed every board axis.
+ */
+export const TILE_H = 148
+/** Deliberate miniature plinth depth; independent from the floor PNG lip. */
+export const TILE_THICK = 18
 
 /** One grid unit in sprite pixels for the non-isometric fallback path. */
 export const UNIT_PX = 92

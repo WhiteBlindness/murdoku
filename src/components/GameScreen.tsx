@@ -8,6 +8,7 @@ import type { Puzzle, CellMark, GameMode, Furniture, FurnitureType } from '../co
 import { findFailingClues, resolveClueHighlights, satisfiedClueFlags } from '../core/ux'
 import { clueHolds } from '../core/engine'
 import type { Tool } from '../hooks/useGame'
+import { TILE_H, TILE_THICK, TILE_W } from '../core/kenneySprites'
 import IsoBoard from './IsoBoard'
 import SuspectCard from './SuspectCard'
 import CaseProgressStrip from './CaseProgressStrip'
@@ -74,7 +75,11 @@ function LegendContent() {
 }
 
 export default function GameScreen(props: Props) {
-  const { puzzle, mode, marks, conflicts, placedOf, selectedPerson, tool, hintsLeft, timer, hideTimer, feedback, correctCount, resolvedClues } = props
+  const {
+    puzzle, mode, marks, conflicts, placedOf, selectedPerson, tool, hintsLeft,
+    timer, hideTimer, feedback, correctCount, resolvedClues,
+    onSelectPerson: selectPerson, onSetTool: setTool, onCell: commitCell,
+  } = props
   const cluesOf: Record<string, string[]> = {}
   for (const ct of puzzle.clues) (cluesOf[ct.clue.person] ||= []).push(ct.text)
   const placedCount = Object.keys(placedOf).length
@@ -94,6 +99,7 @@ export default function GameScreen(props: Props) {
 
   const [help, setHelp] = useState(false)
   const [legend, setLegend] = useState(false)
+  const [placementArmed, setPlacementArmed] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const menuTriggerRef = useRef<HTMLButtonElement>(null)
   const menuPanelRef = useRef<HTMLDivElement>(null)
@@ -105,6 +111,26 @@ export default function GameScreen(props: Props) {
   const clearDescriptionId = useId()
   const stayRef = useRef<HTMLButtonElement>(null)
   const cancelClearRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (tool !== 'place') setPlacementArmed(false)
+  }, [tool])
+
+  const selectForPlacement = useCallback((personId: string) => {
+    selectPerson(personId)
+    if (tool === 'place') setPlacementArmed(true)
+  }, [selectPerson, tool])
+
+  const activatePlaceTool = useCallback(() => {
+    setTool('place')
+    if (selectedPerson) setPlacementArmed(true)
+  }, [setTool, selectedPerson])
+
+  const handleBoardCell = useCallback((row: number, col: number) => {
+    if (tool === 'place' && !placementArmed) return
+    commitCell(row, col)
+    if (tool === 'place') setPlacementArmed(false)
+  }, [commitCell, placementArmed, tool])
 
   // Furniture decoration editor
   const [showDecor, setShowDecor] = useState(false)
@@ -390,7 +416,7 @@ export default function GameScreen(props: Props) {
       // Never steal a keystroke from the case-notes field or any other input.
       if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement || active?.isContentEditable) return
       switch (event.key.toLowerCase()) {
-        case 'p': onSetTool('place'); break
+        case 'p': activatePlaceTool(); break
         case 'x': onSetTool('x'); break
         case 'd': if (detective) onSetTool('draft'); else return; break
         case 'h': if (!detective) onHint(); else return; break
@@ -401,7 +427,7 @@ export default function GameScreen(props: Props) {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [modalOpen, detective, onSetTool, onHint, onAssist])
+  }, [modalOpen, detective, activatePlaceTool, onSetTool, onHint, onAssist])
 
   useEffect(() => {
     try { if (!localStorage.getItem(HELP_KEY)) { setHelp(true); localStorage.setItem(HELP_KEY, '1') } } catch { /* ignore */ }
@@ -683,7 +709,7 @@ export default function GameScreen(props: Props) {
             placedOf={placedOf}
             conflicts={conflicts}
             selectedPerson={selectedPerson}
-            onSelectPerson={props.onSelectPerson}
+            onSelectPerson={selectForPlacement}
           />
         </div>
 
@@ -817,13 +843,28 @@ export default function GameScreen(props: Props) {
           <div className="order-1 lg:flex-1 lg:min-h-0 lg:relative">
             {/* Absolute fill at desktop only; on mobile this is just a normal div */}
             <div className="lg:absolute lg:inset-0 flex items-center justify-center p-3 lg:p-3 lg:[container-type:size]">
-              {/* Square that fits the shorter of available width / height.
-                  Mobile: w-full drives size; aspect-square derives the height
+              {/* Fits the shorter of available width / height, at the
+                  board's OWN aspect ratio rather than a forced square — the
+                  isometric scene is measurably wider than tall (see IsoBoard's
+                  boardW/boardH), and forcing it into a square slot wasted a
+                  large fraction of the box as empty space above or below it.
+                  Mobile: w-full drives size, aspect-ratio derives the height
                     (parent has no fixed height so height:100% would be 0).
-                  Desktop (lg+): container-query units let width and height use
-                    the same smaller value, preserving square cells at any
-                    centre-column width or viewport height. */}
-              <div className="aspect-square w-full lg:w-[min(100cqw,100cqh)] lg:h-[min(100cqw,100cqh)]">
+                  Desktop (lg+): container-query units pick whichever of
+                    width/height is the binding constraint at this ratio. */}
+              <div
+                className="w-full lg:w-[min(100cqw,calc(100cqh*var(--board-ratio)))] lg:h-[min(100cqh,calc(100cqw/var(--board-ratio)))]"
+                style={{
+                  // Mirrors IsoBoard's boardW/boardH. Constants are imported
+                  // from the renderer's projection source so the slot cannot
+                  // silently retain an obsolete 104px floor height.
+                  ['--board-ratio' as string]: String(
+                    (puzzle.size * TILE_W)
+                      / ((puzzle.size - 1) * TILE_H + TILE_H + TILE_THICK + 150 + 28),
+                  ),
+                  aspectRatio: 'var(--board-ratio)',
+                }}
+              >
                 {/* Floor switcher — only for two-storey houses. Single-floor
                     cases render exactly as before, with no extra chrome. */}
                 {twoFloor && props.onSwitchFloor && (
@@ -858,7 +899,7 @@ export default function GameScreen(props: Props) {
                   puzzle={puzzle}
                   marks={marks}
                   conflicts={conflicts}
-                  onCellClick={props.onCell}
+                  onCellClick={handleBoardCell}
                   highlight={clueHighlight}
                   highlightLabel={clueHighlightLabel}
                   ghostMarks={ghostMarks}
@@ -867,6 +908,7 @@ export default function GameScreen(props: Props) {
                   flashRows={flashRows}
                   flashCols={flashCols}
                   floor={activeFloor}
+                  armedPerson={tool === 'place' && placementArmed ? selectedPerson : null}
                 />
               </div>
             </div>
@@ -923,7 +965,7 @@ export default function GameScreen(props: Props) {
             <div className="flex gap-2 justify-center [&>button]:flex-1 sm:[&>button]:flex-none lg:justify-start">
               <ToolBtn
                 active={tool === 'place'}
-                onClick={() => props.onSetTool('place')}
+                onClick={activatePlaceTool}
                 icon={<MousePointerClick size={16} />}
                 label="Place"
                 title={detective ? 'Place a suspect — crosses out their row & column' : 'Place a suspect'}
@@ -1046,7 +1088,7 @@ export default function GameScreen(props: Props) {
                     showCheck={detective}
                     located={locatedPerson === person.id}
                     canLocate={resolveClueHighlights(puzzle, person.id).length > 0}
-                    onSelect={() => props.onSelectPerson(person.id)}
+                    onSelect={() => selectForPlacement(person.id)}
                     onToggleResolved={() => props.onToggleClue(person.id)}
                     onToggleLocate={() => setLocatedPerson(current => current === person.id ? null : person.id)}
                   />

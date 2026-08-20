@@ -22,7 +22,10 @@ export const KENNEY_FILE: Record<FurnitureType, string> = {
   chair: 'chair',
   sofa: 'loungeSofa',
   bed: 'bedDouble',
-  table: 'tableRound',
+  // tableRound's top hides its legs at this camera angle, so it rendered as a
+  // flat tan disc lying on the floor rather than a table. tableCoffee keeps
+  // visible legs and a readable slab.
+  table: 'tableCoffee',
   box: 'cardboardBoxClosed',
   rug: 'rugRectangle',
   plant: 'pottedPlant',
