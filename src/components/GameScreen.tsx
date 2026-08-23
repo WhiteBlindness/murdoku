@@ -842,7 +842,7 @@ export default function GameScreen(props: Props) {
           */}
           <div className="order-1 lg:flex-1 lg:min-h-0 lg:relative">
             {/* Absolute fill at desktop only; on mobile this is just a normal div */}
-            <div className="lg:absolute lg:inset-0 flex items-center justify-center p-3 lg:p-3 lg:[container-type:size]">
+            <div className="lg:absolute lg:inset-0 flex items-center justify-center p-2 lg:p-3 lg:[container-type:size]">
               {/* Fits the shorter of available width / height, at the
                   board's OWN aspect ratio rather than a forced square — the
                   isometric scene is measurably wider than tall (see IsoBoard's

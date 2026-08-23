@@ -259,6 +259,13 @@ describe('GameScreen layout composition', () => {
     const boardWrapper = screen.getByTestId('board').parentElement
     expect(boardWrapper?.style.aspectRatio).toBe('var(--board-ratio)')
   })
+
+  it('uses tighter mobile padding without changing the desktop breathing room', () => {
+    localStorage.setItem('murdoku_seen_help', '1')
+    renderGame()
+    const boardSlot = screen.getByTestId('board').parentElement?.parentElement
+    expect(boardSlot).toHaveClass('p-2', 'lg:p-3')
+  })
 })
 
 describe('GameScreen placement arming', () => {

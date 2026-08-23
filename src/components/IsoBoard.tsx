@@ -3,7 +3,13 @@ import type { Puzzle, Cell, CellMark, Furniture, FurnitureType } from '../core/t
 import { furnitureCells, furnitureFootprint } from '../core/types'
 import { KENNEY_FILE } from '../core/kenneyIcons'
 import { SPRITE_DIMS, TILE_W, TILE_H, TILE_THICK } from '../core/kenneySprites'
-import { getSceneWalls, getSceneDecor } from '../core/handScenes'
+import {
+  getSceneDecor,
+  getSceneFloorAccents,
+  getSceneFloorFinishes,
+  getSceneFurnitureVisual,
+  getSceneWalls,
+} from '../core/handScenes'
 import Avatar from './Avatar'
 
 // ============================================================================
@@ -86,7 +92,7 @@ const SKIN = {
   floor: '#FFC978',
 }
 
-/** Lane palette. Selection is the loudest thing on the board, by design. */
+/** Lane palette. Selection stays legible without outshouting the diorama. */
 // MEASURED against the artwork, not picked by eye. A 50%-alpha amber wash over
 // Kenney's orange floorboards is very nearly invisible, and a cyan wash over the
 // lawn is no better — the lane data was correct on the first pass and still
@@ -100,7 +106,7 @@ const LANE = {
   rowEdge: '#B25E00',
   col: 'rgba(40,170,255,0.62)',       // cyan — the column lane
   colEdge: '#0A5C99',
-  cross: 'rgba(255,255,255,0.92)',    // their intersection: the selected cell
+  cross: 'rgba(255,255,255,0.92)',    // legacy treatment for scenes not yet art-directed
   crossEdge: '#1B1206',
   locked: 'rgba(90,215,130,0.34)',    // completed, persistent and quiet
   lockedEdge: 'rgba(24,96,52,0.85)',
@@ -129,6 +135,7 @@ export default function IsoBoard({
   flashRows, flashCols, armedPerson = null,
 }: Props) {
   const N = puzzle.size
+  const isMidnightDelivery = puzzle.id === 'very-easy-1'
   const [active, setActive] = useState<{ row: number; col: number } | null>(null)
 
   // The scene is authored at native sprite pixels and scaled to fit as ONE
@@ -258,6 +265,8 @@ export default function IsoBoard({
   // direction is approved; this is deliberately not derived from room data.
   const walls = useMemo(() => getSceneWalls(puzzle.id), [puzzle.id])
   const decor = useMemo(() => getSceneDecor(puzzle.id), [puzzle.id])
+  const floorFinishes = useMemo(() => getSceneFloorFinishes(puzzle.id), [puzzle.id])
+  const floorAccents = useMemo(() => getSceneFloorAccents(puzzle.id), [puzzle.id])
 
   // ---- Occlusion -----------------------------------------------------------
   // A piece nearer the viewer than the cell being inspected, and overlapping it
@@ -313,12 +322,8 @@ export default function IsoBoard({
           }}
         >
           {/* ---------------- PLINTH ----------------
-              Each floor sprite carries its own slab thickness, so at the
-              board's outer edge those thicknesses ended in a row of separate
-              teeth with notches between them — the house looked like it was
-              standing on a torn strip rather than a solid base. This is one
-              polygon under all of them tracing the board's outline and
-              dropping TILE_THICK, so the foundation reads as a single block. */}
+              Two camera-facing foundation faces keep the miniature grounded
+              without turning the floor into one thick orange game slab. */}
           {(() => {
             const hw = TILE_W / 2, hh = TILE_H / 2, th = TILE_THICK
             const R = project(0, N - 1)
@@ -326,35 +331,41 @@ export default function IsoBoard({
             const right = [R.left + TILE_W, R.top + hh]
             const bottom = [B.left + hw, B.top + TILE_H]
             const leftPt = [L.left, L.top + hh]
-            // Only the SKIRT (the two front-facing sides), drawn ABOVE the
-            // floor tiles. Underneath them it was useless: every tile paints
-            // its own dark lower-left edge on top, and at the board boundary
-            // those edges are exposed as a row of teeth. One band over the
-            // top of them turns the foundation into a single clean block.
-            const pts = [
-              right, bottom, leftPt,
-              [leftPt[0], leftPt[1] + th],
-              [bottom[0], bottom[1] + th],
-              [right[0], right[1] + th],
-            ].map(p => p.join(',')).join(' ')
+            const pointList = (points: number[][]) => points.map(point => point.join(',')).join(' ')
             return (
               <svg
                 width={boardW} height={boardH}
                 style={{ position: 'absolute', inset: 0, zIndex: 20, pointerEvents: 'none' }}
               >
-                <polygon points={pts} fill="#C4762F" />
+                <polygon
+                  data-plinth-face="right"
+                  points={pointList([right, bottom, [bottom[0], bottom[1] + th], [right[0], right[1] + th]])}
+                  fill="#B86C35"
+                />
+                <polygon
+                  data-plinth-face="left"
+                  points={pointList([bottom, leftPt, [leftPt[0], leftPt[1] + th], [bottom[0], bottom[1] + th]])}
+                  fill="#955128"
+                />
+                <polyline
+                  points={pointList([right, bottom, leftPt])}
+                  fill="none"
+                  stroke="rgba(255,225,179,0.68)"
+                  strokeWidth={2}
+                />
+                <polyline
+                  points={pointList([[right[0], right[1] + th], [bottom[0], bottom[1] + th], [leftPt[0], leftPt[1] + th]])}
+                  fill="none"
+                  stroke="rgba(83,42,23,0.55)"
+                  strokeWidth={2}
+                />
               </svg>
             )
           })()}
 
           {/* ---------------- FLOOR ----------------
-              ONE continuous surface, not 36 tiled sprites.
-              Each Kenney floor sprite carries its own slab thickness and its
-              own dark lower edge, so tiling them painted a step at every cell
-              boundary — which is precisely why the house read as "a bunch of
-              disconnected stairs/platforms" rather than one building. Drawn as
-              geometry there are no internal edges at all. Room identity comes
-              from walls and furnishing, not from the floor. */}
+              One unbroken house surface with room-scale material fields.
+              There are no cell polygons and no permanent room labels. */}
           {(() => {
             const hw = TILE_W / 2, hh = TILE_H / 2
             const T = project(0, 0), R = project(0, N - 1)
@@ -364,24 +375,89 @@ export default function IsoBoard({
               [R.left + TILE_W, R.top + hh],
               [B.left + hw, B.top + TILE_H],
               [L.left, L.top + hh],
-            ].map(p => p.join(',')).join(' ')
+            ].map(point => point.join(',')).join(' ')
             return (
               <svg
                 width={boardW} height={boardH}
                 style={{ position: 'absolute', inset: 0, zIndex: 10, pointerEvents: 'none' }}
               >
-                <polygon data-floor-surface="" points={pts} fill={SKIN.floor} />
+                <defs>
+                  {floorFinishes.map(finish => (
+                    <pattern
+                      key={finish.material}
+                      id={'room-material-' + finish.material}
+                      patternUnits="userSpaceOnUse"
+                      width={finish.material === 'oak' ? 48 : 56}
+                      height={finish.material === 'oak' ? 24 : 56}
+                    >
+                      <rect width="100%" height="100%" fill={finish.fill} />
+                      {finish.material === 'oak' && (
+                        <path d="M0 1 H48 M0 23 H48 M24 1 V23" stroke={finish.detail} strokeWidth="1.4" opacity="0.34" />
+                      )}
+                      {finish.material === 'slate' && (
+                        <path d="M0 50 L56 6" stroke={finish.detail} strokeWidth="2" opacity="0.18" />
+                      )}
+                      {finish.material === 'terrazzo' && (
+                        <path d="M12 14 l5 2 M39 38 l4 -3 M24 48 l3 1" stroke={finish.detail} strokeWidth="3" strokeLinecap="round" opacity="0.32" />
+                      )}
+                      {finish.material === 'carpet' && (
+                        <path d="M4 14 H52 M4 42 H52" stroke={finish.detail} strokeWidth="1.4" strokeDasharray="2 7" opacity="0.23" />
+                      )}
+                      {finish.material === 'tile' && (
+                        <path d="M0 28 H56 M28 0 V56" stroke={finish.detail} strokeWidth="1.3" opacity="0.22" />
+                      )}
+                    </pattern>
+                  ))}
+                </defs>
+                <polygon
+                  data-floor-surface=""
+                  points={pts}
+                  fill={SKIN.floor}
+                  stroke="#7D5233"
+                  strokeWidth={3}
+                />
+                {floorFinishes.map(finish => {
+                  const room = puzzle.rooms.find(candidate =>
+                    candidate.name === finish.room && (candidate.floor ?? 0) === floor)
+                  if (!room?.cells.length) return null
+                  const rows = room.cells.map(cell => cell.row)
+                  const cols = room.cells.map(cell => cell.col)
+                  const r0 = Math.min(...rows), r1 = Math.max(...rows)
+                  const c0 = Math.min(...cols), c1 = Math.max(...cols)
+                  return (
+                    <polygon
+                      key={finish.room}
+                      data-room-floor={finish.room}
+                      data-floor-material={finish.material}
+                      points={footprintPolygon(r0, c0, r1 - r0 + 1, c1 - c0 + 1)}
+                      fill={'url(#room-material-' + finish.material + ')'}
+                      stroke="rgba(69,49,31,0.16)"
+                      strokeWidth={1.5}
+                    />
+                  )
+                })}
+                {floorAccents.map(accent => (
+                  <g key={accent.id}>
+                    <polygon
+                      data-floor-accent={accent.id}
+                      points={footprintPolygon(accent.row, accent.col, accent.h, accent.w, accent.scale)}
+                      fill={accent.fill}
+                      stroke={accent.stroke}
+                      strokeWidth={3}
+                      opacity={0.92}
+                    />
+                    <polygon
+                      data-floor-accent-detail={accent.id}
+                      points={footprintPolygon(accent.row, accent.col, accent.h, accent.w, accent.scale * 0.82)}
+                      fill="none"
+                      stroke="rgba(255,232,205,0.72)"
+                      strokeWidth={2}
+                    />
+                  </g>
+                ))}
               </svg>
             )
           })()}
-
-          {/* NO per-room or per-cell floor tint. A 5-agent design review
-              concluded a translucent colour polygon over every tile is the
-              SAME "pastel checkerboard" technique the whole redesign exists
-              to remove, no matter how low its opacity — room identity has
-              to come from architecture (walls, below) and furniture
-              clustering, not a colour wash on the floor. */}
-
           {/* Idle reads as a room, not a grid — no seam lines, no boundary
               cue at all here. Placement anchors (below) only appear once a
               suspect is armed, per the hidden-grid interaction model. A
@@ -404,7 +480,7 @@ export default function IsoBoard({
                       key={`cs${r}-${c}`}
                       data-placement-cue=""
                       cx={left + TILE_W / 2} cy={top + TILE_H / 2}
-                      r={3.5}
+                      r={isMidnightDelivery ? 8 : 3.5}
                       fill="rgba(70,45,20,0.32)"
                     />
                   )
@@ -414,85 +490,266 @@ export default function IsoBoard({
           )}
 
           {/* ---------------- WALLS ----------------
-              Hand-authored, exact sprite per position (handScenes.ts) — a
-              real wallCorner_* piece at the true back vertex, wallWindow_*
-              over the desk and behind the sofa, wallDoorway_* at every
-              interior gap instead of blank space. Every wall casts a
-              contact shadow onto the floor it stands on, same as furniture
-              below — nothing in this scene floats free of the floor. */}
+              Full-height Kenney sprites frame the camera-facing dollhouse.
+              Interior partitions use low cutaway geometry: their bases stay
+              exact, their widths remain continuous and their doorways are
+              actual gaps rather than compressed raster panels. */}
           {walls.map((w, i) => {
-            const [rawW, rawH] = SPRITE_DIMS[w.file] ?? [109, 212]
-            const ww = rawW
-            // Exterior walls keep their full silhouette. Interior partitions
-            // are vertically shortened only; their native width remains
-            // untouched, so a continuous run never opens panel-sized gaps.
-            const heightScale = w.tall ? 1 : 0.72
-            const wh = rawH * heightScale
-            const virtual = w.kind === 'corner'
-              ? project(w.row - 0.5, w.col - 0.5)
-              : w.edge === 'A'
-                ? project(w.row - 0.5, w.col)
-                : project(w.row, w.col - 0.5)
-            const baseX = virtual.left + TILE_W / 2
-            const baseY = virtual.top + TILE_H / 2
-            const wallLeft = Math.max(0, Math.min(boardW - ww, baseX - ww / 2))
-            // Wall depth is measured at the EDGE it stands on, on the shared
-            // scene scale, so walls and furniture occlude each other by real
-            // distance from the camera rather than by object type.
-            const wRow = w.kind === 'corner' ? w.row - 0.5 : w.edge === 'A' ? w.row - 0.5 : w.row
-            const wCol = w.kind === 'corner' ? w.col - 0.5 : w.edge === 'A' ? w.col : w.col - 0.5
+            const wallSpan = w.span ?? 1
+            const wRow = w.kind === 'corner'
+              ? w.row - 0.5
+              : w.edge === 'A' ? w.row - 0.5 : w.row + wallSpan - 1
+            const wCol = w.kind === 'corner'
+              ? w.col - 0.5
+              : w.edge === 'A' ? w.col + wallSpan - 1 : w.col - 0.5
             const z = sceneZ(wRow, wCol)
+
+            if (w.render === 'native') {
+              const [ww, wh] = SPRITE_DIMS[w.file] ?? [109, 212]
+              const virtual = w.kind === 'corner'
+                ? project(w.row - 0.5, w.col - 0.5)
+                : w.edge === 'A'
+                  ? project(w.row - 0.5, w.col)
+                  : project(w.row, w.col - 0.5)
+              const baseX = virtual.left + TILE_W / 2
+              const baseY = virtual.top + TILE_H / 2
+              const wallLeft = Math.max(0, Math.min(boardW - ww, baseX - ww / 2))
+              return (
+                <div key={'w' + i}>
+                  <div style={{
+                    position: 'absolute', left: baseX - ww * 0.22, top: baseY - wh * 0.05,
+                    width: ww * 0.44, height: wh * 0.1, borderRadius: '50%',
+                    background: SKIN.contactShadow, filter: 'blur(3px)', zIndex: z - 1,
+                  }} />
+                  <img
+                    src={'/kenney/' + w.file + '.png'}
+                    alt=""
+                    aria-hidden
+                    draggable={false}
+                    data-scene-object="wall"
+                    data-wall-render="native"
+                    data-wall-axis={w.kind === 'corner' ? 'corner' : w.edge}
+                    style={{
+                      position: 'absolute',
+                      left: wallLeft,
+                      top: baseY - wh + TILE_H / 4,
+                      width: ww,
+                      height: wh,
+                      zIndex: z,
+                      opacity: 1,
+                      pointerEvents: 'none',
+                    }}
+                  />
+                </div>
+              )
+            }
+
+            const origin = project(w.row, w.col)
+            const startPoint: [number, number] = [origin.left + TILE_W / 2, origin.top]
+            const endPoint: [number, number] = w.edge === 'A'
+              ? [
+                  startPoint[0] + (TILE_W / 2) * wallSpan,
+                  startPoint[1] + (TILE_H / 2) * wallSpan,
+                ]
+              : [
+                  startPoint[0] - (TILE_W / 2) * wallSpan,
+                  startPoint[1] + (TILE_H / 2) * wallSpan,
+                ]
+            const height = 98
+            const thickness = 14
+            const doorway = w.file.includes('Doorway')
+            const gap = w.doorwayWidth ?? 0.6
+            const doorwayIndex = w.doorwayIndex ?? 0
+            const gapFrom = (doorwayIndex + (1 - gap) / 2) / wallSpan
+            const gapTo = (doorwayIndex + (1 + gap) / 2) / wallSpan
+            const ranges: Array<[number, number]> = doorway
+              ? [[0, gapFrom], [gapTo, 1]]
+              : [[0, 1]]
+            const along = (t: number): [number, number] => [
+              startPoint[0] + (endPoint[0] - startPoint[0]) * t,
+              startPoint[1] + (endPoint[1] - startPoint[1]) * t,
+            ]
+            const points = (values: Array<[number, number]>) =>
+              values.map(point => point.join(',')).join(' ')
+            const face = w.edge === 'A' ? '#CBB89B' : '#B7A188'
+            const cap = w.edge === 'A' ? '#E0CFB1' : '#D0BDA0'
+            const revealFace = w.edge === 'A' ? '#BCA68B' : '#A9947D'
+            const capInset: [number, number] = w.edge === 'A'
+              ? [-thickness, thickness / 2]
+              : [thickness, thickness / 2]
+            const gapStart = along(gapFrom)
+            const gapEnd = along(gapTo)
+            const doorwayOpeningHeight = 76
+            const headerBottomStart: [number, number] = [
+              gapStart[0], gapStart[1] - doorwayOpeningHeight,
+            ]
+            const headerBottomEnd: [number, number] = [
+              gapEnd[0], gapEnd[1] - doorwayOpeningHeight,
+            ]
+            const headerTopStart: [number, number] = [gapStart[0], gapStart[1] - height]
+            const headerTopEnd: [number, number] = [gapEnd[0], gapEnd[1] - height]
+            const headerInnerTopStart: [number, number] = [
+              headerTopStart[0] + capInset[0],
+              headerTopStart[1] + capInset[1],
+            ]
+            const headerInnerTopEnd: [number, number] = [
+              headerTopEnd[0] + capInset[0],
+              headerTopEnd[1] + capInset[1],
+            ]
+
             return (
-              <div key={`w${i}`}>
-                <div style={{
-                  position: 'absolute', left: baseX - ww * 0.22, top: baseY - wh * 0.05,
-                  width: ww * 0.44, height: wh * 0.1, borderRadius: '50%',
-                  background: SKIN.contactShadow, filter: 'blur(3px)',
-                  zIndex: z - 1,
-                }} />
-                <img
-                  src={`/kenney/${w.file}.png`}
-                  alt=""
-                  aria-hidden
-                  draggable={false}
-                  data-scene-object="wall"
-                  data-wall-axis={w.kind === 'corner' ? 'corner' : w.edge}
-                  style={{
-                    position: 'absolute',
-                    left: wallLeft,
-                    top: baseY - wh + (TILE_H / 4) * heightScale,
-                    width: ww,
-                    height: wh,
-                    zIndex: z,
-                    opacity: 1,
-                    pointerEvents: 'none',
-                  }}
-                />
-              </div>
+              <svg
+                key={'w' + i}
+                width={boardW}
+                height={boardH}
+                data-scene-object="wall"
+                data-wall-render="cutaway"
+                data-wall-axis={w.edge}
+                data-wall-doorway={doorway ? '' : undefined}
+                data-wall-height={height}
+                data-wall-thickness={thickness}
+                style={{
+                  position: 'absolute', left: 0, top: 0, width: boardW, height: boardH,
+                  zIndex: z, pointerEvents: 'none', overflow: 'visible',
+                }}
+              >
+                {ranges.map(([from, to], segmentIndex) => {
+                  const a = along(from), b = along(to)
+                  const topA: [number, number] = [a[0], a[1] - height]
+                  const topB: [number, number] = [b[0], b[1] - height]
+                  const innerTopA: [number, number] = [
+                    topA[0] + capInset[0],
+                    topA[1] + capInset[1],
+                  ]
+                  const innerTopB: [number, number] = [
+                    topB[0] + capInset[0],
+                    topB[1] + capInset[1],
+                  ]
+                  const exposedBase = segmentIndex === 0 ? b : a
+                  const exposedTop: [number, number] = [
+                    exposedBase[0],
+                    exposedBase[1] - doorwayOpeningHeight,
+                  ]
+                  const exposedInnerTop: [number, number] = [
+                    exposedTop[0] + capInset[0],
+                    exposedTop[1] + capInset[1],
+                  ]
+                  const exposedInnerBase: [number, number] = [
+                    exposedBase[0] + capInset[0],
+                    exposedBase[1] + capInset[1],
+                  ]
+                  return (
+                    <g key={segmentIndex}>
+                      <line
+                        x1={a[0]} y1={a[1] + 2} x2={b[0]} y2={b[1] + 2}
+                        stroke={SKIN.contactShadow} strokeWidth={4} strokeLinecap="round" opacity={0.22}
+                      />
+                      <polygon points={points([a, b, topB, topA])} fill={face} />
+                      {doorway && (
+                        <polygon
+                          data-doorway-reveal=""
+                          points={points([exposedBase, exposedTop, exposedInnerTop, exposedInnerBase])}
+                          fill={revealFace}
+                        />
+                      )}
+                      <polygon
+                        data-cutaway-cap=""
+                        points={points([topA, topB, innerTopB, innerTopA])}
+                        fill={cap}
+                      />
+                      <line
+                        x1={topA[0]} y1={topA[1]} x2={topB[0]} y2={topB[1]}
+                        stroke={face} strokeWidth={1} opacity={0.42}
+                      />
+                      <line
+                        x1={innerTopA[0]} y1={innerTopA[1]} x2={innerTopB[0]} y2={innerTopB[1]}
+                        stroke={revealFace} strokeWidth={1} opacity={0.3}
+                      />
+                    </g>
+                  )
+                })}
+                {doorway && (
+                  <g data-doorway-header="">
+                    <polygon
+                      data-doorway-header-face=""
+                      points={points([
+                        headerBottomStart,
+                        headerBottomEnd,
+                        headerTopEnd,
+                        headerTopStart,
+                      ])}
+                      fill={face}
+                    />
+                    <polygon
+                      data-doorway-header-cap=""
+                      points={points([
+                        headerTopStart,
+                        headerTopEnd,
+                        headerInnerTopEnd,
+                        headerInnerTopStart,
+                      ])}
+                      fill={cap}
+                    />
+                  </g>
+                )}
+                {doorway && (
+                  <g data-doorway-opening="" data-doorway-frame="">
+                    <line
+                      data-doorway-threshold=""
+                      x1={gapStart[0]} y1={gapStart[1] + 1}
+                      x2={gapEnd[0]} y2={gapEnd[1] + 1}
+                      stroke="#7E6957"
+                      strokeWidth={3}
+                      strokeLinecap="round"
+                      opacity={0.52}
+                    />
+                    <line
+                      data-doorway-jamb=""
+                      x1={gapStart[0]} y1={gapStart[1]}
+                      x2={headerBottomStart[0]} y2={headerBottomStart[1]}
+                      stroke="#6F472C"
+                      strokeWidth={6}
+                      strokeLinecap="square"
+                    />
+                    <line
+                      data-doorway-jamb=""
+                      x1={gapEnd[0]} y1={gapEnd[1]}
+                      x2={headerBottomEnd[0]} y2={headerBottomEnd[1]}
+                      stroke="#6F472C"
+                      strokeWidth={6}
+                      strokeLinecap="square"
+                    />
+                    <line
+                      data-doorway-lintel=""
+                      x1={headerBottomStart[0]} y1={headerBottomStart[1]}
+                      x2={headerBottomEnd[0]} y2={headerBottomEnd[1]}
+                      stroke="#6F472C"
+                      strokeWidth={6}
+                      strokeLinecap="square"
+                    />
+                  </g>
+                )}
+              </svg>
             )
           })}
-
           {/* ---------------- DECOR ----------------
-              Pure decoration (handScenes.ts) — never a clue target. Rendered
-              exactly like furniture, contact shadow included, so it grounds
-              into the floor the same way real gameplay pieces do. */}
+              Every raised prop has a declared supporting surface. Small props
+              may be enlarged as miniatures, but remain bottom-anchored. */}
           {decor.map((d, i) => {
-            const file = `${d.file}_${d.facing}`
-            const [dw, dh] = SPRITE_DIMS[file] ?? [60, 90]
+            const file = d.file + '_' + d.facing
+            const [nativeW, nativeH] = SPRITE_DIMS[file] ?? [60, 90]
+            const visualScale = d.scale ?? 1
+            const dw = nativeW * visualScale
+            const dh = nativeH * visualScale
             const { left, top } = project(d.row, d.col)
             const cx = left + TILE_W / 2, cy = top + TILE_H / 2
             const groundY = cy + TILE_H / 4
-            // `lift` raises a prop onto the surface it belongs on — a
-            // microwave onto the counter run, a laptop onto the desk. Without
-            // it every prop bottom-anchors to the tile, which is why a
-            // microwave was sitting on the bare floor. A lifted prop gets no
-            // floor shadow: it isn't on the floor.
             const lift = d.lift ?? 0
             const depthRow = lift > 0 ? Math.ceil(d.row) : d.row
             const depthCol = lift > 0 ? Math.ceil(d.col) : d.col
             const z = sceneZ(depthRow, depthCol, lift > 0 ? 5 : 1)
             return (
-              <div key={`dec${i}`}>
+              <div key={'dec' + i}>
                 {lift === 0 && (
                   <div style={{
                     position: 'absolute',
@@ -504,12 +761,14 @@ export default function IsoBoard({
                   }} />
                 )}
                 <img
-                  src={`/kenney/${file}.png`}
+                  src={'/kenney/' + file + '.png'}
                   alt=""
                   aria-hidden
                   draggable={false}
                   data-scene-object="decor"
                   data-decor={d.file}
+                  data-decor-lift={lift}
+                  data-visual-scale={visualScale}
                   style={{
                     position: 'absolute',
                     left: cx - dw / 2,
@@ -523,7 +782,6 @@ export default function IsoBoard({
               </div>
             )
           })}
-
           {/* Room names are deliberately NOT drawn on the floor. If the
               rooms only read as bedroom/kitchen/office because the words are
               printed across them, the composition has failed — identity has
@@ -560,7 +818,7 @@ export default function IsoBoard({
                 translucent wash at 0.10 so the lane's extent reads as a
                 soft "already settled" tone rather than a drawn line. */}
             {[...lockedRows].map(r => (
-              <g key={`lr${r}`}>
+              <g key={`lr${r}`} data-locked-lane="row">
                 {Array.from({ length: N }, (_, c) => (
                   <polygon key={`lr${r}-${c}`} points={diamond(r, c)} fill={LANE.lockedWash} stroke={LANE.lockedEdge} strokeWidth={2.5} />
                 ))}
@@ -569,7 +827,7 @@ export default function IsoBoard({
               </g>
             ))}
             {[...lockedCols].map(c => (
-              <g key={`lc${c}`}>
+              <g key={`lc${c}`} data-locked-lane="column">
                 {Array.from({ length: N }, (_, r) => (
                   <polygon key={`lc${c}-${r}`} points={diamond(r, c)} fill={LANE.lockedWash} stroke={LANE.lockedEdge} strokeWidth={2.5} />
                 ))}
@@ -635,11 +893,11 @@ export default function IsoBoard({
               )),
             )}
             {active && Array.from({ length: N }, (_, c) => (
-              <polygon key={`ar${c}`} points={diamond(active.row, c)}
+              <polygon key={`ar${c}`} data-active-lane="row" points={diamond(active.row, c)}
                 fill={LANE.row} stroke={LANE.rowEdge} strokeWidth={2.5} />
             ))}
             {active && Array.from({ length: N }, (_, r) => (
-              <polygon key={`ac${r}`} points={diamond(r, active.col)}
+              <polygon key={`ac${r}`} data-active-lane="column" points={diamond(r, active.col)}
                 fill={LANE.col} stroke={LANE.colEdge} strokeWidth={2.5} />
             ))}
             {/* End markers — small triangles pointing off-board at both ends
@@ -662,27 +920,32 @@ export default function IsoBoard({
             })()}
             {active && (
               <polygon
+                data-active-intersection=""
                 points={diamond(active.row, active.col)}
-                fill={LANE.cross}
-                stroke={LANE.crossEdge}
-                strokeWidth={4}
+                fill={isMidnightDelivery ? 'rgba(238,219,170,0.58)' : LANE.cross}
+                stroke={isMidnightDelivery ? 'rgba(82,57,26,0.84)' : LANE.crossEdge}
+                strokeWidth={isMidnightDelivery ? 2.5 : 4}
               />
             )}
           </svg>
           )}
 
           {/* ---------------- FURNITURE ----------------
-              Native resolution, bottom-anchored on the diamond's centre, depth
-              sorted by (row + col) so nearer pieces occlude farther ones. */}
+              The logical object owns one full-footprint shadow and depth key.
+              Scene-specific visual modules may represent that same immutable
+              footprint without changing the puzzle object. */}
           {furniture.map((f, i) => {
             const rot = f.rotation ?? 0
-            const file = `${KENNEY_FILE[f.type]}_${rot === 90 || rot === 270 ? 'SW' : 'SE'}`
-            const [nw, nh] = SPRITE_DIMS[file] ?? [92, 92]
-            // A piece covering several cells must be centred over its WHOLE
-            // FOOTPRINT, not its anchor cell. Drawing a w2 bed or an h2 sofa
-            // at project(row, col) put it half a cell off its real position —
-            // that single bug is what made furniture look like it floated,
-            // clipped into walls and sat inside other objects.
+            const file = KENNEY_FILE[f.type] + '_' + (rot === 90 || rot === 270 ? 'SW' : 'SE')
+            const [nativeW, nativeH] = SPRITE_DIMS[file] ?? [92, 92]
+            const visual = getSceneFurnitureVisual(puzzle.id, f)
+            const visualScale = visual?.scale ?? 1
+            const groundOffsetY = visual?.groundOffsetY ?? 0
+            const shadowScale = visual?.shadowScale ?? 0.58
+            const shadowOpacity = visual?.shadowOpacity ?? 0.55
+            const shadowBlur = visual?.shadowBlur ?? 3
+            const renderW = nativeW * visualScale
+            const renderH = nativeH * visualScale
             const { w: fw, h: fh } = furnitureFootprint(f)
             const centreRow = f.row + (fh - 1) / 2
             const centreCol = f.col + (fw - 1) / 2
@@ -691,53 +954,107 @@ export default function IsoBoard({
             const occupiedCells = furnitureCells(f)
             const { left, top } = project(centreRow, centreCol)
             const occluding = occludes(f, active)
-              || occupiedCells.some(cell => cellsWithToken.has(`${cell.row},${cell.col}`))
+              || occupiedCells.some(cell => cellsWithToken.has(cell.row + ',' + cell.col))
             const opacity = occluding ? 0.26 : inActiveLane(f) ? 0.55 : 1
             const cx = left + TILE_W / 2, cy = top + TILE_H / 2
-            const groundY = cy + TILE_H / 4
-            // The front-most occupied corner owns depth. A centroid can sort
-            // the near half of a two-cell bed behind an object it overlaps.
+            const groundY = cy + TILE_H / 4 + groundOffsetY
             const z = sceneZ(frontRow, frontCol)
+            const commonData = {
+              'data-scene-object': 'furniture',
+              'data-furniture': f.type,
+              'data-footprint-center': centreRow + ',' + centreCol,
+              'data-footprint-front': frontRow + ',' + frontCol,
+              'data-ground-offset-y': groundOffsetY,
+            }
+
             return (
-              <div key={`${f.type}-${f.row}-${f.col}-${i}`}>
+              <div key={f.type + '-' + f.row + '-' + f.col + '-' + i}>
                 <svg
                   width={boardW}
                   height={boardH}
-                  style={{ position: 'absolute', inset: 0, zIndex: z - 1, pointerEvents: 'none', filter: 'blur(5px)' }}
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    zIndex: z - 1,
+                    pointerEvents: 'none',
+                    filter: `blur(${shadowBlur}px)`,
+                  }}
                 >
                   <polygon
                     data-furniture-shadow={f.type}
-                    data-shadow-footprint={`${fh}x${fw}`}
-                    points={footprintPolygon(f.row, f.col, fh, fw, 0.68)}
+                    data-shadow-footprint={fh + 'x' + fw}
+                    data-shadow-scale={shadowScale}
+                    points={footprintPolygon(f.row, f.col, fh, fw, shadowScale)}
                     fill={SKIN.contactShadow}
-                    opacity={opacity * 0.72}
+                    opacity={opacity * shadowOpacity}
                   />
                 </svg>
-                <img
-                  src={`/kenney/${file}.png`}
-                  alt=""
-                  aria-hidden
-                  draggable={false}
-                  data-scene-object="furniture"
-                  data-furniture={f.type}
-                  data-footprint-center={`${centreRow},${centreCol}`}
-                  data-footprint-front={`${frontRow},${frontCol}`}
-                  style={{
-                    position: 'absolute',
-                    left: cx - nw / 2,
-                    top: groundY - nh,
-                    width: nw,
-                    height: nh,
-                    zIndex: z,
-                    opacity,
-                    transition: 'opacity 160ms ease',
-                    pointerEvents: 'none',
-                  }}
-                />
+                {visual?.modules ? (
+                  <div
+                    {...commonData}
+                    data-furniture-modular=""
+                    style={{
+                      position: 'absolute', left: 0, top: 0, width: boardW, height: boardH,
+                      zIndex: z, opacity, transition: 'opacity 160ms ease', pointerEvents: 'none',
+                    }}
+                  >
+                    {visual.modules.map((module, moduleIndex) => {
+                      const moduleFile = module.file + '_' + module.facing
+                      const [moduleNativeW, moduleNativeH] = SPRITE_DIMS[moduleFile] ?? [92, 92]
+                      const moduleScale = module.scale ?? 1
+                      const moduleLift = module.lift ?? 0
+                      const moduleW = moduleNativeW * moduleScale
+                      const moduleH = moduleNativeH * moduleScale
+                      const modulePoint = project(module.row, module.col)
+                      const moduleX = modulePoint.left + TILE_W / 2
+                      const moduleGround = modulePoint.top + TILE_H / 2 + TILE_H / 4
+                      return (
+                        <img
+                          key={module.file + '-' + moduleIndex}
+                          src={'/kenney/' + moduleFile + '.png'}
+                          alt=""
+                          aria-hidden
+                          draggable={false}
+                          data-furniture-module={f.type}
+                          data-furniture-module-file={module.file}
+                          data-furniture-module-lift={moduleLift}
+                          data-visual-scale={moduleScale}
+                          style={{
+                            position: 'absolute',
+                            left: moduleX - moduleW / 2,
+                            top: moduleGround - moduleLift - moduleH,
+                            width: moduleW,
+                            height: moduleH,
+                            pointerEvents: 'none',
+                          }}
+                        />
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <img
+                    src={'/kenney/' + file + '.png'}
+                    alt=""
+                    aria-hidden
+                    draggable={false}
+                    {...commonData}
+                    data-visual-scale={visualScale}
+                    style={{
+                      position: 'absolute',
+                      left: cx - renderW / 2,
+                      top: groundY - renderH,
+                      width: renderW,
+                      height: renderH,
+                      zIndex: z,
+                      opacity,
+                      transition: 'opacity 160ms ease',
+                      pointerEvents: 'none',
+                    }}
+                  />
+                )}
               </div>
             )
           })}
-
           {!envOnly && (
           <>
           {/* ---------------- TOKENS ----------------
@@ -885,7 +1202,7 @@ export default function IsoBoard({
                   fill="transparent"
                   data-cell={`${r}-${c}`}
                   role="gridcell"
-                  style={{ cursor: 'pointer', pointerEvents: 'all' }}
+                  style={{ cursor: 'pointer', pointerEvents: 'all', touchAction: 'manipulation' }}
                   onMouseEnter={() => setActive({ row: r, col: c })}
                   onMouseLeave={() => setActive(a => (a && a.row === r && a.col === c ? null : a))}
                   onClick={() => { setActive({ row: r, col: c }); onCellClick(r, c) }}
