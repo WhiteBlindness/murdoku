@@ -128,6 +128,14 @@ const LANE = {
   invalidTarget: '#C94444',           // illegal placement (already occupied)
 }
 
+const MIDNIGHT_LANE = {
+  row: 'rgba(238,177,75,0.2)',
+  rowEdge: 'rgba(145,91,28,0.55)',
+  col: 'rgba(86,167,190,0.18)',
+  colEdge: 'rgba(33,104,126,0.52)',
+  dim: 'rgba(24,18,10,0.18)',
+}
+
 export default function IsoBoard({
   puzzle, marks, conflicts, onCellClick,
   highlight = null, highlightLabel,
@@ -135,7 +143,7 @@ export default function IsoBoard({
   flashRows, flashCols, armedPerson = null,
 }: Props) {
   const N = puzzle.size
-  const isMidnightDelivery = puzzle.id === 'very-easy-1'
+  const isMidnightDelivery = puzzle.id === 'very-easy-1' && floor === 0
   const [active, setActive] = useState<{ row: number; col: number } | null>(null)
 
   // The scene is authored at native sprite pixels and scaled to fit as ONE
@@ -263,10 +271,22 @@ export default function IsoBoard({
   // Hand-authored wall plan for this ONE scene — see handScenes.ts. Every
   // other puzzle gets an empty list (no walls) until this scene's art
   // direction is approved; this is deliberately not derived from room data.
-  const walls = useMemo(() => getSceneWalls(puzzle.id), [puzzle.id])
-  const decor = useMemo(() => getSceneDecor(puzzle.id), [puzzle.id])
-  const floorFinishes = useMemo(() => getSceneFloorFinishes(puzzle.id), [puzzle.id])
-  const floorAccents = useMemo(() => getSceneFloorAccents(puzzle.id), [puzzle.id])
+  const walls = useMemo(
+    () => isMidnightDelivery ? getSceneWalls(puzzle.id) : [],
+    [isMidnightDelivery, puzzle.id],
+  )
+  const decor = useMemo(
+    () => isMidnightDelivery ? getSceneDecor(puzzle.id) : [],
+    [isMidnightDelivery, puzzle.id],
+  )
+  const floorFinishes = useMemo(
+    () => isMidnightDelivery ? getSceneFloorFinishes(puzzle.id) : [],
+    [isMidnightDelivery, puzzle.id],
+  )
+  const floorAccents = useMemo(
+    () => isMidnightDelivery ? getSceneFloorAccents(puzzle.id) : [],
+    [isMidnightDelivery, puzzle.id],
+  )
 
   // ---- Occlusion -----------------------------------------------------------
   // A piece nearer the viewer than the cell being inspected, and overlapping it
@@ -480,8 +500,8 @@ export default function IsoBoard({
                       key={`cs${r}-${c}`}
                       data-placement-cue=""
                       cx={left + TILE_W / 2} cy={top + TILE_H / 2}
-                      r={isMidnightDelivery ? 8 : 3.5}
-                      fill="rgba(70,45,20,0.32)"
+                      r={isMidnightDelivery ? 3 : 3.5}
+                      fill={isMidnightDelivery ? 'rgba(70,45,20,0.14)' : 'rgba(70,45,20,0.32)'}
                     />
                   )
                 }),
@@ -496,15 +516,14 @@ export default function IsoBoard({
               actual gaps rather than compressed raster panels. */}
           {walls.map((w, i) => {
             const wallSpan = w.span ?? 1
-            const wRow = w.kind === 'corner'
-              ? w.row - 0.5
-              : w.edge === 'A' ? w.row - 0.5 : w.row + wallSpan - 1
-            const wCol = w.kind === 'corner'
-              ? w.col - 0.5
-              : w.edge === 'A' ? w.col + wallSpan - 1 : w.col - 0.5
-            const z = sceneZ(wRow, wCol)
-
             if (w.render === 'native') {
+              const wRow = w.kind === 'corner'
+                ? w.row - 0.5
+                : w.edge === 'A' ? w.row - 0.5 : w.row
+              const wCol = w.kind === 'corner'
+                ? w.col - 0.5
+                : w.edge === 'A' ? w.col : w.col - 0.5
+              const z = sceneZ(wRow, wCol)
               const [ww, wh] = SPRITE_DIMS[w.file] ?? [109, 212]
               const virtual = w.kind === 'corner'
                 ? project(w.row - 0.5, w.col - 0.5)
@@ -544,6 +563,7 @@ export default function IsoBoard({
               )
             }
 
+            const wallId = w.id ?? 'cutaway-' + i
             const origin = project(w.row, w.col)
             const startPoint: [number, number] = [origin.left + TILE_W / 2, origin.top]
             const endPoint: [number, number] = w.edge === 'A'
@@ -555,103 +575,113 @@ export default function IsoBoard({
                   startPoint[0] - (TILE_W / 2) * wallSpan,
                   startPoint[1] + (TILE_H / 2) * wallSpan,
                 ]
-            const height = 98
+            const height = w.height ?? 86
             const thickness = 14
-            const doorway = w.file.includes('Doorway')
-            const gap = w.doorwayWidth ?? 0.6
-            const doorwayIndex = w.doorwayIndex ?? 0
-            const gapFrom = (doorwayIndex + (1 - gap) / 2) / wallSpan
-            const gapTo = (doorwayIndex + (1 + gap) / 2) / wallSpan
-            const ranges: Array<[number, number]> = doorway
-              ? [[0, gapFrom], [gapTo, 1]]
-              : [[0, 1]]
             const along = (t: number): [number, number] => [
               startPoint[0] + (endPoint[0] - startPoint[0]) * t,
               startPoint[1] + (endPoint[1] - startPoint[1]) * t,
             ]
+            const contactAt = (t: number) => w.edge === 'A'
+              ? { row: w.row - 0.5, col: w.col + t * wallSpan }
+              : { row: w.row + t * wallSpan, col: w.col - 0.5 }
             const points = (values: Array<[number, number]>) =>
               values.map(point => point.join(',')).join(' ')
-            const face = w.edge === 'A' ? '#CBB89B' : '#B7A188'
-            const cap = w.edge === 'A' ? '#E0CFB1' : '#D0BDA0'
-            const revealFace = w.edge === 'A' ? '#BCA68B' : '#A9947D'
+            const openingRanges = [...(w.openings ?? [])]
+              .sort((a, b) => a.index - b.index)
+              .map(opening => {
+                const centre = (opening.index + 0.5) / wallSpan
+                const half = opening.width / (2 * wallSpan)
+                return {
+                  opening,
+                  from: Math.max(0, centre - half),
+                  to: Math.min(1, centre + half),
+                }
+              })
+            const boundaries = [
+              0,
+              ...openingRanges.flatMap(range => [range.from, range.to]),
+              1,
+            ]
+            const wallRanges = boundaries.reduce<Array<[number, number]>>((result, value, index) => {
+              if (index % 2 !== 0 || index + 1 >= boundaries.length) return result
+              const next = boundaries[index + 1]
+              return next - value > 0.001 ? [...result, [value, next]] : result
+            }, [])
+            // One visual run must still sort at LOCAL contact depth. Splitting
+            // only at invisible cell boundaries prevents a six-cell face from
+            // borrowing the midpoint depth of its far end and painting over
+            // nearby furniture. The slices overlap by a sub-pixel amount, so
+            // this adds no panel rhythm or anti-alias seam to the wall.
+            const ranges = wallRanges.flatMap(([from, to]) => {
+              const cellCuts = Array.from(
+                { length: Math.max(0, wallSpan - 1) },
+                (_, boundaryIndex) => (boundaryIndex + 1) / wallSpan,
+              ).filter(cut => cut > from && cut < to)
+              const sliceBounds = [from, ...cellCuts, to]
+              return sliceBounds.slice(0, -1).map((sliceFrom, sliceIndex) => (
+                [sliceFrom, sliceBounds[sliceIndex + 1]] as [number, number]
+              ))
+            })
+            const shellTone = w.tone === 'shell'
+            const face = shellTone
+              ? (w.edge === 'A' ? '#819489' : '#6F857A')
+              : (w.edge === 'A' ? '#CBB89B' : '#B7A188')
+            const cap = shellTone
+              ? (w.edge === 'A' ? '#ACB9AF' : '#9EADA2')
+              : (w.edge === 'A' ? '#E0CFB1' : '#D0BDA0')
+            const revealFace = shellTone
+              ? (w.edge === 'A' ? '#71857A' : '#5E756B')
+              : (w.edge === 'A' ? '#BCA68B' : '#A9947D')
             const capInset: [number, number] = w.edge === 'A'
               ? [-thickness, thickness / 2]
               : [thickness, thickness / 2]
-            const gapStart = along(gapFrom)
-            const gapEnd = along(gapTo)
-            const doorwayOpeningHeight = 76
-            const headerBottomStart: [number, number] = [
-              gapStart[0], gapStart[1] - doorwayOpeningHeight,
-            ]
-            const headerBottomEnd: [number, number] = [
-              gapEnd[0], gapEnd[1] - doorwayOpeningHeight,
-            ]
-            const headerTopStart: [number, number] = [gapStart[0], gapStart[1] - height]
-            const headerTopEnd: [number, number] = [gapEnd[0], gapEnd[1] - height]
-            const headerInnerTopStart: [number, number] = [
-              headerTopStart[0] + capInset[0],
-              headerTopStart[1] + capInset[1],
-            ]
-            const headerInnerTopEnd: [number, number] = [
-              headerTopEnd[0] + capInset[0],
-              headerTopEnd[1] + capInset[1],
-            ]
 
             return (
-              <svg
+              <div
                 key={'w' + i}
-                width={boardW}
-                height={boardH}
                 data-scene-object="wall"
                 data-wall-render="cutaway"
+                data-wall-id={wallId}
                 data-wall-axis={w.edge}
-                data-wall-doorway={doorway ? '' : undefined}
                 data-wall-height={height}
                 data-wall-thickness={thickness}
+                data-wall-tone={w.tone ?? 'interior'}
                 style={{
-                  position: 'absolute', left: 0, top: 0, width: boardW, height: boardH,
-                  zIndex: z, pointerEvents: 'none', overflow: 'visible',
+                  position: 'absolute', left: 0, top: 0,
+                  width: boardW, height: boardH, pointerEvents: 'none',
                 }}
               >
                 {ranges.map(([from, to], segmentIndex) => {
-                  const a = along(from), b = along(to)
+                  const seamOverlap = 0.00035
+                  const a = along(Math.max(0, from - seamOverlap))
+                  const b = along(Math.min(1, to + seamOverlap))
                   const topA: [number, number] = [a[0], a[1] - height]
                   const topB: [number, number] = [b[0], b[1] - height]
                   const innerTopA: [number, number] = [
-                    topA[0] + capInset[0],
-                    topA[1] + capInset[1],
+                    topA[0] + capInset[0], topA[1] + capInset[1],
                   ]
                   const innerTopB: [number, number] = [
-                    topB[0] + capInset[0],
-                    topB[1] + capInset[1],
+                    topB[0] + capInset[0], topB[1] + capInset[1],
                   ]
-                  const exposedBase = segmentIndex === 0 ? b : a
-                  const exposedTop: [number, number] = [
-                    exposedBase[0],
-                    exposedBase[1] - doorwayOpeningHeight,
-                  ]
-                  const exposedInnerTop: [number, number] = [
-                    exposedTop[0] + capInset[0],
-                    exposedTop[1] + capInset[1],
-                  ]
-                  const exposedInnerBase: [number, number] = [
-                    exposedBase[0] + capInset[0],
-                    exposedBase[1] + capInset[1],
-                  ]
+                  const contact = contactAt((from + to) / 2)
                   return (
-                    <g key={segmentIndex}>
+                    <svg
+                      key={'segment-' + segmentIndex}
+                      width={boardW}
+                      height={boardH}
+                      data-cutaway-segment=""
+                      data-wall-depth-slice=""
+                      style={{
+                        position: 'absolute', inset: 0,
+                        zIndex: sceneZ(contact.row, contact.col),
+                        pointerEvents: 'none', overflow: 'visible',
+                      }}
+                    >
                       <line
                         x1={a[0]} y1={a[1] + 2} x2={b[0]} y2={b[1] + 2}
                         stroke={SKIN.contactShadow} strokeWidth={4} strokeLinecap="round" opacity={0.22}
                       />
-                      <polygon points={points([a, b, topB, topA])} fill={face} />
-                      {doorway && (
-                        <polygon
-                          data-doorway-reveal=""
-                          points={points([exposedBase, exposedTop, exposedInnerTop, exposedInnerBase])}
-                          fill={revealFace}
-                        />
-                      )}
+                      <polygon data-cutaway-face="" points={points([a, b, topB, topA])} fill={face} />
                       <polygon
                         data-cutaway-cap=""
                         points={points([topA, topB, innerTopB, innerTopA])}
@@ -665,71 +695,100 @@ export default function IsoBoard({
                         x1={innerTopA[0]} y1={innerTopA[1]} x2={innerTopB[0]} y2={innerTopB[1]}
                         stroke={revealFace} strokeWidth={1} opacity={0.3}
                       />
-                    </g>
+                    </svg>
                   )
                 })}
-                {doorway && (
-                  <g data-doorway-header="">
-                    <polygon
-                      data-doorway-header-face=""
-                      points={points([
-                        headerBottomStart,
-                        headerBottomEnd,
-                        headerTopEnd,
-                        headerTopStart,
-                      ])}
-                      fill={face}
-                    />
-                    <polygon
-                      data-doorway-header-cap=""
-                      points={points([
-                        headerTopStart,
-                        headerTopEnd,
-                        headerInnerTopEnd,
-                        headerInnerTopStart,
-                      ])}
-                      fill={cap}
-                    />
-                  </g>
-                )}
-                {doorway && (
-                  <g data-doorway-opening="" data-doorway-frame="">
-                    <line
-                      data-doorway-threshold=""
-                      x1={gapStart[0]} y1={gapStart[1] + 1}
-                      x2={gapEnd[0]} y2={gapEnd[1] + 1}
-                      stroke="#7E6957"
-                      strokeWidth={3}
-                      strokeLinecap="round"
-                      opacity={0.52}
-                    />
-                    <line
-                      data-doorway-jamb=""
-                      x1={gapStart[0]} y1={gapStart[1]}
-                      x2={headerBottomStart[0]} y2={headerBottomStart[1]}
-                      stroke="#6F472C"
-                      strokeWidth={6}
-                      strokeLinecap="square"
-                    />
-                    <line
-                      data-doorway-jamb=""
-                      x1={gapEnd[0]} y1={gapEnd[1]}
-                      x2={headerBottomEnd[0]} y2={headerBottomEnd[1]}
-                      stroke="#6F472C"
-                      strokeWidth={6}
-                      strokeLinecap="square"
-                    />
-                    <line
-                      data-doorway-lintel=""
-                      x1={headerBottomStart[0]} y1={headerBottomStart[1]}
-                      x2={headerBottomEnd[0]} y2={headerBottomEnd[1]}
-                      stroke="#6F472C"
-                      strokeWidth={6}
-                      strokeLinecap="square"
-                    />
-                  </g>
-                )}
-              </svg>
+                {openingRanges.map(({ opening, from, to }, openingIndex) => {
+                  const gapStart = along(from)
+                  const gapEnd = along(to)
+                  const openingHeight = Math.min(68, height - 12)
+                  const headerBottomStart: [number, number] = [gapStart[0], gapStart[1] - openingHeight]
+                  const headerBottomEnd: [number, number] = [gapEnd[0], gapEnd[1] - openingHeight]
+                  const headerTopStart: [number, number] = [gapStart[0], gapStart[1] - height]
+                  const headerTopEnd: [number, number] = [gapEnd[0], gapEnd[1] - height]
+                  const headerInnerTopStart: [number, number] = [
+                    headerTopStart[0] + capInset[0], headerTopStart[1] + capInset[1],
+                  ]
+                  const headerInnerTopEnd: [number, number] = [
+                    headerTopEnd[0] + capInset[0], headerTopEnd[1] + capInset[1],
+                  ]
+                  const startInnerBase: [number, number] = [
+                    gapStart[0] + capInset[0], gapStart[1] + capInset[1],
+                  ]
+                  const endInnerBase: [number, number] = [
+                    gapEnd[0] + capInset[0], gapEnd[1] + capInset[1],
+                  ]
+                  const startInnerTop: [number, number] = [
+                    headerBottomStart[0] + capInset[0], headerBottomStart[1] + capInset[1],
+                  ]
+                  const endInnerTop: [number, number] = [
+                    headerBottomEnd[0] + capInset[0], headerBottomEnd[1] + capInset[1],
+                  ]
+                  const contact = contactAt((from + to) / 2)
+                  return (
+                    <svg
+                      key={'opening-' + openingIndex}
+                      width={boardW}
+                      height={boardH}
+                      data-wall-opening={opening.kind}
+                      style={{
+                        position: 'absolute', inset: 0,
+                        zIndex: sceneZ(contact.row, contact.col, 2),
+                        pointerEvents: 'none', overflow: 'visible',
+                      }}
+                    >
+                      <polygon
+                        data-doorway-reveal=""
+                        points={points([gapStart, headerBottomStart, startInnerTop, startInnerBase])}
+                        fill={revealFace}
+                      />
+                      <polygon
+                        data-doorway-reveal=""
+                        points={points([gapEnd, headerBottomEnd, endInnerTop, endInnerBase])}
+                        fill={revealFace}
+                      />
+                      <g data-doorway-header="">
+                        <polygon
+                          data-doorway-header-face=""
+                          points={points([headerBottomStart, headerBottomEnd, headerTopEnd, headerTopStart])}
+                          fill={face}
+                        />
+                        <polygon
+                          data-doorway-header-cap=""
+                          points={points([headerTopStart, headerTopEnd, headerInnerTopEnd, headerInnerTopStart])}
+                          fill={cap}
+                        />
+                      </g>
+                      <g data-doorway-opening="" data-doorway-frame="">
+                        <line
+                          data-doorway-threshold=""
+                          x1={gapStart[0]} y1={gapStart[1] + 1}
+                          x2={gapEnd[0]} y2={gapEnd[1] + 1}
+                          stroke="#8C7864" strokeWidth={2.5} strokeLinecap="round" opacity={0.42}
+                        />
+                        <line
+                          data-doorway-jamb=""
+                          x1={gapStart[0]} y1={gapStart[1]}
+                          x2={headerBottomStart[0]} y2={headerBottomStart[1]}
+                          stroke="#76523A" strokeWidth={4.5} strokeLinecap="square"
+                        />
+                        <line
+                          data-doorway-jamb=""
+                          x1={gapEnd[0]} y1={gapEnd[1]}
+                          x2={headerBottomEnd[0]} y2={headerBottomEnd[1]}
+                          stroke="#76523A" strokeWidth={4.5} strokeLinecap="square"
+                        />
+                        <line
+                          data-doorway-lintel=""
+                          x1={headerBottomStart[0]} y1={headerBottomStart[1]}
+                          x2={headerBottomEnd[0]} y2={headerBottomEnd[1]}
+                          stroke="#76523A" strokeWidth={4.5} strokeLinecap="square"
+                        />
+                      </g>
+                    </svg>
+                  )
+                })}
+              </div>
             )
           })}
           {/* ---------------- DECOR ----------------
@@ -768,6 +827,7 @@ export default function IsoBoard({
                   data-scene-object="decor"
                   data-decor={d.file}
                   data-decor-lift={lift}
+                  data-decor-support={d.support}
                   data-visual-scale={visualScale}
                   style={{
                     position: 'absolute',
@@ -888,17 +948,26 @@ export default function IsoBoard({
             {active && Array.from({ length: N }, (_, r) =>
               Array.from({ length: N }, (_, c) => (
                 (r === active.row || c === active.col) ? null : (
-                  <polygon key={`dim${r}-${c}`} points={diamond(r, c)} fill={LANE.dim} />
+                  <polygon
+                    key={`dim${r}-${c}`}
+                    data-active-dim=""
+                    points={diamond(r, c)}
+                    fill={isMidnightDelivery ? MIDNIGHT_LANE.dim : LANE.dim}
+                  />
                 )
               )),
             )}
             {active && Array.from({ length: N }, (_, c) => (
               <polygon key={`ar${c}`} data-active-lane="row" points={diamond(active.row, c)}
-                fill={LANE.row} stroke={LANE.rowEdge} strokeWidth={2.5} />
+                fill={isMidnightDelivery ? MIDNIGHT_LANE.row : LANE.row}
+                stroke={isMidnightDelivery ? MIDNIGHT_LANE.rowEdge : LANE.rowEdge}
+                strokeWidth={isMidnightDelivery ? 1.5 : 2.5} />
             ))}
             {active && Array.from({ length: N }, (_, r) => (
               <polygon key={`ac${r}`} data-active-lane="column" points={diamond(r, active.col)}
-                fill={LANE.col} stroke={LANE.colEdge} strokeWidth={2.5} />
+                fill={isMidnightDelivery ? MIDNIGHT_LANE.col : LANE.col}
+                stroke={isMidnightDelivery ? MIDNIGHT_LANE.colEdge : LANE.colEdge}
+                strokeWidth={isMidnightDelivery ? 1.5 : 2.5} />
             ))}
             {/* End markers — small triangles pointing off-board at both ends
                 of the active row and column, so the lane's full extent reads
@@ -911,10 +980,10 @@ export default function IsoBoard({
                 `${x},${y} ${x - dy * 7 - dx * 10},${y + dx * 7 - dy * 10} ${x + dy * 7 - dx * 10},${y - dx * 7 - dy * 10}`
               return (
                 <>
-                  <polygon points={tri(rowStart.left, rowStart.top + hh, -1, 0)} fill={LANE.rowEdge} />
-                  <polygon points={tri(rowEnd.left + TILE_W, rowEnd.top + hh, 1, 0)} fill={LANE.rowEdge} />
-                  <polygon points={tri(colStart.left + TILE_W / 2, colStart.top, 0, -1)} fill={LANE.colEdge} />
-                  <polygon points={tri(colEnd.left + TILE_W / 2, colEnd.top + TILE_H, 0, 1)} fill={LANE.colEdge} />
+                  <polygon points={tri(rowStart.left, rowStart.top + hh, -1, 0)} fill={isMidnightDelivery ? MIDNIGHT_LANE.rowEdge : LANE.rowEdge} />
+                  <polygon points={tri(rowEnd.left + TILE_W, rowEnd.top + hh, 1, 0)} fill={isMidnightDelivery ? MIDNIGHT_LANE.rowEdge : LANE.rowEdge} />
+                  <polygon points={tri(colStart.left + TILE_W / 2, colStart.top, 0, -1)} fill={isMidnightDelivery ? MIDNIGHT_LANE.colEdge : LANE.colEdge} />
+                  <polygon points={tri(colEnd.left + TILE_W / 2, colEnd.top + TILE_H, 0, 1)} fill={isMidnightDelivery ? MIDNIGHT_LANE.colEdge : LANE.colEdge} />
                 </>
               )
             })()}
@@ -922,9 +991,9 @@ export default function IsoBoard({
               <polygon
                 data-active-intersection=""
                 points={diamond(active.row, active.col)}
-                fill={isMidnightDelivery ? 'rgba(238,219,170,0.58)' : LANE.cross}
-                stroke={isMidnightDelivery ? 'rgba(82,57,26,0.84)' : LANE.crossEdge}
-                strokeWidth={isMidnightDelivery ? 2.5 : 4}
+                fill={isMidnightDelivery ? 'rgba(232,207,158,0.26)' : LANE.cross}
+                stroke={isMidnightDelivery ? 'rgba(82,57,26,0.52)' : LANE.crossEdge}
+                strokeWidth={isMidnightDelivery ? 1.5 : 4}
               />
             )}
           </svg>
@@ -938,12 +1007,16 @@ export default function IsoBoard({
             const rot = f.rotation ?? 0
             const file = KENNEY_FILE[f.type] + '_' + (rot === 90 || rot === 270 ? 'SW' : 'SE')
             const [nativeW, nativeH] = SPRITE_DIMS[file] ?? [92, 92]
-            const visual = getSceneFurnitureVisual(puzzle.id, f)
+            const visual = isMidnightDelivery ? getSceneFurnitureVisual(puzzle.id, f) : undefined
             const visualScale = visual?.scale ?? 1
+            const offsetRow = visual?.offsetRow ?? 0
+            const offsetCol = visual?.offsetCol ?? 0
             const groundOffsetY = visual?.groundOffsetY ?? 0
             const shadowScale = visual?.shadowScale ?? 0.58
             const shadowOpacity = visual?.shadowOpacity ?? 0.55
             const shadowBlur = visual?.shadowBlur ?? 3
+            const shadowOffsetRow = visual?.shadowOffsetRow ?? 0
+            const shadowOffsetCol = visual?.shadowOffsetCol ?? 0
             const renderW = nativeW * visualScale
             const renderH = nativeH * visualScale
             const { w: fw, h: fh } = furnitureFootprint(f)
@@ -951,19 +1024,23 @@ export default function IsoBoard({
             const centreCol = f.col + (fw - 1) / 2
             const frontRow = f.row + fh - 1
             const frontCol = f.col + fw - 1
+            const visualCentreRow = centreRow + offsetRow
+            const visualCentreCol = centreCol + offsetCol
             const occupiedCells = furnitureCells(f)
-            const { left, top } = project(centreRow, centreCol)
+            const { left, top } = project(visualCentreRow, visualCentreCol)
             const occluding = occludes(f, active)
               || occupiedCells.some(cell => cellsWithToken.has(cell.row + ',' + cell.col))
             const opacity = occluding ? 0.26 : inActiveLane(f) ? 0.55 : 1
             const cx = left + TILE_W / 2, cy = top + TILE_H / 2
             const groundY = cy + TILE_H / 4 + groundOffsetY
-            const z = sceneZ(frontRow, frontCol)
+            const z = sceneZ(frontRow + offsetRow, frontCol + offsetCol)
             const commonData = {
               'data-scene-object': 'furniture',
               'data-furniture': f.type,
+              'data-logical-cell': f.row + ',' + f.col,
               'data-footprint-center': centreRow + ',' + centreCol,
               'data-footprint-front': frontRow + ',' + frontCol,
+              'data-visual-offset': offsetRow + ',' + offsetCol,
               'data-ground-offset-y': groundOffsetY,
             }
 
@@ -982,9 +1059,18 @@ export default function IsoBoard({
                 >
                   <polygon
                     data-furniture-shadow={f.type}
+                    data-logical-cell={f.row + ',' + f.col}
+                    data-visual-offset={offsetRow + ',' + offsetCol}
+                    data-shadow-offset={shadowOffsetRow + ',' + shadowOffsetCol}
                     data-shadow-footprint={fh + 'x' + fw}
                     data-shadow-scale={shadowScale}
-                    points={footprintPolygon(f.row, f.col, fh, fw, shadowScale)}
+                    points={footprintPolygon(
+                      f.row + offsetRow + shadowOffsetRow,
+                      f.col + offsetCol + shadowOffsetCol,
+                      fh,
+                      fw,
+                      shadowScale,
+                    )}
                     fill={SKIN.contactShadow}
                     opacity={opacity * shadowOpacity}
                   />
@@ -1005,7 +1091,7 @@ export default function IsoBoard({
                       const moduleLift = module.lift ?? 0
                       const moduleW = moduleNativeW * moduleScale
                       const moduleH = moduleNativeH * moduleScale
-                      const modulePoint = project(module.row, module.col)
+                      const modulePoint = project(module.row + offsetRow, module.col + offsetCol)
                       const moduleX = modulePoint.left + TILE_W / 2
                       const moduleGround = modulePoint.top + TILE_H / 2 + TILE_H / 4
                       return (

@@ -20,6 +20,8 @@ import type { Furniture } from './types'
 // ============================================================================
 
 export interface WallSegment {
+  /** Stable scene-only identity for visual QA and local rendering policy. */
+  id?: string
   kind: 'edge' | 'corner'
   /** For kind 'edge': which rear edge of THIS cell — A = row-1 side, B = col-1 side.
    *  For kind 'corner': ignored; the piece sits at THIS cell's back vertex (row-0.5, col-0.5). */
@@ -32,10 +34,20 @@ export interface WallSegment {
   render: 'native' | 'cutaway'
   /** Number of contiguous board edges represented by this single architectural run. */
   span?: number
-  /** Zero-based cell within the run containing a doorway opening. */
-  doorwayIndex?: number
-  /** Doorway width as a fraction of one board edge. */
-  doorwayWidth?: number
+  /** Interior partitions can be lowered without narrowing their plan length. */
+  height?: number
+  /** Shell returns keep the exterior material family while using cutaway geometry. */
+  tone?: 'interior' | 'shell'
+  /** Deliberate openings cut into one continuous architectural run. */
+  openings?: WallOpening[]
+}
+
+export interface WallOpening {
+  /** Zero-based cell within the run containing the opening. */
+  index: number
+  /** Opening width as a fraction of one board edge. */
+  width: number
+  kind: 'door' | 'cased'
 }
 
 const edgeWall = (edge: 'A' | 'B', row: number, col: number, file: string, render: WallSegment['render']): WallSegment =>
@@ -43,15 +55,17 @@ const edgeWall = (edge: 'A' | 'B', row: number, col: number, file: string, rende
 const corner = (row: number, col: number, file: string): WallSegment =>
   ({ kind: 'corner', row, col, file, render: 'native' })
 const cutawayRun = (
+  id: string,
   edge: 'A' | 'B',
   row: number,
   col: number,
   span: number,
   file: string,
-  doorwayIndex?: number,
-  doorwayWidth?: number,
+  height: number,
+  openings: WallOpening[] = [],
+  tone: WallSegment['tone'] = 'interior',
 ): WallSegment => ({
-  kind: 'edge', edge, row, col, span, file, doorwayIndex, doorwayWidth, render: 'cutaway',
+  id, kind: 'edge', edge, row, col, span, file, height, openings, tone, render: 'cutaway',
 })
 
 const VERY_EASY_1: WallSegment[] = [
@@ -66,32 +80,43 @@ const VERY_EASY_1: WallSegment[] = [
   edgeWall('A', 0, 3, 'wall_NW', 'native'),
   edgeWall('A', 0, 4, 'wallWindow_NW', 'native'),
   edgeWall('A', 0, 5, 'wall_NW', 'native'),
-  // Full-height join between the exterior run and the bedroom/office wall.
-  corner(0, 3, 'wallCorner_NW'),
-  // West run (col 0, edge B): a window behind the living-room sofa. It ends
-  // before the open camera-facing corner; a half panel there read as an
-  // orphaned screen rather than an architectural return.
+  // West run (col 0, edge B): a window behind the living-room sofa.
   edgeWall('B', 1, 0, 'wall_NE', 'native'),
   edgeWall('B', 2, 0, 'wall_NE', 'native'),
   edgeWall('B', 3, 0, 'wall_NE', 'native'),
   edgeWall('B', 4, 0, 'wallWindow_NE', 'native'),
 
-  // ---- Interior — six continuous architectural runs. ----------------------
-  // Each run owns its full face and top cap, so tile boundaries cannot show
-  // through as modular panel seams. Doorways are cut into the run itself.
+  // A low camera-side return finishes the perimeter without hiding the room.
+  cutawayRun('shell-west-return', 'B', 5, 0, 1, 'wall_NE', 58, [], 'shell'),
+  // The matching low kitchen return gives the fridge/stove a built edge while
+  // preserving the open dollhouse view across the camera-facing elevation.
+  cutawayRun('shell-kitchen-return', 'B', 3, 6, 3, 'wall_NE', 52, [], 'shell'),
+
+  // ---- Interior — four long architectural runs. ---------------------------
+  // They follow room-scale boundaries, not cell rhythm. Doorways are openings
+  // in these runs, so circulation stays readable without detached panels.
   // Bedroom vs Office: solid private partition.
-  cutawayRun('B', 0, 3, 2, 'wall_NE'),
+  cutawayRun('bedroom-office', 'B', 0, 3, 2, 'wall_NE', 86),
 
-  // Bedroom/Office vs Hallway: one doorway into each room.
-  cutawayRun('A', 2, 0, 3, 'wallDoorway_NW', 1),
-  cutawayRun('A', 2, 3, 3, 'wallDoorway_NW', 1),
+  // Bedroom/Office vs Hallway: one doorway into each private room. The office
+  // opening sits away from the fixed lamp at (1,4).
+  cutawayRun('bedrooms-hall', 'A', 2, 0, 6, 'wallDoorway_NW', 86, [
+    { index: 1, width: 0.74, kind: 'door' },
+    { index: 3, width: 0.74, kind: 'door' },
+  ]),
 
-  // Hallway vs Living Room/Kitchen: one doorway into each room.
-  cutawayRun('A', 3, 0, 3, 'wallDoorway_NW', 1),
-  cutawayRun('A', 3, 3, 3, 'wallDoorway_NW', 1),
+  // The social zone enters through the living room. The kitchen's north wall
+  // remains a coherent service wall behind its immutable counter/stove run.
+  cutawayRun('hall-social', 'A', 3, 0, 6, 'wallDoorway_NW', 80, [
+    { index: 1, width: 0.88, kind: 'cased' },
+  ]),
 
-  // Living Room vs Kitchen: complete partition with a slightly wider opening.
-  cutawayRun('B', 3, 3, 3, 'wallDoorway_NE', 1, 0.66),
+  // Living Room vs Kitchen: the opening is at row 5, not behind the row-4
+  // television/table pair. This also makes the visible route agree with the
+  // authored Priya-at-(5,2) / chair-at-(5,3) relationship.
+  cutawayRun('living-kitchen', 'B', 3, 3, 3, 'wallDoorway_NE', 80, [
+    { index: 2, width: 0.82, kind: 'cased' },
+  ]),
   // NOTE — no "corner return" stubs. An earlier pass added four short walls
   // at (1,1), (1,5), (4,2) and (4,5) to force L-shaped corners, but each of
   // those edges is INSIDE a room, so they rendered as free-standing screens
@@ -113,6 +138,8 @@ export interface DecorPiece {
    * surface beneath it should be deleted, not left floating.
    */
   lift?: number
+  /** Named visible support, required for every lifted scene prop. */
+  support?: 'counter' | 'desk' | 'bookshelf'
   /** Presentational enlargement for props that disappear at phone scale. */
   scale?: number
 }
@@ -124,9 +151,9 @@ export interface DecorPiece {
 // floor next to a furnished far half, so the composition was lopsided. These
 // fill it as a real sitting area and a used corridor.
 const VERY_EASY_1_DECOR: DecorPiece[] = [
-  { row: 3, col: 4, file: 'kitchenMicrowave', facing: 'SE', lift: 62, scale: 1.25 },
-  { row: 0, col: 3, file: 'laptop', facing: 'SE', lift: 58, scale: 1.25 },
-  { row: 1, col: 5, file: 'books', facing: 'SE', lift: 52, scale: 2 },
+  { row: 3, col: 4, file: 'kitchenMicrowave', facing: 'SE', lift: 76, scale: 1.25, support: 'counter' },
+  { row: 0, col: 3, file: 'laptop', facing: 'SE', lift: 68, scale: 1.25, support: 'desk' },
+  { row: 1, col: 5, file: 'books', facing: 'SE', lift: 52, scale: 2, support: 'bookshelf' },
 ]
 
 export type SceneFloorMaterial = 'oak' | 'slate' | 'terrazzo' | 'carpet' | 'tile'
@@ -157,13 +184,7 @@ export interface SceneFloorAccent {
   stroke: string
 }
 
-const VERY_EASY_1_ACCENTS: SceneFloorAccent[] = [
-
-  {
-    id: 'living-rug', row: 3, col: 0, w: 3, h: 3, scale: 0.58,
-    fill: '#817281', stroke: '#594D5A',
-  },
-]
+const VERY_EASY_1_ACCENTS: SceneFloorAccent[] = []
 
 export interface SceneFurnitureModule {
   file: string
@@ -177,12 +198,18 @@ export interface SceneFurnitureModule {
 
 export interface SceneFurnitureVisual {
   scale?: number
+  /** Scene-only fractional shift; logical cell and clue footprint remain unchanged. */
+  offsetRow?: number
+  offsetCol?: number
   /** Small presentational correction for a sprite whose illustrated feet/base sit above its logical contact plane. */
   groundOffsetY?: number
   /** Scene-only contact-shadow tuning; these never change logical footprint or clue semantics. */
   shadowScale?: number
   shadowOpacity?: number
   shadowBlur?: number
+  /** Aligns the contact shadow with transparent padding in the illustrated sprite. */
+  shadowOffsetRow?: number
+  shadowOffsetCol?: number
   modules?: SceneFurnitureModule[]
 }
 
@@ -194,16 +221,18 @@ export function getSceneFurnitureVisual(
   if (furniture.type === 'counter' && furniture.row === 3 && furniture.col === 3) {
     return {
       modules: [
-        { file: 'kitchenSink', facing: 'SE', row: 3, col: 3, scale: 1.15 },
-        { file: 'kitchenCabinet', facing: 'SE', row: 3, col: 4, scale: 1.15 },
+        { file: 'kitchenSink', facing: 'SE', row: 3, col: 3, scale: 1.28 },
+        { file: 'kitchenCabinet', facing: 'SE', row: 3, col: 4, scale: 1.28 },
       ],
     }
   }
   if (furniture.type === 'bed') return {
-    scale: 1, groundOffsetY: 5, shadowScale: 0.5, shadowOpacity: 0.5, shadowBlur: 1.6,
+    scale: 1, groundOffsetY: 7, shadowScale: 0.62, shadowOpacity: 0.38, shadowBlur: 2.2,
+    shadowOffsetRow: -0.05, shadowOffsetCol: -0.35,
   }
   if (furniture.type === 'sofa') return {
-    scale: 1.04, groundOffsetY: 4, shadowScale: 0.48, shadowOpacity: 0.52, shadowBlur: 1.6,
+    scale: 1.04, groundOffsetY: 6, shadowScale: 0.6, shadowOpacity: 0.42, shadowBlur: 2.2,
+    shadowOffsetRow: -0.08, shadowOffsetCol: -0.4,
   }
   if (furniture.type === 'lamp') return {
     modules: [
@@ -217,14 +246,23 @@ export function getSceneFurnitureVisual(
       },
     ],
   }
-  if (furniture.type === 'plant') return { scale: 1.6 }
+  if (furniture.type === 'plant') return { scale: 1.82, offsetRow: 0.2, offsetCol: -0.08 }
+  if (furniture.type === 'chair' && furniture.row === 0 && furniture.col === 4) {
+    return { scale: 1.28, offsetRow: 0.04, offsetCol: -0.38 }
+  }
+  if (furniture.type === 'chair' && furniture.row === 5 && furniture.col === 3) {
+    return { scale: 1.28, offsetRow: 0.08, offsetCol: 0.35 }
+  }
   if (furniture.type === 'chair') return { scale: 1.28 }
   if (furniture.type === 'desk') return { scale: 1.18 }
   if (furniture.type === 'bookshelf') return { scale: 1.25 }
+  if (furniture.type === 'table' && furniture.row === 3 && furniture.col === 1) {
+    return { scale: 1.12, offsetRow: 0.28, offsetCol: 0.22 }
+  }
   if (furniture.type === 'table') return { scale: 1.12 }
   if (furniture.type === 'tv') return { scale: 1.3 }
-  if (furniture.type === 'stove') return { scale: 1.12 }
-  if (furniture.type === 'fridge') return { scale: 1.06 }
+  if (furniture.type === 'stove') return { scale: 1.12, offsetCol: 0.22 }
+  if (furniture.type === 'fridge') return { scale: 1.06, offsetRow: 0.1, offsetCol: 0.22 }
   return undefined
 }
 
