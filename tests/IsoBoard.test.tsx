@@ -156,51 +156,77 @@ describe('Midnight Delivery scene architecture', () => {
     const privateWall = walls.find(w => w.id === 'bedrooms-hall')
     const socialWall = walls.find(w => w.id === 'hall-social')
     const livingKitchen = walls.find(w => w.id === 'living-kitchen')
+    // Interior partitions are LOW (58–74) so the hallway reads as an open
+    // cutaway circulation zone rather than a walled institutional corridor;
+    // plan length (span) and doorway openings are unchanged.
     expect(privateWall).toEqual(expect.objectContaining({
-      edge: 'A', row: 2, col: 0, span: 6, height: 86,
+      edge: 'A', row: 2, col: 0, span: 6, height: 60,
       openings: [
         expect.objectContaining({ index: 1, width: 0.74, kind: 'door' }),
         expect.objectContaining({ index: 3, width: 0.74, kind: 'door' }),
       ],
     }))
     expect(socialWall).toEqual(expect.objectContaining({
-      edge: 'A', row: 3, col: 0, span: 6, height: 80,
+      edge: 'A', row: 3, col: 0, span: 6, height: 58,
       openings: [expect.objectContaining({ index: 1, width: 0.88, kind: 'cased' })],
     }))
     expect(livingKitchen).toEqual(expect.objectContaining({
-      edge: 'B', row: 3, col: 3, span: 3, height: 80,
+      edge: 'B', row: 3, col: 3, span: 3, height: 64,
       openings: [expect.objectContaining({ index: 2, width: 0.82, kind: 'cased' })],
     }))
     expect(walls.flatMap(w => w.openings ?? [])).toHaveLength(4)
   })
 
-  it('keeps every raised prop on a supporting surface and removes overlapping floor clutter', () => {
+  it('keeps every raised prop on a supporting surface and adds only purposeful floor props', () => {
     const decor = getSceneDecor('very-easy-1')
+    // Raised props still ride a declared surface…
     expect(decor).toEqual(expect.arrayContaining([
-      expect.objectContaining({ file: 'kitchenMicrowave', row: 3, col: 4, lift: 76, support: 'counter' }),
       expect.objectContaining({ file: 'laptop', row: 0, col: 3, lift: 68, support: 'desk' }),
       expect.objectContaining({ file: 'books', row: 1, col: 5, lift: 52, support: 'bookshelf' }),
     ]))
-    expect(decor.some(d => ['sideTable', 'pottedPlant', 'loungeChair', 'trashcan', 'cardboardBoxClosed'].includes(d.file))).toBe(false)
+    // The microwave now rides the kitchen counter as a MODULE (see the counter
+    // visual), so it is no longer loose decor.
+    expect(decor.some(d => d.file === 'kitchenMicrowave')).toBe(false)
+    // The only floor-standing props are purposeful: the office wastebasket
+    // (a lived-in study detail) and the unopened delivery beside the victim
+    // (the one detective cue, straight from the case flavour).
+    expect(decor).toEqual(expect.arrayContaining([
+      expect.objectContaining({ file: 'trashcan', row: 1, col: 3 }),
+      expect.objectContaining({ file: 'cardboardBoxClosed', row: 5, col: 1 }),
+    ]))
+    // Every LIFTED prop names its supporting surface; nothing floats.
+    expect(decor.filter(d => (d.lift ?? 0) > 0).every(d => !!d.support)).toBe(true)
     expect(decor.every(d => d.scale === undefined || d.scale >= 1)).toBe(true)
   })
 
-  it('defines five room-scale finishes without a board-like outlined rug', () => {
+  it('defines five room-scale finishes plus two composed area rugs', () => {
     expect(getSceneFloorFinishes('very-easy-1').map(f => f.room)).toEqual([
       'Bedroom', 'Office', 'Hallway', 'Living Room', 'Kitchen',
     ])
     expect(new Set(getSceneFloorFinishes('very-easy-1').map(f => f.material)).size).toBe(5)
-    expect(getSceneFloorAccents('very-easy-1')).toEqual([])
+    // Two authored area rugs zone the open floor: a living-room rug anchoring
+    // the seating group and a hall runner. These are composed room-scale
+    // shapes, NOT a per-cell board pattern (there are exactly two).
+    const accents = getSceneFloorAccents('very-easy-1')
+    expect(accents.map(a => a.id)).toEqual(['living-rug', 'hall-runner'])
+    expect(accents.every(a => a.w >= 1 && a.h >= 1)).toBe(true)
     expect(getSceneFloorFinishes('very-easy-2')).toEqual([])
+    expect(getSceneFloorAccents('very-easy-2')).toEqual([])
   })
 
-  it('turns the fixed two-cell counter into a sink-and-cabinet visual run', () => {
-    expect(getSceneFurnitureVisual('very-easy-1', {
+  it('turns the fixed two-cell counter into a sink+cabinet+microwave run against the wall', () => {
+    const counter = getSceneFurnitureVisual('very-easy-1', {
       type: 'counter', row: 3, col: 3, w: 2, h: 1, rotation: 0,
-    })).toEqual(expect.objectContaining({
+    })
+    // Pushed flush to the back (service) wall so it is not an island mid-floor.
+    expect(counter).toEqual(expect.objectContaining({ offsetRow: -0.18 }))
+    expect(counter).toEqual(expect.objectContaining({
       modules: [
-        expect.objectContaining({ file: 'kitchenSink', row: 3, col: 3, scale: 1.28 }),
-        expect.objectContaining({ file: 'kitchenCabinet', row: 3, col: 4, scale: 1.28 }),
+        expect.objectContaining({ file: 'kitchenSink' }),
+        expect.objectContaining({ file: 'kitchenCabinet' }),
+        // The microwave rides the cabinet as a lifted module, moving WITH the
+        // run rather than floating as separate decor.
+        expect.objectContaining({ file: 'kitchenMicrowave', lift: 66 }),
       ],
     }))
   })
@@ -228,21 +254,35 @@ describe('Midnight Delivery scene architecture', () => {
     expect(getSceneFurnitureVisual('very-easy-1', {
       type: 'plant', row: 3, col: 2, w: 1, h: 1,
     })).toEqual(expect.objectContaining({ scale: 1.82, offsetRow: 0.2, offsetCol: -0.08 }))
+    // Coffee table pulled in toward the sofa (was 0.28,0.22 drifting away).
     expect(getSceneFurnitureVisual('very-easy-1', {
       type: 'table', row: 3, col: 1, w: 1, h: 1,
-    })).toEqual(expect.objectContaining({ offsetRow: 0.28, offsetCol: 0.22 }))
+    })).toEqual(expect.objectContaining({ offsetRow: 0.16, offsetCol: -0.06 }))
     expect(getSceneFurnitureVisual('very-easy-1', {
       type: 'chair', row: 5, col: 3, w: 1, h: 1,
     })).toEqual(expect.objectContaining({ offsetRow: 0.08, offsetCol: 0.35 }))
+    // The office chair is a chairDesk MODULE tucked in front of the desk and
+    // facing it; its offset carries the shadow to the same spot.
     expect(getSceneFurnitureVisual('very-easy-1', {
       type: 'chair', row: 0, col: 4, w: 1, h: 1,
-    })).toEqual(expect.objectContaining({ offsetRow: 0.04, offsetCol: -0.38 }))
+    })).toEqual(expect.objectContaining({
+      offsetRow: 0.36, offsetCol: -0.98,
+      modules: [expect.objectContaining({ file: 'chairDesk', facing: 'NW' })],
+    }))
+    // Appliances tuck to the walls: fridge into the back-right corner, stove
+    // closing the back-wall run.
     expect(getSceneFurnitureVisual('very-easy-1', {
       type: 'fridge', row: 4, col: 5, w: 1, h: 1,
-    })).toEqual(expect.objectContaining({ offsetRow: 0.1, offsetCol: 0.22 }))
+    })).toEqual(expect.objectContaining({ offsetRow: -0.06, offsetCol: 0.26 }))
     expect(getSceneFurnitureVisual('very-easy-1', {
       type: 'stove', row: 3, col: 5, w: 1, h: 1,
-    })).toEqual(expect.objectContaining({ offsetCol: 0.22 }))
+    })).toEqual(expect.objectContaining({ offsetRow: -0.14, offsetCol: 0.08 }))
+    // The television turns to face the sofa's side and reads as a media piece.
+    expect(getSceneFurnitureVisual('very-easy-1', {
+      type: 'tv', row: 4, col: 2, w: 1, h: 1,
+    })).toEqual(expect.objectContaining({
+      modules: [expect.objectContaining({ file: 'televisionVintage', facing: 'SW' })],
+    }))
   })
 })
 
@@ -257,7 +297,9 @@ describe('IsoBoard geometry and interaction states', () => {
   it('renders the five room finishes as room-scale polygons without permanent labels', () => {
     const { container } = renderMidnightDelivery()
     expect(container.querySelectorAll('[data-room-floor]')).toHaveLength(5)
-    expect(container.querySelectorAll('[data-floor-accent]')).toHaveLength(0)
+    // Two composed area rugs (living-room rug + hall runner), not zero and not
+    // a per-cell board pattern.
+    expect(container.querySelectorAll('[data-floor-accent]')).toHaveLength(2)
     expect(container.querySelectorAll('[data-room-label]')).toHaveLength(0)
   })
 
@@ -332,9 +374,9 @@ describe('IsoBoard geometry and interaction states', () => {
   it('moves scene-only furniture visuals and their shadows together without changing logical footprints', () => {
     const { container } = renderMidnightDelivery()
     const livingTable = container.querySelector('[data-furniture="table"][data-logical-cell="3,1"]')
-    expect(livingTable).toHaveAttribute('data-visual-offset', '0.28,0.22')
+    expect(livingTable).toHaveAttribute('data-visual-offset', '0.16,-0.06')
     expect(container.querySelector('[data-furniture-shadow="table"][data-logical-cell="3,1"]'))
-      .toHaveAttribute('data-visual-offset', '0.28,0.22')
+      .toHaveAttribute('data-visual-offset', '0.16,-0.06')
     const kitchenChair = container.querySelector('[data-furniture="chair"][data-logical-cell="5,3"]')
     expect(kitchenChair).toHaveAttribute('data-visual-offset', '0.08,0.35')
   })
@@ -356,11 +398,13 @@ describe('IsoBoard geometry and interaction states', () => {
     expect(cues[0]).toHaveAttribute('fill', 'rgba(70,45,20,0.14)')
   })
 
-  it('renders two visual modules for the fixed counter while preserving one two-cell contact shadow', () => {
+  it('renders the counter as a sink+cabinet+microwave run with one two-cell contact shadow', () => {
     const { container } = renderMidnightDelivery()
-    expect(container.querySelectorAll('[data-furniture-module="counter"]')).toHaveLength(2)
+    expect(container.querySelectorAll('[data-furniture-module="counter"]')).toHaveLength(3)
     expect(container.querySelector('[data-furniture-module-file="kitchenSink"]')).toBeInTheDocument()
     expect(container.querySelector('[data-furniture-module-file="kitchenCabinet"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-furniture-module-file="kitchenMicrowave"]')).toBeInTheDocument()
+    // Still ONE contact shadow for the whole two-cell logical footprint.
     expect(container.querySelector('[data-furniture-shadow="counter"]')).toHaveAttribute('data-shadow-footprint', '1x2')
   })
 
@@ -423,12 +467,15 @@ describe('IsoBoard geometry and interaction states', () => {
     expect(Number(suspect.style.zIndex)).toBeGreaterThan(Number(bed.style.zIndex))
   })
 
-  it('sorts a lifted prop at the front edge of its supporting multi-cell surface', () => {
+  it('rides the microwave on the counter run as a lifted module, not loose floor decor', () => {
     const { container } = renderBoard({
       furniture: [{ type: 'counter', row: 3, col: 3, w: 2, h: 1 }],
     })
-    const microwave = container.querySelector('[data-decor="kitchenMicrowave"]') as HTMLElement
-    const counter = container.querySelector('[data-furniture="counter"]') as HTMLElement
-    expect(Number(microwave.style.zIndex)).toBeGreaterThan(Number(counter.style.zIndex))
+    // The microwave is part of the counter's module group (moves with the run
+    // and rests on the cabinet), never a detached decor sprite on the floor.
+    expect(container.querySelector('[data-decor="kitchenMicrowave"]')).toBeNull()
+    const microwave = container.querySelector('[data-furniture-module-file="kitchenMicrowave"]') as HTMLElement
+    expect(microwave).toBeInTheDocument()
+    expect(Number(microwave.getAttribute('data-furniture-module-lift'))).toBeGreaterThan(0)
   })
 })

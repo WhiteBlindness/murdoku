@@ -806,10 +806,13 @@ export default function IsoBoard({
             const lift = d.lift ?? 0
             const depthRow = lift > 0 ? Math.ceil(d.row) : d.row
             const depthCol = lift > 0 ? Math.ceil(d.col) : d.col
-            const z = sceneZ(depthRow, depthCol, lift > 0 ? 5 : 1)
+            // A flat floor covering sorts just above the floor polygon (z 10)
+            // and the placement cues, but below every standing object, so
+            // furniture and suspects always rest ON the rug, never behind it.
+            const z = d.flat ? 16 : sceneZ(depthRow, depthCol, lift > 0 ? 5 : 1)
             return (
               <div key={'dec' + i}>
-                {lift === 0 && (
+                {lift === 0 && !d.flat && (
                   <div style={{
                     position: 'absolute',
                     left: cx - dw * 0.24,
@@ -832,7 +835,9 @@ export default function IsoBoard({
                   style={{
                     position: 'absolute',
                     left: cx - dw / 2,
-                    top: groundY - dh - lift,
+                    // A flat rug is centred on its cell's floor plane; a
+                    // standing prop is bottom-anchored on the contact line.
+                    top: d.flat ? cy + TILE_H / 4 - dh / 2 : groundY - dh - lift,
                     width: dw,
                     height: dh,
                     zIndex: z,
