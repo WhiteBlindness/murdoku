@@ -45,6 +45,7 @@ colors:
   scene-lane-row: "#FFB547"
   scene-lane-col: "#5AC8FF"
   scene-lane-locked: "#4CAF72"
+  scene-lane-blocked: "#8A6CFF"
   scene-lane-conflict: "#FF3B3B"
   scene-clue-wash: "#FFF2C8"
 typography:

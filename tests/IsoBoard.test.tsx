@@ -8,7 +8,7 @@ import { validateScene } from '../src/scene3d/validate'
 import { midnightDelivery } from '../src/scene3d/scenes/midnight-delivery'
 import { sceneFor, hasAuthoredScene, AUTHORED_SCENES } from '../src/scene3d/scenes'
 import { initCatalog, getPuzzleById } from '../src/core/catalog'
-import { CELL, PARTITION_HEIGHT, WALL_HEIGHT, makeFrame } from '../src/scene3d/units'
+import { CELL, PARTITION_HEIGHT, WALL_HEIGHT, makeFrame, makeStoreyFrame } from '../src/scene3d/units'
 import { MODEL_BOUNDS } from '../src/scene3d/catalog.generated'
 import { metaOf } from '../src/scene3d/catalog'
 import type { SceneSpec } from '../src/scene3d/schema'
@@ -210,6 +210,15 @@ describe('projection', () => {
       expect(f.width / f.height).toBeGreaterThan(1)
     }
   })
+
+  it('reserves more vertical space for an exploded overview than a true-height ghost', () => {
+    const single = makeFrame(8)
+    const ghost = makeStoreyFrame(8, 0, 'ghost')
+    const exploded = makeStoreyFrame(8, 0, 'exploded')
+
+    expect(ghost.height).toBeGreaterThan(single.height)
+    expect(exploded.height).toBeGreaterThan(ghost.height)
+  })
 })
 
 describe('every authored scene passes the validator against its real puzzle', () => {
@@ -284,5 +293,37 @@ describe('IsoBoard component', () => {
   })
   it('shares one CELL constant between the DOM overlay and the renderer', () => {
     expect(CELL).toBeGreaterThan(0.5); expect(CELL).toBeLessThanOrEqual(1)
+  })
+
+  it('shows the other storey as non-interactive context in ghost and exploded modes', () => {
+    initCatalog()
+    const puzzle = getPuzzleById('hard-1')!
+    const { container, rerender } = render(
+      <IsoBoard
+        puzzle={puzzle}
+        marks={emptyMarks(8)}
+        conflicts={new Set()}
+        onCellClick={vi.fn()}
+        floor={0}
+        storeyView="ghost"
+      />,
+    )
+    const board = container.querySelector('[data-iso-board]')!
+    expect(board).toHaveAttribute('data-storey-view', 'ghost')
+    expect(board).toHaveAttribute('data-companion-floor', '1')
+    expect(container.querySelectorAll('[role="gridcell"]')).toHaveLength(64)
+
+    rerender(
+      <IsoBoard
+        puzzle={puzzle}
+        marks={emptyMarks(8)}
+        conflicts={new Set()}
+        onCellClick={vi.fn()}
+        floor={0}
+        storeyView="exploded"
+      />,
+    )
+    expect(container.querySelector('[data-iso-board]')).toHaveAttribute('data-storey-view', 'exploded')
+    expect(container.querySelectorAll('[role="gridcell"]')).toHaveLength(64)
   })
 })

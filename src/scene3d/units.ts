@@ -67,6 +67,7 @@ export const CAMERA_AZIMUTH_DEG = 45
 export const PX_PER_UNIT = 180
 
 export type Vec3 = [number, number, number]
+export type StoreyView = 'ghost' | 'exploded'
 
 const SQ2 = Math.SQRT1_2
 
@@ -95,7 +96,7 @@ export interface SceneFrame {
   headroom: number
 }
 
-export function makeFrame(n: number, headroom = 0): SceneFrame {
+export function makeFrame(n: number, headroom = 0, footroom = 0): SceneFrame {
   const el = (CAMERA_ELEVATION_DEG * Math.PI) / 180
   const s = Math.sin(el), c = Math.cos(el)
   const side = n * CELL
@@ -106,7 +107,7 @@ export function makeFrame(n: number, headroom = 0): SceneFrame {
   const margin = 0.18
   const halfW = side * SQ2 + margin
   const top = upOf([0, WALL_HEIGHT + headroom, 0]) + margin            // back corner wall top (+ ghost storey)
-  const bottom = upOf([side, -FLOOR_THICKNESS - TERRAIN_DROP, side]) - margin // front corner slab bottom
+  const bottom = upOf([side, -FLOOR_THICKNESS - TERRAIN_DROP - footroom, side]) - margin // front corner slab bottom
   const viewWidthUnits = halfW * 2
   const viewHeightUnits = top - bottom
   const width = Math.round(viewWidthUnits * PX_PER_UNIT)
@@ -133,6 +134,12 @@ export function makeFrame(n: number, headroom = 0): SceneFrame {
     project([col * CELL, y, (row + 1) * CELL]),
   ]
   return { n, width, height, viewWidthUnits, viewHeightUnits, centre, project, unprojectFloor, cellCentre, cellPolygon, headroom }
+}
+
+/** Shared frame for the active storey plus its non-interactive companion. */
+export function makeStoreyFrame(n: number, activeFloor: 0 | 1, view: StoreyView): SceneFrame {
+  const separation = view === 'ghost' ? STOREY_HEIGHT : STOREY_HEIGHT * 1.8
+  return makeFrame(n, activeFloor === 0 ? separation : 0, activeFloor === 1 ? separation : 0)
 }
 
 /** Unit vector pointing from the scene toward the camera. */

@@ -11,7 +11,7 @@
 
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { CELL, FLOOR_THICKNESS, cameraDirection, type Vec3 } from './units'
+import { CELL, FLOOR_THICKNESS, cameraDirection, type StoreyView, type Vec3 } from './units'
 import type { ResolvedScene, ResolvedObject, Box3 } from './resolve'
 import type { KenneyModel } from './catalog.generated'
 
@@ -63,6 +63,12 @@ export interface SceneRenderer {
   /** Resolves once every model in the scene has loaded and been drawn. */
   ready: Promise<void>
   dispose: () => void
+}
+
+export interface CompanionScene {
+  scene: ResolvedScene
+  offsetY: number
+  mode: StoreyView
 }
 
 const modelCache = new Map<string, Promise<THREE.Group>>()
@@ -122,6 +128,19 @@ function boxMesh(box: Box3, face: string, cap: string): THREE.Mesh {
   return m
 }
 
+function ghostBox(box: Box3, offsetY: number, opacity: number): THREE.Mesh {
+  const w = box.max[0] - box.min[0], h = box.max[1] - box.min[1], d = box.max[2] - box.min[2]
+  const mesh = new THREE.Mesh(
+    new THREE.BoxGeometry(w, h, d),
+    new THREE.MeshBasicMaterial({
+      color: '#c9ab72', transparent: true, opacity, wireframe: true, depthWrite: false,
+    }),
+  )
+  mesh.position.set(box.min[0] + w / 2, box.min[1] + h / 2 + offsetY, box.min[2] + d / 2)
+  mesh.renderOrder = 4
+  return mesh
+}
+
 function isDescendantOf(node: THREE.Object3D, ancestor: THREE.Object3D): boolean {
   let p: THREE.Object3D | null = node
   while (p) { if (p === ancestor) return true; p = p.parent }
@@ -132,7 +151,7 @@ function helperFor(box: Box3, colour: string): THREE.Box3Helper {
   return new THREE.Box3Helper(new THREE.Box3(new THREE.Vector3(...box.min), new THREE.Vector3(...box.max)), new THREE.Color(colour))
 }
 
-export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedScene): SceneRenderer | null {
+export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedScene, companion?: CompanionScene): SceneRenderer | null {
   let renderer: THREE.WebGLRenderer
   try {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
@@ -141,7 +160,7 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
   }
   renderer.setPixelRatio(Math.min(2, typeof devicePixelRatio === 'number' ? devicePixelRatio : 1))
   renderer.shadowMap.enabled = true
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap
+  renderer.shadowMap.type = THREE.PCFShadowMap
   renderer.outputColorSpace = THREE.SRGBColorSpace
   renderer.toneMapping = THREE.NoToneMapping
   renderer.setClearColor(0x000000, 0)
@@ -177,6 +196,7 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
 
   // ---- highlight decals: one quad per cell, painted on the floor ----
   const cellQuads: THREE.Mesh[][] = []
+  const companionCellQuads: THREE.Mesh[][] = []
   const quadGeo = new THREE.PlaneGeometry(CELL, CELL)
   quadGeo.rotateX(-Math.PI / 2)
   for (let r = 0; r < scene.n; r++) {
@@ -192,6 +212,24 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
       q.visible = false
       world.add(q)
       cellQuads[r].push(q)
+    }
+  }
+  if (companion) {
+    for (let r = 0; r < companion.scene.n; r++) {
+      companionCellQuads.push([])
+      for (let c = 0; c < companion.scene.n; c++) {
+        const mat = new THREE.MeshBasicMaterial({ color: '#8a6cff', transparent: true, opacity: 0, depthWrite: false })
+        const q = new THREE.Mesh(quadGeo, mat)
+        q.position.set(
+          (c + 0.5) * CELL,
+          companion.scene.floorY[r][c] + companion.offsetY + 0.009,
+          (r + 0.5) * CELL,
+        )
+        q.renderOrder = 9
+        q.visible = false
+        world.add(q)
+        companionCellQuads[r].push(q)
+      }
     }
   }
   const diagGroup = new THREE.Group()
@@ -269,6 +307,46 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
     requestRender()
   })
   for (const o of scene.objects) jobs.push(placeObject(o))
+  if (companion) {
+    const ghostOpacity = companion.mode === 'ghost' ? 0.16 : 0.32
+    const other = companion.scene
+    const inOtherStairwell = (r: number, c: number) => {
+      const sw = other.stairwell
+      return !!sw && c >= sw[0] && r >= sw[1] && c <= sw[2] && r <= sw[3]
+    }
+    for (let r = 0; r < other.n; r++) for (let c = 0; c < other.n; c++) {
+      if (inOtherStairwell(r, c)) continue
+      world.add(ghostBox({
+        min: [c * CELL, other.floorY[r][c] - FLOOR_THICKNESS, r * CELL],
+        max: [(c + 1) * CELL, other.floorY[r][c], (r + 1) * CELL],
+      }, companion.offsetY, ghostOpacity))
+    }
+    for (const wall of other.walls) {
+      for (const piece of wall.pieces) world.add(ghostBox(piece, companion.offsetY, ghostOpacity))
+      for (const frameBox of wall.frames) world.add(ghostBox(frameBox, companion.offsetY, ghostOpacity))
+    }
+    for (const stair of other.objects.filter(object => object.kind === 'stairs')) {
+      jobs.push(loadModel(stair.model).then(group => {
+        group.traverse(node => {
+          const mesh = node as THREE.Mesh
+          if (!mesh.isMesh) return
+          const fade = (material: THREE.Material) => {
+            const copy = material.clone()
+            copy.transparent = true
+            copy.opacity = companion.mode === 'ghost' ? 0.26 : 0.48
+            copy.depthWrite = false
+            return copy
+          }
+          mesh.material = Array.isArray(mesh.material) ? mesh.material.map(fade) : fade(mesh.material)
+        })
+        group.position.set(stair.position[0], stair.position[1] + companion.offsetY, stair.position[2])
+        group.rotation.y = (stair.rotY * Math.PI) / 180
+        group.renderOrder = 5
+        world.add(group)
+        requestRender()
+      }))
+    }
+  }
   const ready = Promise.all(jobs).then(() => { requestRender() })
 
   // ---- highlights ------------------------------------------------------------------------
@@ -303,6 +381,24 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
       q.visible = opacity > 0
       if (colour) mat.color.set(colour)
       mat.opacity = opacity
+    }
+    if (companion) {
+      for (let r = 0; r < companion.scene.n; r++) for (let c = 0; c < companion.scene.n; c++) {
+        const q = companionCellQuads[r][c]
+        const mat = q.material as THREE.MeshBasicMaterial
+        let colour = '#8a6cff', opacity = 0
+        if (!h.envOnly) {
+          if (h.blockedRows?.has(r) || h.blockedCols?.has(c)) opacity = 0.12
+          if (h.activeRow === r || h.activeCol === c) opacity = Math.max(opacity, 0.10)
+          if (h.hoverTarget?.row === r && h.hoverTarget.col === c) {
+            colour = h.hoverTarget.valid ? '#3fae5c' : '#c94444'
+            opacity = 0.32
+          }
+        }
+        q.visible = opacity > 0
+        mat.color.set(colour)
+        mat.opacity = opacity
+      }
     }
     requestRender()
   }

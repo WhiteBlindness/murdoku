@@ -5,6 +5,7 @@ import { resolveScene } from '../scene3d/resolve'
 import { sceneFor } from '../scene3d/scenes'
 import type { SceneRenderer } from '../scene3d/renderer'
 import { validateScene, formatViolations } from '../scene3d/validate'
+import { makeStoreyFrame, STOREY_HEIGHT, type StoreyView } from '../scene3d/units'
 import Avatar from './Avatar'
 
 // ============================================================================
@@ -39,6 +40,8 @@ interface Props {
   blockedRows?: ReadonlySet<number>
   blockedCols?: ReadonlySet<number>
   floor?: 0 | 1
+  /** Physical context for the inactive storey. Ghost is the primary play view. */
+  storeyView?: StoreyView
   /** Lanes that JUST locked elsewhere, for the one-shot cross-storey reveal. */
   flashRows?: ReadonlySet<number>
   flashCols?: ReadonlySet<number>
@@ -70,14 +73,33 @@ export default function IsoBoard({
   puzzle, marks, conflicts, onCellClick,
   highlight = null, highlightLabel,
   ghostMarks = null, blockedRows, blockedCols, floor = 0,
-  flashRows, flashCols, armedPerson = null,
+  storeyView = 'ghost', flashRows, flashCols, armedPerson = null,
 }: Props) {
   const N = puzzle.size
   const [active, setActive] = useState<{ row: number; col: number } | null>(null)
 
   const spec = useMemo(() => sceneFor(puzzle, floor), [puzzle, floor])
-  const scene = useMemo(() => resolveScene(spec, N), [spec, N])
-  const frame = scene.frame
+  const rawScene = useMemo(() => resolveScene(spec, N), [spec, N])
+  const twoStorey = (puzzle.floors ?? 1) > 1
+  const companionFloor = (floor === 0 ? 1 : 0) as 0 | 1
+  const companionSpec = useMemo(
+    () => twoStorey ? sceneFor(puzzle, companionFloor) : null,
+    [twoStorey, puzzle, companionFloor],
+  )
+  const companionScene = useMemo(
+    () => companionSpec ? resolveScene(companionSpec, N) : null,
+    [companionSpec, N],
+  )
+  const frame = useMemo(
+    () => twoStorey ? makeStoreyFrame(N, floor, storeyView) : rawScene.frame,
+    [twoStorey, N, floor, storeyView, rawScene.frame],
+  )
+  const scene = useMemo(() => ({ ...rawScene, frame }), [rawScene, frame])
+  const companion = useMemo(() => companionScene ? {
+    scene: companionScene,
+    offsetY: (floor === 0 ? 1 : -1) * (storeyView === 'ghost' ? STOREY_HEIGHT : STOREY_HEIGHT * 1.8),
+    mode: storeyView,
+  } : undefined, [companionScene, floor, storeyView])
 
   // Dev-time guardrail: the physical model is validated on every scene build
   // and the report lands in the console, where the visual QA loop reads it.
@@ -107,14 +129,14 @@ export default function IsoBoard({
     let created: SceneRenderer | null = null
     import('../scene3d/renderer').then(({ createSceneRenderer }) => {
       if (cancelled) return
-      created = createSceneRenderer(canvas, scene)
+      created = createSceneRenderer(canvas, scene, companion)
       rendererRef.current = created
       const el = wrapRef.current
       if (created && el) created.setSize(el.clientWidth || frame.width, el.clientHeight || frame.height)
       setRendererReady(v => v + 1)
     })
     return () => { cancelled = true; created?.dispose(); rendererRef.current = null }
-  }, [scene, frame.width, frame.height])
+  }, [scene, companion, frame.width, frame.height])
 
   useEffect(() => {
     const el = wrapRef.current
@@ -187,6 +209,8 @@ export default function IsoBoard({
       data-testid="board"
       data-iso-board=""
       data-scene-authored={scene.walls.some(w => w.kind === 'partition') ? 'true' : 'false'}
+      data-storey-view={twoStorey ? storeyView : undefined}
+      data-companion-floor={twoStorey ? companionFloor : undefined}
       className="relative w-full select-none"
       style={{ aspectRatio: `${frame.width} / ${frame.height}` }}
       role="grid"

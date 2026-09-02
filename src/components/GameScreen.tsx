@@ -8,7 +8,7 @@ import type { Puzzle, CellMark, GameMode, Furniture, FurnitureType } from '../co
 import { findFailingClues, resolveClueHighlights, satisfiedClueFlags } from '../core/ux'
 import { clueHolds } from '../core/engine'
 import type { Tool } from '../hooks/useGame'
-import { makeFrame } from '../scene3d/units'
+import { makeFrame, makeStoreyFrame, type StoreyView } from '../scene3d/units'
 import IsoBoard from './IsoBoard'
 import SuspectCard from './SuspectCard'
 import CaseProgressStrip from './CaseProgressStrip'
@@ -99,6 +99,7 @@ export default function GameScreen(props: Props) {
 
   const [help, setHelp] = useState(false)
   const [legend, setLegend] = useState(false)
+  const [storeyView, setStoreyView] = useState<StoreyView>('ghost')
   const [placementArmed, setPlacementArmed] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const menuTriggerRef = useRef<HTMLButtonElement>(null)
@@ -291,7 +292,7 @@ export default function GameScreen(props: Props) {
     prevMarks.current = marks
     prevFeedback.current = feedback
     prevSubmitNonce.current = submitNonce
-  })
+  }, [correctCount, feedback, marks, placedOf, puzzle.people, puzzle.size, roomName, submitNonce])
 
   // A miss or an illegal placement is a real rejection and earns the shake.
   // "You haven't finished yet" is guidance, not a mistake, so it only surfaces
@@ -313,6 +314,7 @@ export default function GameScreen(props: Props) {
   const twoFloor = floors > 1 && !!props.marksPerFloor
   const activeFloor = props.activeFloor ?? 0
   const otherFloor = activeFloor === 0 ? 1 : 0
+  const boardFrame = twoFloor ? makeStoreyFrame(puzzle.size, activeFloor, storeyView) : makeFrame(puzzle.size)
   const ghostMarks = twoFloor ? (props.marksPerFloor?.[otherFloor] ?? null) : null
 
   const blockedRows = new Set<number>()
@@ -858,33 +860,44 @@ export default function GameScreen(props: Props) {
                   // Mirrors IsoBoard's boardW/boardH. Constants are imported
                   // from the renderer's projection source so the slot cannot
                   // silently retain an obsolete 104px floor height.
-                  ['--board-ratio' as string]: String(makeFrame(puzzle.size).width / makeFrame(puzzle.size).height),
+                  ['--board-ratio' as string]: String(boardFrame.width / boardFrame.height),
                   aspectRatio: 'var(--board-ratio)',
                 }}
               >
                 {/* Floor switcher — only for two-storey houses. Single-floor
                     cases render exactly as before, with no extra chrome. */}
                 {twoFloor && props.onSwitchFloor && (
-                  <div
-                    className="mb-2 flex items-center gap-1"
-                    role="group"
-                    aria-label="Choose which floor to view"
-                  >
-                    {([0, 1] as const).map(f => (
-                      <button
-                        key={f}
-                        onClick={() => props.onSwitchFloor?.(f)}
-                        aria-pressed={activeFloor === f}
-                        className="focus-ring flex-1 min-h-[44px] border px-3 font-display text-[13px] font-medium uppercase tracking-[0.08em] transition-colors"
-                        style={{
-                          borderColor: activeFloor === f ? 'var(--color-accent-strong)' : 'var(--color-border-strong)',
-                          background: activeFloor === f ? 'var(--color-accent)' : 'transparent',
-                          color: activeFloor === f ? 'var(--color-on-accent)' : 'var(--color-text-secondary)',
-                        }}
-                      >
-                        {f === 0 ? 'Ground floor' : 'Upstairs'}
-                      </button>
-                    ))}
+                  <div className="mb-2 grid gap-1.5">
+                    <div className="flex items-center gap-1" role="group" aria-label="Choose which floor to view">
+                      {([0, 1] as const).map(f => (
+                        <button
+                          key={f}
+                          onClick={() => props.onSwitchFloor?.(f)}
+                          aria-pressed={activeFloor === f}
+                          className="focus-ring flex-1 min-h-[44px] border px-3 font-display text-[13px] font-medium uppercase tracking-[0.08em] transition-colors"
+                          style={{
+                            borderColor: activeFloor === f ? 'var(--color-accent-strong)' : 'var(--color-border-strong)',
+                            background: activeFloor === f ? 'var(--color-accent)' : 'transparent',
+                            color: activeFloor === f ? 'var(--color-on-accent)' : 'var(--color-text-secondary)',
+                          }}
+                        >
+                          {f === 0 ? 'Ground floor' : 'Upstairs'}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-center gap-4" role="group" aria-label="Choose multi-storey context">
+                      {(['ghost', 'exploded'] as const).map(view => (
+                        <button
+                          key={view}
+                          onClick={() => setStoreyView(view)}
+                          aria-pressed={storeyView === view}
+                          className="focus-ring min-h-[44px] font-mono text-[10px] uppercase tracking-[0.12em] transition-colors"
+                          style={{ color: storeyView === view ? 'var(--color-accent)' : 'var(--color-text-muted)' }}
+                        >
+                          {view === 'ghost' ? 'Ghosted context' : 'Exploded overview'}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
 
@@ -905,6 +918,7 @@ export default function GameScreen(props: Props) {
                   flashRows={flashRows}
                   flashCols={flashCols}
                   floor={activeFloor}
+                  storeyView={storeyView}
                   armedPerson={tool === 'place' && placementArmed ? selectedPerson : null}
                 />
               </div>
