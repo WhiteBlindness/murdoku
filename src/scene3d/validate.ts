@@ -7,7 +7,7 @@
 // human should look at. Beauty is not checked here and never will be.
 // ============================================================================
 
-import { CELL, cameraDirection, type Vec3 } from './units'
+import { CELL, STOREY_HEIGHT, cameraDirection, type Vec3 } from './units'
 import { parseLogic, type Box3, type Rect, type ResolvedObject, type ResolvedScene, type ResolvedWall } from './resolve'
 import { furnitureCells, type Puzzle } from '../core/types'
 
@@ -22,6 +22,9 @@ export interface Violation {
     | 'unsupported-prop' | 'prop-overhang'
     | 'door-blocked' | 'wall-free-end'
     | 'room-unreachable' | 'no-entry'
+    | 'storey-mismatch' | 'stair-missing' | 'stair-rise-mismatch'
+    | 'stairwell-missing' | 'stairwell-size-mismatch' | 'stair-floor-mismatch'
+    | 'stair-slab-blocked' | 'stair-landing-blocked' | 'upper-floor-inaccessible'
     | 'object-hidden' | 'cell-hidden' | 'tall-back-exposed'
     | 'logic-missing' | 'logic-unknown' | 'logic-displaced' | 'logic-type'
   severity: Severity
@@ -288,6 +291,106 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
       if (!rectOverlap(o.footprint, area, -0.02)) err('logic-displaced', o.id, `${o.id} does not touch the cells of ${o.logic}`)
     }
     for (const id of ids) if (!represented.has(id)) err('logic-missing', id, `logical furniture ${id} has no visual object`)
+  }
+  return out
+}
+
+/**
+ * Validate the physical contract between two separately rendered storeys.
+ * Each scene remains local to y=0 for active-floor rendering; this check joins
+ * them conceptually at STOREY_HEIGHT and proves that the real Kenney flight,
+ * the slab opening and both circulation landings agree.
+ */
+export function validateStoreyPair(lower: ResolvedScene, upper: ResolvedScene): Violation[] {
+  const out: Violation[] = []
+  const err = (code: Violation['code'], subject: string, message: string) => out.push({ code, severity: 'error' as const, subject, message })
+
+  if (lower.puzzleId !== upper.puzzleId || lower.n !== upper.n || upper.floor !== lower.floor + 1) {
+    err('storey-mismatch', 'storeys', `expected consecutive storeys of one ${lower.n}×${lower.n} case; got ${lower.puzzleId}#${lower.floor} and ${upper.puzzleId}#${upper.floor}`)
+    return out
+  }
+
+  const stair = lower.objects.find(object => object.kind === 'stairs')
+  if (!stair) {
+    err('stair-missing', 'stairs', 'the lower storey has no physical staircase')
+    err('upper-floor-inaccessible', 'upper-storey', 'the upper storey cannot be reached without a staircase')
+    return out
+  }
+
+  if (Math.abs(stair.size[1] - STOREY_HEIGHT) > 0.08) {
+    err('stair-rise-mismatch', stair.id, `${stair.model} rises ${stair.size[1].toFixed(3)}; the storey pitch is ${STOREY_HEIGHT.toFixed(3)}`)
+  }
+
+  const stairwell = upper.stairwell
+  if (!stairwell) {
+    err('stairwell-missing', 'stairwell', 'the upper slab has no opening above the staircase')
+    err('upper-floor-inaccessible', 'upper-storey', 'the staircase terminates below an unbroken upper slab')
+    return out
+  }
+  if (stairwell[0] < 0 || stairwell[1] < 0 || stairwell[2] >= upper.n || stairwell[3] >= upper.n
+    || stairwell[0] > stairwell[2] || stairwell[1] > stairwell[3]) {
+    err('stairwell-size-mismatch', 'stairwell', `stairwell [${stairwell.join(',')}] lies outside the ${upper.n}×${upper.n} upper slab`)
+    err('upper-floor-inaccessible', 'upper-storey', 'the upper stairwell is malformed')
+    return out
+  }
+
+  const stairwellCells = new Set<string>()
+  for (let row = stairwell[1]; row <= stairwell[3]; row++) {
+    for (let col = stairwell[0]; col <= stairwell[2]; col++) stairwellCells.add(`${row},${col}`)
+  }
+  const flightCells = new Set<string>()
+  for (let row = 0; row < lower.n; row++) for (let col = 0; col < lower.n; col++) {
+    const cell: Rect = { minX: col * CELL, maxX: (col + 1) * CELL, minZ: row * CELL, maxZ: (row + 1) * CELL }
+    if (rectOverlap(stair.footprint, cell, 1e-5)) flightCells.add(`${row},${col}`)
+  }
+  const uncovered = [...flightCells].filter(cell => !stairwellCells.has(cell))
+  if (uncovered.length) {
+    err('stairwell-size-mismatch', 'stairwell', `the slab opening misses staircase cell(s): ${uncovered.join(', ')}`)
+  }
+
+  const dir = stair.facing === 'E' ? [1, 0] : stair.facing === 'W' ? [-1, 0]
+    : stair.facing === 'S' ? [0, 1] : [0, -1]
+  const runHalf = (stair.facing === 'E' || stair.facing === 'W')
+    ? (stair.box.max[0] - stair.box.min[0]) / 2
+    : (stair.box.max[2] - stair.box.min[2]) / 2
+  const pointAt = (distance: number): [number, number] => [
+    stair.position[0] + dir[0] * distance,
+    stair.position[2] + dir[1] * distance,
+  ]
+  const cellAt = ([x, z]: [number, number]): [number, number] => [Math.floor(z / CELL), Math.floor(x / CELL)]
+  const topFlightCell = cellAt(pointAt(runHalf - 0.02))
+  if (!stairwellCells.has(`${topFlightCell[0]},${topFlightCell[1]}`)) {
+    err('stair-slab-blocked', 'stairwell', `the stair head at (${topFlightCell.join(',')}) is covered by the upper slab`)
+  }
+
+  const landing = (scene: ResolvedScene, which: 'lower' | 'upper', distance: number) => {
+    const [row, col] = cellAt(pointAt(distance))
+    if (row < 0 || col < 0 || row >= scene.n || col >= scene.n) {
+      err('stair-floor-mismatch', `${which}-landing`, `${which} landing falls outside the floor at (${row},${col})`)
+      return
+    }
+    if (which === 'upper' && stairwellCells.has(`${row},${col}`)) {
+      err('stair-floor-mismatch', 'upper-landing', `upper landing (${row},${col}) is still inside the stairwell instead of on a slab`)
+    }
+    const inset = 0.08
+    const area: Rect = {
+      minX: col * CELL + inset, maxX: (col + 1) * CELL - inset,
+      minZ: row * CELL + inset, maxZ: (row + 1) * CELL - inset,
+    }
+    const obstacle = scene.objects.find(object => object.kind === 'furniture' && !object.parentId && rectOverlap(object.footprint, area, 0.01))
+    const wall = scene.walls.find(candidate => candidate.kind !== 'foundation' && candidate.pieces.some(piece => rectOverlap({
+      minX: piece.min[0], maxX: piece.max[0], minZ: piece.min[2], maxZ: piece.max[2],
+    }, area, 0.01)))
+    if (obstacle || wall) {
+      const blocker = obstacle ? `${obstacle.id} (${obstacle.model})` : `wall ${wall!.id}`
+      err('stair-landing-blocked', `${which}-landing`, `${blocker} blocks the ${which} landing at (${row},${col})`)
+    }
+  }
+
+  landing(lower, 'lower', -runHalf - CELL / 2)
+  landing(upper, 'upper', runHalf + CELL / 2)
+  if (out.some(issue => issue.code.startsWith('stair') && issue.severity === 'error')) {
+    err('upper-floor-inaccessible', 'upper-storey', 'the stair connection is not physically usable')
   }
   return out
 }
