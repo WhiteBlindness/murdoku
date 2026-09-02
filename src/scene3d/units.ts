@@ -44,6 +44,19 @@ export const SHELL_THICKNESS = 0.08
 export const PARTITION_THICKNESS = 0.08
 /** Kenney floorFull slab thickness; the slab edge is the visible plinth. */
 export const FLOOR_THICKNESS = 0.05
+/** Exterior ground (garden, courtyard) sits this far below the finished floor,
+ *  so the building envelope reads as a slab with a foundation edge and every
+ *  door to the outside has a real threshold. */
+export const TERRAIN_DROP = 0.12
+/** Floor-to-floor pitch: one wall plus one slab. Kenney stairs rise 1.34. */
+export const STOREY_HEIGHT = WALL_HEIGHT + FLOOR_THICKNESS
+/** Structural openings, measured from the Kenney models (wallWindow pane
+ *  0.313–0.687 × 0.393–1.057; doorway frame 0.486 × 1.01) plus a frame margin. */
+export const WINDOW_OPENING = { width: 0.42, sill: 0.37, head: 1.08 }
+export const DOOR_OPENING = { width: 0.506, head: 1.03 }
+/** Procedural window frame members: section and how far they proud of the wall. */
+export const FRAME_SECTION = 0.03
+export const FRAME_PROTRUSION = 0.01
 
 /** Fixed camera: 45° azimuth puts the grid's diagonal on screen-x; the
  *  elevation trades floor visibility (higher) for a dollhouse feel (lower). */
@@ -74,12 +87,15 @@ export interface SceneFrame {
   project: (p: Vec3) => [number, number]
   /** Inverse on the floor plane y = 0: screen px -> world (x, z). */
   unprojectFloor: (sx: number, sy: number) => [number, number]
-  cellCentre: (row: number, col: number) => Vec3
+  /** Cell centre at a given floor height (0 indoors, −TERRAIN_DROP outdoors). */
+  cellCentre: (row: number, col: number, y?: number) => Vec3
   /** Corners of a cell's floor diamond in screen px: N, E, S, W order. */
-  cellPolygon: (row: number, col: number) => Array<[number, number]>
+  cellPolygon: (row: number, col: number, y?: number) => Array<[number, number]>
+  /** Screen-space headroom above the back corner, in world units (for ghost storeys). */
+  headroom: number
 }
 
-export function makeFrame(n: number): SceneFrame {
+export function makeFrame(n: number, headroom = 0): SceneFrame {
   const el = (CAMERA_ELEVATION_DEG * Math.PI) / 180
   const s = Math.sin(el), c = Math.cos(el)
   const side = n * CELL
@@ -89,8 +105,8 @@ export function makeFrame(n: number): SceneFrame {
   // extents: floor diamond (y=0) plus headroom for the back walls and the slab below
   const margin = 0.18
   const halfW = side * SQ2 + margin
-  const top = upOf([0, WALL_HEIGHT, 0]) + margin            // back corner wall top
-  const bottom = upOf([side, -FLOOR_THICKNESS, side]) - margin // front corner slab bottom
+  const top = upOf([0, WALL_HEIGHT + headroom, 0]) + margin            // back corner wall top (+ ghost storey)
+  const bottom = upOf([side, -FLOOR_THICKNESS - TERRAIN_DROP, side]) - margin // front corner slab bottom
   const viewWidthUnits = halfW * 2
   const viewHeightUnits = top - bottom
   const width = Math.round(viewWidthUnits * PX_PER_UNIT)
@@ -109,14 +125,14 @@ export function makeFrame(n: number): SceneFrame {
     const sum = -b / (SQ2 * s), diff = a / SQ2
     return [(sum + diff) / 2, (sum - diff) / 2]
   }
-  const cellCentre = (row: number, col: number): Vec3 => [(col + 0.5) * CELL, 0, (row + 0.5) * CELL]
-  const cellPolygon = (row: number, col: number) => [
-    project([col * CELL, 0, row * CELL]),
-    project([(col + 1) * CELL, 0, row * CELL]),
-    project([(col + 1) * CELL, 0, (row + 1) * CELL]),
-    project([col * CELL, 0, (row + 1) * CELL]),
+  const cellCentre = (row: number, col: number, y = 0): Vec3 => [(col + 0.5) * CELL, y, (row + 0.5) * CELL]
+  const cellPolygon = (row: number, col: number, y = 0) => [
+    project([col * CELL, y, row * CELL]),
+    project([(col + 1) * CELL, y, row * CELL]),
+    project([(col + 1) * CELL, y, (row + 1) * CELL]),
+    project([col * CELL, y, (row + 1) * CELL]),
   ]
-  return { n, width, height, viewWidthUnits, viewHeightUnits, centre, project, unprojectFloor, cellCentre, cellPolygon }
+  return { n, width, height, viewWidthUnits, viewHeightUnits, centre, project, unprojectFloor, cellCentre, cellPolygon, headroom }
 }
 
 /** Unit vector pointing from the scene toward the camera. */

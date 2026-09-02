@@ -31,7 +31,14 @@ const FLOOR_SLAB: Record<string, { top: string; edge: string }> = {
   tile: { top: '#ded8c8', edge: '#b9ab8f' },
   grass: { top: '#8cbf6c', edge: '#a37b52' },
   stone: { top: '#b8b2a6', edge: '#8d857a' },
+  dirt: { top: '#b8946a', edge: '#8a6a48' },
 }
+/** Kenney `wood` material (229,153,100) — window frames and thresholds. */
+const FRAME_WOOD = '#e59964'
+const FOUNDATION = '#c9b493'
+/** Neutral placeholder the renderer starts from; every visible colour is set
+ *  from the DESIGN.md scene tokens before a frame is shown. */
+const NEUTRAL_MATERIAL = '#ffffff'
 
 export interface HighlightState {
   activeRow?: number | null
@@ -84,7 +91,7 @@ function loadModel(name: KenneyModel): Promise<THREE.Group> {
           // behind the house. The case plays at night: opaque midnight glass.
           if (b.name === 'glass') return new THREE.MeshLambertMaterial({ color: NIGHT_GLASS, emissive: NIGHT_GLASS_GLOW })
           return new THREE.MeshLambertMaterial({
-            color: boostColour(b.color ?? new THREE.Color('#ffffff')),
+            color: boostColour(b.color ?? new THREE.Color(NEUTRAL_MATERIAL)),
             transparent: b.transparent, opacity: b.opacity, side: b.side,
           })
         }
@@ -113,6 +120,12 @@ function boxMesh(box: Box3, face: string, cap: string): THREE.Mesh {
   m.castShadow = true
   m.receiveShadow = true
   return m
+}
+
+function isDescendantOf(node: THREE.Object3D, ancestor: THREE.Object3D): boolean {
+  let p: THREE.Object3D | null = node
+  while (p) { if (p === ancestor) return true; p = p.parent }
+  return false
 }
 
 function helperFor(box: Box3, colour: string): THREE.Box3Helper {
@@ -172,9 +185,9 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
       // Decals sit a hair above the floor and are occluded by walls and
       // furniture like paint on the floor would be; the DOM lane traces carry
       // the full lane extent on top, so nothing about the topology is lost.
-      const mat = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0, depthWrite: false })
+      const mat = new THREE.MeshBasicMaterial({ color: NEUTRAL_MATERIAL, transparent: true, opacity: 0, depthWrite: false })
       const q = new THREE.Mesh(quadGeo, mat)
-      q.position.set((c + 0.5) * CELL, 0.008, (r + 0.5) * CELL)
+      q.position.set((c + 0.5) * CELL, scene.floorY[r][c] + 0.008, (r + 0.5) * CELL)
       q.renderOrder = 10
       q.visible = false
       world.add(q)
@@ -197,35 +210,56 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
   // ---- build ----------------------------------------------------------------------------
   const jobs: Promise<unknown>[] = []
   // floor: Kenney tiles scaled to the cell, feet at -thickness so the top is y = 0
+  const inStairwell = (r: number, c: number) => {
+    const sw = scene.stairwell
+    return !!sw && c >= sw[0] && r >= sw[1] && c <= sw[2] && r <= sw[3]
+  }
   for (let r = 0; r < scene.n; r++) for (let c = 0; c < scene.n; c++) {
+    if (inStairwell(r, c)) continue
     const material = scene.floorMaterial[r][c]
+    const y = scene.floorY[r][c]
     if (material !== 'wood') {
       const slab = FLOOR_SLAB[material]
-      const m = boxMesh({ min: [c * CELL, -FLOOR_THICKNESS, r * CELL], max: [(c + 1) * CELL, 0, (r + 1) * CELL] }, slab.edge, slab.top)
+      const m = boxMesh({ min: [c * CELL, y - FLOOR_THICKNESS, r * CELL], max: [(c + 1) * CELL, y, (r + 1) * CELL] }, slab.edge, slab.top)
       m.castShadow = false
       world.add(m)
       continue
     }
     jobs.push(loadModel('floorFull').then(g => {
       g.scale.set(CELL, 1, CELL)
-      g.position.set((c + 0.5) * CELL, -FLOOR_THICKNESS, (r + 0.5) * CELL)
+      g.position.set((c + 0.5) * CELL, y - FLOOR_THICKNESS, (r + 0.5) * CELL)
       world.add(g)
       requestRender()
     }))
   }
+  // thresholds: a half-height step on the low side of every opening to lower ground
+  for (const t of scene.thresholds) world.add(boxMesh(t, FOUNDATION, FOUNDATION))
   // walls
   for (const w of scene.walls) {
-    const shell = w.kind !== 'partition'
-    const face = w.kind === 'shell-front' ? PLINTH : shell ? WALL_FACE : PARTITION_FACE
-    const cap = w.kind === 'shell-front' ? PLINTH : shell ? WALL_CAP : PARTITION_CAP
+    const shell = w.kind === 'shell-back' || w.kind === 'shell-front'
+    const face = w.kind === 'foundation' ? FOUNDATION : w.kind === 'shell-front' ? PLINTH : shell ? WALL_FACE : PARTITION_FACE
+    const cap = w.kind === 'foundation' ? FOUNDATION : w.kind === 'shell-front' ? PLINTH : shell ? WALL_CAP : PARTITION_CAP
     for (const piece of w.pieces) {
       world.add(boxMesh(piece, face, cap))
       diagGroup.add(helperFor(piece, '#2f7dff'))
     }
+    for (const f of w.frames) world.add(boxMesh(f, FRAME_WOOD, FRAME_WOOD))
     for (const op of w.openings) diagGroup.add(helperFor(op.box, '#ff9f1c'))
   }
   // objects
   const placeObject = (o: ResolvedObject) => loadModel(o.model).then(g => {
+    if (o.part) {
+      // keep only the named child (the window pane inside wallWindow) and
+      // re-pivot on it: footprint centre at the origin, feet at y = 0
+      const root = g.children[0]
+      const keep = root.getObjectByName(o.part)
+      if (keep) {
+        root.traverse(n => { if ((n as THREE.Mesh).isMesh && !isDescendantOf(n, keep)) n.visible = false })
+        const bb = new THREE.Box3().setFromObject(keep)
+        const sz = bb.getSize(new THREE.Vector3())
+        root.position.set(root.position.x - (bb.min.x + sz.x / 2), root.position.y - bb.min.y, root.position.z - (bb.min.z + sz.z / 2))
+      }
+    }
     g.position.set(o.position[0], o.position[1], o.position[2])
     g.rotation.y = (o.rotY * Math.PI) / 180
     g.userData = { id: o.id, model: o.model, logic: o.logic }

@@ -845,7 +845,9 @@ export function candidateClues(p: Puzzle): Clue[] {
       if (other.id === person.id) continue
       const oc = p.solution[other.id]
       if (cellsAdjacent(cell, oc)) out.push({ kind: 'besidePerson', person: person.id, other: other.id })
-      if (roomIdAt(p, cell) === roomIdAt(p, oc) && other.id !== p.victimId)
+      // never pair anyone with the victim's room in either direction: "the victim
+      // was in the same room as X" names the murderer outright
+      if (roomIdAt(p, cell) === roomIdAt(p, oc) && other.id !== p.victimId && person.id !== p.victimId)
         out.push({ kind: 'sameRoomAs', person: person.id, other: other.id })
       // negation: not in the same room — skip when other is the victim (would leak murderer identity)
       if (roomIdAt(p, cell) !== roomIdAt(p, oc) && other.id !== p.victimId && person.id !== p.victimId)

@@ -28,11 +28,11 @@ export const theLastNightcap: SceneSpec = {
       { wall: 'west', at: 1.5, kind: 'window' },
     ],
   },
-  floors: [{ id: 'garden', cells: [0, 4, 2, 6], material: 'grass' }],
+  floors: [{ id: 'garden', cells: [0, 4, 2, 6], material: 'grass', kind: 'exterior' }],
   walls: [
     { id: 'dining-hall', from: [3, 0], to: [3, 4], openings: [{ at: 1.2, kind: 'door' }] },
-    // stops short of the plinth: the front 1.3 cells are the pass to the garden (no stub at the edge)
-    { id: 'garden-hall', from: [3, 4], to: [3, 5.7], height: 'half', freeEnds: ['to'] },
+    // facade to the garden: a pony wall whose front opening runs to the plinth (no stub)
+    { id: 'garden-hall', from: [3, 4], to: [3, 7], height: 'half', openings: [{ at: 6.4, width: 1.2, kind: 'open' }] },
     { id: 'dining-garden', from: [0, 4], to: [3, 4], height: 'half', openings: [{ at: 1.5, width: 1.0, kind: 'open' }] },
     // breakfast-bar wall; stops at z=4.9 so the front of the kitchen is open (no isolated end piece)
     { id: 'hall-kitchen', from: [5, 0], to: [5, 4.9], height: 'half', openings: [{ at: 1.5, width: 1.0, kind: 'open' }], freeEnds: ['to'] },
@@ -61,9 +61,14 @@ export const theLastNightcap: SceneSpec = {
     { id: 'sideboard', model: 'cabinetTelevisionDoors', against: { wall: 'north', at: 1.5 } },
     { id: 'sideboard-plant', model: 'plantSmall2', on: { parent: 'sideboard', offset: [0.25, 0] } },
     // ---- garden ---------------------------------------------------------------------
-    { id: 'shrub', model: 'pottedPlant', logic: 'shrub@5,2', at: [2.1, 5.3] },
-    { id: 'garden-plant', model: 'pottedPlant', logic: 'plant@6,2', at: [2.1, 6.5] },
-    { id: 'garden-bench', model: 'bench', against: { wall: 'west', at: 5.5 } },
+    { id: 'shrub', model: 'plant_bushDetailed', logic: 'shrub@5,2', at: [2.1, 5.3], yaw: 15 },
+    { id: 'garden-plant', model: 'flower_redA', logic: 'plant@6,2', at: [2.1, 6.45], yaw: -10 },
+    // the tree stands in the front-west corner: a tall object there hides no cell centre
+    { id: 'garden-tree', model: 'tree_oak', at: [0.55, 6.45] },
+    { id: 'garden-flowers', model: 'flower_yellowA', at: [1.3, 6.3], yaw: 20 },
+    { id: 'garden-bench', model: 'bench', at: [0.5, 5.5], facing: 'E' },
+    { id: 'fence-a', model: 'fence_simple', at: [0.07, 4.7], facing: 'E' },
+    { id: 'fence-b', model: 'fence_simple', at: [0.07, 5.95], facing: 'E' },
   ],
   rugs: [
     { id: 'doormat', model: 'rugDoormat', at: [3.8, 0.35] },

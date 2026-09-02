@@ -16,6 +16,8 @@ export type Severity = 'error' | 'warning'
 export interface Violation {
   code:
     | 'unresolved'
+    | 'wall-thickness-inconsistent' | 'insert-off-wall'
+    | 'zone-boundary-unwalled' | 'envelope-undefined' | 'zone-object-mismatch'
     | 'wall-penetration' | 'furniture-overlap' | 'outside-floor'
     | 'unsupported-prop' | 'prop-overhang'
     | 'door-blocked' | 'wall-free-end'
@@ -59,7 +61,7 @@ function rayHitsBox(origin: Vec3, dir: Vec3, box: Box3): number | null {
   return tmin > 1e-6 ? tmin : null
 }
 
-const solidObject = (o: ResolvedObject) => o.kind === 'furniture' && o.meta.support !== 'flat' && o.meta.support !== 'wall'
+const solidObject = (o: ResolvedObject) => (o.kind === 'furniture' || o.kind === 'stairs') && o.meta.support !== 'flat' && o.meta.support !== 'wall'
 
 function floodFill(blocked: Uint8Array, m: number, seed: [number, number]): Uint8Array {
   const reach = new Uint8Array(m * m)
@@ -80,8 +82,54 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
 
   for (const p of scene.problems) err('unresolved', 'scene', p)
 
-  const wallPieces = scene.walls.flatMap(w => w.pieces.map(box => ({ wall: w, box })))
-  const furniture = scene.objects.filter(o => o.kind === 'furniture')
+  // ---- structural walls: one thickness per run, inserts on the wall line ----------
+  for (const w of scene.walls) {
+    if (w.kind === 'foundation') continue
+    for (const piece of w.pieces) {
+      const depth = w.axis === 'x' ? piece.max[2] - piece.min[2] : piece.max[0] - piece.min[0]
+      if (Math.abs(depth - w.thickness) > 1e-6) err('wall-thickness-inconsistent', w.id, `${w.id} has a piece ${depth.toFixed(3)} thick; the wall is ${w.thickness}`)
+    }
+    const lineAt = w.axis === 'x' ? w.from[1] : w.from[0]
+    for (const op of w.openings) {
+      if (op.kind === 'open') continue
+      const insert = scene.objects.find(o => (o.kind === 'window' || o.kind === 'door' || o.kind === 'entry')
+        && Math.abs(o.position[0] - op.centre[0]) < 1e-6 && Math.abs(o.position[2] - op.centre[1]) < 1e-6)
+      if (!insert) { err('insert-off-wall', w.id, `${op.kind} opening in ${w.id} has no inserted frame`); continue }
+      const depth = w.axis === 'x' ? insert.box.max[2] - insert.box.min[2] : insert.box.max[0] - insert.box.min[0]
+      const centre = w.axis === 'x' ? (insert.box.min[2] + insert.box.max[2]) / 2 : (insert.box.min[0] + insert.box.max[0]) / 2
+      // a frame or a slightly open leaf may stand proud of the wall by a couple
+      // of centimetres per side; a Kenney wall slab (0.09) plus offset would not pass
+      if (depth > w.thickness + 0.04 + 1e-6) err('insert-off-wall', insert.id, `${insert.id} is ${depth.toFixed(3)} deep in a ${w.thickness} wall`)
+      if (Math.abs(centre - lineAt) > 0.02) err('insert-off-wall', insert.id, `${insert.id} sits ${(centre - lineAt).toFixed(3)} off the wall line`)
+    }
+  }
+  // ---- building envelope -----------------------------------------------------------
+  {
+    const n = scene.n
+    const interiorCells = scene.zoneKind.flat().filter(k => k === 'interior').length
+    if (interiorCells === 0) err('envelope-undefined', 'scene', 'no interior cells: the building envelope is undefined')
+    const wallOnEdge = (axis: 'x' | 'z', at: number, from: number, to: number) => scene.walls.some(w =>
+      w.kind !== 'foundation' && w.axis === axis && Math.abs((axis === 'x' ? w.from[1] : w.from[0]) - at) < 1e-6
+      && (axis === 'x' ? w.from[0] : w.from[1]) <= from + 1e-6 && (axis === 'x' ? w.to[0] : w.to[1]) >= to - 1e-6)
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+      const k = scene.zoneKind[r][c]
+      if (c + 1 < n && (scene.zoneKind[r][c + 1] === 'interior') !== (k === 'interior')) {
+        if (!wallOnEdge('z', (c + 1) * CELL, r * CELL, (r + 1) * CELL)) err('zone-boundary-unwalled', `${r},${c}`, `interior meets outside between (${r},${c}) and (${r},${c + 1}) with no facade wall`)
+      }
+      if (r + 1 < n && (scene.zoneKind[r + 1][c] === 'interior') !== (k === 'interior')) {
+        if (!wallOnEdge('x', (r + 1) * CELL, c * CELL, (c + 1) * CELL)) err('zone-boundary-unwalled', `${r},${c}`, `interior meets outside between (${r},${c}) and (${r + 1},${c}) with no facade wall`)
+      }
+    }
+    for (const o of scene.objects) {
+      if (o.kind !== 'furniture' || o.parentId) continue
+      const r = Math.min(n - 1, Math.floor(o.position[2] / CELL)), c = Math.min(n - 1, Math.floor(o.position[0] / CELL))
+      const expected = scene.floorY[r][c]
+      if (Math.abs(o.position[1] - expected) > 1e-6) err('zone-object-mismatch', o.id, `${o.id} stands at y=${o.position[1]} on a cell whose ground is ${expected}`)
+    }
+  }
+
+  const wallPieces = scene.walls.filter(w => w.kind !== 'foundation').flatMap(w => w.pieces.map(box => ({ wall: w, box })))
+  const furniture = scene.objects.filter(o => o.kind === 'furniture' || o.kind === 'stairs')
   const solids = furniture.filter(solidObject)
   const byId = new Map(scene.objects.map(o => [o.id, o]))
 
@@ -199,19 +247,19 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
     }
   }
   for (let r = 0; r < scene.n; r++) for (let c = 0; c < scene.n; c++) {
-    const p = scene.frame.cellCentre(r, c)
+    const p = scene.frame.cellCentre(r, c, scene.floorY[r][c])
     const occupant = solids.find(o => !o.parentId && p[0] > o.footprint.minX && p[0] < o.footprint.maxX && p[2] > o.footprint.minZ && p[2] < o.footprint.maxZ)
     const blockers = [...wallBoxes, ...solids.filter(o => o !== occupant && !o.parentId).map(o => o.box)]
     // A suspect standee carries its portrait badge at chest height (~0.45).
     // If the badge centre is hidden at the cell centre, the player cannot see
     // who stands there without help. Feet behind a low object are fine.
-    if (blockers.some(b => rayHitsBox([p[0], 0.45, p[2]], dir, b) !== null)) {
+    if (blockers.some(b => rayHitsBox([p[0], p[1] + 0.45, p[2]], dir, b) !== null)) {
       warn('cell-hidden', `${r},${c}`, `cell (${r},${c}) is hidden from the camera at standee height`)
     }
   }
   // ---- tall objects keep their backs to the back walls ----------------------------------
   for (const o of solids) {
-    if (!o.meta.tall || o.parentId || o.meta.symmetric) continue
+    if (!o.meta.tall || o.parentId || o.meta.symmetric || o.kind === 'stairs') continue
     if (o.facing !== 'N' && o.facing !== 'W') continue
     if (o.againstWall === 'south' || o.againstWall === 'east') {
       warn('tall-back-exposed', o.id, `${o.id} (${o.model}) backs onto the cut-away ${o.againstWall} shell; its back faces the camera — check it reads`)

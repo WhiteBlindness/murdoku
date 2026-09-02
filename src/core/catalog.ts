@@ -60,7 +60,7 @@ const SPEC: { difficulty: Difficulty; count: number }[] = [
 // covers far more than its cell and is the most saturated thing on the
 // board, which is why the scene read as "giant red squares" rather than a
 // room. Cached v22 lists still hold them.
-const KEY = 'murdoku_catalog_v23'
+const KEY = 'murdoku_catalog_v24'
 let puzzles: Puzzle[] = []
 
 function slug(s: string) { return s.toLowerCase().replace(/\s+/g, '-') }

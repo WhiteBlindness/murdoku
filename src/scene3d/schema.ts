@@ -99,13 +99,34 @@ export interface FurnitureSpec {
   yaw?: number
 }
 
-export type FloorMaterial = 'wood' | 'tile' | 'grass' | 'stone'
+export type FloorMaterial = 'wood' | 'tile' | 'grass' | 'stone' | 'dirt'
+
+/**
+ * interior  — finished floor of the building at y = 0, inside the shell.
+ * exterior  — open ground OUTSIDE the building envelope: no shell wall on
+ *             its grid edges, terrain TERRAIN_DROP below the floor, a
+ *             foundation edge where it meets the building, a threshold at
+ *             every opening into it.
+ * courtyard — lowered ground INSIDE the shell (a walled garden): keeps the
+ *             shell, gets the foundation edge and thresholds.
+ */
+export type ZoneKind = 'interior' | 'exterior' | 'courtyard'
 
 export interface FloorZoneSpec {
   id: string
   /** Inclusive cell rectangle [col0, row0, col1, row1]. */
   cells: [number, number, number, number]
   material: FloorMaterial
+  /** Defaults to 'interior' for wood/tile/stone and 'exterior' for grass/dirt. */
+  kind?: ZoneKind
+}
+
+export interface StairsSpec {
+  model: 'stairs' | 'stairsOpen' | 'stairsOpenSingle' | 'stairsCorner'
+  /** Footprint centre of the flight, cell units. */
+  at: [number, number]
+  /** Direction the flight CLIMBS toward (the top step is on that side). */
+  facing: Facing
 }
 
 export interface SceneSpec {
@@ -119,6 +140,11 @@ export interface SceneSpec {
   furniture: FurnitureSpec[]
   /** Optional floor-covering models (rugs) — flat, no collision. */
   rugs?: Array<{ id: string; model: KenneyModel; at: [number, number]; facing?: Facing }>
-  /** Floor material per cell rectangle; cells not covered are wood (Kenney tile). */
+  /** Floor material per cell rectangle; cells not covered are interior wood. */
   floors?: FloorZoneSpec[]
+  /** Ground-floor only: the staircase to the storey above. */
+  stairs?: StairsSpec
+  /** Upper floors only: cells with no slab — the stair arrives here.
+   *  Inclusive [col0, row0, col1, row1]; must match the ground stair footprint. */
+  stairwell?: [number, number, number, number]
 }

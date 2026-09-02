@@ -179,7 +179,8 @@ export default function IsoBoard({
   }, [scene, rendererReady, active, lockedKey, blockedRows, blockedCols, clueCells, armedPerson, envOnly, diag])
 
   const points = (poly: Array<[number, number]>) => poly.map(p => p.join(',')).join(' ')
-  const centreOf = (r: number, c: number) => frame.project(frame.cellCentre(r, c))
+  const centreOf = (r: number, c: number) => frame.project(frame.cellCentre(r, c, scene.floorY[r][c]))
+  const cellPoly = (r: number, c: number) => frame.cellPolygon(r, c, scene.floorY[r][c])
 
   return (
     <div
@@ -238,12 +239,12 @@ export default function IsoBoard({
           {!envOnly && (flashRows?.size || flashCols?.size) ? (
             <svg width={frame.width} height={frame.height} style={{ position: 'absolute', inset: 0, zIndex: 30, pointerEvents: 'none' }}>
               {[...(flashRows ?? [])].map(r => Array.from({ length: N }, (_, c) => (
-                <polygon key={`fr${r}-${c}`} points={points(frame.cellPolygon(r, c))} fill="rgba(150,120,255,0.38)">
+                <polygon key={`fr${r}-${c}`} points={points(cellPoly(r, c))} fill="rgba(150,120,255,0.38)">
                   <animate attributeName="opacity" values="0;1;0.2;1;0.55" dur="1.4s" fill="freeze" />
                 </polygon>
               )))}
               {[...(flashCols ?? [])].map(c => Array.from({ length: N }, (_, r) => (
-                <polygon key={`fc${c}-${r}`} points={points(frame.cellPolygon(r, c))} fill="rgba(150,120,255,0.38)">
+                <polygon key={`fc${c}-${r}`} points={points(cellPoly(r, c))} fill="rgba(150,120,255,0.38)">
                   <animate attributeName="opacity" values="0;1;0.2;1;0.55" dur="1.4s" fill="freeze" />
                 </polygon>
               )))}
@@ -332,7 +333,7 @@ export default function IsoBoard({
             <svg width={frame.width} height={frame.height} style={{ position: 'absolute', inset: 0, zIndex: 400, pointerEvents: 'none' }}>
               <polygon
                 data-placement-target=""
-                points={points(frame.cellPolygon(active.row, active.col))}
+                points={points(cellPoly(active.row, active.col))}
                 fill="none"
                 stroke={marks[active.row][active.col].kind === 'person' ? SKIN.invalidTarget : SKIN.validTarget}
                 strokeWidth={2.5}
@@ -348,7 +349,7 @@ export default function IsoBoard({
             {Array.from({ length: N }, (_, r) => Array.from({ length: N }, (_, c) => (
               <polygon
                 key={`h${r}-${c}`}
-                points={points(frame.cellPolygon(r, c))}
+                points={points(cellPoly(r, c))}
                 fill="transparent"
                 data-cell={`${r}-${c}`}
                 role="gridcell"

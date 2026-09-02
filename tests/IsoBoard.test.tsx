@@ -164,7 +164,7 @@ describe('validator catches the historical failure classes', () => {
 describe('asset catalogue', () => {
   it('measures every Kenney model from geometry; floor tile is the unit, wall height is the shell height', () => {
     const names = Object.keys(MODEL_BOUNDS)
-    expect(names.length).toBe(140)
+    expect(names.length).toBeGreaterThanOrEqual(140) // Furniture Kit (140) + vendored Nature Kit subset
     for (const n of names) {
       const b = MODEL_BOUNDS[n as keyof typeof MODEL_BOUNDS]
       expect(b.size.every(v => v > 0), n).toBe(true)

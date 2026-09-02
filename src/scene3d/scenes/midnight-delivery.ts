@@ -44,6 +44,9 @@ export const midnightDelivery: SceneSpec = {
     // living | kitchen: a waist-high pony wall the TV cabinet backs onto; it stops at z=4.8 and
     // the front 1.2 cells stay open as the pass-through (no stub at the plinth)
     { id: 'kitchen-west', from: [3, 3], to: [3, 4.8], height: 'half', freeEnds: ['to'] },
+    // a short return off the east shell: the fridge backs onto it and faces the
+    // kitchen, so its door — not its back — is what the camera sees
+    { id: 'kitchen-return', from: [6, 4], to: [5.35, 4], freeEnds: ['to'] },
   ],
   furniture: [
     // ---- bedroom --------------------------------------------------------------
@@ -77,7 +80,7 @@ export const midnightDelivery: SceneSpec = {
     { id: 'counter-2', model: 'kitchenCabinetDrawer', logic: 'counter@3,3', against: { wall: 'kitchen-back', side: 'S', at: 4.45 } },
     { id: 'microwave', model: 'kitchenMicrowave', on: { parent: 'counter-2' } },
     { id: 'stove', model: 'kitchenStove', logic: 'stove@3,5', against: { wall: 'kitchen-back', side: 'S', at: 5.0 } },
-    { id: 'fridge', model: 'kitchenFridge', logic: 'fridge@4,5', against: { wall: 'east', at: 4.3 } },
+    { id: 'fridge', model: 'kitchenFridge', logic: 'fridge@4,5', against: { wall: 'kitchen-return', side: 'S', at: 5.65 } },
     { id: 'dining-table', model: 'table', logic: 'table@4,3', at: [3.9, 4.75], facing: 'E' },
     { id: 'dining-chair-front', model: 'chair', logic: 'chair@5,3', at: [3.9, 5.6], facing: 'N' },
     { id: 'dining-chair-back', model: 'chair', at: [3.9, 3.95], facing: 'S' },

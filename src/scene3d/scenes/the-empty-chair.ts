@@ -28,7 +28,9 @@ export const theEmptyChair: SceneSpec = {
       { wall: 'west', at: 2.0, kind: 'window' },
     ],
   },
-  floors: [{ id: 'courtyard', cells: [0, 3, 5, 5], material: 'grass' }],
+  // the garden is OUTSIDE the building: no shell along its edges, ground a step
+  // below the floor, a foundation edge and a threshold at the patio doors
+  floors: [{ id: 'garden', cells: [0, 3, 5, 5], material: 'grass', kind: 'exterior' }],
   walls: [
     // living | office, door near the middle
     { id: 'spine', from: [4, 0], to: [4, 3], openings: [{ at: 1.9, kind: 'door' }] },
@@ -55,15 +57,24 @@ export const theEmptyChair: SceneSpec = {
     { id: 'books', model: 'books', on: { parent: 'shelf-a' } },
     { id: 'office-plant', model: 'pottedPlant', at: [5.55, 2.4] },
     // ---- garden ------------------------------------------------------------------
-    { id: 'plant-1', model: 'pottedPlant', logic: 'plant@3,1', at: [1.5, 3.55] },
-    { id: 'shrub-1', model: 'pottedPlant', logic: 'shrub@4,2', at: [2.45, 4.55] },
-    { id: 'plant-2', model: 'pottedPlant', logic: 'plant@5,3', at: [3.5, 5.5] },
-    { id: 'shrub-2', model: 'pottedPlant', logic: 'shrub@3,4', at: [4.55, 3.55] },
-    { id: 'garden-bench', model: 'bench', against: { wall: 'west', at: 4.6 } },
-    { id: 'garden-chair', model: 'chair', at: [0.9, 5.4], facing: 'N' },
+    // four logical plants, four different species, each pulled off its cell
+    // centre toward something (the fence, the path, the bench) so the lawn
+    // reads as a garden and not as a grid of identical pots
+    { id: 'garden-tree', model: 'tree_small', logic: 'plant@3,1', at: [1.25, 3.7] },
+    { id: 'garden-bush', model: 'plant_bushDetailed', logic: 'shrub@4,2', at: [2.3, 4.7], yaw: 20 },
+    { id: 'garden-flowers', model: 'flower_redA', logic: 'plant@5,3', at: [3.3, 5.35], yaw: -15 },
+    { id: 'garden-flowers-b', model: 'flower_purpleA', at: [3.62, 5.62], yaw: 30 },
+    { id: 'garden-hedge', model: 'plant_bushLarge', logic: 'shrub@3,4', at: [4.7, 3.55], yaw: 10 },
+    { id: 'garden-rock', model: 'rock_smallA', at: [5.2, 4.2], yaw: 25 },
+    { id: 'garden-bench', model: 'bench', at: [0.5, 4.6], facing: 'E' },
+    // garden fence along the open west edge, starting clear of the shell corner
+    { id: 'fence-a', model: 'fence_simple', at: [0.07, 3.7], facing: 'E' },
+    { id: 'fence-b', model: 'fence_simple', at: [0.07, 4.95], facing: 'E' },
   ],
   rugs: [
     { id: 'living-rug', model: 'rugRound', at: [1.5, 2.0] },
-    { id: 'patio-mat', model: 'rugDoormat', at: [2.6, 3.4] },
+    { id: 'patio-mat', model: 'rugDoormat', at: [2.6, 2.75] },
+    { id: 'path-a', model: 'path_stone', at: [2.6, 3.6] },
+    { id: 'path-b', model: 'path_stone', at: [2.6, 4.35] },
   ],
 }

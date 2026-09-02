@@ -65,18 +65,19 @@ export function clueHolds(p: Puzzle, clue: Clue, place: Placement): boolean {
     case 'room':
       return !!self && roomIdAt(p, self) === clue.roomId
     case 'onFurniture':
-      return !!self && furnitureAt(p, self.row, self.col).includes(clue.furniture)
+      // floor-aware: a person upstairs is on the furniture of THEIR storey
+      return !!self && furnitureAt(p, self.row, self.col, cellFloor(self)).includes(clue.furniture)
     case 'besideFurniture':
       return !!self && anyFurnitureAdjacent(p, self, [clue.furniture])
     case 'besideAny':
       return !!self && anyFurnitureAdjacent(p, self, clue.furniture)
     case 'onlyOnFurniture': {
-      if (!self || !furnitureAt(p, self.row, self.col).includes(clue.furniture)) return false
-      // no other person sits on the same furniture type
+      if (!self || !furnitureAt(p, self.row, self.col, cellFloor(self)).includes(clue.furniture)) return false
+      // no other person sits on the same furniture type (on their own storey)
       return p.people.every(person => {
         if (person.id === clue.person) return true
         const c = place[person.id]
-        return !c || !furnitureAt(p, c.row, c.col).includes(clue.furniture)
+        return !c || !furnitureAt(p, c.row, c.col, cellFloor(c)).includes(clue.furniture)
       })
     }
     case 'row':
