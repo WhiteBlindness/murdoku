@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { resolveScene } from '../src/scene3d/resolve'
 import type { SceneSpec } from '../src/scene3d/schema'
 import { validateScene, validateStoreyPair } from '../src/scene3d/validate'
+import { twoStoreyReferenceGround } from '../src/scene3d/scenes/two-storey-reference-ground'
+import { twoStoreyReferenceUpper } from '../src/scene3d/scenes/two-storey-reference-upper'
 
 const lowerSpec = (): SceneSpec => ({
   puzzleId: 'two-storey-reference',
@@ -28,6 +30,13 @@ const pairCodes = (lower = lowerSpec(), upper = upperSpec()) => validateStoreyPa
 ).filter(issue => issue.severity === 'error').map(issue => issue.code)
 
 describe('two-storey stair validation', () => {
+  it('accepts the real playable reference pair', () => {
+    expect(validateStoreyPair(
+      resolveScene(twoStoreyReferenceGround, 8),
+      resolveScene(twoStoreyReferenceUpper, 8),
+    ).filter(issue => issue.severity === 'error')).toEqual([])
+  })
+
   it('accepts a measured flight, matching stairwell and clear landings', () => {
     expect(pairCodes()).toEqual([])
   })

@@ -6,7 +6,7 @@ import { validatePuzzleForProduction } from '../src/core/puzzleValidate'
 import { MODEL_BOUNDS } from '../src/scene3d/catalog.generated'
 import { resolveScene } from '../src/scene3d/resolve'
 import { AUTHORED_SCENES } from '../src/scene3d/scenes'
-import { validateScene } from '../src/scene3d/validate'
+import { validateScene, validateStoreyPair } from '../src/scene3d/validate'
 
 // Fast production gate. This deliberately checks hard invariants only:
 // aesthetic warnings still require the browser and screenshot QA described in
@@ -38,6 +38,26 @@ describe('production preflight', () => {
       const scene = resolveScene(spec, puzzle.size)
       for (const issue of validateScene(scene, puzzle).filter(issue => issue.severity === 'error')) {
         failures.push(`${key}: ${issue.code} — ${issue.message}`)
+      }
+    }
+
+    expect(failures, failures.join('\n')).toEqual([])
+  })
+
+  it('accepts every authored connection between consecutive storeys', () => {
+    const failures: string[] = []
+    for (const puzzle of puzzles.filter(puzzle => (puzzle.floors ?? 1) > 1)) {
+      const lowerSpec = AUTHORED_SCENES[`${puzzle.id}#0`]
+      const upperSpec = AUTHORED_SCENES[`${puzzle.id}#1`]
+      if (!lowerSpec && !upperSpec) continue
+      if (!lowerSpec || !upperSpec) {
+        failures.push(`${puzzle.id}: authored multi-storey scene is incomplete`)
+        continue
+      }
+      const lower = resolveScene(lowerSpec, puzzle.size)
+      const upper = resolveScene(upperSpec, puzzle.size)
+      for (const issue of validateStoreyPair(lower, upper).filter(issue => issue.severity === 'error')) {
+        failures.push(`${puzzle.id}: ${issue.code} — ${issue.message}`)
       }
     }
 

@@ -211,6 +211,16 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
       const [ex, ez] = scene.entry.centre
       seed = [Math.min(m - 1, Math.floor(ez / step + (scene.entry.wall === 'north' ? 0.5 : 0))),
               Math.min(m - 1, Math.floor(ex / step + (scene.entry.wall === 'west' ? 0.5 : 0)))]
+    } else if (scene.floor > 0 && scene.stairwell) {
+      const [c0, r0, c1, r1] = scene.stairwell
+      const candidates: Array<[number, number]> = [
+        [Math.floor(((r0 + r1 + 1) / 2) * res), (c1 + 1) * res + Math.floor(res / 2)],
+        [Math.floor(((r0 + r1 + 1) / 2) * res), c0 * res - Math.ceil(res / 2)],
+        [(r1 + 1) * res + Math.floor(res / 2), Math.floor(((c0 + c1 + 1) / 2) * res)],
+        [r0 * res - Math.ceil(res / 2), Math.floor(((c0 + c1 + 1) / 2) * res)],
+      ]
+      seed = candidates.find(([i, j]) => i >= 0 && j >= 0 && i < m && j < m && !blocked[i * m + j])
+        ?? [Math.floor((r0 + 0.5) * res), Math.floor((c0 + 0.5) * res)]
     } else {
       warn('no-entry', 'scene', 'no entry declared — circulation is checked from the front-most free sample')
       seed = [m - 1, Math.floor(m / 2)]

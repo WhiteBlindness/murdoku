@@ -1434,10 +1434,15 @@ function toClueText(p: Puzzle, clues: Clue[]): ClueText[] {
   return clues.map(clue => ({ clue, text: clueToText(p, clue) }))
 }
 
-/** Remove redundant clues while keeping a unique solution and ≥1 clue/person. */
-export function pruneClues(p: Puzzle, clues: Clue[]): Clue[] {
+/** Remove redundant clues while keeping a unique solution and ≥1 clue/person.
+ * Authored required clues carry deliberate narrative/spatial information and
+ * are never candidates for removal. */
+export function pruneClues(p: Puzzle, clues: Clue[], required: readonly Clue[] = []): Clue[] {
   let cur = [...clues]
+  const keyOf = (clue: Clue) => JSON.stringify(Object.entries(clue).sort(([a], [b]) => a.localeCompare(b)))
+  const requiredKeys = new Set(required.map(keyOf))
   for (const c of shuffle([...cur])) {
+    if (requiredKeys.has(keyOf(c))) continue
     const trial = cur.filter(x => x !== c)
     if (!trial.some(x => x.person === c.person)) continue // keep ≥1 per suspect
     p.clues = toClueText(p, trial)

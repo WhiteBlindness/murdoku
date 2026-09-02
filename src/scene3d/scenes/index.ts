@@ -4,10 +4,13 @@ import { fallbackScene } from './fallback'
 import { midnightDelivery } from './midnight-delivery'
 import { theEmptyChair } from './the-empty-chair'
 import { theLastNightcap } from './the-last-nightcap'
+import { twoStoreyReferenceGround } from './two-storey-reference-ground'
+import { twoStoreyReferenceUpper } from './two-storey-reference-upper'
 
 /** Authored scenes, keyed by `${puzzleId}#${floor}`. */
 export const AUTHORED_SCENES: Record<string, SceneSpec> = Object.fromEntries(
-  [midnightDelivery, theEmptyChair, theLastNightcap].map(s => [`${s.puzzleId}#${s.floor ?? 0}`, s]),
+  [midnightDelivery, theEmptyChair, theLastNightcap, twoStoreyReferenceGround, twoStoreyReferenceUpper]
+    .map(s => [`${s.puzzleId}#${s.floor ?? 0}`, s]),
 )
 
 export function hasAuthoredScene(puzzleId: string, floor = 0): boolean {
