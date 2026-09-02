@@ -31,6 +31,12 @@ export default defineConfig({
         // Cache Google Fonts so repeat/offline visits paint instantly.
         runtimeCaching: [
           {
+            // Kenney glTF models for the 3D board: small, immutable, fetched on demand.
+            urlPattern: /\/kenney3d\/.*\.glb$/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'kenney-models', expiration: { maxEntries: 200 } },
+          },
+          {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\//,
             handler: 'StaleWhileRevalidate',
             options: { cacheName: 'google-fonts-stylesheets' },

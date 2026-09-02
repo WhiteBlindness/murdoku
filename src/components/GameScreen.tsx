@@ -8,7 +8,7 @@ import type { Puzzle, CellMark, GameMode, Furniture, FurnitureType } from '../co
 import { findFailingClues, resolveClueHighlights, satisfiedClueFlags } from '../core/ux'
 import { clueHolds } from '../core/engine'
 import type { Tool } from '../hooks/useGame'
-import { TILE_H, TILE_THICK, TILE_W } from '../core/kenneySprites'
+import { makeFrame } from '../scene3d/units'
 import IsoBoard from './IsoBoard'
 import SuspectCard from './SuspectCard'
 import CaseProgressStrip from './CaseProgressStrip'
@@ -858,10 +858,7 @@ export default function GameScreen(props: Props) {
                   // Mirrors IsoBoard's boardW/boardH. Constants are imported
                   // from the renderer's projection source so the slot cannot
                   // silently retain an obsolete 104px floor height.
-                  ['--board-ratio' as string]: String(
-                    (puzzle.size * TILE_W)
-                      / ((puzzle.size - 1) * TILE_H + TILE_H + TILE_THICK + 150 + 28),
-                  ),
+                  ['--board-ratio' as string]: String(makeFrame(puzzle.size).width / makeFrame(puzzle.size).height),
                   aspectRatio: 'var(--board-ratio)',
                 }}
               >
