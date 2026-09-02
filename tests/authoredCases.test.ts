@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { AUTHORED_CASES } from '../src/data/cases'
 import { buildAuthoredPuzzle, type AuthoredCaseSpec } from '../src/core/authored'
 import { countSolutions } from '../src/core/engine'
+import { reseed } from '../src/core/generate'
+import { validatePuzzleQuality } from '../src/core/puzzleValidate'
 import { furnitureCells, furnitureFootprint, type Clue } from '../src/core/types'
 
 // ============================================================================
@@ -16,6 +18,16 @@ describe('authored cases', () => {
 
   it('at least one authored case exists (the pilot)', () => {
     expect(entries.length).toBeGreaterThan(0)
+  })
+
+  it('builds the same authored clues regardless of the generator seed', () => {
+    const spec = AUTHORED_CASES['very-easy-1']
+    reseed(17)
+    const first = buildAuthoredPuzzle(spec, 'Case No. I')
+    reseed(99173)
+    const second = buildAuthoredPuzzle(spec, 'Case No. I')
+
+    expect(second.clues).toEqual(first.clues)
   })
 
   for (const [slug, spec] of entries) {
@@ -95,5 +107,6 @@ describe('authored cases', () => {
     expect(new Set(Object.values(puzzle.solution).map(cell => cell.floor)).size).toBe(2)
     expect(puzzle.clues.some(item => item.clue.kind === 'above' || item.clue.kind === 'below')).toBe(true)
     expect(countSolutions(puzzle, 2)).toBe(1)
+    expect(validatePuzzleQuality(puzzle).issues.filter(issue => issue.code === 'clue-reveals-murderer')).toEqual([])
   })
 })

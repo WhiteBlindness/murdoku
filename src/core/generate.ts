@@ -1437,11 +1437,17 @@ function toClueText(p: Puzzle, clues: Clue[]): ClueText[] {
 /** Remove redundant clues while keeping a unique solution and ≥1 clue/person.
  * Authored required clues carry deliberate narrative/spatial information and
  * are never candidates for removal. */
-export function pruneClues(p: Puzzle, clues: Clue[], required: readonly Clue[] = []): Clue[] {
+export function pruneClues(
+  p: Puzzle,
+  clues: Clue[],
+  required: readonly Clue[] = [],
+  order: 'seeded' | 'stable' = 'seeded',
+): Clue[] {
   let cur = [...clues]
   const keyOf = (clue: Clue) => JSON.stringify(Object.entries(clue).sort(([a], [b]) => a.localeCompare(b)))
   const requiredKeys = new Set(required.map(keyOf))
-  for (const c of shuffle([...cur])) {
+  const candidates = order === 'stable' ? [...cur].sort((a, b) => keyOf(a).localeCompare(keyOf(b))) : shuffle([...cur])
+  for (const c of candidates) {
     if (requiredKeys.has(keyOf(c))) continue
     const trial = cur.filter(x => x !== c)
     if (!trial.some(x => x.person === c.person)) continue // keep ≥1 per suspect

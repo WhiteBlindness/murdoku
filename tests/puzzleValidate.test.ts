@@ -111,6 +111,21 @@ describe('puzzle validator — the shipped catalog', () => {
       const m = difficultyMetrics(p)
       expect(m.people).toBeGreaterThan(1)
       expect(m.forcedBySingles + m.needsSearch).toBe(m.people)
+      expect(Number.isFinite(m.startingCandidateEntropy)).toBe(true)
+      expect(m.startingCandidateEntropy).toBeGreaterThanOrEqual(0)
+      expect(m.propagationRounds).toBeGreaterThanOrEqual(0)
+      expect(m.relationalClues).toBeGreaterThanOrEqual(0)
+      expect(m.crossFloorClues).toBeGreaterThanOrEqual(0)
+      expect(m.redundantClues).toBeGreaterThanOrEqual(0)
     }
+  })
+
+  it('measures the authored two-storey reference as cross-floor work', () => {
+    initCatalog()
+    const hard = getAllPuzzles().find(p => p.id === 'hard-1')!
+    const m = difficultyMetrics(hard)
+
+    expect(m.crossFloorClues).toBeGreaterThan(0)
+    expect(m.startingCandidateEntropy).toBeGreaterThan(0)
   })
 })

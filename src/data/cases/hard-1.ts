@@ -48,7 +48,8 @@ export const hard1: AuthoredCaseSpec = {
     { name: 'Clara', accentIndex: 7, row: 6, col: 3, floor: 1 },
   ],
   maxDirectness: 6,
-  minDirectness: 0,
+  // Hard cases must not identify the killer with a direct room clue.
+  minDirectness: 1,
   requiredClues: [
     { kind: 'above', person: 'p3', target: 'room1', targetKind: 'room' },
   ],

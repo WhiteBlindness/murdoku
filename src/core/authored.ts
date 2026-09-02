@@ -227,7 +227,7 @@ export function buildAuthoredPuzzle(spec: AuthoredCaseSpec, caseNumber: string):
   if (countSolutions(base, 2) !== 1) {
     throw new Error(`${spec.slug}: could not reach a unique solution with the given rooms/furniture/clue band — redesign the layout`)
   }
-  const chosen = pruneClues(base, acc, required)
+  const chosen = pruneClues(base, acc, required, 'stable')
   base.clues = chosen.map(c => ({ clue: c, text: clueToText(base, c) }))
   base.clues.push({ clue: { kind: 'victim', person: victimId }, text: clueToText(base, { kind: 'victim', person: victimId }) })
 

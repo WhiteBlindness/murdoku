@@ -50,6 +50,16 @@ export interface DifficultyMetrics {
   needsSearch: number
   /** Mean number of unary-legal cells per person at the start. */
   meanCandidates: number
+  /** Mean log2 candidate count after unary clues; a spread signal, not a score. */
+  startingCandidateEntropy: number
+  /** Deterministic singles-propagation passes before the board stalls. */
+  propagationRounds: number
+  /** Clues that relate one person to another person. */
+  relationalClues: number
+  /** Floor, above or below clues. */
+  crossFloorClues: number
+  /** Clues removable without losing uniqueness while their person keeps a clue. */
+  redundantClues: number
   /** Mean directness of the clue set (lower = more direct). */
   meanDirectness: number
 }
@@ -74,6 +84,7 @@ const KNOWN_ROOM_NAMES = new Set([
   'Bedroom', 'Office', 'Study', 'Hallway', 'Hall', 'Living Room', 'Lounge', 'Kitchen', 'Dining Room', 'Pantry',
   'Bathroom', 'Garden', 'Front Yard', 'Back Yard', 'Courtyard', 'Patio', 'Library', 'Garage', 'Attic', 'Cellar',
   'Conservatory', 'Nursery', 'Guest Room', 'Laundry', 'Workshop', 'Porch', 'Balcony', 'Terrace', 'Landing',
+  'Entrance Hall',
 ])
 
 function sameClue(a: Clue, b: Clue): boolean {
@@ -234,7 +245,16 @@ export function validatePuzzle(p: Puzzle): PuzzleIssue[] {
 
 // ---------------------------------------------------------------------------
 
-export function difficultyMetrics(p: Puzzle): DifficultyMetrics {
+function redundantClueIndexes(p: Puzzle): number[] {
+  const real = p.clues.filter(c => c.clue.kind !== 'victim')
+  return real.flatMap((candidate, index) => {
+    const trial: Puzzle = { ...p, clues: p.clues.filter(clue => clue !== candidate) }
+    const stillHasClue = trial.clues.some(clue => clue.clue.kind !== 'victim' && clue.clue.person === candidate.clue.person)
+    return stillHasClue && countSolutions(trial, 2) === 1 ? [index] : []
+  })
+}
+
+function computeDifficultyMetrics(p: Puzzle, redundantClues: number): DifficultyMetrics {
   const N = p.size
   const floors = p.floors ?? 1
   const candidates = new Map<string, Cell[]>()
@@ -250,6 +270,7 @@ export function difficultyMetrics(p: Puzzle): DifficultyMetrics {
   // singles propagation: place anyone with one candidate, remove their row/col from the others
   const placed = new Map<string, Cell>()
   let progress = true
+  let propagationRounds = 0
   while (progress) {
     progress = false
     for (const person of p.people) {
@@ -257,8 +278,15 @@ export function difficultyMetrics(p: Puzzle): DifficultyMetrics {
       const usable = candidates.get(person.id)!.filter(c => ![...placed.values()].some(q => q.row === c.row || q.col === c.col))
       if (usable.length === 1) { placed.set(person.id, usable[0]); progress = true }
     }
+    if (progress) propagationRounds++
   }
   const real = p.clues.filter(c => c.clue.kind !== 'victim')
+  const relationalKinds = new Set<Clue['kind']>(['direction', 'besidePerson', 'sameRoomAs', 'notSameRoomAs'])
+  const relationalClues = real.filter(({ clue }) => relationalKinds.has(clue.kind)
+    || ((clue.kind === 'above' || clue.kind === 'below') && clue.targetKind === 'person')).length
+  const crossFloorClues = real.filter(({ clue }) => clue.kind === 'floor' || clue.kind === 'above' || clue.kind === 'below').length
+  const startingCandidateEntropy = [...candidates.values()]
+    .reduce((sum, cells) => sum + Math.log2(Math.max(1, cells.length)), 0) / Math.max(1, candidates.size)
   return {
     people: p.people.length,
     clues: real.length,
@@ -266,8 +294,17 @@ export function difficultyMetrics(p: Puzzle): DifficultyMetrics {
     forcedBySingles: placed.size,
     needsSearch: p.people.length - placed.size,
     meanCandidates: [...candidates.values()].reduce((s, c) => s + c.length, 0) / Math.max(1, candidates.size),
+    startingCandidateEntropy,
+    propagationRounds,
+    relationalClues,
+    crossFloorClues,
+    redundantClues,
     meanDirectness: real.reduce((s, c) => s + clueDirectness(c.clue), 0) / Math.max(1, real.length),
   }
+}
+
+export function difficultyMetrics(p: Puzzle): DifficultyMetrics {
+  return computeDifficultyMetrics(p, redundantClueIndexes(p).length)
 }
 
 export function validatePuzzleQuality(p: Puzzle): { issues: PuzzleIssue[]; metrics: DifficultyMetrics } {
@@ -280,11 +317,9 @@ export function validatePuzzleQuality(p: Puzzle): { issues: PuzzleIssue[]; metri
     if (sameClue(real[i].clue, real[j].clue)) err('clue-duplicate', `clue#${i}`, `"${real[i].text}" appears twice`)
   }
   // redundancy: a clue whose removal keeps the solution unique (and leaves its person with a clue)
-  for (let i = 0; i < real.length; i++) {
-    const trial: Puzzle = { ...p, clues: p.clues.filter(c => c !== real[i]) }
-    const stillHasClue = trial.clues.some(c => c.clue.kind !== 'victim' && c.clue.person === real[i].clue.person)
-    if (!stillHasClue) continue
-    if (countSolutions(trial, 2) === 1) warn('clue-redundant', `clue#${i}`, `"${real[i].text}" can be removed without losing uniqueness`)
+  const redundant = redundantClueIndexes(p)
+  for (const i of redundant) {
+    warn('clue-redundant', `clue#${i}`, `"${real[i].text}" can be removed without losing uniqueness`)
   }
   // directness band for the tier
   const cfg = DIFFICULTY_CONFIG[p.difficulty]
@@ -301,7 +336,7 @@ export function validatePuzzleQuality(p: Puzzle): { issues: PuzzleIssue[]; metri
     if ((k.kind === 'sameRoomAs' && (k.other === p.victimId || k.person === p.victimId))) err('clue-reveals-murderer', `clue#${i}`, `"${c.text}" pairs a suspect with the victim's room`)
     if (k.kind === 'room' && k.person !== p.victimId && k.roomId === victimRoom) warn('clue-reveals-murderer', `clue#${i}`, `"${c.text}" places a suspect in the victim's room directly`)
   })
-  const metrics = difficultyMetrics(p)
+  const metrics = computeDifficultyMetrics(p, redundant.length)
   const band = DIFFICULTY_BANDS[p.difficulty]
   if (band) {
     const check = (name: keyof typeof band, value: number) => {

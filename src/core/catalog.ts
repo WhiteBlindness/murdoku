@@ -60,7 +60,10 @@ const SPEC: { difficulty: Difficulty; count: number }[] = [
 // covers far more than its cell and is the most saturated thing on the
 // board, which is why the scene read as "giant red squares" rather than a
 // room. Cached v22 lists still hold them.
-const KEY = 'murdoku_catalog_v24'
+// v25: hard-1 became the authored two-storey reference and authored clue
+// pruning became stable. Cached v24 data can contain the old generated case
+// or a seed-dependent clue set.
+const KEY = 'murdoku_catalog_v25'
 let puzzles: Puzzle[] = []
 
 function slug(s: string) { return s.toLowerCase().replace(/\s+/g, '-') }
