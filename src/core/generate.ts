@@ -278,8 +278,8 @@ function rectIsEdge(rect: Rect, size: number): boolean {
  * Rules (hard):
  *   1. Outdoor names (Front Yard, Garden, Porch) are only assignable on floor 0
  *      AND to a rect touching a board edge. Never upstairs.
- *   2. Names are unique within a floor call. (Cross-floor duplication is fine —
- *      a house can have a Bedroom on each storey.)
+ *   2. Names are unique across the whole case. Room names appear verbatim in
+ *      clues, so repeating “Bedroom” on two storeys makes the clue ambiguous.
  *
  * Rules (soft, scored):
  *   3. Names carry a preferred floor (0 = ground, 1 = upper). A name used on
@@ -294,8 +294,13 @@ function rectIsEdge(rect: Rect, size: number): boolean {
  * best soft score among the full remaining pool (ignoring hard bans), then as
  * a last resort picks any remaining name at random.
  */
-function assignRoomNames(rects: Rect[], size: number, floorNum: number): string[] {
-  const available = shuffle([...ROOM_NAMES])
+function assignRoomNames(
+  rects: Rect[],
+  size: number,
+  floorNum: number,
+  excludedNames: ReadonlySet<string> = new Set(),
+): string[] {
+  const available = shuffle(ROOM_NAMES.filter(name => !excludedNames.has(name)))
   const result: string[] = new Array(rects.length).fill('')
 
   // Sort rects largest-first so big rooms get first pick of well-fitting names.
@@ -355,7 +360,12 @@ function assignRoomNames(rects: Rect[], size: number, floorNum: number): string[
   return result
 }
 
-function buildRooms(size: number, targetRooms?: number, floorNum = 0): { rooms: Room[]; roomOf: string[][] } {
+function buildRooms(
+  size: number,
+  targetRooms?: number,
+  floorNum = 0,
+  excludedNames: ReadonlySet<string> = new Set(),
+): { rooms: Room[]; roomOf: string[][] } {
   // Room count tracks area: an 8x8 split into 4 rooms gives 16-cell rooms, which
   // makes "In the Kitchen" nearly free information.
   // Target room counts tuned to keep typical room size at 6–12 cells.
@@ -377,7 +387,7 @@ function buildRooms(size: number, targetRooms?: number, floorNum = 0): { rooms: 
   )
   const rects = splitRects(size, target)
   // Assign names by fit: size band + floor preference + outdoor-edge rule
-  const names = assignRoomNames(rects, size, floorNum)
+  const names = assignRoomNames(rects, size, floorNum, excludedNames)
   const roomOf: string[][] = Array.from({ length: size }, () => new Array(size).fill(''))
   const rooms: Room[] = rects.map((rect, i) => {
     const id = `room${i}`
@@ -402,7 +412,8 @@ function buildTwoFloorRooms(size: number, targetRooms?: number): {
 } {
   const { rooms: rooms0, roomOf: roomOf0 } = buildRooms(size, targetRooms, 0)
   const offset = rooms0.length
-  const { rooms: rooms1, roomOf: roomOf1 } = buildRooms(size, targetRooms, 1)
+  const usedNames = new Set(rooms0.map(room => room.name))
+  const { rooms: rooms1, roomOf: roomOf1 } = buildRooms(size, targetRooms, 1, usedNames)
 
   // Re-id floor-1 rooms to avoid collisions with floor-0 room ids
   const roomOf1remapped: string[][] = Array.from({ length: size }, () => new Array(size).fill(''))
