@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
@@ -36,5 +36,36 @@ describe('permanent production instructions', () => {
     expect(roadmap).toContain('Nível 1')
     expect(roadmap).toContain('Nível 2')
     expect(roadmap).toContain('Nível 3')
+  })
+
+  it('keeps the release QA report and its deliberate reference render set', () => {
+    const report = read('docs/QA_RELEASE_REPORT.md')
+    const referenceIndex = read('docs/reference/README.md')
+    const requiredRenders = [
+      'midnight-delivery-environment.png',
+      'midnight-delivery-interaction.png',
+      'midnight-delivery-case-closed.png',
+      'midnight-delivery-mobile.png',
+      'empty-chair-environment.png',
+      'empty-chair-transition.png',
+      'empty-chair-landscaping.png',
+      'last-nightcap-environment.png',
+      'last-nightcap-window-wall.png',
+      'last-nightcap-service.png',
+      'two-storey-ground-ghost.png',
+      'two-storey-upper-ghost.png',
+      'two-storey-exploded.png',
+      'two-storey-stairs.png',
+      'two-storey-stairwell.png',
+      'two-storey-mobile.png',
+    ]
+
+    expect(report).toContain('348 testes passaram')
+    expect(report).toContain('60 casos')
+    expect(referenceIndex).toContain('07/09/2026')
+    for (const render of requiredRenders) {
+      expect(referenceIndex).toContain(render)
+      expect(existsSync(join(process.cwd(), 'docs/reference', render))).toBe(true)
+    }
   })
 })
