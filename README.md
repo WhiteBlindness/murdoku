@@ -1,60 +1,72 @@
 # Murdoku
 
-A noir **murder-mystery deduction puzzle** (inspired by Manuel Garand's Murdoku).
-Read each suspect's clue, place everyone on the house map so that each person sits
-in exactly one row and one column, and unmask whoever is left **alone with the
-victim**. Built as an installable, offline-capable PWA.
+O Murdoku é um jogo de dedução policial inspirado na obra de Manuel Garand. O jogador lê as pistas, coloca cada pessoa numa casa isométrica e identifica quem ficou a sós com a vítima. É uma aplicação web progressiva instalável e funciona sem ligação à rede depois da primeira visita.
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173  (add --host for LAN access)
-npm run build    # production build in dist/
-npm run preview  # serve the production build
+npm run dev      # desenvolvimento em http://localhost:5173
+npm run build    # versão de produção em dist/
+npm run preview  # pré-visualização da versão de produção
 ```
 
-## How it works
-- The board is a top-down house map split into **rooms** (colored regions) with
-  **furniture** (line icons the clues reference: chair, box, rug, plant, bed…).
-- Each of N people (suspects + one **victim**) occupies **one row and one column**
-  — a permutation, so most cells stay empty. Mark impossible cells with ✕.
-- Every suspect carries a **clue** that must be literally true ("On the box",
-  "In the Bedroom", "The only person on a rug", "Right beside Greta", "Exactly one
-  row north of Priya"…). The clues together pin down a **unique** arrangement.
-- Solve the grid and submit. The murderer is the suspect sharing the victim's room.
+## Como funciona
 
-## Features
-- **27 procedurally generated cases** across five difficulties (Very Easy 4×4 →
-  Expert 7×7), each guaranteed to have a single solution.
-- **Illustrated suspects** (DiceBear portraits) + **Lucide furniture icons**.
-- **Light & dark themes** — follows the device, one-tap toggle, remembers choice,
-  WCAG-AA in both.
-- Place / Mark-✕ / Undo / Clear / Hint tools, live row-column conflict warnings,
-  animated "Case Solved" reveal.
-- Search and difficulty filters, resumable in-progress cases, and private per-case
-  notes persisted on the current device.
-- Release Notes page. Installable PWA, playable offline (fonts + avatars cached).
+- A casa divide-se em células e divisões, com mobiliário a que as pistas podem fazer referência.
+- Cada pessoa ocupa uma linha e uma coluna exclusivas, mesmo quando o caso possui dois pisos.
+- Todas as pistas são literalmente verdadeiras e o conjunto admite uma única solução.
+- O assassino é o suspeito que partilha a divisão da vítima.
 
-## Architecture (portable by design)
+## Funcionalidades
+
+- 60 casos determinísticos distribuídos por seis níveis, de Muito fácil a Mestre.
+- Quatro casos com cenas 3D escritas à mão, incluindo um caso completo de dois pisos, e uma cena de recurso para os restantes casos.
+- Vista isométrica com paredes e aberturas físicas, sombras, mobiliário Kenney medido e associação entre objetos lógicos e visuais.
+- Piso ativo com contexto fantasma não interativo e panorama explodido opcional nos casos de dois pisos.
+- Colocar, marcar com X, desfazer, limpar, pedir ajuda e acusar, com avisos de conflito entre linhas e colunas.
+- Temas claro e escuro, progresso retomável, notas privadas por caso e página de notas de lançamento.
+- Aplicação web progressiva instalável, com tipos de letra e retratos disponíveis sem ligação à rede.
+
+## Arquitetura
+
+```text
+src/core/       modelo, motor de pistas, solucionador, gerador e catálogo
+src/data/       casos escritos à mão
+src/scene3d/    esquema, catálogo físico, resolvedor, validação e renderizador
+src/hooks/      estado do jogo e tema
+src/components/ ecrãs React, interação e tabuleiro isométrico
+src/styles/     variáveis semânticas e estilos
+tests/          testes unitários, de integração e de pré-validação
+docs/           decisões, manuais, relatórios e referências visuais
 ```
-src/core/       Pure TS — no React:
-  types.ts        data model (puzzle, clues, play state)
-  engine.ts       clue evaluation, backtracking solver, uniqueness, murderer
-  generate.ts     procedural generator (solution → true clues → unique puzzle)
-  catalog.ts      stable seeded set of puzzles (+ localStorage cache)
-  furniture.tsx   FurnitureType → Lucide icon map
-  changelog.ts    release-notes data
-src/hooks/      useGame (reducer state machine) · useTheme
-src/components/ MapGrid · SuspectCard · GameScreen · VictoryScreen · HomeScreen …
-src/styles/     theme.css design tokens
-docs/           UX_REVIEW.md · PERF_AUDIT.md
+
+O motor em `src/core` não depende do React. A camada visual consome o mesmo contrato lógico e valida separadamente a arquitetura da cena.
+
+## Produção e validação
+
+Antes de criar ou modificar um caso ou uma cena 3D, lê `docs/OPUS_PRODUCTION_MANUAL.md`. Os documentos principais são:
+
+- `docs/PUZZLE_AUTHORING.md`, para dificuldade e autoria de pistas;
+- `docs/ISOMETRIC_SCENE_SYSTEM.md`, para arquitetura e composição;
+- `docs/KENNEY_PACK_SURVEY.md`, para seleção de recursos;
+- `docs/KENNEY_ENVIRONMENT_EXPANSION.md`, para o roteiro de ambientes.
+
+Controlos rápidos:
+
+```bash
+npm run validate:production
+node scripts/measure-puzzles.mjs --check
 ```
-The game engine is framework-agnostic; the React layer is a thin view over
-`src/core`, so it ports to React Native or another runtime unchanged.
 
-## Theming
-Semantic CSS custom properties in `src/styles/theme.css`. Dark is the default and
-works with zero JS (system preference respected); a tiny inline script only applies
-a remembered override. Add a theme = one `:root.theme-<name> { … }` block + one
-entry in `THEMES` (`src/hooks/useTheme.ts`).
+Controlo integral:
 
-See `docs/` for the UX review and load-performance audit.
+```bash
+npm test
+npm run validate:production
+node scripts/measure-puzzles.mjs --check
+npm run lint
+npm run build
+```
+
+## Temas
+
+Os temas usam propriedades personalizadas semânticas em `src/styles/theme.css`. O tema escuro é o predefinido, respeita a preferência do sistema e não depende de JavaScript. Para adicionar um tema, cria um bloco `:root.theme-<nome>` e acrescenta a entrada correspondente em `THEMES`, em `src/hooks/useTheme.ts`.

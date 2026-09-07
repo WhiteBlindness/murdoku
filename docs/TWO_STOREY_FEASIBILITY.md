@@ -1,73 +1,54 @@
-# Two storeys and stairs — feasibility study
+# Dois pisos e escadas — decisão implementada
 
-Product rule to satisfy: a logical row/column relationship may couple corresponding positions across storeys (the existing `above` / `below` / `floor` clues and the cross-floor row/column lock in `useGame`). The presentation must make that coupling understandable.
+Estado confirmado em 07/09/2026: a solução descrita neste documento está implementada no caso de referência `hard-1`. Uma relação lógica entre linhas ou colunas pode associar posições correspondentes entre pisos através das pistas `above`, `below` e `floor` e do bloqueio cruzado em `useGame`. A apresentação torna essa associação simultaneamente visível e não interfere com a interação.
 
-## 1. Assets
+## 1. Recursos
 
-### Furniture Kit (already in the project)
+### Furniture Kit, já presente no projeto
 
-The kit ships four staircases as glTF, measured from geometry (`catalog.generated.ts`):
+O pacote fornece quatro escadas medidas a partir da geometria em `catalog.generated.ts`:
 
-| Model | Size w × h × d (Kenney units) | Notes |
+| Modelo | Dimensões l × a × p, em unidades Kenney | Notas |
 | --- | --- | --- |
-| `stairs` | 1.82 × 1.34 × 0.79 | closed stringers, straight run |
-| `stairsOpen` | 1.82 × 1.34 × 0.79 | open risers |
-| `stairsOpenSingle` | 1.82 × 1.34 × 0.79 | open, single stringer |
-| `stairsCorner` | 1.77 × 1.34 × 1.43 | quarter-turn landing |
+| `stairs` | 1,82 × 1,34 × 0,79 | lanço reto, laterais fechadas |
+| `stairsOpen` | 1,82 × 1,34 × 0,79 | lanço reto, degraus abertos |
+| `stairsOpenSingle` | 1,82 × 1,34 × 0,79 | lanço aberto, uma longarina |
+| `stairsCorner` | 1,77 × 1,34 × 1,43 | patamar com quarto de volta |
 
-Key fact: **rise 1.34 ≈ wall height 1.29**. The kit was designed so one straight flight climbs one storey. A straight flight occupies 1.82 × 0.79 units = 2.3 × 1.0 cells at `CELL = 0.8`; a corner flight 2.2 × 1.8 cells. That is a large footprint on a 6×6 board and acceptable on 8×8 (the only two-storey sizes today).
+Facto principal: **a subida de 1,34 aproxima-se da parede de 1,29**. Um lanço reto sobe um piso. Ocupa 1,82 × 0,79 unidades, ou seja, 2,3 × 1,0 células com `CELL = 0.8`; a escada de canto ocupa 2,2 × 1,8 células. Esta pegada é grande numa grelha de 6 × 6 e adequada à grelha de 8 × 8 do piloto.
 
-Also in the kit: `floorFull` (1 × 0.05) for the upper slab, `wall`, `wallHalf`, `wallCorner`, `wallWindow`, `wallDoorway` for the upper shell, `paneling`.
+O pacote também fornece `floorFull` (1 × 0,05) para a laje superior e os modelos `wall`, `wallHalf`, `wallCorner`, `wallWindow`, `wallDoorway` e `paneling` para o envelope.
 
-### Building Kit (kenney.nl/assets/building-kit, 80 pieces, CC0) and Modular Buildings (100 variations, CC0)
+### Building Kit e Modular Buildings
 
-Both are exterior/architectural kits: walls, roofs, windows, doors, stairs and porches at a slightly larger "house" scale intended for outdoors. They are the right source for **roofs, balconies, exterior stairs and a gable end** if a case ever shows the house from outside, and for a landing/balustrade vocabulary. They are not needed for interior storeys: the Furniture Kit already covers stairs, slab and shell. Mixing kits is safe as long as each owns a layer (exterior envelope vs interior fit-out) — the same rule the old `assets-dropbox/README.md` states for 2D.
+Estes pacotes destinam-se a arquitetura exterior. Fornecem paredes, telhados, janelas, portas, escadas e alpendres numa escala própria. Podem vir a fornecer telhados, varandas e escadas exteriores, mas não são necessários para os pisos interiores: a Furniture Kit já cobre escada, laje e envelope.
 
-Verification still owed before adoption: download both kits and run `scripts/kenney-catalog.mjs` on them to confirm wall height and unit scale match 1.29 / 1.0 (Kenney kits generally share the metre-ish unit, but this must be measured, not assumed).
+A medição recuperada mostrou que a Building Kit usa paredes de 2,40 unidades e a Modular Buildings usa módulos de piso com cerca de 0,60. Por isso, ambas exigem um adaptador de envelope e não podem ser misturadas diretamente com a parede interior de 1,29. A decisão completa consta de `docs/KENNEY_PACK_SURVEY.md`.
 
-## 2. Geometry of a second storey in the current system
+## 2. Geometria implementada
 
-Everything below is a `y` offset; nothing in `resolve.ts` or `validate.ts` cares which storey it is.
+- A distância entre pisos é `STOREY_HEIGHT = WALL_HEIGHT + FLOOR_THICKNESS`.
+- Cada piso possui uma `SceneSpec` própria, com `floor: 0 | 1`, resolvida e validada contra a topologia e o mobiliário lógico desse piso.
+- O rés-do-chão declara `stairs`; o piso superior declara um `stairwell` coincidente.
+- O resolvedor retira a laje na abertura, coloca a escada à altura física e reserva as respetivas células.
+- O validador confirma a correspondência entre a escada e o vão, a subida, os limites, os patamares livres e a inexistência de laje na abertura.
 
-- Storey pitch `STOREY = 1.29 + 0.05` (wall + slab).
-- Upper floor tiles at `y = STOREY − 0.05`, upper walls from `y = STOREY`.
-- Each storey is its own `SceneSpec` (`floor: 0 | 1`), resolved and validated independently against `puzzle.roomOfByFloor[floor]` and that floor's furniture — this already works: `sceneFor(puzzle, floor)`.
-- Stairs are a **system feature, not décor**: a `stairs` entry on the ground-floor spec names the cells it occupies; the resolver adds the model, blocks those cells for furniture, and on the upper spec carries the matching stairwell (a hole in the slab) automatically. The validator adds two rules: the stair's top lands inside the upper floor, and the stairwell cells are free on the upper floor.
+## 3. Apresentação escolhida
 
-## 3. Presentation options
-
-| Option | How it looks | Reads the coupling? | Cost / risk |
-| --- | --- | --- | --- |
-| **A. Stacked dollhouse** (both storeys in one frame, upper slab at `STOREY`) | one tall diorama | poorly: the upper storey hides most of the ground floor from a 32° camera; the ground floor's back rows vanish | breaks the visibility invariant; rejected |
-| **B. Exploded floors** (both storeys, upper one lifted by ~2× STOREY with a gap) | two slabs in one frame, stairs bridging the gap | well: the same column is literally the same screen diagonal; a vertical guide line can connect coupled cells | frame becomes ~1.8× taller; on phones each storey is small; doubles draw calls (fine) |
-| **C. Active storey + ghost** (draw the active storey normally, the other as a translucent wireframe/slab above or below at true height) | current single-storey look with a faint second slab | moderately: ghost cells above/below the hovered cell can be highlighted | keeps everything readable; needs a depth-sorted transparency pass (three.js handles it); ghost must never receive hit-testing |
-| **D. Camera transition** (animate the camera up/down when switching floors; only one storey drawn) | two single-storey scenes with a lift between them | only through motion memory; nothing simultaneous on screen | simplest; reduced-motion users see a cut; does not show coupling at all |
-
-### Recommendation
-
-**C now, B as the "overview" mode.**
-
-- Default play: the active storey exactly as today, plus a **ghost** of the other storey: its slab and partitions as 12% opacity wireframe boxes at the true `y` offset, the stairwell drawn solid at both levels. When the player hovers a cell, the corresponding cell on the ghost storey lights with the same lane colours, and the existing cross-floor lock washes (`blockedRows/Cols`) are drawn on the ghost as well. This is what makes "directly above the kitchen" legible without leaving the floor.
-- Floor switch: the existing buttons; the ghost and the active storey swap roles with a 250 ms opacity cross-fade, no camera move (reduced-motion safe).
-- Overview (optional, later): a toggle that renders option B — both storeys exploded with the stair bridging them — for the "reveal" moment at case completion and the victory replay.
-- Stairs: authored once on the ground-floor spec; the resolver mirrors the stairwell upstairs.
-
-## 4. What changes in code (estimate)
-
-| Piece | Change | Size |
+| Opção | Resultado | Decisão |
 | --- | --- | --- |
-| `schema.ts` | `stairs?: { model, at, facing }` on the ground spec | small |
-| `resolve.ts` | stairs object + upstairs stairwell cut-out; `y` offset per floor; `storey` on `ResolvedScene` | small |
-| `validate.ts` | stair top inside upper slab; stairwell free upstairs; stairs cells not hidden | small |
-| `renderer.ts` | draw a second (ghost) resolved scene at `y = ±STOREY` with a wireframe material; ghost highlight quads | medium |
-| `IsoBoard.tsx` | pass both scenes; ghost hover; frame height grows by the ghost's extent (headroom above for floor 0, slab below for floor 1) | medium |
-| `units.ts` | `STOREY` constant; `makeFrame` takes a `ghost: 'above' \| 'below' \| 'none'` extent | small |
-| Tests | ghost never has hit polygons; stair rules; frame extents | small |
+| **Casa empilhada** | o piso superior oculta o rés-do-chão | rejeitada |
+| **Pisos explodidos** | mostra os dois pisos com distância adicional | implementada como panorama opcional |
+| **Piso ativo e contexto fantasma** | preserva a leitura do piso ativo e mostra a estrutura do outro | implementada como vista predefinida |
+| **Transição de câmara** | depende da memória do movimento e não mostra a relação simultânea | rejeitada |
 
-A spike of the ghost renderer is about a day; the full feature including authoring 30 upper-floor scenes is the migration plan's Batch E.
+Na vista predefinida, o piso ativo mantém opacidade e interação completas. O outro surge à altura real, com laje e paredes translúcidas, sem mobiliário. O contexto fantasma não possui polígonos de interação. O realce de uma célula inclui a posição correspondente no outro piso e os bloqueios de linhas e colunas.
 
-## 5. Open questions for the product owner
+O botão de panorama ativa a vista explodida. A câmara não muda e não existe animação obrigatória, por isso o comportamento respeita a redução de movimento. Os botões de piso trocam os papéis ativo e fantasma.
 
-1. Should the ghost show its furniture (silhouettes) or only slab + walls? Recommendation: slab + walls + the stairs; furniture ghosts add noise.
-2. Is the exploded overview wanted at all, or is the ghost enough? It costs a taller frame on phones.
-3. Should the stairs be a clue target ever ("on the stairs")? If yes, `stairs` needs a logical furniture type; today it does not exist in `FurnitureType`.
+## 4. Decisões de produto
+
+1. O contexto fantasma mostra apenas a estrutura, a escada e o vão; o mobiliário fantasma foi excluído para reduzir ruído.
+2. O panorama explodido existe como modo opcional, incluindo em ecrãs estreitos.
+3. A escada continua a ser circulação física, não um tipo de mobiliário ou alvo de pista.
+4. `hard-1` é o caso de referência obrigatório para regressão visual, interação entre pisos e validação física.

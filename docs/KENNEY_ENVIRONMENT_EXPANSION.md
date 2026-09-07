@@ -1,53 +1,82 @@
-# Kenney environment expansion — outdoor and other scenes
+# Roteiro de expansão dos ambientes Kenney
 
-Question: can future cases play in a garden, courtyard, forest clearing, park, campsite or exterior crime scene while keeping normal Murdoku logic and the hidden N×N grid?
+Este roteiro parte dos recursos medidos em `docs/KENNEY_PACK_SURVEY.md` e das capacidades que já existem no código. Não promete temas sem suporte físico e visual.
 
-Short answer: yes, with the same scene system, one new floor material set, and a second Kenney kit that shares the Furniture Kit's scale and style. Nothing about the puzzle, the projection, the interaction layer or the validator changes.
+## Estado atual
 
-## 1. Compatible assets
+O sistema já suporta:
 
-- **Nature Kit** — kenney.nl/assets/nature-kit, 330 models, CC0, same author and low-poly flat-colour style as the Furniture Kit (trees, rocks, bushes, flowers, grass tufts, paths, fences, logs, tents, mushrooms, cliffs). Distributed in the same formats (glTF among them). Scale must be measured with `scripts/kenney-catalog.mjs` before use; Kenney's nature pieces are authored around a 1-unit ground tile, which matches `floorFull`.
-- **Furniture Kit** pieces that already work outdoors: `bench`, `benchCushion`, `chair`, `tableRound`, `pottedPlant`, `cardboardBox*`, `lampSquareFloor` (as a lamppost), `rugDoormat` (as a step), `wallHalf` (garden wall), `doorway` (a garden gate).
-- The pilots already prove the mechanism: The Empty Chair and The Last Nightcap each have a `grass` floor zone inside the shell.
+- interiores e exteriores como topologias arquitetónicas diferentes;
+- pátios, terreno exterior rebaixado, fundações e soleiras;
+- materiais `wood`, `tile`, `stone`, `grass` e `dirt`;
+- paredes, portas e janelas com abertura física;
+- uma seleção de 21 modelos da Nature Kit, medida e catalogada;
+- casas de um ou dois pisos, escadas, patamares e vista fantasma ou explodida;
+- composição exterior não alinhada com a grelha nos pilotos The Empty Chair e The Last Nightcap.
 
-## 2. Scene concepts (each is a normal SceneSpec)
+## Nível 1 — funciona com o sistema atual
 
-| Concept | Shell | Walls | Floor | Objects |
-| --- | --- | --- | --- | --- |
-| Walled courtyard / garden (exists today) | north/west full, south/east plinth | pony walls, patio openings | `grass` zone | potted plants, bench, chairs |
-| Park | no shell walls (a new `shell: 'none'` option), plinth only | none; low `wallHalf` as railings, hedges as furniture | `grass` with `stone` paths | trees, benches, lamppost, bins |
-| Forest clearing | none | none | `grass`, `dirt` (new material) | trees on the perimeter cells, logs, rocks, a tent |
-| Campsite | none | none | `grass`/`dirt` | tents, fire ring (rocks), logs as seats, a cooler box |
-| Exterior crime scene (front garden + porch) | north full with the house façade (Building Kit door/window pieces), west full or hedge | porch pony wall | `stone` porch, `grass` lawn, `stone` path | mailbox, bins, a parked box, bushes |
+| Família | Pacotes autorizados | Limites |
+| --- | --- | --- |
+| apartamento ou casa | Furniture Kit | envelope recortado, até dois pisos; sem telhado exterior |
+| escritório ou estudo | Furniture Kit | usa secretárias, cadeiras, estantes, candeeiros e superfícies existentes |
+| sala de jantar, café ou bar doméstico | Furniture Kit | sem alimentos detalhados; balcões e mesas existentes |
+| pátio ou jardim murado | Furniture Kit + subconjunto Nature Kit | relva, pedra, arbustos, árvore, rochas e vedação já catalogados |
+| jardim frontal ou exterior parcial | Furniture Kit + subconjunto Nature Kit | zona `exterior`, fundação e soleira; o edifício continua a usar o envelope atual |
+| casa de dois pisos | Furniture Kit | uma cena por piso; escada e abertura validadas |
 
-A "hedge" is furniture with `support: 'floor'`, `tall: true`, `symmetric: true` and `represents: ['shrub']`; the Nature Kit has several bush models that fit.
+Estas famílias podem ser produzidas por uma `SceneSpec` nova, sem alterar o esquema, o renderizador ou os validadores.
 
-## 3. Technical reuse
+## Nível 2 — extensão pequena e isolada
 
-- `schema.ts`: add `FloorMaterial` values (`dirt`, `path`), an optional `shell: { walls: 'full' | 'none' }`, and nothing else. `floors`, `walls` (as railings/hedge lines), `furniture`, `rugs` already express everything above.
-- `catalog.generated.ts`: run the generator over the Nature Kit's glb folder into a second generated table; `catalog.ts` gains the semantic entries (tree = floor + tall + symmetric; rock = floor + loose; tent = floor + tall, faces S). The `KenneyModel` union becomes the union of both tables; the loader looks up the path by table.
-- `renderer.ts`: floor slabs already handle non-wood materials; add the two colours. Trees cast shadows like everything else — no special case.
-- `validate.ts`: unchanged. A tree is a tall symmetric object; a hedge line is a wall for reachability if authored as a wall, or a row of furniture if authored as furniture (prefer walls so `door-blocked`/`room-unreachable` keep working).
-- Interaction layer: unchanged.
+| Família | Recurso provável | Trabalho obrigatório |
+| --- | --- | --- |
+| parque ou clareira | Nature Kit | medir e importar mais bancos, troncos, flores e caminhos; caso-piloto totalmente exterior; rever iluminação |
+| acampamento | Nature Kit ou Survival Kit | tendas e fogueira; adaptador separado se usar Survival Kit; auditoria de oclusão |
+| restaurante, café ou bar | Food Kit | modelos pequenos sempre apoiados em superfícies-pai; catálogo semântico e caso-piloto |
+| loja ou supermercado | Mini Market | usar prateleiras e arcas como mobiliário, não as paredes de 1,00; adaptar materiais `colormap` |
+| cemitério | Graveyard Kit | paleta e materiais próprios, árvores no perímetro, criptas fora das células jogáveis |
+| cabana sazonal | Holiday Kit | escolher uma única escala de envelope e validar neve, telhado e iluminação |
 
-## 4. Readability risks and their answers
+Cada extensão de Nível 2 deve ter um commit de adaptador, testes físicos, um caso-piloto e aprovação visual antes de entrar num lote de conteúdo.
 
-- **Trees hide cells.** A tree is tall; anything south-east of it is occluded. The validator's `cell-hidden` warning already catches this. Rule: trees go on the north/west perimeter cells only, or use short bushes elsewhere — every cell can hold a suspect, so there is no "safe" interior cell for a tall canopy.
-- **No walls means no room boundaries.** Outdoors, "rooms" (Garden / Path / Pond) need another cue: floor material zones carry it (grass vs stone vs dirt), exactly as the courtyard does today. The hit layer keeps the room name in `aria-label`.
-- **A lawn reads as a flat green board.** Break it with paths, a tree line, a fence — objects that people place for reasons, not to mark cells. Never draw the grid.
-- **Night palette.** The current key light and midnight glass are indoor choices. Outdoor cases at night need a cooler hemisphere and a lamppost as a local warm source; that is one constant set in `renderer.ts` selected by a `scene.lighting: 'night' | 'day'` field (to add when the first outdoor case is authored).
+## Nível 3 — trabalho de arquitetura do sistema
 
-## 5. How the hidden logical grid works outdoors
+| Família | Motivo |
+| --- | --- |
+| rua ou quarteirão urbano | City Kit (Roads) exige uma segunda grelha modular, passeios, limites de mapa e iluminação exterior |
+| exterior suburbano completo | City Kit (Suburban) usa casas em escala de cidade, não interiores jogáveis |
+| exterior comercial | City Kit (Commercial) usa edifícios completos e arranha-céus em escala própria |
+| armazém ou fábrica | Factory Kit e City Kit (Industrial) exigem uma linguagem estrutural e de circulação nova |
+| fachada com telhado, varanda ou escada exterior | Building Kit ou Modular Buildings precisam de um adaptador de envelope; as paredes de 2,40 ou os andares de 0,60 não podem misturar-se diretamente com a parede interior de 1,29 |
+| beco retro | Retro Urban Kit usa textura pixelizada incompatível; só avançaria com uma direção visual nova e aprovada |
 
-Exactly as indoors: the grid is `CELL`-sized world squares; nothing on screen shows it until interaction. Outdoors the *architecture* that normally hints at cell rhythm (walls on cell lines) is absent, which makes the hidden-grid goal easier, not harder. Row/column feedback (floor washes, dashed traces, end pins) is projected onto the ground plane the same way; a wash on grass reads as a spotlight on the lawn.
+Um caso de Nível 3 é «SYSTEM ESCALATION». Não pertence a produção normal do Opus.
 
-Two things to watch:
-- Paths and hedges should not run along cell lines for their whole length, or they become the grid. Offset them by a fraction of a cell or give them a bend.
-- Standees need ground contact cues on uneven ground; keep outdoor floors flat (no terrain height), which the slab model already guarantees.
+## Ordem de adoção recomendada
 
-## 6. Order of work when this is picked up
+1. parque ou clareira apenas com a Nature Kit já compatível;
+2. café/restaurante com um subconjunto pequeno da Food Kit;
+3. supermercado com objetos da Mini Market, mantendo a estrutura atual;
+4. cemitério como lote temático isolado;
+5. só depois estudar um adaptador exterior para Building Kit ou City Kit.
 
-1. Download the Nature Kit; run the catalogue generator; check unit scale against `floorFull`.
-2. Add the two materials and the `shell: 'none'` option (small, with tests).
-3. Author one outdoor pilot (a Very Easy case that already has a Garden room) and run it through the migration plan's per-scene workflow.
-4. Only then consider the Building Kit for façades.
+## Regras visuais exteriores
+
+- uma árvore alta fica no perímetro norte/oeste ou precisa de prova de visibilidade;
+- caminhos e vedações não devem repetir a grelha célula a célula;
+- objetos naturais formam grupos com variação de modelo e rotação permitida;
+- a associação lógica continua exata, mesmo quando a composição visual se afasta do centro da célula;
+- o terreno mantém alturas discretas e validadas; não se criam elevações manuais;
+- cada família precisa de controlo em ambiente isolado, jogo completo, secretária e telemóvel.
+
+## Critério de saída
+
+Uma família passa para o nível suportado apenas quando existe:
+
+- pelo menos um caso jogável;
+- todos os modelos medidos e catalogados;
+- zero erros físicos;
+- jogabilidade completa;
+- imagens de referência aprovadas;
+- documentação do adaptador e dos seus limites.

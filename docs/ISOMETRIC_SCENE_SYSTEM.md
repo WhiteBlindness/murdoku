@@ -2,7 +2,7 @@
 
 This is the authoring contract for every dollhouse scene in Alibi/Murdoku. It exists so that a scene can be built by a capable agent **without improvising any foundational rule**. If a rule here is not enough to decide something, the answer is "ask", not "tune a number until it looks close".
 
-Companion documents: `ADR-0001-3d-scene-renderer.md` (why 3D), `ROOT_CAUSE_REPORT.md` (what went wrong before), `SCENE_MIGRATION_PLAN.md` (how to roll this out).
+Companion documents: `ADR-0001-3d-scene-renderer.md` (why 3D), `ROOT_CAUSE_REPORT.md` (what went wrong before), `SCENE_MIGRATION_PLAN.md` (how to roll this out), `TWO_STOREY_FEASIBILITY.md` (implemented multi-storey decision), `KENNEY_PACK_SURVEY.md` (asset evidence), and `OPUS_PRODUCTION_MANUAL.md` (mandatory production gate).
 
 Golden master: **Midnight Delivery** (`src/scene3d/scenes/midnight-delivery.ts`). When in doubt, do what it does. Reference renders: `docs/scenes/midnight-delivery-*.png`.
 
@@ -223,4 +223,4 @@ Reject if anything floats, intersects, ends nowhere, shows its back, blocks a do
 - The kit has no clock, no bush, no ceiling. `radio`/`speaker` stand in for clocks, `pottedPlant` for shrubs. If a case leans on those clues, say so in the scene comment.
 - Tall furniture whose logical cell is on the south/east edge must either face S/E free-standing or back onto the cut shell (warning). There is no third option without changing the puzzle, which is forbidden.
 - Windows are night-blue by material override; a daytime case would need a different glass rule (one constant in `renderer.ts`).
-- Two-storey cases render each storey as its own scene (`floor` in the spec); vertical relationships are a study, not a feature yet — see `TWO_STOREY_FEASIBILITY.md`.
+- Two-storey cases render one scene per floor and require matched stairs/stairwell geometry. The active floor is accompanied by a non-interactive structural ghost of the other floor; an exploded overview is optional. See `TWO_STOREY_FEASIBILITY.md` and the `hard-1` reference case.
