@@ -14,6 +14,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { CELL, FLOOR_THICKNESS, cameraDirection, type StoreyView, type Vec3 } from './units'
 import type { ResolvedScene, ResolvedObject, Box3 } from './resolve'
 import type { KenneyModel } from './catalog.generated'
+import { companionFloorBoxes } from './companionGeometry'
 
 // ---- look: one light, one palette rule -------------------------------------
 /** Kenney's palette is authored for a bright render; a mild saturation lift
@@ -310,17 +311,7 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
   if (companion) {
     const ghostOpacity = companion.mode === 'ghost' ? 0.16 : 0.32
     const other = companion.scene
-    const inOtherStairwell = (r: number, c: number) => {
-      const sw = other.stairwell
-      return !!sw && c >= sw[0] && r >= sw[1] && c <= sw[2] && r <= sw[3]
-    }
-    for (let r = 0; r < other.n; r++) for (let c = 0; c < other.n; c++) {
-      if (inOtherStairwell(r, c)) continue
-      world.add(ghostBox({
-        min: [c * CELL, other.floorY[r][c] - FLOOR_THICKNESS, r * CELL],
-        max: [(c + 1) * CELL, other.floorY[r][c], (r + 1) * CELL],
-      }, companion.offsetY, ghostOpacity))
-    }
+    for (const slab of companionFloorBoxes(other)) world.add(ghostBox(slab, companion.offsetY, ghostOpacity))
     for (const wall of other.walls) {
       for (const piece of wall.pieces) world.add(ghostBox(piece, companion.offsetY, ghostOpacity))
       for (const frameBox of wall.frames) world.add(ghostBox(frameBox, companion.offsetY, ghostOpacity))
