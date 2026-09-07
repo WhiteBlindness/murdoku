@@ -513,7 +513,8 @@ export function resolveScene(spec: SceneSpec, n: number): ResolvedScene {
     const size = MODEL_BOUNDS[s.model].size as unknown as Vec3
     // Kenney flights climb toward +x at rot 0 (the top step is at max x);
     // `facing` names the climb direction, so E is rot 0.
-    const climbRot: Record<Facing, number> = { E: 0, S: 90, W: 180, N: 270 }
+    // Three's positive Y rotation sends +x toward -z (north).
+    const climbRot: Record<Facing, number> = { E: 0, S: 270, W: 180, N: 90 }
     const [tw, td] = s.facing === 'E' || s.facing === 'W' ? [size[0], size[2]] : [size[2], size[0]]
     const box = boxAround(x, y, z, tw, size[1], td)
     objects.push({

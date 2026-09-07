@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { Vector3 } from 'three'
 import { resolveScene } from '../src/scene3d/resolve'
 import type { SceneSpec } from '../src/scene3d/schema'
 import { validateScene, validateStoreyPair } from '../src/scene3d/validate'
@@ -30,6 +31,16 @@ const pairCodes = (lower = lowerSpec(), upper = upperSpec()) => validateStoreyPa
 ).filter(issue => issue.severity === 'error').map(issue => issue.code)
 
 describe('two-storey stair validation', () => {
+  it.each([
+    ['E', 1, 0], ['S', 0, 1], ['W', -1, 0], ['N', 0, -1],
+  ] as const)('renders the measured +X stair climb toward %s', (facing, x, z) => {
+    const spec = { ...lowerSpec(), stairs: { ...lowerSpec().stairs!, facing } }
+    const stair = resolveScene(spec, 8).objects.find(object => object.kind === 'stairs')!
+    const climb = new Vector3(1, 0, 0).applyAxisAngle(new Vector3(0, 1, 0), stair.rotY * Math.PI / 180)
+    expect(climb.x).toBeCloseTo(x)
+    expect(climb.z).toBeCloseTo(z)
+  })
+
   it('accepts the real playable reference pair', () => {
     expect(validateStoreyPair(
       resolveScene(twoStoreyReferenceGround, 8),
