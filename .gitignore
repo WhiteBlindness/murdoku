@@ -33,3 +33,6 @@ dist-ssr
 .claude/
 AGENTS.md
 assets-dropbox/
+
+# Session-local design audit state. The durable design system remains tracked.
+.impeccable/hook.cache.json

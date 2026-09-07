@@ -1,5 +1,6 @@
 import React from 'react'
 import type { FurnitureType } from './types'
+import { frameOffset } from './furnitureGeometry'
 
 /**
  * Uniform fill factor for each furniture type.
@@ -218,18 +219,6 @@ const FOOT = { stroke: INK, strokeWidth: 3, strokeLinecap: 'round' as const }
  * 100×100 canvas. offsetX = (vbW/2)*(1−k), offsetY = (vbH/2)*(1−k). For the
  * default 100×100 this reduces to 50*(1−k) — identical to the old formula.
  */
-
-/** Parse a "0 0 W H" viewBox string into { w, h }. */
-function parseVB(vb: string): { w: number; h: number } {
-  const parts = vb.split(/\s+/)
-  return { w: Number(parts[2]) ?? 100, h: Number(parts[3]) ?? 100 }
-}
-
-/** Centring offset for the scale transform on each axis. */
-export function frameOffset(vb: string, k: number): { x: number; y: number } {
-  const { w, h } = parseVB(vb)
-  return { x: (w / 2) * (1 - k), y: (h / 2) * (1 - k) }
-}
 
 function Frame({ prefix, size, tone, vb = '0 0 100 100', children }: {
   prefix: string

@@ -1,7 +1,8 @@
 import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import MapGrid from '../src/components/MapGrid'
-import { FURNITURE_ICON, FURNITURE_OVERHANG, FURNITURE_SCALE, frameOffset } from '../src/core/furniture'
+import { FURNITURE_ICON, FURNITURE_OVERHANG, FURNITURE_SCALE } from '../src/core/furniture'
+import { frameOffset } from '../src/core/furnitureGeometry'
 import type { FurnitureType, Puzzle, CellMark } from '../src/core/types'
 
 /**
@@ -339,6 +340,13 @@ describe('Frame centring maths via frameOffset', () => {
     expect(y).toBeCloseTo(4, 6)
     // Key property: x ≠ y on a non-square canvas (the bug was x=y=4)
     expect(x).not.toBeCloseTo(y, 6)
+  })
+
+  it('falls back to the default 100×100 canvas when the viewBox is malformed', () => {
+    const { x, y } = frameOffset('malformed', 0.92)
+
+    expect(x).toBeCloseTo(4, 6)
+    expect(y).toBeCloseTo(4, 6)
   })
 
   it('naive 50*(1-k) formula would have placed artwork off-centre on a 2:1 viewBox', () => {
