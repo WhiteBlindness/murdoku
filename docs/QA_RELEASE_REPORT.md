@@ -15,7 +15,7 @@ revisão está indexado em [`reference/README.md`](reference/README.md).
 
 ## Portas técnicas
 
-- Na suite integral de base, 348 testes passaram e 5 foram ignorados.
+- Na suite integral final, 351 testes passaram e 5 foram ignorados.
 - A cobertura atingiu 91,02 % nas instruções, 84,09 % nos ramos, 91,17 % nas
   funções e 95,63 % nas linhas.
 - A análise estática terminou sem erros nem avisos.
@@ -23,6 +23,7 @@ revisão está indexado em [`reference/README.md`](reference/README.md).
   renderizador mede 607,21 kB e 153,94 kB comprimido.
 - A pré-validação aprovou os 60 casos, todas as cenas, todos os pisos e todos os
   recursos referenciados.
+- A auditoria das 531 dependências não encontrou vulnerabilidades conhecidas.
 - O relatório determinístico do catálogo não encontrou erros graves. Conserva
   20 avisos editoriais conhecidos em 19 casos: 3 pistas diretas sobre a divisão
   do assassino, 15 redundâncias e 2 sinais de dificuldade.

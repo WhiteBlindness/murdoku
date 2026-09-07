@@ -60,7 +60,7 @@ describe('permanent production instructions', () => {
       'two-storey-mobile.png',
     ]
 
-    expect(report).toContain('348 testes passaram')
+    expect(report).toContain('351 testes passaram')
     expect(report).toContain('60 casos')
     expect(referenceIndex).toContain('07/09/2026')
     for (const render of requiredRenders) {
