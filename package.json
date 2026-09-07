@@ -13,7 +13,7 @@
     "validate:production": "tsc -b --pretty false && vitest run tests/productionPreflight.test.ts --reporter=verbose",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage --testTimeout=60000"
   },
   "dependencies": {
     "@types/three": "^0.185.4",

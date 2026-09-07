@@ -66,6 +66,10 @@ export default defineConfig({
   ],
   build: {
     target: 'es2020',
+    // The WebGL renderer is already a lazy route-level chunk. Its current
+    // 607 kB minified / 154 kB gzip size is within this explicit budget;
+    // the warning returns after roughly 7% growth.
+    chunkSizeWarningLimit: 650,
     // Split the two biggest third-party libs into their own long-cache chunks
     // so app-code changes don't force users to re-download the vendor bundle.
     rollupOptions: {
