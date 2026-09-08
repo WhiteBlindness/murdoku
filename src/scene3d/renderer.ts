@@ -129,12 +129,16 @@ function boxMesh(box: Box3, face: string, cap: string): THREE.Mesh {
   return m
 }
 
-function ghostBox(box: Box3, offsetY: number, opacity: number): THREE.Mesh {
+function ghostBox(box: Box3, offsetY: number, opacity: number): THREE.LineSegments {
   const w = box.max[0] - box.min[0], h = box.max[1] - box.min[1], d = box.max[2] - box.min[2]
-  const mesh = new THREE.Mesh(
-    new THREE.BoxGeometry(w, h, d),
-    new THREE.MeshBasicMaterial({
-      color: '#c9ab72', transparent: true, opacity, wireframe: true, depthWrite: false,
+  const boxGeometry = new THREE.BoxGeometry(w, h, d)
+  const edges = new THREE.EdgesGeometry(boxGeometry)
+  boxGeometry.dispose()
+  // Architectural edges only: mesh wireframes expose each face's triangulation.
+  const mesh = new THREE.LineSegments(
+    edges,
+    new THREE.LineBasicMaterial({
+      color: '#c9ab72', transparent: true, opacity, depthWrite: false,
     }),
   )
   mesh.position.set(box.min[0] + w / 2, box.min[1] + h / 2 + offsetY, box.min[2] + d / 2)
@@ -323,9 +327,12 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
           if (!mesh.isMesh) return
           const fade = (material: THREE.Material) => {
             const copy = material.clone()
-            copy.transparent = true
-            copy.opacity = companion.mode === 'ghost' ? 0.26 : 0.48
-            copy.depthWrite = false
+            // At true height the active slab must occlude the lower flight,
+            // leaving real, solid treads visible through its stairwell opening.
+            const exploded = companion.mode === 'exploded'
+            copy.transparent = exploded
+            copy.opacity = exploded ? 0.48 : 1
+            copy.depthWrite = !exploded
             return copy
           }
           mesh.material = Array.isArray(mesh.material) ? mesh.material.map(fade) : fade(mesh.material)

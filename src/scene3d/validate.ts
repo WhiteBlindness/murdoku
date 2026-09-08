@@ -10,6 +10,7 @@
 import { CELL, STOREY_HEIGHT, cameraDirection, type Vec3 } from './units'
 import { parseLogic, type Box3, type Rect, type ResolvedObject, type ResolvedScene, type ResolvedWall } from './resolve'
 import { furnitureCells, type Puzzle } from '../core/types'
+import { resolvedObjectVisibilityBoxes } from './stairVisibility'
 
 export type Severity = 'error' | 'warning'
 
@@ -262,7 +263,7 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
   for (let r = 0; r < scene.n; r++) for (let c = 0; c < scene.n; c++) {
     const p = scene.frame.cellCentre(r, c, scene.floorY[r][c])
     const occupant = solids.find(o => !o.parentId && p[0] > o.footprint.minX && p[0] < o.footprint.maxX && p[2] > o.footprint.minZ && p[2] < o.footprint.maxZ)
-    const blockers = [...wallBoxes, ...solids.filter(o => o !== occupant && !o.parentId).map(o => o.box)]
+    const blockers = [...wallBoxes, ...solids.filter(o => o !== occupant && !o.parentId).flatMap(resolvedObjectVisibilityBoxes)]
     // A suspect standee carries its portrait badge at chest height (~0.45).
     // If the badge centre is hidden at the cell centre, the player cannot see
     // who stands there without help. Feet behind a low object are fine.
