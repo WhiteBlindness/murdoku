@@ -21,7 +21,7 @@ Se duas fontes entrarem em conflito, para e pede uma decisão. Não inventes uma
 
 ## 2. Política de ramos
 
-Quando esta linha Sol tiver sido aprovada como referência dourada, cada lote deve começar no SHA aprovado:
+Cada lote deve começar no SHA explicitamente aprovado como referência dourada. O nome do ramo e a existência de testes aprovados não substituem essa decisão:
 
 ```text
 git switch --detach <sha-aprovado>
@@ -96,6 +96,8 @@ O tipo lógico não escolhe automaticamente a composição visual. A cena deve a
 Usa apenas os tipos declarados em `src/core/types.ts`. Todas as pistas têm de ser literalmente verdadeiras na solução. As relações `above`, `below` e `floor` só pertencem a casos de dois pisos. As relações entre linhas e colunas são globais aos pisos.
 
 Usa `requiredClues` para preservar intenção narrativa ou espacial durante a poda. Não uses uma pista que identifique diretamente o suspeito que está com a vítima. Constrói o caso duas vezes após sementes diferentes se alterares a seleção de pistas; o resultado escrito à mão tem de ser idêntico.
+
+Antes de escrever as pistas finais, descreve a cadeia de dedução pretendida: o primeiro facto utilizável, as relações que desbloqueiam novas posições e a conclusão sobre o assassino. Uma história nova com a mesma disposição e as mesmas pistas é apenas uma variante; não conta como caso original. Aplica os critérios editoriais de `docs/PUZZLE_AUTHORING.md`.
 
 ### 4.6 Validar o caso
 
@@ -173,9 +175,25 @@ Todas as divisões precisam de acesso desde a entrada ou o patamar. Mantém port
 
 Cria uma cena por piso. O rés-do-chão declara `stairs`; o piso superior declara um `stairwell` coincidente. A escada deve subir `STOREY_HEIGHT`, a abertura não pode conter laje e ambos os patamares devem estar livres e acessíveis.
 
-A vista predefinida mostra o piso ativo e o outro como contexto fantasma à altura real. A vista explodida serve de panorama. O piso fantasma nunca recebe eventos e não mostra mobiliário que distraia.
+Desenha primeiro o percurso entrada → pé da escada → último degrau → patamar superior → portas das divisões. Reserva a pegada física medida do lanço e as áreas de aproximação antes de mobilar. `facing` indica a direção da subida; confirma-a nos degraus do modelo, não apenas na sua caixa de limites.
 
-### 6.9 Iluminação e sombras
+O último degrau tem de encontrar a aresta real da laje superior. Estar na mesma célula que um patamar calculado não prova contacto: rejeita um degrau que termina no ar ou sob uma porção de laje. Mede esta relação a partir do modelo e de `CELL`; não a afines em píxeis. O patamar físico pode fazer parte de uma galeria noutra divisão lógica, mas deve conduzir claramente às divisões e à zona de distribuição da casa.
+
+Protege os lados expostos do vão com paredes ou parapeitos coerentes com o recorte isométrico; deixa a chegada aberta. Não uses mobiliário como substituto de guarda. Nenhum tapete pode atravessar o vão, ficar sob os degraus ou sugerir uma passagem sobre o vazio. Mantém os tapetes associados a grupos de mobiliário, sem os usar para preencher zonas desocupadas.
+
+O piso superior precisa de funções reconhecíveis: cama com cabeceira apoiada, posto de trabalho com cadeira orientada para a secretária, instalações sanitárias e uma zona de leitura ou distribuição quando a composição o justificar. O espaço livre deve servir circulação ou acesso ao mobiliário; não deve resultar de objetos dispersos sem relação.
+
+A vista predefinida mostra o piso ativo e o outro como contexto fantasma à altura real. O contexto usa arestas arquitetónicas, sem diagonais de triangulação; a escada mantém leitura sólida à altura real e é ocultada pela laje ativa onde esta existe. A vista explodida serve de panorama e torna a escada do contexto translúcida. O piso fantasma nunca recebe eventos nem mostra mobiliário que distraia.
+
+Aprova os dois pisos na vista predefinida e na vista explodida, em secretária e telemóvel. Guarda um pormenor do encontro entre último degrau, vão e patamar. Uma vista explodida convincente não compensa uma chegada ilegível na vista de jogo.
+
+### 6.9 Legibilidade da interação
+
+A grelha permanece discreta em repouso. Depois de uma interação, a célula ativa conserva um contorno de contraste duplo, também sobre mobiliário; sair com o ponteiro não apaga a seleção. A colocação mantém um sinal visível nos pés da pessoa. Um conflito combina cor, forma e texto; nunca depende apenas de uma tonalidade vermelha.
+
+As indicações de colocação comunicam ocupação e exclusões de linha/coluna, incluindo o outro piso. «Linha e coluna livres» não significa «posição deduzida correta». A ajuda de uma pista só aparece quando pedida. Confirma estes estados com rato, teclado e toque, incluindo a deslocação de uma pessoa já colocada e a mudança de piso.
+
+### 6.10 Iluminação e sombras
 
 O renderizador converte materiais Kenney sem iluminação em Lambert, usa uma luz principal e sombras reais. Não cries sombras falsas por objeto nem alteres luzes para esconder problemas de contacto.
 
@@ -256,4 +274,4 @@ Além disso, conclui o controlo visual de secretária e telemóvel, a jogabilida
 
 Regista a escalada quando surgir uma nova semântica de pista, um terceiro piso, uma nova regra de assassino, uma incompatibilidade de escala, uma necessidade de escala ou elevação por objeto, uma alteração da câmara, um tipo de abertura não representável ou um falso positivo plausível do validador.
 
-Uma escalada deve indicar: o caso, a regra bloqueada, a prova, os ficheiros fundamentais que seriam afetados, alternativas dentro do sistema e a decisão necessária. Não contornes o bloqueio.
+Uma escalada deve indicar: o caso, a regra bloqueada, a prova, os ficheiros fundamentais que seriam afetados, alternativas dentro do sistema e a decisão necessária. Não contornes o bloqueio. Suspende a alteração fundamental até existir autorização explícita; podes continuar trabalho independente de autoria e documentação. Não aumentes tolerâncias, não desatives verificações, não escondas geometria com opacidade ou enquadramento e não inventes deslocamentos para aprovar uma cena. A autorização excecional de uma correção do sistema num passe de arquitetura não autoriza futuros lotes de produção a repetir essa alteração.

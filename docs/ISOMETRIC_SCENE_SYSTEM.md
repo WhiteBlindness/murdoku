@@ -41,13 +41,16 @@ Authoring coordinates are **cell units** (0…N). Convert in your head: 1 cell =
   puzzleId: 'very-easy-1', floor: 0,
   entry:  { wall: 'west' | 'north', at: <cell> },            // the front door
   shell:  { features: [{ wall: 'north'|'west', at, kind: 'window'|'door' }] },
-  floors: [{ id, cells: [col0,row0,col1,row1], material: 'grass'|'tile'|'stone' }],
+  floors: [{ id, cells: [col0,row0,col1,row1], material: 'wood'|'grass'|'tile'|'stone'|'dirt',
+             kind?: 'interior'|'exterior'|'courtyard' }],
   walls:  [{ id, from: [x,z], to: [x,z], height?: 'low'|'half'|'full',
              openings?: [{ at, width?, kind: 'door'|'open' }], freeEnds?: ['from'|'to'] }],
   furniture: [{ id, model, logic?, facing?,
                 at?: [x,z] | against?: { wall, at, side?, gap? } | on?: { parent, offset?, surface? },
                 yaw? }],
   rugs: [{ id, model, at, facing? }],
+  stairs: { model: 'stairsOpen', at: [x,z], facing: 'E' }, // ground floor only; direction of climb
+  stairwell: [col0,row0,col1,row1], // upper floor only; inclusive cells without slab
 }
 ```
 
@@ -72,7 +75,7 @@ What the schema deliberately **cannot** express: per-object scale, pixel offsets
 - North and west shell walls: full height (1.29), carry windows and the front door.
 - South and east shell walls: cut to a 0.12 plinth. The floor slab edge is the visible base.
 - Corners meet: the resolver extends closed wall ends by half a thickness. Never author corner pieces.
-- Every shell segment ends at a corner or at a window/door feature; the validator's tiling test proves there are no gaps.
+- Every interior shell segment ends at a corner or at a window/door feature; the validator checks continuity. An explicitly authored exterior zone removes the shell along its exposed grid edges.
 
 ### 3.2 Partitions
 
@@ -97,7 +100,10 @@ What the schema deliberately **cannot** express: per-object scale, pixel offsets
 
 ### 3.5 Floors
 
-- Default is the Kenney wood tile per cell. `floors` zones override cells with `grass`, `tile` or `stone` slabs. A garden is a grass zone inside the shell (a courtyard); it needs no extra walls.
+- O pavimento interior predefinido é de madeira. As zonas `floors` aceitam `wood`, `tile`, `stone`, `grass` e `dirt`.
+- Declara a intenção através de `kind`: `interior` conserva pavimento acabado; `exterior` baixa o terreno e remove o envelope no limite exposto; `courtyard` baixa o terreno, mas conserva o envelope. As transições têm fundação e soleiras.
+- Sem `kind`, `grass` e `dirt` assumem `exterior`; os restantes materiais assumem `interior`. Não descrevas um pátio apenas pela cor verde: usa `kind: 'courtyard'`.
+- Num piso superior, o `stairwell` remove a laje nas células declaradas. Tapetes e mobiliário não podem preencher esse vazio.
 
 ---
 
@@ -120,7 +126,7 @@ What the schema deliberately **cannot** express: per-object scale, pixel offsets
 - Tall objects (> 0.7, or flagged `tall`) must face `S` or `E` — never show their back to the camera — unless the catalogue marks them `symmetric` (floor lamps, plants, coat stands, speakers).
 - A tall object `against` the south or east shell (cut-away side) is allowed but reported as a warning: its back faces the camera. Accept only when the logical cell leaves no alternative (Midnight Delivery's fridge at (4,5)); otherwise re-plan.
 - Chairs face their table/desk. Sofas face the TV. Counters face into the kitchen. Beds have their head to a wall.
-- Furniture is square to the walls. Only `loose` props (boxes, books, bins, pillows) accept a `yaw`, and only a small one (≤ 20°).
+- Furniture is square to the walls. Only models marked `loose` in the catalogue accept `yaw`; this includes selected small props and natural landscaping assets. Do not infer eligibility from the model name.
 
 ### 4.4 Visibility
 
@@ -150,12 +156,13 @@ What the schema deliberately **cannot** express: per-object scale, pixel offsets
 
 ## 6. Interaction layer (`IsoBoard.tsx`)
 
-- Idle: no markers of any kind. The house is the whole picture.
-- Hover: the row and column get floor washes painted **on the floor** (occluded by furniture like real paint) plus a thin dashed trace with end pins in the DOM layer so the lane's extent is always legible; the intersection cell is brighter.
-- Armed placement: small landing dots on free cells; a dashed ring on the hovered cell (green = free, red = occupied).
-- Placed suspects: standees whose feet sit on the cell's floor point; locked rows/columns get a quiet green wash; conflicts a red wash and a red standee plate.
-- Clue locate: cream wash on the target cells.
-- Nothing ever outlines every cell.
+- Em repouso, antes de selecionar uma célula, não se desenha uma grelha permanente.
+- A célula ativa tem contorno duplo, escuro e claro, legível sobre o mobiliário. A seleção persiste quando o ponteiro sai; o foco de teclado permite deslocação pelas setas e colocação com Enter ou espaço.
+- As faixas de linha e coluna mantêm-se no pavimento. As indicações de colocação só aparecem com uma pessoa selecionada e respeitam ocupação e exclusões entre pisos. Ao mover uma pessoa, a sua posição atual não deve bloquear a própria linha ou coluna.
+- A pessoa colocada conserva um contorno nos pés. O conflito acrescenta vermelho, tracejado, símbolo e texto; não depende apenas de cor.
+- O estado textual identifica célula, divisão, ocupação, conflito ou disponibilidade da linha e coluna. Disponibilidade não é garantia de solução correta.
+- A localização de pistas usa realce creme/âmbar sobre os alvos, apenas quando pedida. Selecionar uma pessoa não revela automaticamente a resposta da pista.
+- O contexto do outro piso nunca recebe interação. Verifica seleção, troca de piso, ajuda e conflitos na vista de jogo e no panorama explodido.
 
 ---
 
@@ -178,6 +185,8 @@ Errors (must be zero to ship):
 | `logic-missing` / `logic-unknown` / `logic-type` / `logic-displaced` | the puzzle contract |
 
 Warnings (a human decides): `cell-hidden`, `tall-back-exposed` on the cut shell, `no-entry`.
+
+Na advertência `cell-hidden`, as três escadas retas usam onze volumes conservadores medidos nos GLB, em vez de um bloco com a altura total do lanço. Isto evita falsas ocultações junto aos degraus baixos. Os testes provam que os volumes incluem os triângulos reais e preservam a ocultação no topo. Colisões, acessibilidade, vão e patamares continuam a usar a caixa de limites completa. Esta exceção pertence ao sistema (`stairVisibility.ts`), não à autoria; não ajustes volumes por caso.
 
 The dev build prints the report to the console on every scene build; `tests/IsoBoard.test.tsx` runs it for every authored scene and also proves each rule fires on a deliberately broken spec.
 
@@ -220,7 +229,17 @@ Reject if anything floats, intersects, ends nowhere, shows its back, blocks a do
 
 ## 10. Known limits
 
-- The kit has no clock, no bush, no ceiling. `radio`/`speaker` stand in for clocks, `pottedPlant` for shrubs. If a case leans on those clues, say so in the scene comment.
+- A Furniture Kit não fornece um relógio nem um teto. `radio`/`speaker` representam relógios segundo a convenção do catálogo; documenta essa substituição na cena. O catálogo integrado já inclui arbustos `plant_bush*` medidos, por isso não é necessário substituir toda a vegetação por plantas em vaso.
 - Tall furniture whose logical cell is on the south/east edge must either face S/E free-standing or back onto the cut shell (warning). There is no third option without changing the puzzle, which is forbidden.
 - Windows are night-blue by material override; a daytime case would need a different glass rule (one constant in `renderer.ts`).
 - Two-storey cases render one scene per floor and require matched stairs/stairwell geometry. The active floor is accompanied by a non-interactive structural ghost of the other floor; an exploded overview is optional. See `TWO_STOREY_FEASIBILITY.md` and the `hard-1` reference case.
+
+## 11. Aceitação arquitetónica de dois pisos
+
+Consulta a secção 6.8 de `OPUS_PRODUCTION_MANUAL.md` antes de desenhar os móveis. Reserva primeiro escada, vão, chegada e circulação. `facing` designa a direção de subida e a posição `at` designa o centro da pegada física, não o primeiro degrau.
+
+A cabeça do lanço deve tocar na aresta da laje, sem intervalo horizontal nem laje sobre a chegada. Usa o comprimento medido do modelo dividido por `CELL` para definir esse contacto. A coincidência de células e os testes de acessibilidade não substituem a inspeção dos degraus reais.
+
+Guarda os lados expostos do vão, abre a chegada para uma galeria utilizável e mantém o percurso até às portas. A galeria pode pertencer a uma divisão lógica diferente de «Landing»; essa separação não autoriza circulação ambígua. Rejeita tapetes sobre o vazio, mobiliário no acesso e áreas superiores sem função. Confirma a relação escada–laje na vista à altura real e na vista explodida; a segunda é um auxiliar, não uma correção da primeira.
+
+No contexto fantasma, desenham-se arestas arquitetónicas sem diagonais da triangulação. A escada do contexto mantém leitura sólida à altura real e fica oculta pela laje ativa; no panorama explodido, surge translúcida. Estas são regras do renderizador, não parâmetros de autoria por cena. Qualquer limitação que exija alterar projeção, geometria resolvida ou validação exige «SYSTEM ESCALATION», com prova e autorização próprias.

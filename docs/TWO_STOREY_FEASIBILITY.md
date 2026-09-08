@@ -42,7 +42,7 @@ A medição recuperada mostrou que a Building Kit usa paredes de 2,40 unidades e
 | **Piso ativo e contexto fantasma** | preserva a leitura do piso ativo e mostra a estrutura do outro | implementada como vista predefinida |
 | **Transição de câmara** | depende da memória do movimento e não mostra a relação simultânea | rejeitada |
 
-Na vista predefinida, o piso ativo mantém opacidade e interação completas. O outro surge à altura real, com laje e paredes translúcidas, sem mobiliário. O contexto fantasma não possui polígonos de interação. O realce de uma célula inclui a posição correspondente no outro piso e os bloqueios de linhas e colunas.
+Na vista predefinida, o piso ativo mantém opacidade e interação completas. O outro surge à altura real, com arestas de laje e paredes translúcidas, sem diagonais da malha nem mobiliário. A sua escada permanece sólida neste modo, para revelar o lanço através do vão; a laje ativa oculta as partes que ficam sob ela. No panorama explodido, a escada do contexto usa opacidade de 0,48. O contexto fantasma não possui polígonos de interação. O realce de uma célula inclui a posição correspondente no outro piso e os bloqueios de linhas e colunas.
 
 O botão de panorama ativa a vista explodida. A câmara não muda e não existe animação obrigatória, por isso o comportamento respeita a redução de movimento. Os botões de piso trocam os papéis ativo e fantasma.
 
@@ -52,3 +52,25 @@ O botão de panorama ativa a vista explodida. A câmara não muda e não existe 
 2. O panorama explodido existe como modo opcional, incluindo em ecrãs estreitos.
 3. A escada continua a ser circulação física, não um tipo de mobiliário ou alvo de pista.
 4. `hard-1` é o caso de referência obrigatório para regressão visual, interação entre pisos e validação física.
+
+## 5. Critérios espaciais do passe Astra
+
+A revisão de `hard-1` mantém a solução e as pistas existentes. O lanço junto à fachada norte, centrado na linha 0,6, sobe para este e encontra exatamente a aresta da laje na coluna 5. O vão superior ocupa `[2, 0, 4, 2]`, em coordenadas inclusivas de células; a abertura mais ampla permite ver o lanço descendente. A chegada física integra a galeria de acesso ao escritório. O percurso passa a sul da guarda para chegar ao quarto, à casa de banho e à zona de distribuição e leitura. O nome lógico «Landing» não obriga a deslocar a chegada física para essa divisão, mas o percurso entre ambas tem de ser claro.
+
+As guardas protegem o lado oeste do vão em `x = 1.9` e a frente em `z = 3.05`, sem fechar a chegada a este. A cama apoia-se na parede oeste, na coordenada 2,5; o tapete orientado para este, em `[1.05, 2.7]`, acompanha a cama sem cobrir o vão. O murete de serviço do escritório situa-se em `z = 1.5` e a cadeira em `[6.05, 2.6]`, orientada para a secretária. O pavimento distingue a casa de banho e a zona de leitura dá uma função à distribuição superior. São relações de autoria; não acrescentam regras ao quebra-cabeças. As coordenadas entre acentos graves usam a sintaxe decimal do código.
+
+Antes de aceitar qualquer novo caso de dois pisos:
+
+1. confirma a direção real de subida, a pegada medida e o contacto do último degrau com a aresta da laje;
+2. percorre visualmente o acesso ao primeiro degrau, a chegada e todas as portas, sem atravessar móveis ou vazio;
+3. verifica os lados protegidos do vão e a abertura de chegada;
+4. inspeciona os dois pisos à altura real e no panorama explodido, incluindo um pormenor dos degraus e do patamar;
+5. testa a leitura em telemóvel e as exclusões de linhas e colunas entre pisos.
+
+O validador é necessário, mas não prova sozinho continuidade visual, qualidade do percurso ou propósito das divisões. Uma correção de orientação do modelo ou da apresentação do contexto pertence ao sistema e exige uma «SYSTEM ESCALATION» separada; nunca alteres tolerâncias para acomodar um lanço mal colocado. O estado de aprovação deste passe encontra-se em `ASTRA_POLISH_REPORT.md`.
+
+## 6. Limite da correção de visibilidade das escadas
+
+A correção registada como «SYSTEM ESCALATION» limita-se à advertência `cell-hidden`. Um bloco único com a altura total da escada ocultava matematicamente células junto ao pé do lanço, mesmo quando os degraus reais não as tapavam. `stairVisibility.ts` usa onze volumes conservadores, medidos nos três modelos retos `stairs`, `stairsOpen` e `stairsOpenSingle`, para representar a subida na verificação de visibilidade.
+
+Os testes verificam a inclusão de todos os triângulos dos GLB nesses volumes e distinguem raios bloqueados no topo de raios livres junto ao pé nas quatro direções. Colisões, acessibilidade, vão e patamares continuam a usar a caixa de limites completa. O modelo de canto e as orientações não ortogonais conservam essa caixa também na visibilidade. Esta correção não cria tolerâncias de autoria nem autoriza reduzir volumes para aprovar futuras cenas.

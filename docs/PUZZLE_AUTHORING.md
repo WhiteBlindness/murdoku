@@ -16,7 +16,7 @@ Um caso só pode seguir para produção quando cumprir todos os pontos seguintes
 6. as advertências de qualidade foram revistas por uma pessoa ou agente responsável;
 7. a pré-validação, os testes e a análise visual passaram.
 
-Não se deve enfraquecer um validador para aprovar um caso existente. Deve corrigir-se a causa no gerador, nos dados ou no motor. Se a regra de produto não for inequívoca, deve registar-se a dúvida e parar.
+Não se deve enfraquecer um validador para aprovar um caso existente. Na produção normal, deve corrigir-se a causa nos dados ou na composição. Uma causa no gerador ou no motor exige «SYSTEM ESCALATION» e autorização para uma alteração separada. Se a regra de produto não for inequívoca, deve registar-se a dúvida e parar.
 
 ## Erros e advertências
 
@@ -80,6 +80,23 @@ O catálogo atual tem zero erros rígidos. Tem 20 advertências em 19 casos: tr�
 9. Construir a cena segundo `docs/ISOMETRIC_SCENE_SYSTEM.md`.
 10. Executar `npm run validate:production`, os testes relevantes e a verificação no navegador.
 11. Rever a diferença, criar um commit descritivo e publicar apenas no ramo de produção autorizado.
+
+## Originalidade e revisão editorial
+
+Um caso original combina um lugar com propósito, uma situação narrativa e uma cadeia de dedução própria. Mudar nomes, cores ou título de um caso existente não basta. Antes da implementação, regista brevemente:
+
+- o acontecimento e o pormenor visual que o torna reconhecível;
+- a função de cada divisão e os percursos necessários, incluindo escadas e patamares;
+- os factos iniciais, as dependências entre pistas e a dedução final;
+- a diferença concreta face aos casos mais próximos do catálogo.
+
+Planeia o espaço necessário antes de fixar posições da solução: uma pessoa não pode depender de uma célula que depois precisa de desaparecer para abrir o vão de uma escada. Ao melhorar a cena de um caso já publicado, preserva a solução e a semântica das pistas; redesenha a arquitetura dentro desse contrato.
+
+Revê as pistas tal como aparecem ao jogador, não apenas o objeto de dados. Cada referência visual deve ser inequívoca: decoração semelhante a um alvo de pista não pode sugerir uma segunda resposta. Um objeto que representa um relógio através de outro modelo precisa de uma convenção documentada e reconhecível; não introduzas substituições silenciosas.
+
+Prova que a solução é única com as pistas efetivamente apresentadas. Verifica também que o percurso dedutivo é compreensível sem conhecer a solução. Não uses uma pista que anuncie diretamente quem está na divisão da vítima. Investiga cada redundância: aceita uma repetição apenas com motivo editorial explícito, não para inflacionar a dificuldade aparente. As advertências históricas do catálogo não são precedentes para novos casos.
+
+A dificuldade resulta da combinação de relações e etapas necessárias. Não a aumentes através de redação ambígua, mobiliário escondido, alvos visuais duvidosos ou troca gratuita de pisos. Usa `requiredClues` para preservar a intenção indispensável; confirma determinismo após sementes diferentes e volta a medir o perfil. Se a cadeia só funcionar com um novo significado de pista, para e escala.
 
 ## Quando parar
 

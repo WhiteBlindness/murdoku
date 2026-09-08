@@ -1,5 +1,10 @@
 # Relatório de controlo de qualidade
 
+Atualização de 08/09/2026: a revisão Astra posterior está descrita em
+[`ASTRA_POLISH_REPORT.md`](ASTRA_POLISH_REPORT.md), com 376 testes aprovados,
+nova composição de dois pisos, interação mais legível e imagens `astra-`.
+O registo abaixo conserva os resultados históricos da ronda Sol.
+
 Data: 07/09/2026
 
 Ramo: `sol/isometric-system-hardening`

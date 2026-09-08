@@ -355,9 +355,19 @@ The default form is a sharp rectangle. Evidence frames use clipped 6–10px corn
 
 ### Illustrated Reconstruction Board
 
-Each case is an authored 3D scene laid over the unchanged logical board (Midnight Delivery is the golden master). Architecture comes first: a continuous north/west shell with windows and the front door, south/east walls cut to a plinth, cut-down partitions with door frames, pony walls where furniture must back onto the camera side. The floor is one slab; grass, tile and stone zones and Kenney rugs are interior accents, never logical room boundaries.
+Each case is an authored 3D scene laid over the unchanged logical board (Midnight Delivery is the golden master). Architecture comes first: a continuous north/west shell with windows and the front door, south/east walls cut to a plinth, cut-down partitions with door frames, pony walls where furniture must back onto the camera side. Interior flooring forms a continuous architectural surface except at a declared stairwell. Tile and stone distinguish uses; exterior and courtyard zones lower the terrain and create physical transitions. Rugs belong to furniture groups and never bridge a stairwell. These choices do not draw logical room boundaries.
 
-Every logical furnishing keeps an explicit `logic` association with a visual object that touches its cells; models render at Kenney's real size (there is no per-object scale). Small props declare a supporting surface. At rest there are no cell markers, row bands, column bands or room labels. Placement mode reveals tiny floor cues. Active and completed rows and columns use floor washes painted on the floor (occluded by furniture), thin dashed traces and small endpoints; they never outline every cell.
+Every logical furnishing keeps an explicit `logic` association with a visual object that touches its cells; models render at Kenney's real size (there is no per-object scale). Small props declare a supporting surface. Before interaction there are no cell markers, row bands, column bands or room labels. A selected cell retains its visible boundary after the pointer leaves. Placement mode reveals restrained floor cues for available lanes. Active and completed rows and columns use floor washes painted on the floor (occluded by furniture), thin dashed traces and small endpoints; they never outline every cell.
+
+### Leitura da seleção e de dois pisos
+
+A célula ativa usa um contorno escuro exterior e um contorno claro interior, com espessura estável no ecrã. O sinal permanece legível sobre móveis e pavimentos claros ou escuros. Uma pessoa colocada mantém o contorno nos pés; um conflito acrescenta tracejado, símbolo de aviso e texto. A cor reforça o significado, mas não o comunica sozinha.
+
+O texto de apoio identifica a célula e a divisão e distingue ocupação, conflito, ajuda e disponibilidade de linha/coluna. «Linha e coluna livres» descreve uma possibilidade de colocação, não a resposta do caso. As setas deslocam o foco na grelha, Enter ou espaço executam a ação e a seleção pertence ao caso e piso ativos.
+
+A ajuda pedida tem um contorno creme/âmbar próprio sobre o alvo. Não a confundas com os sinais de colocação nem a atives automaticamente ao selecionar uma pessoa. Mantém a linguagem material de tinta, papel e âmbar; não acrescentes brilhos saturados nem uma grelha permanente.
+
+Nos casos de dois pisos, as arestas do contexto fantasma descrevem paredes e lajes sem diagonais da malha. À altura real, a escada mantém volume legível através do vão; o panorama explodido torna a escada do contexto translúcida. A composição deve permitir compreender pé, subida, chegada e circulação na vista normal. Quarto, escritório, instalações sanitárias e zona de leitura devem ter relações de mobiliário reconhecíveis, com tapetes fora do vão.
 
 ### Named Rules
 
