@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { Puzzle, Cell, CellMark, FurnitureType } from '../core/types'
 import { furnitureCells } from '../core/types'
 import { resolveScene } from '../scene3d/resolve'
@@ -59,9 +59,9 @@ const SKIN = {
   draftPlate: '#FFF8E6',
   draftInk: '#2A1D10',
   ghostRing: 'rgba(80,60,40,0.55)',
-  validTarget: '#3FAE5C',
+  validTarget: '#B97919',
   invalidTarget: '#C94444',
-  placementCue: 'rgba(70,45,20,0.18)',
+  placementCue: '#62400B',
   laneRow: 'rgba(145,91,28,0.75)',
   laneCol: 'rgba(33,104,126,0.75)',
 }
@@ -76,7 +76,12 @@ export default function IsoBoard({
   storeyView = 'ghost', flashRows, flashCols, armedPerson = null,
 }: Props) {
   const N = puzzle.size
-  const [active, setActive] = useState<{ row: number; col: number } | null>(null)
+  const scope = `${puzzle.id}:${floor}`
+  const [selected, setSelected] = useState<{ row: number; col: number; scope: string } | null>(null)
+  const [hover, setHover] = useState<typeof selected>(null)
+  const selection = selected?.scope === scope ? selected : null
+  const active = hover?.scope === scope ? hover : selection
+  const descriptionId = useId()
 
   const spec = useMemo(() => sceneFor(puzzle, floor), [puzzle, floor])
   const rawScene = useMemo(() => resolveScene(spec, N), [spec, N])
@@ -163,14 +168,43 @@ export default function IsoBoard({
 
   // ---- lane state, derived from the SAME marks the logical game uses -------
   const lockedRows = new Set<number>(), lockedCols = new Set<number>()
+  const placementRows = new Set<number>(), placementCols = new Set<number>()
   const conflictRows = new Set<number>(), conflictCols = new Set<number>()
   for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
     const m = marks[r][c]
     if (m.kind === 'person') {
       lockedRows.add(r); lockedCols.add(c)
+      if (m.person !== armedPerson) { placementRows.add(r); placementCols.add(c) }
       if (conflicts.has(m.person)) { conflictRows.add(r); conflictCols.add(c) }
     }
   }
+  // The mover vacates its previous cell on either floor. Rebuild guidance from
+  // the other floor's people so another occupant sharing that lane still counts.
+  const otherPlacementRows = new Set<number>(ghostMarks ? [] : blockedRows)
+  const otherPlacementCols = new Set<number>(ghostMarks ? [] : blockedCols)
+  if (ghostMarks) ghostMarks.forEach((row, r) => row.forEach((mark, c) => {
+    if (mark.kind === 'person' && mark.person !== armedPerson) {
+      otherPlacementRows.add(r)
+      otherPlacementCols.add(c)
+    }
+  }))
+  // Guidance describes lane occupancy, not whether all puzzle clues are satisfied.
+  // The game reducer remains the authority for placement, swaps and detective locks.
+  const guidanceFor = (r: number, c: number) => {
+    const mark = marks[r][c]
+    if (mark.kind === 'person') return `${conflicts.has(mark.person) ? 'Conflict · ' : ''}Occupied · ${personById(mark.person)?.name ?? 'Person'}${mark.locked ? ' · Locked placement' : ''}`
+    const reasons = [
+      otherPlacementRows?.has(r) ? 'Row occupied on the other floor' : placementRows.has(r) ? 'Row occupied on this floor' : '',
+      otherPlacementCols?.has(c) ? 'Column occupied on the other floor' : placementCols.has(c) ? 'Column occupied on this floor' : '',
+    ].filter(Boolean)
+    return reasons.join(' · ') || (mark.kind === 'x' && !(mark.auto && armedPerson) ? 'Marked as excluded' : mark.kind === 'draft' ? 'Pencilled candidates' : 'Row and column free')
+  }
+  const isOpenTarget = (r: number, c: number) => {
+    const mark = marks[r][c]
+    return mark.kind !== 'person'
+      && !placementRows.has(r) && !placementCols.has(c) && !otherPlacementRows?.has(r) && !otherPlacementCols?.has(c)
+  }
+  const targetOpen = active ? isOpenTarget(active.row, active.col) : false
   const furniture = useMemo(() => puzzle.furniture.filter(f => (f.floor ?? 0) === floor), [puzzle.furniture, floor])
   const clueCells = useMemo(() => {
     const targets: ClueTarget[] = highlight ? (Array.isArray(highlight) ? highlight : [highlight]) : []
@@ -192,13 +226,13 @@ export default function IsoBoard({
       lockedRows, lockedCols, conflictRows, conflictCols,
       blockedRows, blockedCols, clueCells,
       hoverTarget: armedPerson && active
-        ? { row: active.row, col: active.col, valid: marks[active.row][active.col].kind !== 'person' }
+        ? { row: active.row, col: active.col, valid: targetOpen }
         : null,
       envOnly, diag,
     })
     // lockedKey stands in for the four derived sets, which are rebuilt every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scene, rendererReady, active, lockedKey, blockedRows, blockedCols, clueCells, armedPerson, envOnly, diag])
+  }, [scene, rendererReady, active, lockedKey, blockedRows, blockedCols, clueCells, armedPerson, targetOpen, envOnly, diag])
 
   const points = (poly: Array<[number, number]>) => poly.map(p => p.join(',')).join(' ')
   const centreOf = (r: number, c: number) => frame.project(frame.cellCentre(r, c, scene.floorY[r][c]))
@@ -215,6 +249,7 @@ export default function IsoBoard({
       style={{ aspectRatio: `${frame.width} / ${frame.height}` }}
       role="grid"
       aria-label={`Isometric house, ${N} by ${N} grid, floor ${floor + 1}`}
+      aria-describedby={envOnly ? undefined : descriptionId}
     >
       <div ref={wrapRef} style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
         <canvas
@@ -234,9 +269,9 @@ export default function IsoBoard({
           {!envOnly && armedPerson && (
             <svg width={frame.width} height={frame.height} style={{ position: 'absolute', inset: 0, zIndex: 20, pointerEvents: 'none' }}>
               {Array.from({ length: N }, (_, r) => Array.from({ length: N }, (_, c) => {
-                if (!roomOf[r]?.[c] || marks[r][c].kind !== 'empty') return null
+                if (!roomOf[r]?.[c] || marks[r][c].kind !== 'empty' || !isOpenTarget(r, c)) return null
                 const [x, y] = centreOf(r, c)
-                return <circle key={`cue${r}-${c}`} data-placement-cue="" cx={x} cy={y} r={3.5} fill={SKIN.placementCue} />
+                return <circle key={`cue${r}-${c}`} data-placement-cue={`${r}-${c}`} cx={x} cy={y} r={4} fill={SKIN.placementCue} stroke={SKIN.draftPlate} strokeWidth={1} vectorEffect="non-scaling-stroke" />
               }))}
             </svg>
           )}
@@ -249,8 +284,8 @@ export default function IsoBoard({
                 const c0 = centreOf(0, active.col), c1 = centreOf(N - 1, active.col)
                 return (
                   <>
-                    <line data-lane-trace="row" x1={r0[0]} y1={r0[1]} x2={r1[0]} y2={r1[1]} stroke={SKIN.laneRow} strokeWidth={2.5} strokeDasharray="9 7" />
-                    <line data-lane-trace="column" x1={c0[0]} y1={c0[1]} x2={c1[0]} y2={c1[1]} stroke={SKIN.laneCol} strokeWidth={2.5} strokeDasharray="9 7" />
+                    <line data-lane-trace="row" x1={r0[0]} y1={r0[1]} x2={r1[0]} y2={r1[1]} stroke={SKIN.laneRow} strokeWidth={1.2} vectorEffect="non-scaling-stroke" strokeDasharray="7 6" />
+                    <line data-lane-trace="column" x1={c0[0]} y1={c0[1]} x2={c1[0]} y2={c1[1]} stroke={SKIN.laneCol} strokeWidth={1.2} vectorEffect="non-scaling-stroke" strokeDasharray="7 6" />
                     {[r0, r1].map((p, i) => <circle key={'rp' + i} cx={p[0]} cy={p[1]} r={5} fill={SKIN.laneRow} />)}
                     {[c0, c1].map((p, i) => <circle key={'cp' + i} cx={p[0]} cy={p[1]} r={5} fill={SKIN.laneCol} />)}
                   </>
@@ -274,6 +309,18 @@ export default function IsoBoard({
               )))}
             </svg>
           ) : null}
+
+          {/* Occupied footprints anchor the portrait to its exact logical cell. */}
+          {!envOnly && (
+            <svg width={frame.width} height={frame.height} aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 80, pointerEvents: 'none' }}>
+              {marks.flatMap((row, r) => row.map((mark, c) => mark.kind === 'person' ? (
+                <g key={`placed${r}-${c}`} data-placed-cell={`${r}-${c}`}>
+                  <polygon points={points(cellPoly(r, c))} fill={conflicts.has(mark.person) ? 'rgba(201,68,68,0.15)' : 'rgba(255,248,230,0.16)'} stroke={SKIN.draftPlate} strokeWidth={3} vectorEffect="non-scaling-stroke" />
+                  <polygon points={points(cellPoly(r, c))} fill="none" stroke={conflicts.has(mark.person) ? SKIN.invalidTarget : SKIN.markInk} strokeWidth={1.2} vectorEffect="non-scaling-stroke" strokeDasharray={conflicts.has(mark.person) ? '5 3' : undefined} />
+                </g>
+              ) : null))}
+            </svg>
+          )}
 
           {/* ---------------- TOKENS ----------------
               Suspects are gameplay and stand IN the scene: a standee whose feet
@@ -311,6 +358,10 @@ export default function IsoBoard({
                   }}>
                     <Avatar seed={p.avatarSeed} accent={p.accent} size={58} dead={p.isVictim} name={p.name} />
                   </div>
+                  {bad && <svg data-conflict-icon="" aria-hidden width={28} height={28} viewBox="0 0 28 28" style={{ position: 'absolute', right: -7, top: -7 }}>
+                    <path d="M14 2 L27 25 H1 Z" fill={SKIN.invalidTarget} stroke={SKIN.draftPlate} strokeWidth={2} />
+                    <path d="M14 10 V16 M14 20 V21" stroke={SKIN.draftPlate} strokeWidth={2.5} strokeLinecap="round" />
+                  </svg>}
                 </div>
               )
             }
@@ -352,24 +403,32 @@ export default function IsoBoard({
             return null
           }))}
 
-          {/* placement target ring on the hovered cell while a suspect is armed */}
-          {!envOnly && armedPerson && active && (
-            <svg width={frame.width} height={frame.height} style={{ position: 'absolute', inset: 0, zIndex: 400, pointerEvents: 'none' }}>
-              <polygon
-                data-placement-target=""
-                points={points(cellPoly(active.row, active.col))}
-                fill="none"
-                stroke={marks[active.row][active.col].kind === 'person' ? SKIN.invalidTarget : SKIN.validTarget}
-                strokeWidth={2.5}
-                strokeDasharray="5 4"
-              />
+          {/* Evidence outlines remain legible over beds, tables and tall models. */}
+          {!envOnly && clueCells.size > 0 && (
+            <svg width={frame.width} height={frame.height} aria-hidden style={{ position: 'absolute', inset: 0, zIndex: 300, pointerEvents: 'none' }}>
+              {[...clueCells].map(key => {
+                const [r, c] = key.split(',').map(Number)
+                if (r < 0 || r >= N || c < 0 || c >= N) return null
+                return <g key={key} data-clue-cell={`${r}-${c}`}>
+                  <polygon points={points(cellPoly(r, c))} fill="rgba(255,248,230,0.12)" stroke={SKIN.draftPlate} strokeWidth={3} vectorEffect="non-scaling-stroke" />
+                  <polygon points={points(cellPoly(r, c))} fill="none" stroke={SKIN.validTarget} strokeWidth={1.2} strokeDasharray="4 3" vectorEffect="non-scaling-stroke" />
+                </g>
+              })}
+            </svg>
+          )}
+
+          {/* Persistent selection + pointer/focus target, with contrast on every material. */}
+          {!envOnly && active && (
+            <svg width={frame.width} height={frame.height} aria-hidden data-active-cell={`${active.row}-${active.col}`} style={{ position: 'absolute', inset: 0, zIndex: 400, pointerEvents: 'none' }}>
+              <polygon points={points(cellPoly(active.row, active.col))} fill="rgba(255,248,230,0.14)" stroke={SKIN.markInk} strokeWidth={5} vectorEffect="non-scaling-stroke" />
+              <polygon data-placement-target={armedPerson ? '' : undefined} points={points(cellPoly(active.row, active.col))} fill="none" stroke={armedPerson && !targetOpen ? SKIN.invalidTarget : SKIN.draftPlate} strokeWidth={2.5} vectorEffect="non-scaling-stroke" />
             </svg>
           )}
 
           {/* ---------------- HIT LAYER ----------------
               Precise floor polygons above everything, so a click lands on the
               cell the player aimed at and never on a model that overhangs it. */}
-          <svg width={frame.width} height={frame.height} style={{ position: 'absolute', inset: 0, zIndex: 500 }}>
+          <svg width={frame.width} height={frame.height} aria-hidden={envOnly || undefined} style={{ position: 'absolute', inset: 0, zIndex: 500, pointerEvents: 'none' }}>
             {Array.from({ length: N }, (_, r) => Array.from({ length: N }, (_, c) => (
               <polygon
                 key={`h${r}-${c}`}
@@ -377,17 +436,39 @@ export default function IsoBoard({
                 fill="transparent"
                 data-cell={`${r}-${c}`}
                 role="gridcell"
-                style={{ cursor: 'pointer', pointerEvents: 'all', touchAction: 'manipulation' }}
-                onMouseEnter={() => setActive({ row: r, col: c })}
-                onMouseLeave={() => setActive(a => (a && a.row === r && a.col === c ? null : a))}
-                onClick={() => { setActive({ row: r, col: c }); onCellClick(r, c) }}
-                aria-label={`Row ${r + 1}, column ${c + 1}${roomName(r, c) ? `, ${roomName(r, c)}` : ''}`}
+                tabIndex={envOnly ? -1 : (selection?.row ?? 0) === r && (selection?.col ?? 0) === c ? 0 : -1}
+                aria-selected={selection?.row === r && selection.col === c}
+                style={{ cursor: 'pointer', pointerEvents: envOnly ? 'none' : 'all', touchAction: 'manipulation', outline: 'none' }}
+                onMouseEnter={() => setHover({ row: r, col: c, scope })}
+                onMouseLeave={() => setHover(null)}
+                onFocus={() => { setHover(null); setSelected({ row: r, col: c, scope }) }}
+                onClick={() => { setSelected({ row: r, col: c, scope }); onCellClick(r, c) }}
+                onKeyDown={event => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault(); onCellClick(r, c); return
+                  }
+                  const delta = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] }[event.key]
+                  if (!delta) return
+                  event.preventDefault()
+                  const row = Math.max(0, Math.min(N - 1, r + delta[0]))
+                  const col = Math.max(0, Math.min(N - 1, c + delta[1]))
+                  event.currentTarget.ownerSVGElement?.querySelector<SVGElement>(`[data-cell="${row}-${col}"]`)?.focus()
+                }}
+                aria-label={`Row ${r + 1}, column ${c + 1}${roomName(r, c) ? `, ${roomName(r, c)}` : ''}${marks[r][c].kind !== 'empty' ? `, ${guidanceFor(r, c)}` : ''}`}
               />
             )))}
           </svg>
         </div>
       </div>
-      {highlightLabel && <span className="sr-only">Clue highlight: {highlightLabel}</span>}
+      {!envOnly && <>
+        <span id={descriptionId} className="sr-only">Use arrow keys to move between cells. Enter or Space applies the selected tool. Rows and columns are shared across floors.</span>
+        <div role="status" aria-live="polite" aria-atomic="true" style={{ position: 'absolute', bottom: 3, left: 8, right: 8, pointerEvents: 'none', textAlign: 'center', fontSize: 12, lineHeight: 1.4, color: SKIN.draftPlate }}>
+          {active && <span style={{ display: 'inline-block', padding: '4px 8px', background: SKIN.markInk }}>
+            {`R${active.row + 1} · C${active.col + 1} · ${roomName(active.row, active.col)} — ${guidanceFor(active.row, active.col)}`}
+          </span>}
+        </div>
+        {highlightLabel && <span style={{ position: 'absolute', top: 4, left: 8, maxWidth: 'calc(100% - 16px)', padding: '4px 8px', background: SKIN.draftPlate, color: SKIN.markInk, fontSize: 12, pointerEvents: 'none' }}>Clue: {highlightLabel}</span>}
+      </>}
     </div>
   )
 }

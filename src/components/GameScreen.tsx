@@ -184,14 +184,14 @@ export default function GameScreen(props: Props) {
   // effect run we seed the ref WITHOUT announcing, so the full initial board
   // state is never read aloud.
   const [liveMsg, setLiveMsg] = useState('')
-  const prevPlacedOf = useRef<Record<string, { row: number; col: number; locked?: boolean }> | null>(null)
+  const prevPlacedOf = useRef<Props['placedOf'] | null>(null)
   const prevMarks = useRef<CellMark[][] | null>(null)
   const prevFeedback = useRef<'none' | 'incomplete' | 'wrong' | 'blocked'>('none')
   const prevSubmitNonce = useRef(0)
 
-  // Build a fast lookup: person id → room name at (row, col)
-  const roomName = useCallback((row: number, col: number): string => {
-    const rid = puzzle.roomOf[row]?.[col]
+  // Use the placement's floor, which can differ from the currently viewed floor.
+  const roomName = useCallback((row: number, col: number, floor = 0): string => {
+    const rid = (puzzle.roomOfByFloor?.[floor] ?? puzzle.roomOf)[row]?.[col]
     return puzzle.rooms.find(r => r.id === rid)?.name ?? ''
   }, [puzzle])
 
@@ -213,12 +213,12 @@ export default function GameScreen(props: Props) {
     // is NOT mis-reported as Assist.
     const placedNow = Object.keys(placedOf)
     const placedBefore = Object.keys(prev)
-    if (placedNow.length !== placedBefore.length ||
-        placedNow.some(id => !prev[id] || prev[id].row !== placedOf[id].row || prev[id].col !== placedOf[id].col)) {
+    const changedPlacement = (id: string) => !prev[id] || prev[id].row !== placedOf[id].row
+      || prev[id].col !== placedOf[id].col || (prev[id].floor ?? 0) !== (placedOf[id].floor ?? 0)
+    if (placedNow.length !== placedBefore.length || placedNow.some(changedPlacement)) {
 
       // Find what changed
-      const added = placedNow.filter(id => !prev[id] ||
-        prev[id].row !== placedOf[id].row || prev[id].col !== placedOf[id].col)
+      const added = placedNow.filter(changedPlacement)
       const removed = placedBefore.filter(id => !placedOf[id])
 
       let msg = ''
@@ -226,7 +226,7 @@ export default function GameScreen(props: Props) {
         const id = added[0]
         const p = puzzle.people.find(p => p.id === id)
         const cell = placedOf[id]
-        const room = roomName(cell.row, cell.col)
+        const room = roomName(cell.row, cell.col, cell.floor)
         msg = `${p?.name ?? id} placed${room ? ` in the ${room}` : ''}, row ${cell.row + 1} column ${cell.col + 1}`
       } else if (removed.length > 0) {
         const id = removed[0]
@@ -842,32 +842,10 @@ export default function GameScreen(props: Props) {
                 the shorter available axis instead of stretching after one axis
                 hits a max constraint.
           */}
-          <div className="order-1 lg:flex-1 lg:min-h-0 lg:relative">
-            {/* Absolute fill at desktop only; on mobile this is just a normal div */}
-            <div className="lg:absolute lg:inset-0 flex items-center justify-center p-2 lg:p-3 lg:[container-type:size]">
-              {/* Fits the shorter of available width / height, at the
-                  board's OWN aspect ratio rather than a forced square — the
-                  isometric scene is measurably wider than tall (see IsoBoard's
-                  boardW/boardH), and forcing it into a square slot wasted a
-                  large fraction of the box as empty space above or below it.
-                  Mobile: w-full drives size, aspect-ratio derives the height
-                    (parent has no fixed height so height:100% would be 0).
-                  Desktop (lg+): container-query units pick whichever of
-                    width/height is the binding constraint at this ratio. */}
-              <div
-                className="w-full lg:w-[min(100cqw,calc(100cqh*var(--board-ratio)))] lg:h-[min(100cqh,calc(100cqw/var(--board-ratio)))]"
-                style={{
-                  // Mirrors IsoBoard's boardW/boardH. Constants are imported
-                  // from the renderer's projection source so the slot cannot
-                  // silently retain an obsolete 104px floor height.
-                  ['--board-ratio' as string]: String(boardFrame.width / boardFrame.height),
-                  aspectRatio: 'var(--board-ratio)',
-                }}
-              >
                 {/* Floor switcher — only for two-storey houses. Single-floor
                     cases render exactly as before, with no extra chrome. */}
                 {twoFloor && props.onSwitchFloor && (
-                  <div className="mb-2 grid gap-1.5">
+                  <div className="order-1 shrink-0 grid gap-1.5 px-3 pb-2">
                     <div className="flex items-center gap-1" role="group" aria-label="Choose which floor to view">
                       {([0, 1] as const).map(f => (
                         <button
@@ -901,6 +879,28 @@ export default function GameScreen(props: Props) {
                   </div>
                 )}
 
+          <div className="order-1 lg:flex-1 lg:min-h-0 lg:relative">
+            {/* Absolute fill at desktop only; on mobile this is just a normal div */}
+            <div className="lg:absolute lg:inset-0 flex items-center justify-center p-2 lg:p-3 lg:[container-type:size]">
+              {/* Fits the shorter of available width / height, at the
+                  board's OWN aspect ratio rather than a forced square — the
+                  isometric scene is measurably wider than tall (see IsoBoard's
+                  boardW/boardH), and forcing it into a square slot wasted a
+                  large fraction of the box as empty space above or below it.
+                  Mobile: w-full drives size, aspect-ratio derives the height
+                    (parent has no fixed height so height:100% would be 0).
+                  Desktop (lg+): container-query units pick whichever of
+                    width/height is the binding constraint at this ratio. */}
+              <div
+                className="w-full lg:w-[min(100cqw,calc(100cqh*var(--board-ratio)))] lg:h-[min(100cqh,calc(100cqw/var(--board-ratio)))]"
+                style={{
+                  // Mirrors IsoBoard's boardW/boardH. Constants are imported
+                  // from the renderer's projection source so the slot cannot
+                  // silently retain an obsolete 104px floor height.
+                  ['--board-ratio' as string]: String(boardFrame.width / boardFrame.height),
+                  aspectRatio: 'var(--board-ratio)',
+                }}
+              >
                 {/* ISOMETRIC DOLLHOUSE — a projection of the same logical
                     grid MapGrid draws. Identical props, identical rules; only
                     the presentation differs. MapGrid is kept importable so the
