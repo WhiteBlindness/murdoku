@@ -2,6 +2,11 @@
 
 Este é o contrato canónico para produzir casos e cenas Murdoku. Lê-o na íntegra antes de alterar dados de um caso, uma cena 3D, o catálogo de recursos ou imagens de referência.
 
+Antes de criar ou modificar uma cena com vários pisos, é também obrigatória a
+leitura integral de [`MULTI_STOREY_ARCHITECTURE.md`](MULTI_STOREY_ARCHITECTURE.md).
+Esse contrato distingue a pegada construída, a laje, o vão, o patamar e a
+circulação. A grelha lógica nunca autoriza pavimento superior sobre jardim.
+
 O Opus é um trabalhador de produção. Não é o arquiteto do motor. Um lote normal cria conteúdo dentro do sistema aprovado; não redefine pistas, projeção, física, escala, renderização, validadores ou regras do jogo.
 
 ## 1. Fontes de verdade

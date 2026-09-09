@@ -86,3 +86,103 @@ corredor, portas e contactos em 1 440 × 1 100 e 390 × 844; testar contexto
 fantasma, panorama explodido e interação; rever os três pilotos de um piso;
 executar o controlo completo de produção. Esta decisão de projeto não é uma
 aprovação visual e não altera o estado pendente indicado no início.
+
+## Contrato editorial permanente
+
+### Uma casa, dois pisos
+
+Desenha os dois pisos em conjunto antes de mobilar. Identifica primeiro o
+edifício real no rés-do-chão e todos os jardins, caminhos e pátios. A pegada
+superior só pode ocupar área construída inferior. Uma retração retira parte
+da pegada; não se representa como um jardim suspenso nem como um material de
+pavimento diferente. Não existem balanços ou terraços implicitamente autorizados.
+
+O vão pertence ao volume do edifício, mas não contém laje. Pavimento interior,
+terreno exterior e ausência de piso são conceitos diferentes. Um relvado
+inferior não recebe teto, paredes ou móveis superiores por ocupar células da
+grelha. Janelas só pertencem a segmentos reais do envelope desse piso.
+
+### Escada, patamar e circulação
+
+Reserva o lanço medido, a aproximação inferior, a chegada superior e o percurso
+até às divisões antes de colocar móveis. O patamar tem de permitir sair em
+frente e escolher um percurso utilizável. Não pode ser apenas uma célula livre
+no interior de um quarto ou entre uma secretária e a sua cadeira.
+
+Num piso com várias divisões, um átrio, corredor ou galeria deve servir as
+entradas. Declara espaços de circulação livres, com larguras medidas entre
+faces acabadas; não uses uma linha abstrata que atravessa paredes ou móveis.
+Cada entrada precisa de aproximação útil dos dois lados. A casa de banho não
+pode funcionar como passagem obrigatória para chegar ao quarto.
+
+As dimensões de circulação deste projeto servem a coerência da miniatura.
+Não constituem certificação de acessibilidade ou cumprimento de normas de
+construção de edifícios reais.
+
+### Vão e proteção
+
+O contorno do vão acompanha o volume do lanço e deixa a cabeça encontrar a
+laje. Inspeciona os degraus reais, não apenas a caixa do modelo. Não há tapetes,
+móveis, apoios de móveis ou soluções válidas sobre o vazio.
+
+Protege todas as margens expostas que não sejam a própria chegada, com paredes
+ou guardas coerentes. O recorte isométrico pode baixar a altura visível dessas
+paredes, mas não pode apagar a intenção de proteção. Uma abertura escura sem
+degraus reconhecíveis ou sem margens deliberadas falha a revisão visual.
+
+### Divisões e mobiliário
+
+Cada divisão deve possuir função, entrada e um conjunto de móveis relacionado:
+cama com cabeceira e acesso lateral; secretária com cadeira; casa de banho com
+equipamento e privacidade; leitura com assento e apoio. Relaciona esses grupos
+com paredes e janelas. O espaço vazio serve circulação ou acesso; não se preenche
+com cadeiras órfãs nem se deixa sem propósito por conveniência da grelha.
+
+Os objetos pequenos apoiam-se em superfícies-pai declaradas. Os móveis mantêm
+escala Kenney e contacto real com o pavimento. Uma pista não justifica colocar
+um móvel no vão, na porta ou no patamar. Se não for possível conservar a
+associação lógica e uma composição física válida, regista a incompatibilidade;
+não alteres a pista, a solução ou as tolerâncias para a esconder.
+
+### Separação da lógica
+
+Linhas, colunas, pistas, solução e regiões lógicas continuam no modelo Murdoku.
+Os nomes das divisões não definem circulação. «Study» pode conter parte de uma
+galeria arquitetónica, mas isso não autoriza a chegada a atravessar o conjunto
+de trabalho. A associação visual dos objetos lógicos mantém contacto com as
+células correspondentes, conforme o contrato do validador.
+
+### Revisão obrigatória no navegador
+
+Antes de aceitar o caso, guarda vistas completas e pormenores sem recortar o
+encontro que está em avaliação. Confirma: lanço inferior, chegada, patamar,
+vão, guardas, corredor, cada porta, grupos de mobiliário e relação entre
+pegadas. Repete com contexto fantasma, panorama explodido e interação ativa.
+Usa aproximadamente 1 440 × 1 100 e 390 × 844 píxeis.
+
+Testa seleção, colocação, conflito local e entre pisos, localização de pistas,
+ajuda, troca de piso, teclado, desfazer/refazer e conclusão do caso. Depois de
+uma alteração estrutural, abre também Midnight Delivery, The Empty Chair e
+The Last Nightcap. Testes aprovados não são aprovação visual.
+
+### Erros que obrigam a rejeição
+
+- Dois quadrados completos sobrepostos sem decisão de pegada.
+- Jardim coberto por piso interior superior.
+- Escada que termina no conjunto de cama ou secretária.
+- Patamar sem distribuição ou com passagem apertada e sem função residencial.
+- Vão coberto por laje, tapete ou mobiliário.
+- Abertura que parece geometria em falta e não uma escada deliberada.
+- Divisões isoladas sem percurso humano entre elas.
+- Móveis dispersos para preencher coordenadas de pistas.
+- Janela sem parede exterior ou sobre uma zona sem piso superior.
+- Validação afrouxada para aprovar uma composição impossível.
+
+### Escalada futura
+
+Uma necessidade de varanda, balanço, novo sistema de escadas ou outra forma de
+apoio exige «SYSTEM ESCALATION»: descreve a limitação, mostra a falha concreta,
+compara alternativas no sistema existente e propõe a menor abstração reutilizável.
+Não cries indicadores específicos de um caso. A presente missão autoriza a
+alteração descrita acima; essa autorização não se transfere automaticamente
+para futuros lotes de produção.
