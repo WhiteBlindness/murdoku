@@ -266,8 +266,8 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
     const shell = w.kind === 'shell-back' || w.kind === 'shell-front'
     const face = w.kind === 'foundation' ? FOUNDATION : w.kind === 'shell-front' ? PLINTH : shell ? WALL_FACE : PARTITION_FACE
     const cap = w.kind === 'foundation' ? FOUNDATION : w.kind === 'shell-front' ? PLINTH : shell ? WALL_CAP : PARTITION_CAP
-    for (const piece of w.pieces) {
-      world.add(boxMesh(piece, face, cap))
+    for (const piece of w.visualPieces ?? w.pieces) {
+      world.add(boxMesh(piece, w.visualPieces ? FRAME_WOOD : face, w.visualPieces ? FRAME_WOOD : cap))
       diagGroup.add(helperFor(piece, '#2f7dff'))
     }
     for (const f of w.frames) world.add(boxMesh(f, FRAME_WOOD, FRAME_WOOD))
@@ -301,7 +301,7 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
     const other = companion.scene
     for (const slab of companionFloorBoxes(other)) world.add(ghostBox(slab, companion.offsetY, ghostOpacity))
     for (const wall of other.walls) {
-      for (const piece of wall.pieces) world.add(ghostBox(piece, companion.offsetY, ghostOpacity))
+      for (const piece of wall.visualPieces ?? wall.pieces) world.add(ghostBox(piece, companion.offsetY, ghostOpacity))
       for (const frameBox of wall.frames) world.add(ghostBox(frameBox, companion.offsetY, ghostOpacity))
     }
     for (const stair of other.objects.filter(object => object.kind === 'stairs')) {

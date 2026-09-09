@@ -48,6 +48,8 @@ export interface WallSpec {
    *  pony wall that furniture may back onto from the camera side; 'full' is for
    *  walls with nothing playable behind them (the validator checks visibility). */
   height?: 'low' | 'half' | 'full'
+  /** An open guard has visible posts and a handrail but remains a walk barrier. */
+  treatment?: 'solid' | 'railing'
   openings?: OpeningSpec[]
   /** Declare an endpoint that deliberately stops in open floor (a half wall,
    *  a counter return). Undeclared free ends are a validation error. */

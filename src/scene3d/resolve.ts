@@ -34,6 +34,7 @@ import { MODEL_BOUNDS, type KenneyModel } from './catalog.generated'
 import { metaOf, type ModelMeta } from './catalog'
 import type { CirculationSpec, Facing, FloorMaterial, FurnitureSpec, PlanRect, SceneSpec, OpeningSpec, ShellWall, ZoneKind } from './schema'
 import { resolveFootprint, resolveStairwell } from './floorGeometry'
+import { railingPieces } from './railingGeometry'
 
 export interface Box3 { min: Vec3; max: Vec3 }
 export interface Rect { minX: number; maxX: number; minZ: number; maxZ: number }
@@ -63,6 +64,8 @@ export interface ResolvedWall {
   thickness: number
   /** Solid structural pieces after openings are subtracted (may be lintels / spandrels). */
   pieces: Box3[]
+  /** Optional visible members; pieces still define the collision barrier. */
+  visualPieces?: Box3[]
   openings: ResolvedOpening[]
   /** Procedural window frame members (wood), drawn proud of both wall faces. */
   frames: Box3[]
@@ -350,6 +353,8 @@ export function resolveScene(spec: SceneSpec, n: number): ResolvedScene {
       height,
       thickness: line.thickness,
       pieces: structuralPieces(line, cuts, true),
+      visualPieces: w.treatment === 'railing'
+        ? structuralPieces(line, cuts, true).flatMap(piece => railingPieces(piece, axis)) : undefined,
       openings: cuts.map(c => openingOf(line, c)),
       frames: [],
       // freeEnds are authored against the author's from/to; the resolved run is

@@ -353,13 +353,15 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
   }
   // ---- visibility from the camera ---------------------------------------------------
   const dir = cameraDirection()
-  const wallBoxes = wallPieces.map(p => p.box)
+  const visibleWalls = scene.walls.filter(w => w.kind !== 'foundation')
+    .flatMap(wall => (wall.visualPieces ?? wall.pieces).map(box => ({ wall, box })))
+  const wallBoxes = visibleWalls.map(p => p.box)
   for (const o of solids) {
     if (o.parentId) continue
     const top: Vec3 = [(o.box.min[0] + o.box.max[0]) / 2, o.box.max[1] * 0.9, (o.box.min[2] + o.box.max[2]) / 2]
     const hit = wallBoxes.find(b => rayHitsBox(top, dir, b) !== null)
     if (hit) {
-      const wall = wallPieces.find(p => p.box === hit)!.wall
+      const wall = visibleWalls.find(p => p.box === hit)!.wall
       err('object-hidden', o.id, `${o.id} (${o.model}) is hidden behind wall ${wall.id} from the camera`)
     }
   }
