@@ -15,6 +15,7 @@ import { CELL, FLOOR_THICKNESS, cameraDirection, type StoreyView, type Vec3 } fr
 import type { ResolvedScene, ResolvedObject, Box3 } from './resolve'
 import type { KenneyModel } from './catalog.generated'
 import { companionFloorBoxes } from './companionGeometry'
+import { floorPatches } from './floorGeometry'
 
 // ---- look: one light, one palette rule -------------------------------------
 /** Kenney's palette is authored for a bright render; a mild saturation lift
@@ -199,44 +200,33 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
   key.shadow.radius = 2
   world.add(key, key.target)
 
-  // ---- highlight decals: one quad per cell, painted on the floor ----
-  const cellQuads: THREE.Mesh[][] = []
-  const companionCellQuads: THREE.Mesh[][] = []
-  const quadGeo = new THREE.PlaneGeometry(CELL, CELL)
-  quadGeo.rotateX(-Math.PI / 2)
-  for (let r = 0; r < scene.n; r++) {
-    cellQuads.push([])
-    for (let c = 0; c < scene.n; c++) {
-      // Decals sit a hair above the floor and are occluded by walls and
-      // furniture like paint on the floor would be; the DOM lane traces carry
-      // the full lane extent on top, so nothing about the topology is lost.
-      const mat = new THREE.MeshBasicMaterial({ color: NEUTRAL_MATERIAL, transparent: true, opacity: 0, depthWrite: false })
-      const q = new THREE.Mesh(quadGeo, mat)
-      q.position.set((c + 0.5) * CELL, scene.floorY[r][c] + 0.008, (r + 0.5) * CELL)
-      q.renderOrder = 10
-      q.visible = false
-      world.add(q)
-      cellQuads[r].push(q)
+  // ---- highlight decals: clipped to each physical part of a logical cell ----
+  const makeCellQuads = (target: ResolvedScene, offsetY: number, colour: string, order: number) => {
+    const quads: THREE.Mesh[][][] = Array.from({ length: target.n }, () => Array.from({ length: target.n }, () => []))
+    for (const patch of floorPatches(target)) {
+      const width = patch.box.max[0] - patch.box.min[0]
+      const depth = patch.box.max[2] - patch.box.min[2]
+      const geometry = new THREE.PlaneGeometry(width, depth)
+      geometry.rotateX(-Math.PI / 2)
+      const material = new THREE.MeshBasicMaterial({ color: colour, transparent: true, opacity: 0, depthWrite: false })
+      const quad = new THREE.Mesh(geometry, material)
+      quad.position.set(
+        (patch.box.min[0] + patch.box.max[0]) / 2,
+        patch.y + offsetY + (order === 10 ? 0.008 : 0.009),
+        (patch.box.min[2] + patch.box.max[2]) / 2,
+      )
+      quad.renderOrder = order
+      quad.visible = false
+      world.add(quad)
+      quads[patch.row][patch.col].push(quad)
     }
+    return quads
   }
-  if (companion) {
-    for (let r = 0; r < companion.scene.n; r++) {
-      companionCellQuads.push([])
-      for (let c = 0; c < companion.scene.n; c++) {
-        const mat = new THREE.MeshBasicMaterial({ color: '#8a6cff', transparent: true, opacity: 0, depthWrite: false })
-        const q = new THREE.Mesh(quadGeo, mat)
-        q.position.set(
-          (c + 0.5) * CELL,
-          companion.scene.floorY[r][c] + companion.offsetY + 0.009,
-          (r + 0.5) * CELL,
-        )
-        q.renderOrder = 9
-        q.visible = false
-        world.add(q)
-        companionCellQuads[r].push(q)
-      }
-    }
-  }
+  // Logical interaction remains N×N; only the floor paint follows the slab.
+  const cellQuads = makeCellQuads(scene, 0, NEUTRAL_MATERIAL, 10)
+  const companionCellQuads = companion
+    ? makeCellQuads(companion.scene, companion.offsetY, '#8a6cff', 9)
+    : []
   const diagGroup = new THREE.Group()
   diagGroup.visible = false
   world.add(diagGroup)
@@ -252,25 +242,19 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
 
   // ---- build ----------------------------------------------------------------------------
   const jobs: Promise<unknown>[] = []
-  // floor: Kenney tiles scaled to the cell, feet at -thickness so the top is y = 0
-  const inStairwell = (r: number, c: number) => {
-    const sw = scene.stairwell
-    return !!sw && c >= sw[0] && r >= sw[1] && c <= sw[2] && r <= sw[3]
-  }
-  for (let r = 0; r < scene.n; r++) for (let c = 0; c < scene.n; c++) {
-    if (inStairwell(r, c)) continue
-    const material = scene.floorMaterial[r][c]
-    const y = scene.floorY[r][c]
-    if (material !== 'wood') {
-      const slab = FLOOR_SLAB[material]
-      const m = boxMesh({ min: [c * CELL, y - FLOOR_THICKNESS, r * CELL], max: [(c + 1) * CELL, y, (r + 1) * CELL] }, slab.edge, slab.top)
+  // Fractional wood pieces retain the Kenney floor material and slab height.
+  for (const patch of floorPatches(scene)) {
+    const [x0, z0, x1, z1] = patch.bounds
+    if (patch.material !== 'wood') {
+      const slab = FLOOR_SLAB[patch.material]
+      const m = boxMesh(patch.box, slab.edge, slab.top)
       m.castShadow = false
       world.add(m)
       continue
     }
     jobs.push(loadModel('floorFull').then(g => {
-      g.scale.set(CELL, 1, CELL)
-      g.position.set((c + 0.5) * CELL, y - FLOOR_THICKNESS, (r + 0.5) * CELL)
+      g.scale.set((x1 - x0) * CELL, 1, (z1 - z0) * CELL)
+      g.position.set((x0 + x1) * CELL / 2, patch.y - FLOOR_THICKNESS, (z0 + z1) * CELL / 2)
       world.add(g)
       requestRender()
     }))
@@ -352,8 +336,6 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
   const setHighlights = (h: HighlightState) => {
     diagGroup.visible = !!h.diag
     for (let r = 0; r < scene.n; r++) for (let c = 0; c < scene.n; c++) {
-      const q = cellQuads[r][c]
-      const mat = q.material as THREE.MeshBasicMaterial
       let colour: string | null = null, opacity = 0
       if (!h.envOnly) {
         const inRow = h.activeRow === r, inCol = h.activeCol === c
@@ -376,14 +358,15 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
           colour = h.hoverTarget.valid ? '#3fae5c' : '#c94444'; opacity = 0.5
         }
       }
-      q.visible = opacity > 0
-      if (colour) mat.color.set(colour)
-      mat.opacity = opacity
+      for (const q of cellQuads[r][c]) {
+        const mat = q.material as THREE.MeshBasicMaterial
+        q.visible = opacity > 0
+        if (colour) mat.color.set(colour)
+        mat.opacity = opacity
+      }
     }
     if (companion) {
       for (let r = 0; r < companion.scene.n; r++) for (let c = 0; c < companion.scene.n; c++) {
-        const q = companionCellQuads[r][c]
-        const mat = q.material as THREE.MeshBasicMaterial
         let colour = '#8a6cff', opacity = 0
         if (!h.envOnly) {
           if (h.blockedRows?.has(r) || h.blockedCols?.has(c)) opacity = 0.12
@@ -393,9 +376,12 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
             opacity = 0.32
           }
         }
-        q.visible = opacity > 0
-        mat.color.set(colour)
-        mat.opacity = opacity
+        for (const q of companionCellQuads[r][c]) {
+          const mat = q.material as THREE.MeshBasicMaterial
+          q.visible = opacity > 0
+          mat.color.set(colour)
+          mat.opacity = opacity
+        }
       }
     }
     requestRender()

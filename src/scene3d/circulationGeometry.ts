@@ -1,0 +1,29 @@
+import type { PlanRect } from './schema'
+
+const EPS = 1e-8
+
+/** Two clear rectangles connect through overlap or a shared edge of positive width. */
+export function circulationRectsConnect(a: PlanRect, b: PlanRect): boolean {
+  const overlapX = Math.min(a[2], b[2]) - Math.max(a[0], b[0])
+  const overlapZ = Math.min(a[3], b[3]) - Math.max(a[1], b[1])
+  if (overlapX > EPS && overlapZ > EPS) return true
+  const sharesXEdge = (Math.abs(a[2] - b[0]) <= EPS || Math.abs(b[2] - a[0]) <= EPS) && overlapZ > EPS
+  const sharesZEdge = (Math.abs(a[3] - b[1]) <= EPS || Math.abs(b[3] - a[1]) <= EPS) && overlapX > EPS
+  return sharesXEdge || sharesZEdge
+}
+
+/** Indices reachable from rectangle zero in the authored circulation graph. */
+export function connectedCirculationRects(rects: PlanRect[]): Set<number> {
+  if (!rects.length) return new Set()
+  const connected = new Set<number>([0])
+  const pending = [0]
+  while (pending.length) {
+    const current = pending.pop()!
+    for (let candidate = 0; candidate < rects.length; candidate++) {
+      if (connected.has(candidate) || !circulationRectsConnect(rects[current], rects[candidate])) continue
+      connected.add(candidate)
+      pending.push(candidate)
+    }
+  }
+  return connected
+}

@@ -11,6 +11,9 @@ import { CELL, STOREY_HEIGHT, cameraDirection, type Vec3 } from './units'
 import { parseLogic, type Box3, type Rect, type ResolvedObject, type ResolvedScene, type ResolvedWall } from './resolve'
 import { furnitureCells, type Puzzle } from '../core/types'
 import { resolvedObjectVisibilityBoxes } from './stairVisibility'
+import { planRectToWorld, validPlanRect, worldRectCoveredByFloor, type WorldRect } from './floorGeometry'
+import { connectedCirculationRects } from './circulationGeometry'
+import { validatePhysicalConnection, validateUpperSupport } from './storeyConnection'
 
 export type Severity = 'error' | 'warning'
 
@@ -20,14 +23,19 @@ export interface Violation {
     | 'wall-thickness-inconsistent' | 'insert-off-wall'
     | 'zone-boundary-unwalled' | 'envelope-undefined' | 'zone-object-mismatch'
     | 'wall-penetration' | 'furniture-overlap' | 'outside-floor'
+    | 'floor-missing' | 'stairwell-collision' | 'wall-unsupported'
     | 'unsupported-prop' | 'prop-overhang'
     | 'door-blocked' | 'wall-free-end'
     | 'room-unreachable' | 'no-entry'
     | 'storey-mismatch' | 'stair-missing' | 'stair-rise-mismatch'
     | 'stairwell-missing' | 'stairwell-size-mismatch' | 'stair-floor-mismatch'
     | 'stair-slab-blocked' | 'stair-landing-blocked' | 'upper-floor-inaccessible'
+    | 'upper-floor-unsupported'
+    | 'circulation-missing' | 'circulation-malformed' | 'circulation-too-narrow'
+    | 'circulation-blocked' | 'circulation-disconnected'
     | 'object-hidden' | 'cell-hidden' | 'tall-back-exposed'
     | 'logic-missing' | 'logic-unknown' | 'logic-displaced' | 'logic-type'
+    | 'solution-floor-missing'
   severity: Severity
   subject: string
   message: string
@@ -110,17 +118,19 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
   // ---- building envelope -----------------------------------------------------------
   {
     const n = scene.n
-    const interiorCells = scene.zoneKind.flat().filter(k => k === 'interior').length
+    const interiorCells = scene.zoneKind.flatMap((row, r) => row.filter((k, c) => scene.floorPresent[r][c] && k === 'interior')).length
     if (interiorCells === 0) err('envelope-undefined', 'scene', 'no interior cells: the building envelope is undefined')
     const wallOnEdge = (axis: 'x' | 'z', at: number, from: number, to: number) => scene.walls.some(w =>
       w.kind !== 'foundation' && w.axis === axis && Math.abs((axis === 'x' ? w.from[1] : w.from[0]) - at) < 1e-6
       && (axis === 'x' ? w.from[0] : w.from[1]) <= from + 1e-6 && (axis === 'x' ? w.to[0] : w.to[1]) >= to - 1e-6)
     for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
       const k = scene.zoneKind[r][c]
-      if (c + 1 < n && (scene.zoneKind[r][c + 1] === 'interior') !== (k === 'interior')) {
+      if (scene.floorPresent[r][c] && c + 1 < n && scene.floorPresent[r][c + 1]
+        && (scene.zoneKind[r][c + 1] === 'interior') !== (k === 'interior')) {
         if (!wallOnEdge('z', (c + 1) * CELL, r * CELL, (r + 1) * CELL)) err('zone-boundary-unwalled', `${r},${c}`, `interior meets outside between (${r},${c}) and (${r},${c + 1}) with no facade wall`)
       }
-      if (r + 1 < n && (scene.zoneKind[r + 1][c] === 'interior') !== (k === 'interior')) {
+      if (scene.floorPresent[r][c] && r + 1 < n && scene.floorPresent[r + 1][c]
+        && (scene.zoneKind[r + 1][c] === 'interior') !== (k === 'interior')) {
         if (!wallOnEdge('x', (r + 1) * CELL, c * CELL, (c + 1) * CELL)) err('zone-boundary-unwalled', `${r},${c}`, `interior meets outside between (${r},${c}) and (${r + 1},${c}) with no facade wall`)
       }
     }
@@ -136,6 +146,37 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
   const furniture = scene.objects.filter(o => o.kind === 'furniture' || o.kind === 'stairs')
   const solids = furniture.filter(solidObject)
   const byId = new Map(scene.objects.map(o => [o.id, o]))
+
+  // ---- every architectural/object footprint must have real floor support ------
+  const hasFloorBesideWall = (wall: ResolvedWall, along: number) => {
+    const lineAt = wall.axis === 'x' ? wall.from[1] : wall.from[0]
+    const offset = wall.thickness / 2 + 0.002
+    const points: Array<[number, number]> = wall.axis === 'x'
+      ? [[along, lineAt - offset], [along, lineAt + offset]]
+      : [[lineAt - offset, along], [lineAt + offset, along]]
+    // A wall may bound the stair volume without a slab immediately beside it.
+    return points.some(([x, z]) => worldRectCoveredByFloor({ ...scene, stairwellBounds: undefined }, {
+      minX: x - 0.001, maxX: x + 0.001, minZ: z - 0.001, maxZ: z + 0.001,
+    }))
+  }
+  for (const wall of scene.walls) {
+    if (wall.kind === 'foundation') continue
+    const start = wall.axis === 'x' ? wall.from[0] : wall.from[1]
+    const end = wall.axis === 'x' ? wall.to[0] : wall.to[1]
+    const samples = Math.max(1, Math.ceil((end - start) / (CELL / 4)))
+    const supported = Array.from({ length: samples }, (_, i) => start + (i + 0.5) * (end - start) / samples)
+      .every(along => hasFloorBesideWall(wall, along))
+    if (!supported) err('wall-unsupported', wall.id, `${wall.id} has no floor support along part of its run`)
+  }
+
+  for (const object of scene.objects.filter(o => o.kind === 'furniture' || o.kind === 'rug' || o.kind === 'stairs')) {
+    const overlapsWell = !!scene.stairwellBounds && rectOverlap(object.footprint, planRectToWorld(scene.stairwellBounds))
+    if (overlapsWell) {
+      err('stairwell-collision', object.id, `${object.id} (${object.model}) crosses the open stairwell`)
+    } else if (!worldRectCoveredByFloor(scene, object.footprint)) {
+      err('floor-missing', object.id, `${object.id} (${object.model}) is not fully supported by this storey's floor`)
+    }
+  }
 
   // ---- physical envelope vs walls and floor -----------------------------------
   for (const o of solids) {
@@ -190,6 +231,62 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
       if (!onSomeWall(p, w)) err('wall-free-end', w.id, `${w.id} ends in open floor at (${(p[0] / CELL).toFixed(2)}, ${(p[1] / CELL).toFixed(2)}) — join it to a wall or declare freeEnds`)
     }
   }
+
+  // ---- authored upper-storey circulation ------------------------------------
+  if (scene.circulation) {
+    const circulation = scene.circulation
+    const authored = [
+      { id: 'landing', bounds: circulation.landing, minimumWidth: true },
+      ...circulation.halls.map(hall => ({ ...hall, minimumWidth: true })),
+      ...circulation.roomAccessTargets.map(target => ({ ...target, minimumWidth: false })),
+    ]
+    const ids = new Set<string>()
+    const usable: Array<{ id: string; bounds: WorldRect }> = []
+    for (const item of authored) {
+      if (ids.has(item.id)) err('circulation-malformed', item.id, `duplicate circulation id ${item.id}`)
+      ids.add(item.id)
+      if (!validPlanRect(item.bounds, scene.n)) {
+        err('circulation-malformed', item.id, `${item.id} has invalid bounds [${item.bounds.join(',')}]`)
+        continue
+      }
+      const original = planRectToWorld(item.bounds)
+      if (!worldRectCoveredByFloor(scene, original)) {
+        err('circulation-blocked', item.id, `${item.id} crosses missing floor or the stairwell`)
+        continue
+      }
+      const clear = { ...original }
+      let crossedWall: string | undefined
+      for (const { wall, box } of wallPieces) {
+        const wallRect: WorldRect = { minX: box.min[0], maxX: box.max[0], minZ: box.min[2], maxZ: box.max[2] }
+        if (!rectOverlap(clear, wallRect)) continue
+        if (wall.axis === 'z') {
+          if (wallRect.minX <= clear.minX + EPS) clear.minX = Math.max(clear.minX, wallRect.maxX)
+          else if (wallRect.maxX >= clear.maxX - EPS) clear.maxX = Math.min(clear.maxX, wallRect.minX)
+          else crossedWall = wall.id
+        } else {
+          if (wallRect.minZ <= clear.minZ + EPS) clear.minZ = Math.max(clear.minZ, wallRect.maxZ)
+          else if (wallRect.maxZ >= clear.maxZ - EPS) clear.maxZ = Math.min(clear.maxZ, wallRect.minZ)
+          else crossedWall = wall.id
+        }
+      }
+      const obstacle = solids.find(object => !object.parentId && rectOverlap(object.footprint, clear, 0.005))
+      if (crossedWall || obstacle) {
+        err('circulation-blocked', item.id, `${item.id} is blocked by ${crossedWall ? `wall ${crossedWall}` : `${obstacle!.id} (${obstacle!.model})`}`)
+      }
+      if (item.minimumWidth && Math.min(clear.maxX - clear.minX, clear.maxZ - clear.minZ) < 0.6 - EPS) {
+        err('circulation-too-narrow', item.id, `${item.id} has less than 0.600 clear world units between finished faces`)
+      }
+      usable.push({ id: item.id, bounds: clear })
+    }
+    if (usable.length === authored.length) {
+      const connected = connectedCirculationRects(usable.map(({ bounds }) => [
+        bounds.minX / CELL, bounds.minZ / CELL, bounds.maxX / CELL, bounds.maxZ / CELL,
+      ]))
+      authored.forEach((item, index) => {
+        if (!connected.has(index)) err('circulation-disconnected', item.id, `${item.id} is not connected to the stair landing`)
+      })
+    }
+  }
   // ---- reachability: every room walkable from the entry ---------------------------
   if (puzzle) {
     const res = 4
@@ -200,6 +297,9 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
     // sampling step, so a point test would let the flood fill leak through them.
     const half = step / 2
     const walkable = (px: number, pz: number) => {
+      if (!worldRectCoveredByFloor(scene, {
+        minX: px - half, maxX: px + half, minZ: pz - half, maxZ: pz + half,
+      })) return false
       for (const { box } of wallPieces) {
         if (px + half > box.min[0] && px - half < box.max[0] && pz + half > box.min[2] && pz - half < box.max[2]) return false
       }
@@ -212,16 +312,19 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
       const [ex, ez] = scene.entry.centre
       seed = [Math.min(m - 1, Math.floor(ez / step + (scene.entry.wall === 'north' ? 0.5 : 0))),
               Math.min(m - 1, Math.floor(ex / step + (scene.entry.wall === 'west' ? 0.5 : 0)))]
-    } else if (scene.floor > 0 && scene.stairwell) {
-      const [c0, r0, c1, r1] = scene.stairwell
+    } else if (scene.floor > 0 && scene.circulation) {
+      const landing = scene.circulation.landing
+      seed = [Math.floor(((landing[1] + landing[3]) / 2) * res), Math.floor(((landing[0] + landing[2]) / 2) * res)]
+    } else if (scene.floor > 0 && scene.stairwellBounds) {
+      const [x0, z0, x1, z1] = scene.stairwellBounds
       const candidates: Array<[number, number]> = [
-        [Math.floor(((r0 + r1 + 1) / 2) * res), (c1 + 1) * res + Math.floor(res / 2)],
-        [Math.floor(((r0 + r1 + 1) / 2) * res), c0 * res - Math.ceil(res / 2)],
-        [(r1 + 1) * res + Math.floor(res / 2), Math.floor(((c0 + c1 + 1) / 2) * res)],
-        [r0 * res - Math.ceil(res / 2), Math.floor(((c0 + c1 + 1) / 2) * res)],
+        [Math.floor(((z0 + z1) / 2) * res), Math.ceil(x1 * res)],
+        [Math.floor(((z0 + z1) / 2) * res), Math.floor(x0 * res) - 1],
+        [Math.ceil(z1 * res), Math.floor(((x0 + x1) / 2) * res)],
+        [Math.floor(z0 * res) - 1, Math.floor(((x0 + x1) / 2) * res)],
       ]
       seed = candidates.find(([i, j]) => i >= 0 && j >= 0 && i < m && j < m && !blocked[i * m + j])
-        ?? [Math.floor((r0 + 0.5) * res), Math.floor((c0 + 0.5) * res)]
+        ?? [Math.floor(((z0 + z1) / 2) * res), Math.floor(((x0 + x1) / 2) * res)]
     } else {
       warn('no-entry', 'scene', 'no entry declared — circulation is checked from the front-most free sample')
       seed = [m - 1, Math.floor(m / 2)]
@@ -262,6 +365,7 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
   }
   for (let r = 0; r < scene.n; r++) for (let c = 0; c < scene.n; c++) {
     const p = scene.frame.cellCentre(r, c, scene.floorY[r][c])
+    if (!worldRectCoveredByFloor(scene, { minX: p[0] - 0.001, maxX: p[0] + 0.001, minZ: p[2] - 0.001, maxZ: p[2] + 0.001 })) continue
     const occupant = solids.find(o => !o.parentId && p[0] > o.footprint.minX && p[0] < o.footprint.maxX && p[2] > o.footprint.minZ && p[2] < o.footprint.maxZ)
     const blockers = [...wallBoxes, ...solids.filter(o => o !== occupant && !o.parentId).flatMap(resolvedObjectVisibilityBoxes)]
     // A suspect standee carries its portrait badge at chest height (~0.45).
@@ -283,6 +387,13 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
   }
   // ---- logic contract ---------------------------------------------------------------
   if (puzzle) {
+    for (const [personId, cell] of Object.entries(puzzle.solution)) {
+      if ((cell.floor ?? 0) !== scene.floor) continue
+      const x = (cell.col + 0.5) * CELL, z = (cell.row + 0.5) * CELL
+      if (!worldRectCoveredByFloor(scene, { minX: x - 0.001, maxX: x + 0.001, minZ: z - 0.001, maxZ: z + 0.001 })) {
+        err('solution-floor-missing', personId, `${personId}'s solved position (${cell.row},${cell.col}) has no floor`)
+      }
+    }
     const logical = puzzle.furniture.filter(f => (f.floor ?? 0) === scene.floor)
     const ids = new Set(logical.map(f => `${f.type}@${f.row},${f.col}`))
     const represented = new Set<string>()
@@ -321,6 +432,8 @@ export function validateStoreyPair(lower: ResolvedScene, upper: ResolvedScene): 
     return out
   }
 
+  out.push(...validateUpperSupport(lower, upper))
+
   const stair = lower.objects.find(object => object.kind === 'stairs')
   if (!stair) {
     err('stair-missing', 'stairs', 'the lower storey has no physical staircase')
@@ -330,6 +443,10 @@ export function validateStoreyPair(lower: ResolvedScene, upper: ResolvedScene): 
 
   if (Math.abs(stair.size[1] - STOREY_HEIGHT) > 0.08) {
     err('stair-rise-mismatch', stair.id, `${stair.model} rises ${stair.size[1].toFixed(3)}; the storey pitch is ${STOREY_HEIGHT.toFixed(3)}`)
+  }
+
+  if (upper.stairwellSource === 'bounds') {
+    return [...out, ...validatePhysicalConnection(lower, upper)]
   }
 
   const stairwell = upper.stairwell

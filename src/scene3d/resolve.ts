@@ -32,7 +32,8 @@ import {
 } from './units'
 import { MODEL_BOUNDS, type KenneyModel } from './catalog.generated'
 import { metaOf, type ModelMeta } from './catalog'
-import type { Facing, FloorMaterial, FurnitureSpec, SceneSpec, OpeningSpec, ShellWall, ZoneKind } from './schema'
+import type { CirculationSpec, Facing, FloorMaterial, FurnitureSpec, PlanRect, SceneSpec, OpeningSpec, ShellWall, ZoneKind } from './schema'
+import { resolveFootprint, resolveStairwell } from './floorGeometry'
 
 export interface Box3 { min: Vec3; max: Vec3 }
 export interface Rect { minX: number; maxX: number; minZ: number; maxZ: number }
@@ -107,10 +108,16 @@ export interface ResolvedScene {
   zoneKind: ZoneKind[][]
   /** Finished ground height of every cell: 0 indoors, −TERRAIN_DROP outdoors. */
   floorY: number[][]
+  /** Whether this storey has physical floor at each logical cell. */
+  floorPresent: boolean[][]
   /** Step boxes on the low side of openings between different ground heights. */
   thresholds: Box3[]
   /** Upper-floor cells with no slab (the stair arrives here), as [col0,row0,col1,row1]. */
   stairwell?: [number, number, number, number]
+  /** Normalised continuous opening in cell units (exclusive maximum bounds). */
+  stairwellBounds?: PlanRect
+  stairwellSource?: 'legacy' | 'bounds'
+  circulation?: CirculationSpec
   entry?: { centre: [number, number]; wall: 'north' | 'west' }
   /** Specs that could not be resolved. Each is a hard validation failure. */
   problems: string[]
@@ -215,6 +222,10 @@ export function resolveScene(spec: SceneSpec, n: number): ResolvedScene {
   const walls: ResolvedWall[] = []
   const objects: ResolvedObject[] = []
   const thresholds: Box3[] = []
+  const footprint = resolveFootprint(spec, n)
+  const stairwell = resolveStairwell(spec, n)
+  problems.push(...footprint.problems, ...stairwell.problems)
+  const floorPresent = footprint.present
 
   // ---- zones ------------------------------------------------------------------
   const floorMaterial: FloorMaterial[][] = Array.from({ length: n }, () => Array<FloorMaterial>(n).fill('wood'))
@@ -226,7 +237,8 @@ export function resolveScene(spec: SceneSpec, n: number): ResolvedScene {
     for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) { floorMaterial[r][c] = zone.material; zoneKind[r][c] = kind }
   }
   const floorY = zoneKind.map(row => row.map(k => (k === 'interior' ? 0 : -TERRAIN_DROP)))
-  const inEnvelope = (r: number, c: number) => r >= 0 && c >= 0 && r < n && c < n && zoneKind[r][c] !== 'exterior'
+  const inEnvelope = (r: number, c: number) => r >= 0 && c >= 0 && r < n && c < n
+    && floorPresent[r][c] && zoneKind[r][c] !== 'exterior'
   const yAt = (x: number, z: number) => {
     const r = Math.min(n - 1, Math.max(0, Math.floor(z / CELL)))
     const c = Math.min(n - 1, Math.max(0, Math.floor(x / CELL)))
@@ -357,11 +369,11 @@ export function resolveScene(spec: SceneSpec, n: number): ResolvedScene {
   const half = SHELL_THICKNESS / 2
   for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
     const y = floorY[r][c]
-    if (c + 1 < n && floorY[r][c + 1] !== y) {
+    if (floorPresent[r][c] && c + 1 < n && floorPresent[r][c + 1] && floorY[r][c + 1] !== y) {
       const x = (c + 1) * CELL, lo = Math.min(y, floorY[r][c + 1]), hi = Math.max(y, floorY[r][c + 1])
       foundationPieces.push({ min: [x - half, lo, r * CELL - half], max: [x + half, hi, (r + 1) * CELL + half] })
     }
-    if (r + 1 < n && floorY[r + 1][c] !== y) {
+    if (floorPresent[r][c] && r + 1 < n && floorPresent[r + 1][c] && floorY[r + 1][c] !== y) {
       const z = (r + 1) * CELL, lo = Math.min(y, floorY[r + 1][c]), hi = Math.max(y, floorY[r + 1][c])
       foundationPieces.push({ min: [c * CELL - half, lo, z - half], max: [(c + 1) * CELL + half, hi, z + half] })
     }
@@ -527,8 +539,11 @@ export function resolveScene(spec: SceneSpec, n: number): ResolvedScene {
   return {
     puzzleId: spec.puzzleId,
     floor: spec.floor ?? 0,
-    n, side, frame, walls, objects, floorMaterial, zoneKind, floorY, thresholds,
+    n, side, frame, walls, objects, floorMaterial, zoneKind, floorY, floorPresent, thresholds,
     stairwell: spec.stairwell,
+    stairwellBounds: stairwell.bounds,
+    stairwellSource: stairwell.source,
+    circulation: spec.circulation,
     entry: entry ? { wall: entry.wall, centre: entry.wall === 'north' ? [entry.at * CELL, 0] : [0, entry.at * CELL] } : undefined,
     problems,
   }

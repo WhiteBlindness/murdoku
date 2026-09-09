@@ -121,6 +121,25 @@ export interface FloorZoneSpec {
   kind?: ZoneKind
 }
 
+/** Inclusive logical-cell rectangle [col0, row0, col1, row1]. */
+export type CellRect = [number, number, number, number]
+
+/** Continuous plan rectangle [x0, z0, x1, z1] in cell units; maxima are exclusive. */
+export type PlanRect = [number, number, number, number]
+
+export type StoreyFootprintSpec =
+  | { kind: 'full' }
+  | { kind: 'cell-rects'; rects: CellRect[] }
+
+export interface CirculationSpec {
+  /** Clear physical step-off area at the stair head. */
+  landing: PlanRect
+  /** Clear rectangles whose touching edges form the distribution route. */
+  halls: Array<{ id: string; bounds: PlanRect }>
+  /** Architectural access points; ids do not depend on logical room names. */
+  roomAccessTargets: Array<{ id: string; bounds: PlanRect }>
+}
+
 export interface StairsSpec {
   model: 'stairs' | 'stairsOpen' | 'stairsOpenSingle' | 'stairsCorner'
   /** Footprint centre of the flight, cell units. */
@@ -142,9 +161,17 @@ export interface SceneSpec {
   rugs?: Array<{ id: string; model: KenneyModel; at: [number, number]; facing?: Facing }>
   /** Floor material per cell rectangle; cells not covered are interior wood. */
   floors?: FloorZoneSpec[]
+  /** Physical floor/site area on this storey. On the ground floor this can include
+   *  exterior terrain; building support is the footprint intersected with interior zones.
+   *  Omission preserves legacy full-board scenes. */
+  storeyFootprint?: StoreyFootprintSpec
   /** Ground-floor only: the staircase to the storey above. */
   stairs?: StairsSpec
   /** Upper floors only: cells with no slab — the stair arrives here.
    *  Inclusive [col0, row0, col1, row1]; must match the ground stair footprint. */
   stairwell?: [number, number, number, number]
+  /** V2 stair opening in continuous cell units, with exclusive maximum bounds. */
+  stairwellBounds?: PlanRect
+  /** Clear upper-storey route from the stair landing to architectural access targets. */
+  circulation?: CirculationSpec
 }
