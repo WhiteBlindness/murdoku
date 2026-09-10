@@ -61,6 +61,8 @@ export const FRAME_PROTRUSION = 0.01
 /** Fixed camera: 45° azimuth puts the grid's diagonal on screen-x; the
  *  elevation trades floor visibility (higher) for a dollhouse feel (lower). */
 export const CAMERA_ELEVATION_DEG = tune('elev', 32)
+/** The raised storey view exposes the flight below the active slab. */
+export const STOREY_CAMERA_ELEVATION_DEG = tune('elev', 42)
 export const CAMERA_AZIMUTH_DEG = 45
 
 /** Screen pixels per Kenney unit on the virtual (unscaled) canvas. */
@@ -78,6 +80,7 @@ const SQ2 = Math.SQRT1_2
  */
 export interface SceneFrame {
   n: number
+  cameraDirection: Vec3
   width: number
   height: number
   /** World extent of the ortho frustum, matching width/height at PX_PER_UNIT. */
@@ -96,8 +99,8 @@ export interface SceneFrame {
   headroom: number
 }
 
-export function makeFrame(n: number, headroom = 0, footroom = 0): SceneFrame {
-  const el = (CAMERA_ELEVATION_DEG * Math.PI) / 180
+export function makeFrame(n: number, headroom = 0, footroom = 0, elevation = CAMERA_ELEVATION_DEG): SceneFrame {
+  const el = (elevation * Math.PI) / 180
   const s = Math.sin(el), c = Math.cos(el)
   const side = n * CELL
   // camera basis for azimuth 45°: screen-x = (x - z)/√2, screen-up = -(x+z)·s/√2 + y·c
@@ -133,18 +136,18 @@ export function makeFrame(n: number, headroom = 0, footroom = 0): SceneFrame {
     project([(col + 1) * CELL, y, (row + 1) * CELL]),
     project([col * CELL, y, (row + 1) * CELL]),
   ]
-  return { n, width, height, viewWidthUnits, viewHeightUnits, centre, project, unprojectFloor, cellCentre, cellPolygon, headroom }
+  return { n, cameraDirection: cameraDirection(elevation), width, height, viewWidthUnits, viewHeightUnits, centre, project, unprojectFloor, cellCentre, cellPolygon, headroom }
 }
 
 /** Shared frame for the active storey plus its non-interactive companion. */
 export function makeStoreyFrame(n: number, activeFloor: 0 | 1, view: StoreyView): SceneFrame {
   const separation = view === 'ghost' ? STOREY_HEIGHT : STOREY_HEIGHT * 1.8
-  return makeFrame(n, activeFloor === 0 ? separation : 0, activeFloor === 1 ? separation : 0)
+  return makeFrame(n, activeFloor === 0 ? separation : 0, activeFloor === 1 ? separation : 0, STOREY_CAMERA_ELEVATION_DEG)
 }
 
 /** Unit vector pointing from the scene toward the camera. */
-export function cameraDirection(): Vec3 {
-  const el = (CAMERA_ELEVATION_DEG * Math.PI) / 180
+export function cameraDirection(elevation = CAMERA_ELEVATION_DEG): Vec3 {
+  const el = (elevation * Math.PI) / 180
   const az = (CAMERA_AZIMUTH_DEG * Math.PI) / 180
   return [Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el)]
 }

@@ -11,10 +11,10 @@
 
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { CELL, FLOOR_THICKNESS, cameraDirection, type StoreyView, type Vec3 } from './units'
+import { CELL, FLOOR_THICKNESS, type StoreyView, type Vec3 } from './units'
 import type { ResolvedScene, ResolvedObject, Box3 } from './resolve'
 import type { KenneyModel } from './catalog.generated'
-import { companionFloorBoxes } from './companionGeometry'
+import { companionFloorBoxes, companionWallBoxesThroughStairwell } from './companionGeometry'
 import { floorPatches } from './floorGeometry'
 
 // ---- look: one light, one palette rule -------------------------------------
@@ -179,7 +179,7 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
     -frame.viewWidthUnits / 2, frame.viewWidthUnits / 2,
     frame.viewHeightUnits / 2, -frame.viewHeightUnits / 2, -50, 50,
   )
-  const dir = cameraDirection()
+  const dir = frame.cameraDirection
   const centre = new THREE.Vector3(...frame.centre)
   cam.position.set(centre.x + dir[0] * 20, centre.y + dir[1] * 20, centre.z + dir[2] * 20)
   cam.lookAt(centre)
@@ -299,6 +299,11 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
   if (companion) {
     const ghostOpacity = companion.mode === 'ghost' ? 0.16 : 0.32
     const other = companion.scene
+    for (const piece of companionWallBoxesThroughStairwell(scene, other, companion)) {
+      const patch = boxMesh(piece, WALL_FACE, WALL_CAP)
+      patch.position.y += companion.offsetY
+      world.add(patch)
+    }
     for (const slab of companionFloorBoxes(other)) world.add(ghostBox(slab, companion.offsetY, ghostOpacity))
     for (const wall of other.walls) {
       for (const piece of wall.visualPieces ?? wall.pieces) world.add(ghostBox(piece, companion.offsetY, ghostOpacity))
@@ -329,7 +334,9 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
       }))
     }
   }
-  const ready = Promise.all(jobs).then(() => { requestRender() })
+  const ready = Promise.all(jobs).then(() => {
+    requestRender()
+  })
 
   // ---- highlights ------------------------------------------------------------------------
   const key2 = (r: number, c: number) => `${r},${c}`

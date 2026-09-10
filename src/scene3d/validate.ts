@@ -7,7 +7,7 @@
 // human should look at. Beauty is not checked here and never will be.
 // ============================================================================
 
-import { CELL, STOREY_HEIGHT, cameraDirection, type Vec3 } from './units'
+import { CELL, STOREY_HEIGHT, type Vec3 } from './units'
 import { parseLogic, type Box3, type Rect, type ResolvedObject, type ResolvedScene, type ResolvedWall } from './resolve'
 import { furnitureCells, type Puzzle } from '../core/types'
 import { resolvedObjectVisibilityBoxes } from './stairVisibility'
@@ -362,7 +362,7 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
     }
   }
   // ---- visibility from the camera ---------------------------------------------------
-  const dir = cameraDirection()
+  const dir = scene.frame.cameraDirection
   const visibleWalls = scene.walls.filter(w => w.kind !== 'foundation')
     .flatMap(wall => (wall.visualPieces ?? wall.pieces).map(box => ({ wall, box })))
   const wallBoxes = visibleWalls.map(p => p.box)
