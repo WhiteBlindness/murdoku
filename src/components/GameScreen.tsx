@@ -876,6 +876,11 @@ export default function GameScreen(props: Props) {
                         </button>
                       ))}
                     </div>
+                    {storeyView === 'exploded' && (
+                      <p className="text-center font-mono text-[10px] text-text-secondary px-3 pb-2">
+                        Dashed lines connect the stair arrival across the separated floors.
+                      </p>
+                    )}
                   </div>
                 )}
 

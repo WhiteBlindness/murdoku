@@ -16,6 +16,7 @@ import type { ResolvedScene, ResolvedObject, Box3 } from './resolve'
 import type { KenneyModel } from './catalog.generated'
 import { companionFloorBoxes, companionWallBoxesThroughStairwell } from './companionGeometry'
 import { floorPatches } from './floorGeometry'
+import { explodedConnectionSegments } from './explodedConnection'
 
 // ---- look: one light, one palette rule -------------------------------------
 /** Kenney's palette is authored for a bright render; a mild saturation lift
@@ -299,6 +300,25 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
   if (companion) {
     const ghostOpacity = companion.mode === 'ghost' ? 0.16 : 0.32
     const other = companion.scene
+    if (companion.mode === 'exploded') {
+      const lower = companion.offsetY > 0 ? scene : other
+      for (const stair of lower.objects.filter(object => object.kind === 'stairs')) {
+        const segments = explodedConnectionSegments(stair,
+          companion.offsetY < 0 ? companion.offsetY : 0,
+          companion.offsetY > 0 ? companion.offsetY : 0)
+        for (const [index, points] of [segments.slice(0, 2), segments.slice(2)].entries()) {
+          const geometry = new THREE.BufferGeometry().setFromPoints(points.flat().map(point => new THREE.Vector3(...point)))
+          const appearance = { color: '#99612c', transparent: true, opacity: 0.75, depthTest: false, depthWrite: false }
+          const material = index === 0
+            ? new THREE.LineDashedMaterial({ ...appearance, dashSize: 0.07, gapSize: 0.04 })
+            : new THREE.LineBasicMaterial(appearance)
+          const guide = new THREE.LineSegments(geometry, material)
+          guide.computeLineDistances()
+          guide.renderOrder = 6
+          world.add(guide)
+        }
+      }
+    }
     for (const piece of companionWallBoxesThroughStairwell(scene, other, companion)) {
       const patch = boxMesh(piece, WALL_FACE, WALL_CAP)
       patch.position.y += companion.offsetY
