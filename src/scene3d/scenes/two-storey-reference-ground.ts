@@ -2,11 +2,13 @@ import type { SceneSpec } from '../schema'
 import { MODEL_BOUNDS } from '../catalog.generated'
 import { CELL } from '../units'
 
-// The north flight arrives at the upper study's clear entrance gallery.
-// Its head meets the column-5 slab edge; the hall stays clear below.
+// The ground storey is a full 8 × 8 built footprint. The upper composition
+// carries the fractional stair opening; this scene keeps the existing house,
+// furniture groups and staircase unchanged.
 export const twoStoreyReferenceGround: SceneSpec = {
   puzzleId: 'hard-1',
   floor: 0,
+  storeyFootprint: { kind: 'full' },
   entry: { wall: 'west', at: 0.5 },
   shell: {
     features: [

@@ -64,6 +64,19 @@ describe('production preflight', () => {
     expect(failures, failures.join('\n')).toEqual([])
   })
 
+  it('requires explicit architectural footprints and arrival circulation for authored multi-storey production', () => {
+    const failures: string[] = []
+    for (const spec of Object.values(AUTHORED_SCENES)) {
+      const puzzle = getPuzzleById(spec.puzzleId)
+      if (!puzzle || (puzzle.floors ?? 1) < 2) continue
+      // Production is stricter than legacy scene loading: an implicit square
+      // must never become the architectural decision for a new upper storey.
+      if (!('storeyFootprint' in spec) || !spec.storeyFootprint) failures.push(`${spec.puzzleId}#${spec.floor}: explicit footprint missing`)
+      if ((spec.floor ?? 0) > 0 && (!('circulation' in spec) || !spec.circulation)) failures.push(`${spec.puzzleId}#${spec.floor}: architectural arrival/circulation missing`)
+    }
+    expect(failures, failures.join('\n')).toEqual([])
+  })
+
   it('finds every catalogued Kenney model in the public asset bundle', () => {
     const missing = Object.keys(MODEL_BOUNDS)
       .filter(model => !existsSync(join(process.cwd(), 'public', 'kenney3d', `${model}.glb`)))
