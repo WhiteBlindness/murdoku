@@ -154,10 +154,20 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
     const points: Array<[number, number]> = wall.axis === 'x'
       ? [[along, lineAt - offset], [along, lineAt + offset]]
       : [[lineAt - offset, along], [lineAt + offset, along]]
-    // A wall may bound the stair volume without a slab immediately beside it.
-    return points.some(([x, z]) => worldRectCoveredByFloor({ ...scene, stairwellBounds: undefined }, {
+    const sampleHasFloor = (candidate: ResolvedScene) => points.some(([x, z]) => worldRectCoveredByFloor(candidate, {
       minX: x - 0.001, maxX: x + 0.001, minZ: z - 0.001, maxZ: z + 0.001,
     }))
+    if (sampleHasFloor(scene)) return true
+    if (!scene.stairwellBounds) return false
+
+    // A wall on a stairwell face may bound the stair volume without adjacent slab.
+    const well = planRectToWorld(scene.stairwellBounds)
+    const followsWellFace = wall.axis === 'x'
+      ? (Math.abs(lineAt - well.minZ) <= EPS || Math.abs(lineAt - well.maxZ) <= EPS)
+        && along >= well.minX - EPS && along <= well.maxX + EPS
+      : (Math.abs(lineAt - well.minX) <= EPS || Math.abs(lineAt - well.maxX) <= EPS)
+        && along >= well.minZ - EPS && along <= well.maxZ + EPS
+    return followsWellFace && sampleHasFloor({ ...scene, stairwellBounds: undefined })
   }
   for (const wall of scene.walls) {
     if (wall.kind === 'foundation') continue
@@ -258,7 +268,7 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
       let crossedWall: string | undefined
       for (const { wall, box } of wallPieces) {
         const wallRect: WorldRect = { minX: box.min[0], maxX: box.max[0], minZ: box.min[2], maxZ: box.max[2] }
-        if (!rectOverlap(clear, wallRect)) continue
+        if (!rectOverlap(clear, wallRect, 1e-8)) continue
         if (wall.axis === 'z') {
           if (wallRect.minX <= clear.minX + EPS) clear.minX = Math.max(clear.minX, wallRect.maxX)
           else if (wallRect.maxX >= clear.maxX - EPS) clear.maxX = Math.min(clear.maxX, wallRect.minX)
@@ -281,7 +291,7 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
     if (usable.length === authored.length) {
       const connected = connectedCirculationRects(usable.map(({ bounds }) => [
         bounds.minX / CELL, bounds.minZ / CELL, bounds.maxX / CELL, bounds.maxZ / CELL,
-      ]))
+      ]), 0.6 / CELL)
       authored.forEach((item, index) => {
         if (!connected.has(index)) err('circulation-disconnected', item.id, `${item.id} is not connected to the stair landing`)
       })

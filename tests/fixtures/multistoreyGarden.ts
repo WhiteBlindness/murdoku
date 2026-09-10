@@ -37,7 +37,7 @@ export const multistoreyGardenUpper: SceneSpec = {
   circulation: {
     landing: [STAIR_HEAD_X, 0, 4, 1.15],
     halls: [{ id: 'east-gallery', bounds: [3, 1.15, 4, 4] }],
-    roomAccessTargets: [{ id: 'west-room-door', bounds: [2.5, 3.5, 3, 4] }],
+    roomAccessTargets: [{ id: 'west-room-door', bounds: [2.5, 3.25, 3, 4] }],
   },
   walls: [{ id: 'upper-garden-facade', from: [4, 0], to: [4, 6], height: 'full' }],
   furniture: [],

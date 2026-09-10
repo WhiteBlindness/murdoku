@@ -113,6 +113,25 @@ describe('floor support validation', () => {
     expect(hardCodes(unsupportedWall)).toContain('wall-unsupported')
   })
 
+  it('rejects a wall through the void while accepting walls on the void and shell boundaries', () => {
+    const spec: SceneSpec = {
+      puzzleId: 'void-wall-support',
+      floor: 1,
+      storeyFootprint: { kind: 'full' },
+      stairwellBounds: [1, 0, 3, 1],
+      walls: [
+        { id: 'well-edge', from: [1, 0], to: [1, 1], height: 'half', freeEnds: ['to'] },
+        { id: 'through-void', from: [2, 0], to: [2, 1], height: 'half', freeEnds: ['to'] },
+      ],
+      furniture: [],
+    }
+    const issues = validateScene(resolveScene(spec, 6))
+    const unsupported = issues.filter(issue => issue.code === 'wall-unsupported').map(issue => issue.subject)
+    expect(unsupported).toContain('through-void')
+    expect(unsupported).not.toContain('well-edge')
+    expect(unsupported).not.toContain('shell-north')
+  })
+
   it('rejects solved positions on missing floor or in the fractional void', () => {
     const puzzle = {
       size: 6,
@@ -204,5 +223,38 @@ describe('V2 stair and circulation validation', () => {
     const closed: SceneSpec = { ...throughGap, walls: [...multistoreyGardenUpper.walls, { ...wall, openings: [] }] }
     expect(hardCodes(throughGap)).not.toContain('circulation-blocked')
     expect(hardCodes(closed)).toContain('circulation-blocked')
+  })
+
+  it('rejects a pinched connection between otherwise wide circulation rectangles', () => {
+    const spec: SceneSpec = {
+      puzzleId: 'pinched-circulation',
+      floor: 1,
+      storeyFootprint: { kind: 'full' },
+      walls: [],
+      furniture: [],
+      circulation: {
+        landing: [1, 1, 3, 2],
+        halls: [{ id: 'wide-hall', bounds: [2.99, 2, 3.99, 4] }],
+        roomAccessTargets: [],
+      },
+    }
+    expect(hardCodes(spec)).toContain('circulation-disconnected')
+  })
+
+  it('accepts a shallow room approach with 0.600 world units along the doorway seam', () => {
+    const spec: SceneSpec = {
+      puzzleId: 'door-approach',
+      floor: 1,
+      storeyFootprint: { kind: 'full' },
+      walls: [],
+      furniture: [],
+      circulation: {
+        landing: [1, 1, 3, 2],
+        halls: [{ id: 'hall', bounds: [1, 2, 3, 3] }],
+        roomAccessTargets: [{ id: 'door', bounds: [1.2, 2.9, 1.95, 3.01] }],
+      },
+    }
+    expect(hardCodes(spec)).not.toContain('circulation-disconnected')
+    expect(hardCodes(spec)).not.toContain('circulation-too-narrow')
   })
 })
