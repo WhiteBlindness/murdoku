@@ -124,13 +124,13 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
       w.kind !== 'foundation' && w.axis === axis && Math.abs((axis === 'x' ? w.from[1] : w.from[0]) - at) < 1e-6
       && (axis === 'x' ? w.from[0] : w.from[1]) <= from + 1e-6 && (axis === 'x' ? w.to[0] : w.to[1]) >= to - 1e-6)
     for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
-      const k = scene.zoneKind[r][c]
-      if (scene.floorPresent[r][c] && c + 1 < n && scene.floorPresent[r][c + 1]
-        && (scene.zoneKind[r][c + 1] === 'interior') !== (k === 'interior')) {
+      const interior = scene.floorPresent[r][c] && scene.zoneKind[r][c] === 'interior'
+      if (c + 1 < n
+        && (scene.floorPresent[r][c + 1] && scene.zoneKind[r][c + 1] === 'interior') !== interior) {
         if (!wallOnEdge('z', (c + 1) * CELL, r * CELL, (r + 1) * CELL)) err('zone-boundary-unwalled', `${r},${c}`, `interior meets outside between (${r},${c}) and (${r},${c + 1}) with no facade wall`)
       }
-      if (scene.floorPresent[r][c] && r + 1 < n && scene.floorPresent[r + 1][c]
-        && (scene.zoneKind[r + 1][c] === 'interior') !== (k === 'interior')) {
+      if (r + 1 < n
+        && (scene.floorPresent[r + 1][c] && scene.zoneKind[r + 1][c] === 'interior') !== interior) {
         if (!wallOnEdge('x', (r + 1) * CELL, c * CELL, (c + 1) * CELL)) err('zone-boundary-unwalled', `${r},${c}`, `interior meets outside between (${r},${c}) and (${r + 1},${c}) with no facade wall`)
       }
     }

@@ -22,6 +22,22 @@ const hardCodes = (spec: SceneSpec, puzzle?: Puzzle) => validateScene(resolveSce
   .map(issue => issue.code)
 
 describe('explicit storey floor geometry', () => {
+  it.each([
+    { rect: [0, 0, 3, 5], from: [4, 0], to: [4, 6] },
+    { rect: [2, 0, 5, 5], from: [2, 0], to: [2, 6] },
+    { rect: [0, 0, 5, 3], from: [0, 4], to: [6, 4] },
+    { rect: [0, 2, 5, 5], from: [0, 2], to: [6, 2] },
+  ] as const)('requires an authored facade at the setback $rect', ({ rect, from, to }) => {
+    const spec: SceneSpec = {
+      puzzleId: 'setback-facade', floor: 1,
+      storeyFootprint: { kind: 'cell-rects', rects: [[...rect]] },
+      walls: [], furniture: [],
+    }
+    expect(hardCodes(spec)).toContain('zone-boundary-unwalled')
+    expect(hardCodes({ ...spec, walls: [{ id: 'facade', from: [...from], to: [...to], height: 'half' }] }))
+      .not.toContain('zone-boundary-unwalled')
+  })
+
   it('keeps the omitted single-storey footprint byte-for-byte equivalent to a full slab', () => {
     const scene = resolveScene({ puzzleId: 'legacy', walls: [], furniture: [] }, 6)
     expect(scene.floorPresent).toEqual(Array.from({ length: 6 }, () => Array(6).fill(true)))
