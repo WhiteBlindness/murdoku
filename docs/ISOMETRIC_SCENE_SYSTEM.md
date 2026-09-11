@@ -2,7 +2,19 @@
 
 This is the authoring contract for every dollhouse scene in Alibi/Murdoku. It exists so that a scene can be built by a capable agent **without improvising any foundational rule**. If a rule here is not enough to decide something, the answer is "ask", not "tune a number until it looks close".
 
-Companion documents: `ADR-0001-3d-scene-renderer.md` (why 3D), `ROOT_CAUSE_REPORT.md` (what went wrong before), `SCENE_MIGRATION_PLAN.md` (how to roll this out), `TWO_STOREY_FEASIBILITY.md` (implemented multi-storey decision), `KENNEY_PACK_SURVEY.md` (asset evidence), and `OPUS_PRODUCTION_MANUAL.md` (mandatory production gate).
+Companion documents: `ADR-0001-3d-scene-renderer.md` (why 3D), `ROOT_CAUSE_REPORT.md` (what went wrong before), `SCENE_MIGRATION_PLAN.md` (how to roll this out), `MULTI_STOREY_ARCHITECTURE.md` (current multi-storey contract), `TWO_STOREY_FEASIBILITY.md` (historical decision), `KENNEY_PACK_SURVEY.md` (asset evidence), and `OPUS_PRODUCTION_MANUAL.md` (mandatory production gate).
+
+> Contrato V2 de vários pisos: `makeFrame` usa 32° em cenas de um piso e
+> `makeStoreyFrame` usa 42° em vistas de vários pisos. O mesmo `SceneFrame`
+> alimenta projeção, câmara e validação. As cenas atuais declaram
+> `storeyFootprint`, `stairwellBounds` contínuo com máximos exclusivos e
+> `circulation`. Consulte o contrato em
+> [`MULTI_STOREY_ARCHITECTURE.md`](MULTI_STOREY_ARCHITECTURE.md) e as APIs em
+> [`schema.ts`](../src/scene3d/schema.ts), [`resolve.ts`](../src/scene3d/resolve.ts),
+> [`units.ts`](../src/scene3d/units.ts), [`circulationGeometry.ts`](../src/scene3d/circulationGeometry.ts),
+> [`storeyConnection.ts`](../src/scene3d/storeyConnection.ts),
+> [`validate.ts`](../src/scene3d/validate.ts), [`renderer.ts`](../src/scene3d/renderer.ts)
+> e [`explodedConnection.ts`](../src/scene3d/explodedConnection.ts).
 
 Golden master: **Midnight Delivery** (`src/scene3d/scenes/midnight-delivery.ts`). When in doubt, do what it does. Reference renders: `docs/scenes/midnight-delivery-*.png`.
 

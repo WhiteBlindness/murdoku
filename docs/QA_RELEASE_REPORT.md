@@ -1,5 +1,15 @@
 # Relatório de controlo de qualidade
 
+Atualização de 11/09/2026: a arquitetura de vários pisos V2 está documentada em
+[`MULTI_STOREY_V2_REPORT.md`](MULTI_STOREY_V2_REPORT.md). O controlo final passou
+com 423 testes aprovados e 5 ignorados, 6 testes de produção, catálogo de 60
+casos atualizado, TypeScript, lint e compilação aprovados. As capturas de
+computador e telemóvel estão em
+[`reference/multistorey-v2`](reference/multistorey-v2/README.md).
+O contrato obrigatório para novas cenas é
+[`MULTI_STOREY_ARCHITECTURE.md`](MULTI_STOREY_ARCHITECTURE.md).
+Os resultados históricos abaixo conservam as datas e o âmbito das revisões anteriores.
+
 Atualização de 08/09/2026: a revisão Astra posterior está descrita em
 [`ASTRA_POLISH_REPORT.md`](ASTRA_POLISH_REPORT.md), com 376 testes aprovados,
 nova composição de dois pisos, interação mais legível e imagens `astra-`.

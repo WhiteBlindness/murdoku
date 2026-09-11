@@ -1,5 +1,12 @@
 # Referências visuais de produção
 
+## Arquitetura de vários pisos V2: 11/09/2026
+
+O conjunto atual está em [multistorey-v2/README.md](multistorey-v2/README.md).
+Inclui a chegada protegida, circulação superior, contexto entre pisos,
+regra de jardim, interação e regressões de um piso. As secções seguintes
+conservam as provas históricas das revisões anteriores.
+
 ## Revisão Astra — 08/09/2026
 
 As imagens `astra-` correspondem à composição e interação posteriores à ronda

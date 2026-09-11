@@ -1,6 +1,11 @@
-# Dois pisos e escadas — decisão implementada
+> Registo histórico de 07/09/2026. Para as regras e a planta atuais, este
+> registo foi substituído pelo contrato canónico de
+> [`MULTI_STOREY_ARCHITECTURE.md`](MULTI_STOREY_ARCHITECTURE.md). Este ficheiro
+> conserva a decisão histórica e não declara uma entrega pronta.
 
-Estado confirmado em 07/09/2026: a solução descrita neste documento está implementada no caso de referência `hard-1`. Uma relação lógica entre linhas ou colunas pode associar posições correspondentes entre pisos através das pistas `above`, `below` e `floor` e do bloqueio cruzado em `useGame`. A apresentação torna essa associação simultaneamente visível e não interfere com a interação.
+# Dois pisos e escadas: decisão implementada
+
+Estado histórico registado em 07/09/2026: a solução descrita neste documento estava implementada no caso de referência `hard-1`. Uma relação lógica entre linhas ou colunas pode associar posições correspondentes entre pisos através das pistas `above`, `below` e `floor` e do bloqueio cruzado em `useGame`. A apresentação torna essa associação simultaneamente visível e não interfere com a interação.
 
 ## 1. Recursos
 
