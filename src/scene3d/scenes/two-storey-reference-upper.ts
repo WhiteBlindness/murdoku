@@ -10,9 +10,9 @@ export const twoStoreyReferenceUpper: SceneSpec = {
   circulation: {
     // The stair arrives at x = 5; the landing continues east before the
     // corridor turns south along the open side of the study.
-    landing: [5, 0.05, 7.95, 1.6],
+    landing: [5, 0.05, 7.95, 1.1],
     halls: [
-      { id: 'east-corridor', bounds: [6.85, 1.6, 7.95, 4.65] },
+      { id: 'east-corridor', bounds: [6.85, 1.1, 7.95, 4.65] },
       { id: 'transverse-hall', bounds: [0.05, 3.7, 7.95, 4.65] },
     ],
     // These are door approaches, rather than the full room rectangles. They
@@ -38,7 +38,8 @@ export const twoStoreyReferenceUpper: SceneSpec = {
     { id: 'bedroom-south', height: 'half', from: [0, 3.65], to: [5.05, 3.65], openings: [{ at: 2.7, width: 1, kind: 'open' }] },
     { id: 'bathroom-north', height: 'half', from: [0, 4.7], to: [3.9, 4.7], openings: [{ at: 3.1, width: 1, kind: 'open' }] },
     // The study occupies the east wing and has its own entrance from the hall.
-    { id: 'study-west', from: [5.05, 1.65], to: [5.05, 3.65], height: 'half', treatment: 'railing' },
+    // The free end is the guard post beside the stair exit, not an unfinished partition.
+    { id: 'study-west', from: [5.05, 1.15], to: [5.05, 3.65], height: 'half', treatment: 'railing', freeEnds: ['from'] },
     { id: 'study-north', from: [5.05, 1.65], to: [6.8, 1.65], height: 'half', treatment: 'railing' },
     { id: 'study-east', from: [6.8, 1.65], to: [6.8, 3.65] },
     { id: 'study-south', height: 'half', from: [5.05, 3.65], to: [6.8, 3.65], openings: [{ at: 5.65, width: 1, kind: 'open' }] },

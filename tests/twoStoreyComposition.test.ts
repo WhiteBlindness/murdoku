@@ -27,6 +27,15 @@ const planRectsConnect = (a: [number, number, number, number], b: [number, numbe
 }
 
 describe('two-storey reference composition', () => {
+  it('protects the well edge beside the arrival without narrowing the flight exit', () => {
+    const stair = lower.objects.find(object => object.kind === 'stairs')!
+    const guard = higher.walls.find(wall => wall.id === 'study-west')!
+    expect(guard.from[1]).toBeGreaterThan(stair.footprint.maxZ)
+    expect(guard.from[1] - stair.footprint.maxZ).toBeLessThan(0.05)
+    expect(guard.to[1]).toBeGreaterThan(higher.stairwellBounds![3] * CELL)
+    expect(validateStoreyPair(lower, higher).filter(issue => issue.severity === 'error')).toEqual([])
+  })
+
   it('keeps placement positions visible in both actual storey views', () => {
     for (const floor of [0, 1] as const) for (const view of ['ghost', 'exploded'] as const) {
       const scene = { ...(floor === 0 ? lower : higher), frame: makeStoreyFrame(8, floor, view) }
