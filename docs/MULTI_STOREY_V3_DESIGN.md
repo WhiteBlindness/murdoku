@@ -1,6 +1,7 @@
 # Projeto residencial do piso superior V3
 
-Data: 11/09/2026. Estado: proposta em revisão, sem aprovação visual.
+Início: 11/09/2026. Revisão da composição: 12/09/2026.
+Estado: composição validada tecnicamente; revisão visual final em curso.
 Base: `bb2e8413129e52412d2ad77558025849e2fc1a9c`.
 Ramo autorizado: `astra/multistorey-residential-design-v3`.
 
@@ -90,3 +91,87 @@ como esperado: cama, banheira e sanita têm vistas diretas da chegada. O ensaio
 usa vários pontos no patamar, duas alturas e nove alvos por equipamento. Mede
 paredes visíveis, incluindo os intervalos das guardas, e não presume portas
 fechadas. Este ensaio complementa a inspeção das imagens; não a substitui.
+
+## Planta implementada após medição e inspeção do protótipo
+
+O patamar mede 0,85 × 1,05 células. A circulação desce entre a guarda do vão
+e a parede do escritório; no átrio transversal, distribui-se por quatro portas.
+Um corredor lateral separado da sala de leitura serve a entrada do banho.
+O vão conserva exatamente as dimensões V2; a redução da chegada e o desenho
+das paredes retiram-lhe a função indevida de organizar mobiliário disperso.
+
+```text
+Escada
+  Patamar compacto
+    Corredor junto ao escritório
+      Átrio transversal
+        Porta do quarto
+        Porta do escritório
+        Porta da sala de leitura
+        Corredor lateral e porta do banho
+```
+
+| Espaço | Limites x/z | Entrada | Função do espaço livre |
+| --- | --- | --- | --- |
+| Quarto | `[0,0,2.4,3.4]` | Sul, x=1,65 | Acesso lateral à cama e passagem nos pés |
+| Escritório | `[5.9,0,8,3.7]` | Sul, x=6,9 | Entrada, uso da cadeira e acesso à arrumação |
+| Banho | `[0,5.4,3.4,8]` | Este, z=6,8 | Lavatório na faixa seca, acesso à banheira e sanita |
+| Leitura | `[4.35,4.7,8,8]` | Norte, x=5,2 | Aproximação aos assentos, estante e consola |
+
+A casa de banho passa de 12,87 para 8,84 células², uma redução de 31,3 %.
+A banheira fica junto à janela oeste; o lavatório apoia-se na parede norte e
+a sanita na parede sul. O mosaico ocupa a zona húmida; a faixa seca do
+lavatório conserva madeira. A porta este fica fora das linhas de visão da
+chegada. As duas hipóteses de porta norte foram rejeitadas após medição.
+
+O quarto tem uma parede completa entre a cama e a escada. A parede sul usa
+o recorte isométrico com uma porta real. A cabeceira encosta a oeste e a mesa
+de cabeceira fica a norte; a passagem nos pés tem cerca de 0,71 unidades físicas.
+O escritório passa a ocupar o canto nordeste, com janela própria. Secretária
+e cadeira partilham o eixo z=2,05; a estante baixa fica no perímetro norte.
+
+A sala de leitura foi delimitada depois de a imagem do primeiro protótipo
+mostrar que um assento isolado ainda deixava uma área indefinida. Um sofá e
+uma poltrona enfrentam-se através da mesa baixa. O tapete pertence a esse
+conjunto. A planta fica atrás e ao lado da poltrona, sem ocupar a aproximação.
+Estante e consola conservam as associações lógicas existentes.
+
+As áreas abertas são distribuição e aproximação: mudança de direção depois
+do lanço, átrio diante do quarto e escritório, corredor do banho e acesso aos
+assentos. A laje integral mantém-se; não foram retiradas células nem adicionados
+modelos ao catálogo. O rés-do-chão e a lógica do caso permanecem intactos.
+
+## Limite observado nas portas completas
+
+A projeção dos lintéis no teste de circulação pode tratar uma porta livre
+como obstáculo. Não foi alterado qualquer validador. O troço da entrada do
+banho usa o recorte baixo existente e mantém o aro da porta; os painéis norte
+e nordeste continuam completos e garantem a privacidade medida. No quarto,
+o recorte sul também conserva a porta e a parede este opaca.
+
+Este registo não autoriza uma correção do sistema. Uma futura necessidade de
+representar todas estas entradas com lintel estrutural completo exige uma
+«SYSTEM ESCALATION» própria, com prova e autorização.
+
+Os 21 testes focados e os seis controlos de produção passaram na composição
+final, incluindo zero posições ocultas nas vistas reais dos dois pisos. Os
+testes novos amostram privacidade em 18 posições/alturas da chegada, com nove
+alvos na cama e dez em cada equipamento sanitário. Não constituem prova
+contínua de todas as linhas de visão possíveis nem aprovação visual automática.
+
+## Verificação final de código, 12/09/2026
+
+A bateria completa passou: 38 ficheiros, 426 testes aprovados e cinco ignorados.
+A cobertura configurada no projeto passou os quatro limiares de 80 %:
+91,02 % de instruções, 84,09 % de ramos, 91,17 % de funções e 95,63 % de linhas.
+Estas métricas abrangem os quatro ficheiros configurados no Vitest, não todo
+o motor da cena. Também passaram a compilação, a análise estática, os seis
+controlos de produção e a verificação das medições dos 60 casos. A auditoria
+das dependências de produção não encontrou vulnerabilidades.
+
+O teste geral de cenas passou a usar a câmara real dos pisos nas duas vistas,
+«ghost» e «exploded». Antes, aplicava a câmara dos casos de um piso a todos
+os casos. Mantém as exigências de zero erros e zero posições ocultas, agora
+nas duas composições efetivamente usadas pela aplicação. Não houve alterações
+ao renderizador, aos validadores ou às regras do jogo. Uma revisão independente
+Astra confirmou esta correção do teste e não encontrou problemas acionáveis.

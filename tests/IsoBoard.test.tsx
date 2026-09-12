@@ -227,11 +227,22 @@ describe('every authored scene passes the validator against its real puzzle', ()
     it(key, () => {
       const puzzle = getPuzzleById(spec.puzzleId)
       expect(puzzle, `puzzle ${spec.puzzleId}`).toBeDefined()
-      const scene = resolveScene(spec, puzzle!.size)
-      const report = validateScene(scene, puzzle!)
-      const errors = report.filter(v => v.severity === 'error').map(v => v.message)
-      expect(errors, errors.join(' | ')).toEqual([])
-      expect(report.filter(v => v.code === 'cell-hidden').map(v => v.message)).toEqual([])
+      const resolved = resolveScene(spec, puzzle!.size)
+      const floor = (spec.floor ?? 0) as 0 | 1
+      const views = (puzzle!.floors ?? 1) > 1
+        ? (['ghost', 'exploded'] as const).map(view => ({
+            view,
+            scene: { ...resolved, frame: makeStoreyFrame(puzzle!.size, floor, view) },
+          }))
+        : [{ view: 'single-floor' as const, scene: resolved }]
+      for (const { view, scene } of views) {
+        const report = validateScene(scene, puzzle!)
+        const errors = report.filter(v => v.severity === 'error').map(v => v.message)
+        const context = `${key} floor ${floor} view ${view}`
+        expect(errors, `${context}: ${errors.join(' | ')}`).toEqual([])
+        const hidden = report.filter(v => v.code === 'cell-hidden').map(v => v.message)
+        expect(hidden, `${context}: ${hidden.join(' | ')}`).toEqual([])
+      }
     })
   }
 })
