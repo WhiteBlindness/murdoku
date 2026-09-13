@@ -1,7 +1,7 @@
 # Projeto residencial do piso superior V3
 
 Início: 11/09/2026. Revisão da composição: 12/09/2026.
-Estado: composição validada tecnicamente; revisão visual final em curso.
+Estado: aceite após revisão visual e verificação interativa, em 13/09/2026.
 Base: `bb2e8413129e52412d2ad77558025849e2fc1a9c`.
 Ramo autorizado: `astra/multistorey-residential-design-v3`.
 
@@ -175,3 +175,30 @@ os casos. Mantém as exigências de zero erros e zero posições ocultas, agora
 nas duas composições efetivamente usadas pela aplicação. Não houve alterações
 ao renderizador, aos validadores ou às regras do jogo. Uma revisão independente
 Astra confirmou esta correção do teste e não encontrou problemas acionáveis.
+
+## Aceitação visual final
+
+As [treze vistas obrigatórias](reference/multistorey-v3/README.md) foram
+inspecionadas individualmente. A aceitação resulta dessa revisão e dos
+percursos e composições observados, além da validação técnica.
+
+| Critério | Resultado e fundamento |
+| --- | --- |
+| A escada chega à circulação | Sim: patamar livre e corredor dedicado |
+| O percurso identifica-se sem explicação | Sim: continuidade do pavimento entre paredes e portas |
+| Várias divisões partem do percurso | Sim: quarto, escritório, leitura e corredor do banho |
+| O quarto é privado | Sim: parede este completa e porta sul |
+| A cama fica protegida da chegada | Sim: a parede este interrompe a vista |
+| A casa de banho tem dimensão adequada | Sim: 8,84 células², menos 31,3 % |
+| A composição sanitária é plausível | Sim: banheira, lavatório e sanita com aproximação livre |
+| O escritório tem uma definição deliberada | Sim: divisão com porta, janela e posto de trabalho alinhado |
+| Cada conjunto de mobiliário tem uma função | Sim: dormir, trabalhar, higiene, leitura e arrumação |
+| A poltrona é utilizável | Sim: frente livre, voltada para a mesa e o sofá |
+| As plantas deixam o mobiliário e a circulação livres | Sim: planta atrás e ao lado da poltrona |
+| As áreas restantes têm um propósito | Sim: circulação e aproximação ao mobiliário |
+| O piso é habitável na leitura residencial da cena | Sim: funções separadas, acessos próprios e privacidade |
+| O desenho tem a intenção do rés-do-chão | Sim: divisões e conjuntos completos, sem mobiliário disperso no patamar |
+
+O caso foi concluído no computador e repetido em dimensões móveis. As três
+cenas de referência também foram inspecionadas. O registo de imagens distingue
+as capturas de arquitetura, a verificação do jogo e as cenas de referência.
