@@ -29,7 +29,7 @@ export type ShellWall = 'north' | 'west' | 'south' | 'east'
 export interface OpeningSpec {
   /** Absolute coordinate of the opening's centre along the wall's axis, in cell units. */
   at: number
-  /** Clear width in cell units. Defaults to the door frame model's width. */
+  /** Structural rough-opening width in cell units. Doors default to the measured frame plus installation allowance. */
   width?: number
   /**
    * door  — a Kenney open-door frame stands in the gap (reads as a doorway

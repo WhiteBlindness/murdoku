@@ -275,27 +275,37 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
     for (const op of w.openings) diagGroup.add(helperFor(op.box, '#ff9f1c'))
   }
   // objects
-  const placeObject = (o: ResolvedObject) => loadModel(o.model).then(g => {
-    if (o.part) {
-      // keep only the named child (the window pane inside wallWindow) and
-      // re-pivot on it: footprint centre at the origin, feet at y = 0
-      const root = g.children[0]
-      const keep = root.getObjectByName(o.part)
-      if (keep) {
-        root.traverse(n => { if ((n as THREE.Mesh).isMesh && !isDescendantOf(n, keep)) n.visible = false })
-        const bb = new THREE.Box3().setFromObject(keep)
-        const sz = bb.getSize(new THREE.Vector3())
-        root.position.set(root.position.x - (bb.min.x + sz.x / 2), root.position.y - bb.min.y, root.position.z - (bb.min.z + sz.z / 2))
+  const placeObject = (o: ResolvedObject): Promise<void> => {
+    if (o.architecturalMembers?.length) {
+      for (const member of o.architecturalMembers) {
+        world.add(boxMesh(member.box, FRAME_WOOD, FRAME_WOOD))
+        diagGroup.add(helperFor(member.box, '#e59964'))
       }
+      requestRender()
+      return Promise.resolve()
     }
-    g.position.set(o.position[0], o.position[1], o.position[2])
-    g.rotation.y = (o.rotY * Math.PI) / 180
-    g.userData = { id: o.id, model: o.model, logic: o.logic }
-    world.add(g)
-    const colour = o.kind === 'furniture' ? (o.parentId ? '#ff4fd8' : '#3ddc84') : '#9aa0a6'
-    diagGroup.add(helperFor(o.box, colour))
-    requestRender()
-  })
+    return loadModel(o.model).then(g => {
+      if (o.part) {
+        // keep only the named child (the window pane inside wallWindow) and
+        // re-pivot on it: footprint centre at the origin, feet at y = 0
+        const root = g.children[0]
+        const keep = root.getObjectByName(o.part)
+        if (keep) {
+          root.traverse(n => { if ((n as THREE.Mesh).isMesh && !isDescendantOf(n, keep)) n.visible = false })
+          const bb = new THREE.Box3().setFromObject(keep)
+          const sz = bb.getSize(new THREE.Vector3())
+          root.position.set(root.position.x - (bb.min.x + sz.x / 2), root.position.y - bb.min.y, root.position.z - (bb.min.z + sz.z / 2))
+        }
+      }
+      g.position.set(o.position[0], o.position[1], o.position[2])
+      g.rotation.y = (o.rotY * Math.PI) / 180
+      g.userData = { id: o.id, model: o.model, logic: o.logic }
+      world.add(g)
+      const colour = o.kind === 'furniture' ? (o.parentId ? '#ff4fd8' : '#3ddc84') : '#9aa0a6'
+      diagGroup.add(helperFor(o.box, colour))
+      requestRender()
+    })
+  }
   for (const o of scene.objects) jobs.push(placeObject(o))
   if (companion) {
     const ghostOpacity = companion.mode === 'ghost' ? 0.16 : 0.32

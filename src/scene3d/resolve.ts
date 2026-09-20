@@ -32,6 +32,7 @@ import {
 } from './units'
 import { MODEL_BOUNDS, type KenneyModel } from './catalog.generated'
 import { metaOf, type ModelMeta } from './catalog'
+import { resolveDoorGeometry, type DoorMember } from './doorGeometry'
 import type { CirculationSpec, Facing, FloorMaterial, FurnitureSpec, PlanRect, SceneSpec, OpeningSpec, ShellWall, ZoneKind } from './schema'
 import { resolveFootprint, resolveStairwell } from './floorGeometry'
 import { railingPieces } from './railingGeometry'
@@ -67,7 +68,7 @@ export interface ResolvedWall {
   /** Optional visible members; pieces still define the collision barrier. */
   visualPieces?: Box3[]
   openings: ResolvedOpening[]
-  /** Procedural window frame members (wood), drawn proud of both wall faces. */
+  /** Procedural window and entry finish members (wood), drawn proud of wall faces. */
   frames: Box3[]
   declaredFreeEnds: Array<'from' | 'to'>
 }
@@ -92,6 +93,8 @@ export interface ResolvedObject {
   againstWall?: string
   /** Render only this named child of the model (a window pane out of wallWindow). */
   part?: string
+  /** Procedural architectural members rendered in place of the model, when set. */
+  architecturalMembers?: DoorMember[]
   meta: ModelMeta
   /** Kenney size [w, h, d] before rotation (of the rendered part). */
   size: Vec3
@@ -135,7 +138,7 @@ export const WINDOW_MODEL: KenneyModel = 'wallWindow'
 export const WINDOW_PART = 'window'
 export const ENTRY_DOOR_MODEL: KenneyModel = 'doorway'
 
-/** Clear gap for a partition door opening: the frame model plus a hair of clearance. */
+/** Default structural opening: measured frame width plus 0.02 installation allowance. */
 export const DOOR_GAP = MODEL_BOUNDS.doorwayOpen.size[0] + 0.02
 
 export function parseLogic(logic: string): { type: string; row: number; col: number } | null {
@@ -302,7 +305,17 @@ export function resolveScene(spec: SceneSpec, n: number): ResolvedScene {
         thickness: line.thickness,
         pieces: structuralPieces(line, cuts, true),
         openings: cuts.map(c => openingOf(line, c)),
-        frames: cuts.filter(c => c.kind === 'window').flatMap(c => frameMembers(line, c)),
+        frames: cuts.filter(c => c.kind === 'window').flatMap(c => frameMembers(line, c)).concat(
+          cuts.filter(c => c.kind === 'entry')
+            .flatMap(c => resolveDoorGeometry({
+              axis: line.axis,
+              centre: c.at,
+              wallAt: line.at,
+              roughWidth: c.width,
+              wallThickness: line.thickness,
+              structuralHead: c.head,
+            }).members.filter(member => member.role === 'casing').map(member => member.box)),
+        ),
         declaredFreeEnds: [],
       })
       // inserts stand on the wall line
@@ -363,8 +376,7 @@ export function resolveScene(spec: SceneSpec, n: number): ResolvedScene {
     })
     for (const cut of cuts) {
       if (cut.kind !== 'door') continue
-      const pos: Vec3 = axis === 'x' ? [cut.at, 0, at] : [at, 0, cut.at]
-      objects.push(makeInsert(`${w.id}-door-${cut.at.toFixed(2)}`, DOOR_MODEL, 'door', pos, axis === 'x' ? 0 : 90))
+      objects.push(makeDoorInsert(`${w.id}-door-${cut.at.toFixed(2)}`, axis, cut.at, at, cut.width, cut.head))
     }
   }
 
@@ -563,6 +575,37 @@ function makeInsert(id: string, model: KenneyModel, kind: ObjectKind, position: 
   const [fw, fd] = facing === 'E' ? [size[2], size[0]] : [size[0], size[2]]
   const box = boxAround(position[0], position[1], position[2], fw, size[1], fd)
   return { id, model, kind, position, rotY, facing, box, footprint: rectOf(box), meta: metaOf(model), size, part }
+}
+
+function makeDoorInsert(id: string, axis: 'x' | 'z', centre: number, wallAt: number, roughWidth: number, structuralHead: number): ResolvedObject {
+  const position: Vec3 = axis === 'x' ? [centre, 0, wallAt] : [wallAt, 0, centre]
+  const rotY = axis === 'x' ? 0 : 90
+  const facing: Facing = axis === 'x' ? 'S' : 'E'
+  const geometry = resolveDoorGeometry({
+    axis,
+    centre,
+    wallAt,
+    roughWidth,
+    wallThickness: PARTITION_THICKNESS,
+    structuralHead,
+  })
+  const width = geometry.bounds.max[0] - geometry.bounds.min[0]
+  const height = geometry.bounds.max[1] - geometry.bounds.min[1]
+  const depth = geometry.bounds.max[2] - geometry.bounds.min[2]
+  const size: Vec3 = axis === 'x' ? [width, height, depth] : [depth, height, width]
+  return {
+    id,
+    model: DOOR_MODEL,
+    kind: 'door',
+    position,
+    rotY,
+    facing,
+    box: geometry.bounds,
+    footprint: rectOf(geometry.bounds),
+    architecturalMembers: geometry.members,
+    meta: metaOf(DOOR_MODEL),
+    size,
+  }
 }
 
 export function opposite(f: Facing): Facing { return OPPOSITE[f] }

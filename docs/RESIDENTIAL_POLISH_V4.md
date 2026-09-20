@@ -73,6 +73,13 @@ centros, larguras dos vãos e altura útil do aro. A folga de montagem mantém
 ombreira, 0,014175. Projeta-se 0,01 para fora de cada face da parede,
 conforme o acabamento de janela existente. Não haverá travessa no pavimento.
 
+A guarnição encosta diretamente à face da parede. Deixa meia secção do aro
+visível junto à passagem, em vez de alinhar duas faces na mesma posição.
+A interseção de 0,00455 em profundidade fica dentro do acabamento de madeira;
+não há guarnições suspensas, nem peças da própria guarnição sobrepostas.
+As folgas laterais recebem enchimentos até à travessa, incluindo a zona
+visível pelo topo das paredes recortadas.
+
 O vão superior de 0,8 terá passagem acabada de 0,7233, depois das duas
 folgas e duas ombreiras. O vão por omissão de 0,506 conservará a passagem
 medida de 0,4293. A entrada exterior conserva a folha Kenney e recebe apenas
@@ -94,3 +101,34 @@ para 1,29 oculta três posições junto à chegada. As alternativas visuais irã
 distinguir uma divisória de divisão apresentada em recorte de uma meia-parede
 real e de um recorte do lado da câmara. A escada, o envelope e as guardas
 conservam as cotas existentes.
+
+O ensaio seguinte separou as duas paredes laterais (`office-west` e
+`reading-west`) das quatro entradas voltadas para a câmara. Nas laterais,
+0,66, 0,69 e 0,8 não ocultam células; 0,9 oculta três posições no corredor
+do escritório. Subir também as entradas para 0,66 já oculta cinco posições.
+Por isso, a comparação visual será feita apenas nas laterais, através de uma
+classe explícita `room-cutaway`. A classe `cutaway` identifica os cortes
+voltados para a câmara, que conservam 0,6. `low` mantém compatibilidade com
+as cenas existentes. Esta separação não altera os limites das divisões nem
+transforma guardas em paredes. A escolha da altura continua dependente das
+imagens, não destes ensaios numéricos.
+
+## Revisão visual da correção das portas
+
+Em 20/09/2026, Astra reviu as capturas posteriores à correção, com o mesmo
+enquadramento da referência: quarto, casa de banho, escritório, leitura,
+piso superior completo, rés-do-chão com contexto superior e as três cenas
+de referência. As juntas laterais estão cobertas nos dois eixos. As portas
+já terminam nas paredes, em vez de parecerem aros independentes dentro de
+vãos maiores. Não se observou alteração da composição das janelas nem das
+cenas Midnight Delivery, The Empty Chair e The Last Nightcap.
+
+Esta aprovação é apenas do encontro porta/parede. A altura das divisórias
+e a revisão visual final da missão continuam pendentes.
+
+Validação deste lote: 19 testes focados aprovados (geometria das portas,
+composição dos dois pisos e privacidade), seis controlos de produção aprovados,
+TypeScript e análise estática sem erros. O catálogo medido dos 60 casos
+permanece atualizado. A auditoria das dependências de produção não encontrou
+vulnerabilidades. Os testes das portas leem diretamente os vértices do GLB,
+verificam a passagem livre e limitam a interseção às peças de acabamento.
