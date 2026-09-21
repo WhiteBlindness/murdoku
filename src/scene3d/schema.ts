@@ -26,6 +26,9 @@ export type Facing = 'N' | 'E' | 'S' | 'W'
 
 export type ShellWall = 'north' | 'west' | 'south' | 'east'
 
+/** Semantic height intents for structural partitions. */
+export type WallHeight = 'low' | 'cutaway' | 'room-cutaway' | 'half' | 'full'
+
 export interface OpeningSpec {
   /** Absolute coordinate of the opening's centre along the wall's axis, in cell units. */
   at: number
@@ -44,10 +47,11 @@ export interface WallSpec {
   /** Axis-aligned run in cell units. from/to must share x or z. */
   from: [number, number]
   to: [number, number]
-  /** Interior partitions are cut down by default ('low'); 'half' is a waist-high
-   *  pony wall that furniture may back onto from the camera side; 'full' is for
-   *  walls with nothing playable behind them (the validator checks visibility). */
-  height?: 'low' | 'half' | 'full'
+  /** Interior partitions are cut down by default ('low'); 'cutaway' keeps the
+   *  legacy camera-facing cut, while 'room-cutaway' is tuned for room sides;
+   *  'half' is a waist-high pony wall and 'full' is for walls with nothing
+   *  playable behind them (the validator checks visibility). */
+  height?: WallHeight
   /** An open guard has visible posts and a handrail but remains a walk barrier. */
   treatment?: 'solid' | 'railing'
   openings?: OpeningSpec[]

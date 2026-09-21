@@ -132,3 +132,31 @@ TypeScript e análise estática sem erros. O catálogo medido dos 60 casos
 permanece atualizado. A auditoria das dependências de produção não encontrou
 vulnerabilidades. Os testes das portas leem diretamente os vértices do GLB,
 verificam a passagem livre e limitam a interseção às peças de acabamento.
+
+## Escolha visual das alturas
+
+Astra comparou a referência de 0,6 com A (0,66), B (0,69) e C (0,8), no
+mesmo enquadramento de 1440 × 1100. A e B ainda apresentam uma parede pouco
+expressiva atrás da secretária. C dá continuidade mais convincente ao
+escritório e à sala de leitura, sem esconder o mobiliário, a chegada nem o
+percurso de distribuição. Foi escolhida C, a menor das opções comparadas que
+satisfez essa leitura. O aumento é de 0,2 unidades (33,3 %), limitado às duas
+laterais; as tentativas iniciais de 10 % e 15 % foram rejeitadas visualmente.
+
+| Categoria | Paredes | V3 | V4 |
+| --- | --- | --- | --- |
+| Envelope posterior | Norte e oeste | 1,29 | 1,29 |
+| Divisórias completas | `bedroom-east`, `bathroom-north`, `bathroom-east-private` | 1,29 | 1,29 |
+| Divisórias laterais em recorte | `office-west`, `reading-west` | 0,6 | 0,8 |
+| Recortes interiores voltados para a câmara | Quatro paredes das entradas superiores | 0,6 | 0,6 |
+| Meias-paredes | Divisórias `half` do rés-do-chão | 0,35 | 0,35 |
+| Guardas | `study-west`, `stairwell-west`, `stairwell-south` | 0,35 | 0,35 |
+| Recorte exterior | Sul e este | 0,12 | 0,12 |
+
+O intervalo entre pisos mantém 1,34. Não se subiram as paredes completas
+para além da cota da laje, nem se alteraram as escadas. A V4 melhora a
+apresentação das divisórias que antes partilhavam a classe genérica `low`;
+não aumenta a altura física de todo o edifício. As portas mantêm as cotas
+medidas e o acabamento escolhido no lote anterior. Os encontros em L entre
+laterais mais altas e entradas recortadas são transições deliberadas do
+modelo aberto, sem mudar os extremos das paredes.

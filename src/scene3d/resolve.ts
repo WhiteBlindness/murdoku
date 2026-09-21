@@ -26,7 +26,7 @@
 // ============================================================================
 
 import {
-  CELL, WALL_HEIGHT, PARTITION_HEIGHT, HALF_HEIGHT, FRONT_HEIGHT, SHELL_THICKNESS, PARTITION_THICKNESS,
+  CELL, WALL_HEIGHT, FULL_PARTITION_HEIGHT, PARTITION_HEIGHT, ROOM_PARTITION_HEIGHT, HALF_HEIGHT, FRONT_HEIGHT, SHELL_THICKNESS, PARTITION_THICKNESS,
   TERRAIN_DROP, STOREY_HEIGHT, WINDOW_OPENING, DOOR_OPENING, FRAME_SECTION, FRAME_PROTRUSION,
   makeFrame, type SceneFrame, type Vec3,
 } from './units'
@@ -343,7 +343,10 @@ export function resolveScene(spec: SceneSpec, n: number): ResolvedScene {
     const at = (alongX ? z0 : x0) * CELL
     const a = Math.min(alongX ? x0 : z0, alongX ? x1 : z1) * CELL
     const b = Math.max(alongX ? x0 : z0, alongX ? x1 : z1) * CELL
-    const height = w.height === 'full' ? WALL_HEIGHT : w.height === 'half' ? HALF_HEIGHT : PARTITION_HEIGHT
+    const height = w.height === 'full' ? FULL_PARTITION_HEIGHT
+      : w.height === 'room-cutaway' ? ROOM_PARTITION_HEIGHT
+      : w.height === 'half' ? HALF_HEIGHT
+      : PARTITION_HEIGHT
     const line: WallLine = { axis, at, a, b, thickness: PARTITION_THICKNESS, height }
     wallLines.set(w.id, line)
     const cuts: Cut[] = []

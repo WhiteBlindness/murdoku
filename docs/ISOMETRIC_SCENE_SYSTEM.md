@@ -55,7 +55,7 @@ Authoring coordinates are **cell units** (0…N). Convert in your head: 1 cell =
   shell:  { features: [{ wall: 'north'|'west', at, kind: 'window'|'door' }] },
   floors: [{ id, cells: [col0,row0,col1,row1], material: 'wood'|'grass'|'tile'|'stone'|'dirt',
              kind?: 'interior'|'exterior'|'courtyard' }],
-  walls:  [{ id, from: [x,z], to: [x,z], height?: 'low'|'half'|'full',
+  walls:  [{ id, from: [x,z], to: [x,z], height?: 'low'|'cutaway'|'room-cutaway'|'half'|'full',
              openings?: [{ at, width?, kind: 'door'|'open' }], freeEnds?: ['from'|'to'] }],
   furniture: [{ id, model, logic?, facing?,
                 at?: [x,z] | against?: { wall, at, side?, gap? } | on?: { parent, offset?, surface? },
@@ -91,6 +91,14 @@ What the schema deliberately **cannot** express: per-object scale, pixel offsets
 
 ### 3.2 Partitions
 
+A V4 distingue o recorte voltado para a câmara (`cutaway`, 0,6) do recorte
+lateral de uma divisão (`room-cutaway`, altura definida em
+`ROOM_PARTITION_HEIGHT`). A classe histórica `low` conserva 0,6 para as cenas
+existentes. `full` usa `FULL_PARTITION_HEIGHT`, correspondente aos 1,29 do
+envelope. As guardas continuam a usar `half` com tratamento `railing`; a sua
+altura não acompanha as divisórias. A escolha e a comparação visual estão
+registadas no [relatório V4](RESIDENTIAL_POLISH_V4.md).
+
 - Default `'low'` (0.6): a Sims-style cut-down wall. Reads as a wall, hides nothing at standee height.
 - `'half'` (0.35): a pony wall / breakfast bar. **The only wall furniture may back onto from the camera side** (its west or north face), because anything behind a 0.6 wall on that side is hidden (see §4.4).
 - `'full'` (1.29): only where nothing playable is behind it. The validator will tell you if you are wrong.
@@ -99,7 +107,7 @@ What the schema deliberately **cannot** express: per-object scale, pixel offsets
 
 ### 3.3 Openings
 
-- `door`: a `doorwayOpen` frame model stands in the gap. Gap = frame width + 0.02 (`DOOR_GAP`). The frame is full height even in a low wall — that is how a doorway stays a doorway in a cutaway.
+- `door`: o aro interior é construído por membros procedimentais de secção medida no `doorwayOpen.glb`. `width` define o vão estrutural, em células; por omissão, este mede 0,506 unidades. O aro adapta-se ao vão, conserva a secção de 0,02835 e a passagem vertical de 0,98118174. A guarnição nas duas faces cobre a folga de montagem e sobrepõe a parede em 0,014175, com meia secção do aro exposta junto à passagem. O aro mantém a altura completa quando a parede é apresentada em recorte. A entrada exterior conserva a folha Kenney e recebe apenas guarnição. Ver [medições e regras V4](RESIDENTIAL_POLISH_V4.md).
 - `open`: a plain pass-through; give it a `width` (1.0–1.3 cells reads as patio doors / a wide opening).
 - Keep 0.3+ cells of wall between an opening and a corner or it reads as a jamb-less slot.
 - Clearance: 0.45 units on both sides of every opening must be free of solid furniture (validated).

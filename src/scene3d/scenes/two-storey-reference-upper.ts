@@ -29,26 +29,27 @@ export const twoStoreyReferenceUpper: SceneSpec = {
   },
   walls: [
     // O quarto fica protegido a este por uma parede completa e abre a sul
-    // através de uma parede baixa com porta.
+    // através de um recorte voltado para a câmara, com porta.
     { id: 'bedroom-east', height: 'full', from: [2.4, 0], to: [2.4, 3.4] },
-    { id: 'bedroom-south', height: 'low', from: [0, 3.4], to: [2.4, 3.4], openings: [{ at: 1.65, width: 1, kind: 'door' }] },
+    { id: 'bedroom-south', height: 'cutaway', from: [0, 3.4], to: [2.4, 3.4], openings: [{ at: 1.65, width: 1, kind: 'door' }] },
 
     // A chegada permanece aberta junto à guarda original do vão.
     { id: 'study-west', from: [5.05, 1.15], to: [5.05, 2.65], height: 'half', treatment: 'railing', freeEnds: ['from'] },
 
-    // O escritório tem uma entrada própria pelo átrio. A parede oeste baixa
-    // deixa a escada legível a partir da chegada.
-    { id: 'office-west', from: [5.9, 0], to: [5.9, 3.7], height: 'low' },
-    { id: 'office-south', from: [5.9, 3.7], to: [8, 3.7], height: 'low', openings: [{ at: 6.9, width: 1, kind: 'door' }] },
+    // O escritório tem uma entrada própria pelo átrio. A parede oeste usa o
+    // recorte específico da divisão para deixar a escada legível na chegada.
+    { id: 'office-west', from: [5.9, 0], to: [5.9, 3.7], height: 'room-cutaway' },
+    { id: 'office-south', from: [5.9, 3.7], to: [8, 3.7], height: 'cutaway', openings: [{ at: 6.9, width: 1, kind: 'door' }] },
 
     // O banho fica protegido a norte; a entrada abre para o corredor lateral.
     { id: 'bathroom-north', height: 'full', from: [0, 5.4], to: [3.4, 5.4] },
     { id: 'bathroom-east-private', height: 'full', from: [3.4, 5.4], to: [3.4, 6.1] },
-    { id: 'bathroom-east-entry', height: 'low', from: [3.4, 6.1], to: [3.4, 8], openings: [{ at: 6.8, width: 1, kind: 'door' }] },
+    { id: 'bathroom-east-entry', height: 'cutaway', from: [3.4, 6.1], to: [3.4, 8], openings: [{ at: 6.8, width: 1, kind: 'door' }] },
 
-    // A leitura forma uma sala aberta ao corredor através da porta norte.
-    { id: 'reading-west', from: [4.35, 4.7], to: [4.35, 8], height: 'low' },
-    { id: 'reading-north', from: [4.35, 4.7], to: [8, 4.7], height: 'low', openings: [{ at: 5.2, width: 1, kind: 'door' }] },
+    // A leitura forma uma sala aberta ao corredor através da porta norte; a
+    // parede oeste usa o recorte específico da divisão.
+    { id: 'reading-west', from: [4.35, 4.7], to: [4.35, 8], height: 'room-cutaway' },
+    { id: 'reading-north', from: [4.35, 4.7], to: [8, 4.7], height: 'cutaway', openings: [{ at: 5.2, width: 1, kind: 'door' }] },
 
     // Guardas físicas contínuas com leitura visual aberta.
     { id: 'stairwell-west', from: [2.6, 0], to: [2.6, 2.65], height: 'half', treatment: 'railing' },

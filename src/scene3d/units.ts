@@ -36,6 +36,10 @@ const tune = (key: string, fallback: number): number => {
 
 /** Interior partitions are cut down dollhouse-style so no cell hides behind them. */
 export const PARTITION_HEIGHT = tune('pw', 0.6)
+/** Full interior partitions share the canonical shell height. */
+export const FULL_PARTITION_HEIGHT = WALL_HEIGHT
+/** Room-facing cutaways use the Astra-approved V4 height. */
+export const ROOM_PARTITION_HEIGHT = tune('rp', 0.8)
 /** A pony wall: waist height. Furniture may back onto it from either side. */
 export const HALF_HEIGHT = 0.35
 /** Camera-facing shell walls are cut to this plinth height (0 removes them). */

@@ -198,8 +198,13 @@ describe('procedural interior door finish', () => {
   })
 
   it('adds entry casing without replacing the exterior door or touching window inserts', () => {
-    for (const spec of [midnightDelivery, theEmptyChair, theLastNightcap]) {
-      const scene = resolveScene(spec, 6)
+    for (const { spec, n } of [
+      { spec: midnightDelivery, n: 6 },
+      { spec: theEmptyChair, n: 6 },
+      { spec: theLastNightcap, n: 7 },
+    ]) {
+      const scene = resolveScene(spec, n)
+      expect(scene.problems).toEqual([])
       const entries = scene.objects.filter(object => object.kind === 'entry')
       expect(entries).toHaveLength(1)
       expect(entries[0].model).toBe('doorway')
@@ -217,7 +222,10 @@ describe('procedural interior door finish', () => {
       })
       expect(nearEntry).toHaveLength(6)
       expect(nearEntry.some(frame => frame.max[1] < 0.001)).toBe(false)
-      expect(scene.objects.filter(object => object.kind === 'window').every(object => !object.architecturalMembers)).toBe(true)
+      const expectedWindows = spec.shell?.features.filter(feature => feature.kind === 'window').length ?? 0
+      const windows = scene.objects.filter(object => object.kind === 'window')
+      expect(windows).toHaveLength(expectedWindows)
+      expect(windows.every(object => !object.architecturalMembers)).toBe(true)
     }
   })
 })

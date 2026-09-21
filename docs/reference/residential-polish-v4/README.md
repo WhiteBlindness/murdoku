@@ -82,3 +82,16 @@ isso, não têm o controlo «Upstairs».
 | `very-easy-1` | [Referência](v3-before-golden-very-easy-1.png) |
 | `very-easy-2` | [Referência](v3-before-golden-very-easy-2.png) |
 | `easy-1` | [Referência](v3-before-golden-easy-1.png) |
+
+## Variantes temporárias de altura
+
+Estas imagens são comparações de trabalho, capturadas a 20/09/2026 com o
+mesmo viewport, o mesmo *canvas* e os recortes do escritório e da leitura. A
+consulta `rp` altera apenas as duas paredes semânticas `office-west` e
+`reading-west`; as restantes categorias mantêm as suas alturas.
+
+| Variante | Piso superior | Escritório | Leitura |
+| --- | --- | --- | --- |
+| `rp=0.66` | [Canvas](v4-height-a-066-upper-canvas.png) | [Recorte](v4-height-a-066-office.png) | [Recorte](v4-height-a-066-reading.png) |
+| `rp=0.69` | [Canvas](v4-height-b-069-upper-canvas.png) | [Recorte](v4-height-b-069-office.png) | [Recorte](v4-height-b-069-reading.png) |
+| `rp=0.8` | [Canvas](v4-height-c-080-upper-canvas.png) | [Recorte](v4-height-c-080-office.png) | [Recorte](v4-height-c-080-reading.png) |
