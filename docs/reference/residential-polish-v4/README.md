@@ -95,3 +95,92 @@ consulta `rp` altera apenas as duas paredes semânticas `office-west` e
 | `rp=0.66` | [Canvas](v4-height-a-066-upper-canvas.png) | [Recorte](v4-height-a-066-office.png) | [Recorte](v4-height-a-066-reading.png) |
 | `rp=0.69` | [Canvas](v4-height-b-069-upper-canvas.png) | [Recorte](v4-height-b-069-office.png) | [Recorte](v4-height-b-069-reading.png) |
 | `rp=0.8` | [Canvas](v4-height-c-080-upper-canvas.png) | [Recorte](v4-height-c-080-office.png) | [Recorte](v4-height-c-080-reading.png) |
+
+## Provas finais V4
+
+As capturas finais foram recolhidas em 21/09/2026 no ramo
+`astra/residential-architectural-polish-v4`, a partir do SHA
+`7675d24ccb7ac09be7ffcafc34fda4836a51e5ea`. Foram produzidas no Chromium real
+através de *dev-browser*, com DPR 1. As vistas de ambiente usam a consulta
+`?env=1&case=hard-1`, a janela de 1 440 × 1 100 e o *canvas* nativo. A vista
+móvel usa 390 × 844.
+
+### Ambiente e pisos
+
+| Vista | Imagem |
+| --- | --- |
+| Piso superior ativo, fantasma do rés-do-chão, página | [Página](v4-final-upper-lower-ghost-page-1440x1100.png) |
+| Piso superior ativo, fantasma do rés-do-chão, *canvas* | [Canvas](v4-final-upper-lower-ghost-canvas.png) |
+| Rés-do-chão ativo, fantasma do piso superior, página | [Página](v4-final-ground-upper-ghost-page-1440x1100.png) |
+| Rés-do-chão ativo, fantasma do piso superior, *canvas* | [Canvas](v4-final-ground-upper-ghost-canvas.png) |
+| Vista explodida, página | [Página](v4-final-exploded-page-1440x1100.png) |
+| Vista explodida, *canvas* | [Canvas](v4-final-exploded-canvas.png) |
+| Piso superior no telemóvel | [390 × 844](v4-final-mobile-upper-390x844.png) |
+
+### Portas, divisões e percurso
+
+Os cinco primeiros recortes mantêm as coordenadas relativas ao *canvas* usadas
+nas comparações anteriores. Os quatro recortes de corredor alargam o campo de
+visão para documentar a continuidade entre cada divisão, o patamar e a zona de
+leitura.
+
+| Zona | Imagem |
+| --- | --- |
+| Porta do quarto | [Recorte](v4-final-bedroom-door.png) |
+| Porta da casa de banho | [Recorte](v4-final-bathroom-door.png) |
+| Porta do escritório/estudo | [Recorte](v4-final-office-door.png) |
+| Porta da leitura | [Recorte](v4-final-reading-door.png) |
+| Escada e patamar | [Recorte](v4-final-stair-landing.png) |
+| Quarto e corredor | [Recorte](v4-final-bedroom-corridor.png) |
+| Casa de banho e corredor | [Recorte](v4-final-bathroom-corridor.png) |
+| Escritório e corredor | [Recorte](v4-final-office-corridor.png) |
+| Grupo da leitura | [Recorte](v4-final-reading-group.png) |
+
+### Estados de jogo
+
+Capturas de página a 1 440 × 1 100, com os elementos DOM sobre o tabuleiro,
+através de `?case=hard-1`. A seleção usa o foco real da célula. Jonas foi
+colocado na linha 4, coluna 7, do piso superior; Clara foi depois colocada
+na linha 4, coluna 8, para produzir um conflito real de linha. As duas
+colocações foram desfeitas no fim, com confirmação de 0/5 pessoas colocadas.
+
+| Estado | Imagem |
+| --- | --- |
+| Inicial, sem pessoas colocadas | [Inicial](v4-final-game-idle.png) |
+| Célula selecionada, ainda livre | [Seleção](v4-final-game-selected.png) |
+| Célula ocupada por Jonas | [Ocupação](v4-final-game-occupied.png) |
+| Jonas e Clara em conflito | [Conflito](v4-final-game-conflict.png) |
+
+### Correspondência com as 24 provas pedidas
+
+| N.º | Prova | Imagem |
+| --- | --- | --- |
+| 1 | Porta do quarto antes | [V3](v3-before-bedroom-door.png) |
+| 2 | Porta do quarto depois | [V4](v4-final-bedroom-door.png) |
+| 3 | Porta da casa de banho antes | [V3](v3-before-bathroom-door.png) |
+| 4 | Porta da casa de banho depois | [V4](v4-final-bathroom-door.png) |
+| 5 | Porta do escritório | [V4](v4-final-office-door.png) |
+| 6 | Porta no eixo oposto, Z | [Casa de banho](v4-final-bathroom-door.png) |
+| 7 | Piso superior antes | [V3](v3-before-upper-canvas.png) |
+| 8 | Piso superior depois | [V4](v4-final-upper-canvas.png) |
+| 9 | Quarto e corredor | [V4](v4-final-bedroom-corridor.png) |
+| 10 | Casa de banho e corredor | [V4](v4-final-bathroom-corridor.png) |
+| 11 | Escritório e corredor | [V4](v4-final-office-corridor.png) |
+| 12 | Patamar e guarda | [V4](v4-final-stair-landing.png) |
+| 13 | Vista limpa do piso superior | [V4](v4-final-upper-canvas.png) |
+| 14 | Rés-do-chão ativo e piso superior fantasma | [V4](v4-final-ground-upper-ghost-canvas.png) |
+| 15 | Piso superior ativo e rés-do-chão fantasma | [V4](v4-final-upper-lower-ghost-canvas.png) |
+| 16 | Vista explodida | [V4](v4-final-exploded-canvas.png) |
+| 17 | Estado inicial | [V4](v4-final-game-idle.png) |
+| 18 | Seleção | [V4](v4-final-game-selected.png) |
+| 19 | Ocupação | [V4](v4-final-game-occupied.png) |
+| 20 | Conflito | [V4](v4-final-game-conflict.png) |
+| 21 | Móvel, 390 × 844 | [V4](v4-final-mobile-upper-390x844.png) |
+| 22 | Midnight Delivery | [Após a correção partilhada](v4-after-golden-very-easy-1.png) |
+| 23 | The Empty Chair | [Após a correção partilhada](v4-after-golden-very-easy-2.png) |
+| 24 | The Last Nightcap | [Após a correção partilhada](v4-after-golden-easy-1.png) |
+
+As provas 4/6 e 8/13 partilham imagens: a primeira já mostra o eixo Z;
+a segunda é a vista limpa completa. As três cenas de regressão foram
+inspecionadas após a correção partilhada das portas. A nova classe de altura
+não é usada nessas cenas e os testes preservam o seu comportamento anterior.

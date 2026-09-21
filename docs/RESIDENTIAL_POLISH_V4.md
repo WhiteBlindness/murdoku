@@ -1,6 +1,6 @@
 # Acabamentos arquitetónicos residenciais V4
 
-Início: 17/09/2026. Estado: diagnóstico e comparação visual em curso.
+Início: 17/09/2026. Conclusão: 21/09/2026. Estado: READY, após revisão visual Astra.
 Origem local e remota verificada após `git fetch origin`:
 `astra/multistorey-residential-design-v3`,
 `1e78316f024c60bac98239ed0104c1f44b4d43bf`.
@@ -123,8 +123,8 @@ já terminam nas paredes, em vez de parecerem aros independentes dentro de
 vãos maiores. Não se observou alteração da composição das janelas nem das
 cenas Midnight Delivery, The Empty Chair e The Last Nightcap.
 
-Esta aprovação é apenas do encontro porta/parede. A altura das divisórias
-e a revisão visual final da missão continuam pendentes.
+Nesta fase, a aprovação abrangia apenas o encontro porta/parede. A escolha
+das alturas e a aceitação final estão documentadas nas secções seguintes.
 
 Validação deste lote: 19 testes focados aprovados (geometria das portas,
 composição dos dois pisos e privacidade), seis controlos de produção aprovados,
@@ -160,3 +160,70 @@ não aumenta a altura física de todo o edifício. As portas mantêm as cotas
 medidas e o acabamento escolhido no lote anterior. Os encontros em L entre
 laterais mais altas e entradas recortadas são transições deliberadas do
 modelo aberto, sem mudar os extremos das paredes.
+
+## Verificação da implementação final
+
+Código final: `7675d24ccb7ac09be7ffcafc34fda4836a51e5ea`, publicado no ramo
+V4. A revisão técnica independente não encontrou defeitos materiais no
+resolvedor ou no desenho das portas. Detetou uma dimensão incorreta no teste
+de The Last Nightcap: passou a usar 7 × 7, a exigir ausência de problemas e
+a verificar todas as janelas declaradas. O código da cena não precisou de
+alterações.
+
+| Verificação | Resultado |
+| --- | --- |
+| Bateria completa, 21/09/2026 | 40 ficheiros; 441 testes aprovados, cinco ignorados |
+| Produção, incluindo TypeScript, 21/09/2026 | Seis controlos aprovados, catálogo completo de 60 casos |
+| Compilação para produção da mesma implementação | Aprovada, incluindo geração PWA |
+| Análise estática da implementação final | Aprovada |
+| Catálogo medido | Relatório atualizado, 60 casos |
+| Auditoria das dependências de produção, 21/09/2026 | Zero vulnerabilidades |
+| Cobertura de `doorGeometry.ts` | Instruções: 95 %; ramos: 83,33 %; funções: 100 %; linhas: 98,27 % |
+| Diferença em `src/core` e `src/data` face à V3 | Nenhuma |
+
+A cobertura indicada é apenas a do novo módulo de portas, não uma medição
+global do projeto. Foram acrescentados dez testes de portas e cinco da
+hierarquia de paredes. Nenhum validador ou limiar foi alterado.
+
+## Aceitação visual final
+
+Em 21/09/2026, Astra inspecionou diretamente as imagens finais, incluindo
+os recortes das divisões, o patamar, os dois modos de contexto entre pisos,
+a vista explodida, o telemóvel e os quatro estados de jogo. A aceitação
+resulta dessa revisão dos píxeis, em conjunto com as comparações V3/V4.
+
+| Critério | Decisão visual |
+| --- | --- |
+| Portas | Aros integrados nas paredes, juntas cobertas e ausência de folgas laterais visíveis nos eixos X e Z |
+| Paredes | Laterais do escritório e da leitura mais convincentes; recortes voltados para a câmara continuam a permitir ler o interior |
+| Construção | Encontros e terminações coerentes; transições de altura correspondem aos recortes deliberados |
+| Piso superior | Patamar e corredor legíveis, acesso livre às divisões, privacidade do quarto e da casa de banho preservada |
+| Escritório e leitura | Escritório reconhecível como divisão; secretária, cadeira e conjunto de leitura utilizáveis, sem plantas a bloquear acessos |
+| Escada e contexto | Guarda, abertura e chegada preservadas; os pisos continuam a pertencer à mesma casa |
+| Regressões | Midnight Delivery, The Empty Chair e The Last Nightcap conservam a composição e a integração das janelas |
+
+As capturas usam Chromium, DPR 1, área de conteúdo de 1 440 × 1 100 no
+computador e 390 × 844 no telemóvel, sem redimensionar as imagens. O
+[índice de provas](reference/residential-polish-v4/README.md) liga as 24
+vistas pedidas, as comparações de altura e os recortes adicionais.
+
+Os estados de jogo foram produzidos por interação real: seleção de uma
+célula livre, colocação de Jonas na linha 4/coluna 7 e colocação de Clara
+na linha 4/coluna 8 para criar um conflito. As duas colocações foram
+desfeitas e confirmou-se o regresso a 0/5 pessoas colocadas.
+
+Não foram identificadas imperfeições visuais impeditivas. Mantém-se a
+convenção deliberada de casa aberta: nas paredes recortadas, os aros completos
+podem ultrapassar o topo visível da parede. As guarnições retangulares simples
+acompanham a linguagem Kenney. As paredes completas de 1,29 não foram
+elevadas; o ganho visual vem das duas divisórias laterais em recorte de 0,8.
+
+Decisão final: **READY**. A planta V3, o mobiliário, a escada, a área construída
+e a lógica do puzzle foram preservados. Não houve integração noutros ramos.
+
+## Histórico publicado
+
+- `c21adf7`: diagnóstico V4 e referência visual V3.
+- `ca36044`: integração dos acabamentos medidos das portas com as paredes.
+- `7675d24`: separação dos recortes e reforço visual das divisórias laterais.
+- O commit que contém esta aceitação acrescenta apenas documentação e imagens.
