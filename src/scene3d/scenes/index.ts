@@ -6,10 +6,11 @@ import { theEmptyChair } from './the-empty-chair'
 import { theLastNightcap } from './the-last-nightcap'
 import { twoStoreyReferenceGround } from './two-storey-reference-ground'
 import { twoStoreyReferenceUpper } from './two-storey-reference-upper'
+import { deathBeforeDinner } from './death-before-dinner'
 
 /** Authored scenes, keyed by `${puzzleId}#${floor}`. */
 export const AUTHORED_SCENES: Record<string, SceneSpec> = Object.fromEntries(
-  [midnightDelivery, theEmptyChair, theLastNightcap, twoStoreyReferenceGround, twoStoreyReferenceUpper]
+  [midnightDelivery, theEmptyChair, theLastNightcap, twoStoreyReferenceGround, twoStoreyReferenceUpper, deathBeforeDinner]
     .map(s => [`${s.puzzleId}#${s.floor ?? 0}`, s]),
 )
 
