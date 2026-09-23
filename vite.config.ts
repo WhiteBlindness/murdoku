@@ -1,10 +1,25 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { rm } from 'node:fs/promises'
+import { resolve } from 'node:path'
+
+let labBuildPath = ''
 
 export default defineConfig({
   plugins: [
     react(),
+    {
+      name: 'omit-kenney-lab-from-production',
+      apply: 'build',
+      configResolved(config) {
+        labBuildPath = resolve(config.root, config.build.outDir, 'kenney-lab')
+      },
+      async closeBundle() {
+        // Experimental models are served by Vite in development only.
+        if (labBuildPath) await rm(labBuildPath, { recursive: true, force: true })
+      },
+    },
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg'],
