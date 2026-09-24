@@ -15,6 +15,7 @@ import CaseProgressStrip from './CaseProgressStrip'
 import CaseNotes from './CaseNotes'
 import HowToPlay from './HowToPlay'
 import FurniturePicker from './FurniturePicker'
+import '../styles/site-game.css'
 
 interface Props {
   puzzle: Puzzle
@@ -457,7 +458,8 @@ export default function GameScreen(props: Props) {
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      className="desk-surface bg-bg-base flex flex-col min-h-[100dvh] lg:h-[100dvh] lg:overflow-hidden"
+      data-complete={placedCount === puzzle.people.length}
+      className="site-game-root desk-surface bg-bg-base flex flex-col min-h-[100dvh] lg:h-[100dvh] lg:overflow-hidden"
     >
       {/* ── Screen-reader live region — always mounted so the first announcement
           is not swallowed. aria-atomic so partial text updates are read in full.
@@ -519,9 +521,9 @@ export default function GameScreen(props: Props) {
             with no gap at lg so columns cannot drift from the content below.
       */}
       <header
-        className="case-masthead pt-safe flex-shrink-0 h-16 items-center
+        className="site-game-header case-masthead pt-safe flex-shrink-0 h-16 items-center
           grid grid-cols-[auto_1fr_auto] gap-0 px-2
-          lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:px-0 lg:gap-0"
+          lg:grid-cols-[minmax(0,7fr)_minmax(340px,3fr)] lg:px-0 lg:gap-0"
         style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
       >
 
@@ -699,13 +701,13 @@ export default function GameScreen(props: Props) {
       */}
       <div
         className={[
-          'relative flex-1 flex flex-col min-h-0',
+          'site-game-workspace relative flex-1 flex flex-col min-h-0',
           // lg: two-column grid
-          'lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] lg:grid-rows-[auto_minmax(0,1fr)] lg:min-h-0',
+          'lg:grid lg:grid-cols-[minmax(0,7fr)_minmax(340px,3fr)] lg:grid-rows-[auto_minmax(0,1fr)] lg:min-h-0',
         ].join(' ')}
       >
 
-        <div className="order-2 lg:order-none lg:col-span-full lg:row-start-1">
+        <div className="site-sequence-slot order-1 lg:order-none lg:col-start-2 lg:row-start-1">
           <CaseProgressStrip
             puzzle={puzzle}
             placedOf={placedOf}
@@ -812,9 +814,9 @@ export default function GameScreen(props: Props) {
         */}
         <div
           className={[
-            'contents',
+            'contents site-scene-column',
             // lg: real grid column — non-scrolling, board fills the height
-            'lg:flex lg:flex-col lg:min-h-0 lg:overflow-hidden lg:col-start-1 lg:row-start-2',
+            'lg:flex lg:flex-col lg:min-h-0 lg:overflow-hidden lg:col-start-1 lg:row-start-1 lg:row-span-2',
           ].join(' ')}
         >
           {/* ── Instruction line (mobile: order 0, desktop: inside centre) ── */}
@@ -845,7 +847,7 @@ export default function GameScreen(props: Props) {
                 {/* Floor switcher — only for two-storey houses. Single-floor
                     cases render exactly as before, with no extra chrome. */}
                 {twoFloor && props.onSwitchFloor && (
-                  <div className="order-1 shrink-0 grid gap-1.5 px-3 pb-2">
+                  <div className="site-storey-controls order-2 shrink-0 grid gap-1.5 px-3 pb-2">
                     <div className="flex items-center gap-1" role="group" aria-label="Choose which floor to view">
                       {([0, 1] as const).map(f => (
                         <button
@@ -884,7 +886,7 @@ export default function GameScreen(props: Props) {
                   </div>
                 )}
 
-          <div className="order-1 lg:flex-1 lg:min-h-0 lg:relative">
+          <div className="site-board-slot order-3 lg:flex-1 lg:min-h-0 lg:relative">
             {/* Absolute fill at desktop only; on mobile this is just a normal div */}
             <div className="lg:absolute lg:inset-0 flex items-center justify-center p-2 lg:p-3 lg:[container-type:size]">
               {/* Fits the shorter of available width / height, at the
@@ -931,7 +933,7 @@ export default function GameScreen(props: Props) {
           </div>
 
           {/* Legend (mobile only — disclosure; on xl it's in the rail, expanded) */}
-          <div className="order-4 lg:hidden mx-auto w-full max-w-[640px] px-4 pb-1">
+          <div className="order-8 lg:hidden mx-auto w-full max-w-[640px] px-4 pb-1">
             <button
               onClick={() => setLegend(v => !v)}
               className="focus-ring flex min-h-[44px] items-center gap-1.5 text-[11px] text-text-muted font-mono mx-auto tracking-widest uppercase hover:text-text-secondary transition-colors"
@@ -957,7 +959,7 @@ export default function GameScreen(props: Props) {
               Desktop: flex-shrink-0 at the bottom of the scene column.
               FurniturePicker lives here so it's beside the board.
           */}
-          <div className="command-rail order-5 flex-shrink-0 w-full px-3 py-2 flex flex-col gap-2">
+          <div className="site-action-toolbar command-rail order-4 flex-shrink-0 w-full px-3 py-2 flex flex-col gap-2">
             {/* FurniturePicker — transient, in the scene column */}
             <AnimatePresence>
               {showDecor && (
@@ -1043,7 +1045,7 @@ export default function GameScreen(props: Props) {
         */}
         <div
           className={[
-            'contents',
+            'contents site-dossier-column',
             'lg:flex lg:flex-col lg:min-h-0 lg:border-l lg:col-start-2 lg:row-start-2',
           ].join(' ')}
           style={{ borderColor: 'var(--color-border-subtle)' } as React.CSSProperties}
@@ -1078,8 +1080,8 @@ export default function GameScreen(props: Props) {
             Mobile: order-2 — between board and toolbar in the single column.
             Desktop: flex-1 overflow-y-auto — fills dossier column, scrolls.
           */}
-          <div className="order-3 lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
-            <div className="relative p-3 lg:p-4 flex flex-col gap-3">
+          <div className="site-suspect-list order-5 lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
+              <div className="site-suspect-list-inner relative p-3 lg:p-4 flex flex-col gap-3">
 
               {/* Suspects label */}
               <p className="text-[10px] text-text-muted font-mono uppercase tracking-[0.2em]">
@@ -1089,7 +1091,7 @@ export default function GameScreen(props: Props) {
               </p>
 
               {/* Suspect cards — single column on all breakpoints in the dossier */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+              <div className="site-suspect-cards grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
                 {puzzle.people.map(person => (
                   <SuspectCard
                     key={person.id}
@@ -1123,7 +1125,7 @@ export default function GameScreen(props: Props) {
               translate3d(±5px) must not clip inside the scroll container, which
               would also produce a transient horizontal scrollbar at 390px.
           */}
-          <div className="command-rail order-6 flex-shrink-0 p-3 lg:p-4 flex flex-col gap-2 border-t"
+          <div className="site-submit-area command-rail order-6 flex-shrink-0 p-3 lg:p-4 flex flex-col gap-2 border-t"
             style={{ borderColor: 'var(--color-border-subtle)' }}
           >
             {/* ── Accuse — the dramatic beat ─────────────────────────────── */}
@@ -1133,13 +1135,7 @@ export default function GameScreen(props: Props) {
               ref={ctaRef}
               whileTap={{ scale: 0.97 }}
               onClick={handleSubmit}
-              className="focus-ring w-full py-4 font-display font-bold tracking-[0.15em] uppercase text-sm transition-colors"
-              style={{
-                background: 'var(--color-accent)',
-                color: 'var(--color-on-accent)',
-                boxShadow: 'var(--shadow-cut), 0 8px 22px -12px color-mix(in srgb, var(--color-accent) 60%, transparent)',
-                letterSpacing: '0.15em',
-              }}
+              className={`site-submit-button focus-ring w-full py-4 font-display font-bold uppercase text-sm transition-colors ${placedCount === puzzle.people.length ? 'site-submit-ready' : 'site-submit-pending'}`}
             >
               {/* Count the CAST, not the board. These were the same number
                   while every N x N board had exactly N suspects; now a 10x10
