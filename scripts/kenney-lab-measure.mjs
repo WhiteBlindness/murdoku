@@ -74,7 +74,7 @@ function parseGlb(b) {
     const n=b.readUInt32LE(o), type=b.readUInt32LE(o+4), data=b.subarray(o+8,o+8+n);
     if(o+8+n>b.length) throw new Error('Bloco GLB truncado');
     chunks.push({type,data});
-    if(type===0x4e4f534a) json=JSON.parse(data.toString('utf8').replace(/\0+$/g,'').trim());
+    if(type===0x4e4f534a) json=JSON.parse(data.toString('utf8').replaceAll('\0','').trim());
     o+=8+n;
   }
   if(!json) throw new Error('JSON GLB em falta');
