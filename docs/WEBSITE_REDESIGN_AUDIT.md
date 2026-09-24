@@ -1,7 +1,9 @@
 # Auditoria da interface anterior ao redesenho
 
-Data: 24/09/2026  
-Base aprovada: `aa384c2f69ab6168786abccf04f713ad3ae24a58`  
+Data: 24/09/2026
+
+Base aprovada: `aa384c2f69ab6168786abccf04f713ad3ae24a58`
+
 Ramo: `sol/site-redesign-v1`
 
 ## Âmbito e método
