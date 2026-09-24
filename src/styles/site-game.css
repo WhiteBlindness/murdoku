@@ -1,5 +1,5 @@
 .site-game-root {
-  color: var(--site-paper-strong);
+  color: var(--site-shell-text);
 }
 
 .site-game-header {
@@ -8,7 +8,7 @@
 }
 
 .site-game-header h1 {
-  color: var(--site-paper-strong);
+  color: var(--site-shell-text);
   font-family: 'Barlow Condensed', ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(1.15rem, 1.5vw, 1.7rem);
   letter-spacing: 0.015em;
@@ -455,7 +455,7 @@
   min-height: 44px;
   border: 0;
   border-right: 1px solid var(--site-rule);
-  color: var(--site-paper-strong) !important;
+  color: var(--site-shell-text) !important;
   background: transparent !important;
   font: 700 13px/1 'Hanken Grotesk', ui-sans-serif, sans-serif;
   text-transform: none;
@@ -477,7 +477,7 @@
 .site-storey-controls [aria-label='Choose multi-storey context'] button {
   min-height: 44px;
   padding: 0 8px;
-  color: var(--site-paper-muted) !important;
+  color: var(--site-shell-muted) !important;
   font: 12px/1 'Hanken Grotesk', ui-sans-serif, sans-serif;
   text-transform: none;
 }
@@ -790,7 +790,7 @@
 
   .site-suspect-list-inner > p:first-child {
     margin: 0;
-    color: var(--site-paper-strong);
+    color: var(--site-shell-text);
     font: 10px/1.2 'Courier Prime', ui-monospace, monospace;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -834,7 +834,7 @@
   }
 
   .site-submit-pending {
-    color: var(--site-paper-strong);
+    color: var(--site-shell-text);
   }
 
   .site-submit-button {

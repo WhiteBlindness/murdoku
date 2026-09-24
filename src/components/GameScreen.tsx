@@ -2,7 +2,7 @@ import { useState, useEffect, useId, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Undo2, Redo2, Trash2, Lightbulb, X as XIcon, MousePointerClick, Pencil,
-  HelpCircle, Eye, EyeOff, Info, Palette, Wand2, MoreHorizontal,
+  HelpCircle, Eye, EyeOff, Info, Palette, Wand2, MoreHorizontal, Sun, Moon,
 } from 'lucide-react'
 import type { Puzzle, CellMark, GameMode, Furniture, FurnitureType } from '../core/types'
 import { findFailingClues, resolveClueHighlights, satisfiedClueFlags } from '../core/ux'
@@ -15,6 +15,7 @@ import CaseProgressStrip from './CaseProgressStrip'
 import CaseNotes from './CaseNotes'
 import HowToPlay from './HowToPlay'
 import FurniturePicker from './FurniturePicker'
+import ThemeToggle from './ThemeToggle'
 import '../styles/site-game.css'
 
 interface Props {
@@ -50,6 +51,8 @@ interface Props {
   onSubmit: () => void
   onDismissFeedback: () => void
   onBack: () => void
+  resolvedTheme?: string
+  onToggleTheme?: () => void
   /** Switch active floor — only called when puzzle.floors === 2. */
   onSwitchFloor?: (floor: 0 | 1) => void
 }
@@ -654,6 +657,16 @@ export default function GameScreen(props: Props) {
                   <HelpCircle size={16} />
                   How to play
                 </button>
+                {props.onToggleTheme && (
+                  <button
+                    role="menuitem"
+                    onClick={() => { props.onToggleTheme?.(); closeMenu() }}
+                    className="focus-ring w-full text-left px-4 py-3 flex items-center gap-3 text-[13px] font-mono text-text-secondary hover:text-text-primary hover:bg-bg-elevated transition-colors"
+                  >
+                    {props.resolvedTheme === 'dark' ? <Sun size={16} aria-hidden /> : <Moon size={16} aria-hidden />}
+                    {props.resolvedTheme === 'dark' ? 'Light theme' : 'Dark theme'}
+                  </button>
+                )}
             </div>
           )}
         </div>
@@ -691,6 +704,9 @@ export default function GameScreen(props: Props) {
           >
             <HelpCircle size={19} />
           </button>
+          {props.onToggleTheme && (
+            <ThemeToggle resolved={props.resolvedTheme ?? 'dark'} onToggle={props.onToggleTheme} />
+          )}
         </div>
       </header>
 

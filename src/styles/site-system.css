@@ -14,6 +14,13 @@
   --site-success: #19796e;
   --site-teal: #4ec9c0;
   --site-coral: #e57465;
+  --site-shell-text: #fff1e4;
+  --site-shell-copy: #d9cfdb;
+  --site-shell-muted: #b2a8bb;
+  --site-shell-header: #242437;
+  --site-shell-panel: rgba(18, 22, 34, 0.55);
+  --site-shell-panel-hover: rgba(255, 241, 228, 0.08);
+  --site-shell-gradient: linear-gradient(148deg, #121a2a 0%, #282238 52%, #171a2b 100%);
   --site-space-1: 4px;
   --site-space-2: 8px;
   --site-space-3: 12px;
@@ -21,6 +28,36 @@
   --site-space-6: 24px;
   --site-space-8: 32px;
   --site-space-12: 48px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not(.theme-dark) {
+    --site-deep: #f4f0e9;
+    --site-shell-text: #24283b;
+    --site-shell-copy: #444558;
+    --site-shell-muted: #626274;
+    --site-shell-header: #eeeaf0;
+    --site-shell-panel: rgba(255, 252, 247, 0.7);
+    --site-shell-panel-hover: rgba(255, 252, 247, 0.95);
+    --site-shell-gradient: linear-gradient(148deg, #fcf8f0 0%, #eee8ed 53%, #e0ece9 100%);
+    --site-rule: rgba(51, 50, 67, 0.24);
+    --site-brass: #875337;
+    --site-coral: #ae4e54;
+  }
+}
+
+:root.theme-light {
+  --site-deep: #f4f0e9;
+  --site-shell-text: #24283b;
+  --site-shell-copy: #444558;
+  --site-shell-muted: #626274;
+  --site-shell-header: #eeeaf0;
+  --site-shell-panel: rgba(255, 252, 247, 0.7);
+  --site-shell-panel-hover: rgba(255, 252, 247, 0.95);
+  --site-shell-gradient: linear-gradient(148deg, #fcf8f0 0%, #eee8ed 53%, #e0ece9 100%);
+  --site-rule: rgba(51, 50, 67, 0.24);
+  --site-brass: #875337;
+  --site-coral: #ae4e54;
 }
 
 .site-display {
@@ -55,11 +92,10 @@
 /* Deep violet ink and bright signals echo the scene's peach, timber and green. */
 html .site-home,
 html .site-tier {
-  --home-copy: #d9cfdb;
-  --home-muted: #b2a8bb;
-  background-image:
-    radial-gradient(ellipse 54% 48% at 82% 7%, rgba(94, 180, 178, 0.18), transparent 72%),
-    radial-gradient(ellipse 60% 40% at 4% 2%, rgba(226, 106, 105, 0.14), transparent 76%);
+  --home-paper-strong: var(--site-shell-text);
+  --home-copy: var(--site-shell-copy);
+  --home-muted: var(--site-shell-muted);
+  background-image: var(--site-shell-gradient);
 }
 
 html .site-home__title span {
@@ -82,15 +118,20 @@ html .site-home__daily {
 }
 
 html .site-home__scene {
-  border-color: #4ec9c0;
+  border: 0;
+}
+
+html .site-game-root {
+  color: var(--site-shell-text);
+  background: var(--site-shell-gradient);
 }
 
 html .site-game-header {
-  background: #242437;
+  background: var(--site-shell-header);
 }
 
 html .site-game-header h1 {
-  color: var(--site-paper-strong);
+  color: var(--site-shell-text);
 }
 
 html .site-sequence {

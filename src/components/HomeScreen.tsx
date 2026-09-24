@@ -77,6 +77,8 @@ export default function HomeScreen({
         onSetMode={onSetMode}
         onSelect={onSelect}
         onBack={() => setView('landing')}
+        resolvedTheme={resolvedTheme}
+        onToggleTheme={onToggleTheme}
       />
     )
   }
@@ -115,7 +117,7 @@ export default function HomeScreen({
 
             <div className="site-home__dispatch">
               <figure className="site-home__scene">
-                <img src="/assets/site-home-dollhouse.png" alt="Isometric view of the rooms in a Murdoku house." />
+                <img src="/assets/site-home-dollhouse-cutout.png" width="1320" height="1191" alt="Isometric view of the rooms in a Murdoku house." />
                 <figcaption><span aria-hidden>◆</span> The house is part of the evidence</figcaption>
               </figure>
               {resumablePuzzle && inProgress ? (
@@ -301,10 +303,12 @@ interface TierScreenProps {
   onSetMode: (m: GameMode) => void
   onSelect: (id: string) => void
   onBack: () => void
+  resolvedTheme: string
+  onToggleTheme: () => void
 }
 
 function TierScreen({
-  difficulty, puzzles, completedIds, records, mode, onSetMode, onSelect, onBack,
+  difficulty, puzzles, completedIds, records, mode, onSetMode, onSelect, onBack, resolvedTheme, onToggleTheme,
 }: TierScreenProps) {
   const [query, setQuery] = useState('')
 
@@ -338,9 +342,12 @@ function TierScreen({
             <h1 style={{ color: diffText(difficulty) }}>{difficulty}</h1>
             <p className="site-tier__summary">{solvedInTier} of {tierPuzzles.length} cases closed</p>
           </div>
-          <div className="site-tier__completion" aria-hidden>
-            <span>{tierPuzzles.length ? Math.round((solvedInTier / tierPuzzles.length) * 100) : 0}%</span>
-            <small>complete</small>
+          <div className="site-tier__header-actions">
+            <div className="site-tier__completion" aria-hidden>
+              <span>{tierPuzzles.length ? Math.round((solvedInTier / tierPuzzles.length) * 100) : 0}%</span>
+              <small>complete</small>
+            </div>
+            <ThemeToggle resolved={resolvedTheme} onToggle={onToggleTheme} />
           </div>
         </nav>
 

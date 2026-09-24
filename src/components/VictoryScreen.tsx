@@ -8,6 +8,7 @@ import { buildShareText, copyShareText } from '../core/share'
 import { loadStreak } from '../core/daily'
 import { resolveClueHighlights } from '../core/ux'
 import type { ClueHighlight } from '../core/ux'
+import ThemeToggle from './ThemeToggle'
 import '../styles/site-victory.css'
 
 interface Props {
@@ -22,9 +23,11 @@ interface Props {
   onNext: () => void
   onPlayUnsolved: (id: string) => void
   onHome: () => void
+  resolvedTheme?: string
+  onToggleTheme?: () => void
 }
 
-export default function VictoryScreen({ puzzle, murderer, timer, elapsedSeconds, hintsLeft, completedIds, onNext, onPlayUnsolved, onHome }: Props) {
+export default function VictoryScreen({ puzzle, murderer, timer, elapsedSeconds, hintsLeft, completedIds, onNext, onPlayUnsolved, onHome, resolvedTheme, onToggleTheme }: Props) {
   const [showReplay, setShowReplay] = useState(false)
   const killer = puzzle.people.find(p => p.id === murderer)!
   const victim = puzzle.people.find(p => p.id === puzzle.victimId)!
@@ -65,7 +68,10 @@ export default function VictoryScreen({ puzzle, murderer, timer, elapsedSeconds,
             <span className="site-victory__brand-mark" aria-hidden="true">A</span>
             <span>Alibi <span className="site-victory__brand-divider">/</span> Case file</span>
           </div>
-          <p className="site-victory__case-ref">Case {puzzle.caseNumber}</p>
+          <div className="site-victory__header-actions">
+            <p className="site-victory__case-ref">Case {puzzle.caseNumber}</p>
+            {onToggleTheme && <ThemeToggle resolved={resolvedTheme ?? 'dark'} onToggle={onToggleTheme} />}
+          </div>
         </header>
 
         <section className="site-victory__lead" aria-labelledby="victory-title">

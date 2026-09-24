@@ -129,6 +129,8 @@ function AppInner() {
           onDismissFeedback={game.dismissFeedback}
           onBack={() => game.navigate('home')}
           onSwitchFloor={game.switchFloor}
+          resolvedTheme={theme.resolved}
+          onToggleTheme={theme.toggle}
         />
       </div>
     )
@@ -176,6 +178,8 @@ function AppInner() {
               onNext={nextCase}
               onPlayUnsolved={(id) => game.start(id, game.mode)}
               onHome={() => game.navigate('home')}
+              resolvedTheme={theme.resolved}
+              onToggleTheme={theme.toggle}
             />
           )}
         </Suspense>
