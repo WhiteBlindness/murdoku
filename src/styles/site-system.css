@@ -1,0 +1,141 @@
+/* Investigation desk palette. These roles style only the application shell.
+   Scene materials, camera output and board overlays retain their own tokens. */
+:root {
+  --site-ink: #242437;
+  --site-deep: #151724;
+  --site-paper: #ebe3db;
+  --site-paper-strong: #fff1e4;
+  --site-paper-ink: #2b2835;
+  --site-paper-muted: #5c5864;
+  --site-brass: #f4b96b;
+  --site-brass-dark: #855048;
+  --site-rule: rgba(255, 224, 197, 0.25);
+  --site-conflict: #aa4354;
+  --site-success: #19796e;
+  --site-teal: #4ec9c0;
+  --site-coral: #e57465;
+  --site-space-1: 4px;
+  --site-space-2: 8px;
+  --site-space-3: 12px;
+  --site-space-4: 16px;
+  --site-space-6: 24px;
+  --site-space-8: 32px;
+  --site-space-12: 48px;
+}
+
+.site-display {
+  font-family: 'Barlow Condensed', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.012em;
+}
+
+.site-copy {
+  font-family: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.52;
+}
+
+.site-data {
+  font-family: 'Courier Prime', ui-monospace, SFMono-Regular, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.site-control {
+  min-height: 44px;
+  font-family: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+}
+
+.site-control:focus-visible {
+  outline: 2px solid var(--site-brass);
+  outline-offset: 3px;
+}
+
+/* Deep violet ink and bright signals echo the scene's peach, timber and green. */
+html .site-home,
+html .site-tier {
+  --home-copy: #d9cfdb;
+  --home-muted: #b2a8bb;
+  background-image:
+    radial-gradient(ellipse 54% 48% at 82% 7%, rgba(94, 180, 178, 0.18), transparent 72%),
+    radial-gradient(ellipse 60% 40% at 4% 2%, rgba(226, 106, 105, 0.14), transparent 76%);
+}
+
+html .site-home__title span {
+  color: var(--site-coral);
+}
+
+html .site-home__primary-action {
+  color: #fff8ed;
+  background: #167a7a;
+  border-color: #6ed3c8;
+}
+
+html .site-home__primary-action:hover {
+  background: #23928f;
+}
+
+html .site-home__dispatch-sheet,
+html .site-home__daily {
+  border-top: 4px solid var(--site-coral);
+}
+
+html .site-home__scene {
+  border-color: #4ec9c0;
+}
+
+html .site-game-header {
+  background: #242437;
+}
+
+html .site-game-header h1 {
+  color: var(--site-paper-strong);
+}
+
+html .site-sequence {
+  border-top: 3px solid #167a7a;
+}
+
+html .site-sequence-person[aria-pressed='true'],
+html .site-suspect-card.is-selected {
+  border-color: #167a7a;
+  box-shadow: inset 3px 0 #167a7a;
+}
+
+html .site-sequence-person[aria-pressed='true'] .site-sequence-number {
+  background: #167a7a;
+  border-color: #167a7a;
+  color: white;
+}
+
+html .site-suspect-action[aria-pressed='true'] {
+  color: #126665;
+  border-color: #167a7a;
+  background: rgba(22, 122, 122, 0.12);
+}
+
+html .site-victory__document {
+  border-top: 6px solid #167a7a;
+}
+
+html .site-victory__seal {
+  color: #fff1e4;
+  background: #a74755;
+  border-color: #a74755;
+  box-shadow: 4px 5px 0 rgba(43, 40, 53, 0.14);
+}
+
+html .site-victory__next-button {
+  color: #fff8ed;
+  background: #167a7a;
+  border-color: #126a6a;
+}
+
+html .site-victory__next-button:hover {
+  background: #23928f;
+}
+
+html .site-victory__next-label {
+  color: rgba(255, 248, 237, 0.8);
+}
