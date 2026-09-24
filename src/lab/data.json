@@ -8950,12 +8950,16 @@
       "id": "graveyard",
       "title": "Cemitério",
       "packIds": [
-        "graveyard-kit"
+        "graveyard-kit",
+        "nature-kit"
       ],
       "assetIds": [
         "graveyard-kit--grave",
         "graveyard-kit--gravestone-cross",
-        "graveyard-kit--crypt-small"
+        "graveyard-kit--crypt-small",
+        "nature-kit--tree-default",
+        "nature-kit--plant-bush",
+        "nature-kit--fence-simple"
       ]
     },
     {
