@@ -54,14 +54,20 @@ export const SCALE_REFERENCES: RefModel[] = [
 
 const COMPOSITIONS: Record<string, Placement[]> = {
   suburban: [
-    { assetId: 'city-kit-suburban--building-type-a', at: [0, -TERRAIN_DROP, -1.55] },
-    { assetId: 'city-kit-suburban--fence-2x3', at: [-1.75, -TERRAIN_DROP, 0.45], yaw: Math.PI / 2 },
-    { assetId: 'city-kit-suburban--driveway-short', at: [0, -TERRAIN_DROP, 1.7] },
-    { assetId: 'city-kit-suburban--path-stones-messy', at: [0.05, -TERRAIN_DROP, 0.35] },
-    { assetId: 'nature-kit--tree-default', at: [-2.15, -TERRAIN_DROP, -1.2] },
-    { assetId: 'nature-kit--plant-bush', at: [2.0, -TERRAIN_DROP, -0.7] },
-    { assetId: 'nature-kit--path-stone', at: [0, -TERRAIN_DROP, 1.12], yaw: Math.PI / 2 },
-    { assetId: 'nature-kit--fence-simple', at: [1.55, -TERRAIN_DROP, 1.65] },
+    { assetId: 'city-kit-suburban--building-type-a', at: [0, -TERRAIN_DROP, -0.8] },
+    { assetId: 'city-kit-suburban--fence-low', at: [-1.0, -TERRAIN_DROP, 1.1] },
+    { assetId: 'city-kit-suburban--fence-low', at: [1.0, -TERRAIN_DROP, 1.1] },
+    { assetId: 'city-kit-suburban--driveway-long', at: [0, -TERRAIN_DROP, -0.25], yaw: Math.PI / 2 },
+    { assetId: 'city-kit-suburban--driveway-long', at: [0, -TERRAIN_DROP, 0.15], yaw: Math.PI / 2 },
+    { assetId: 'city-kit-suburban--driveway-long', at: [0, -TERRAIN_DROP, 0.55], yaw: Math.PI / 2 },
+    { assetId: 'city-kit-suburban--driveway-long', at: [0, -TERRAIN_DROP, 0.95], yaw: Math.PI / 2 },
+    { assetId: 'city-kit-suburban--driveway-long', at: [0, -TERRAIN_DROP, 1.35], yaw: Math.PI / 2 },
+    { assetId: 'city-kit-suburban--driveway-long', at: [0, -TERRAIN_DROP, 1.75], yaw: Math.PI / 2 },
+    { assetId: 'city-kit-suburban--path-stones-messy', at: [-0.7, -TERRAIN_DROP, 0.35] },
+    { assetId: 'city-kit-suburban--tree-large', at: [-1.25, -TERRAIN_DROP, -0.45] },
+    { assetId: 'nature-kit--tree-default', at: [1.25, -TERRAIN_DROP, -0.45] },
+    { assetId: 'nature-kit--plant-bush', at: [-1.2, -TERRAIN_DROP, 0.48] },
+    { assetId: 'nature-kit--plant-bush', at: [1.2, -TERRAIN_DROP, 0.48] },
   ],
   cafe: [
     { assetId: 'furniture-kit--table', at: [-0.7, 0, -0.9] },
@@ -76,10 +82,25 @@ const COMPOSITIONS: Record<string, Placement[]> = {
     { assetId: 'city-kit-commercial--detail-parasol-a', at: [1.55, -TERRAIN_DROP, 1.15] },
   ],
   market: [
-    { assetId: 'mini-market--shelf-boxes', at: [-1.2, 0, -0.75] },
-    { assetId: 'mini-market--shelf-boxes', at: [1.2, 0, -0.75] },
-    { assetId: 'mini-market--freezer', at: [-1.2, 0, -1.75] },
-    { assetId: 'mini-market--cash-register', at: [1.25, 0, 0.8] },
+    { assetId: 'mini-market--wall', at: [-2.0, 0, -2.3] },
+    { assetId: 'mini-market--wall-window', at: [-1.0, 0, -2.3] },
+    { assetId: 'mini-market--wall', at: [0, 0, -2.3] },
+    { assetId: 'mini-market--wall', at: [1.0, 0, -2.3] },
+    { assetId: 'mini-market--wall', at: [2.0, 0, -2.3] },
+    { assetId: 'mini-market--wall', at: [-2.5, 0, -1.8], yaw: Math.PI / 2 },
+    { assetId: 'mini-market--wall', at: [-2.5, 0, -0.8], yaw: Math.PI / 2 },
+    { assetId: 'mini-market--wall', at: [2.5, 0, -1.8], yaw: Math.PI / 2 },
+    { assetId: 'mini-market--wall', at: [2.5, 0, -0.8], yaw: Math.PI / 2 },
+    { assetId: 'mini-market--shelf-boxes', at: [-1.65, 0, -0.75] },
+    { assetId: 'mini-market--shelf-bags', at: [-0.45, 0, -0.75] },
+    { assetId: 'mini-market--shelf-boxes', at: [0.75, 0, -0.75] },
+    { assetId: 'mini-market--display-fruit', at: [-1.75, 0, 0.45] },
+    { assetId: 'mini-market--display-bread', at: [-0.6, 0, 0.45] },
+    { assetId: 'mini-market--freezer', at: [1.65, 0, -1.72] },
+    { assetId: 'mini-market--cash-register', at: [1.65, 0, 0.72] },
+    { assetId: 'mini-market--shopping-cart', at: [0.55, 0, 1.05], yaw: -Math.PI / 2 },
+    { assetId: 'mini-market--shopping-basket', at: [-1.75, 0, 1.12] },
+    { assetId: 'mini-market--character-employee', at: [2.08, 0, 0.95] },
   ],
   graveyard: [
     { assetId: 'graveyard-kit--crypt-small', at: [0, -TERRAIN_DROP, -1.75] },
@@ -121,10 +142,37 @@ const COMPOSITIONS: Record<string, Placement[]> = {
     { assetId: 'survival-kit--campfire-pit', at: [1.3, -TERRAIN_DROP, -0.4] },
   ],
   holiday: [
-    { assetId: 'holiday-kit--cabin-wall', at: [-0.45, -TERRAIN_DROP, -1.2] },
-    { assetId: 'holiday-kit--cabin-wall', at: [0.05, -TERRAIN_DROP, -0.72], yaw: Math.PI / 2 },
-    { assetId: 'holiday-kit--cabin-roof-snow', at: [-0.2, 1 - TERRAIN_DROP, -1.0], supportY: 1 - TERRAIN_DROP, supportPackageId: 'holiday-kit' },
-    { assetId: 'holiday-kit--snowman', at: [1.7, -TERRAIN_DROP, 1.1] },
+    { assetId: 'holiday-kit--floor-wood-snow', at: [0, -TERRAIN_DROP, -1.25] },
+    { assetId: 'holiday-kit--floor-wood-snow', at: [0, -TERRAIN_DROP, -0.25] },
+    { assetId: 'holiday-kit--cabin-wall-wreath', at: [0, -TERRAIN_DROP + 0.075, -1.25] },
+    { assetId: 'holiday-kit--cabin-wall', at: [-0.5, -TERRAIN_DROP + 0.075, -0.75], yaw: Math.PI / 2 },
+    { assetId: 'holiday-kit--cabin-window-large', at: [0.5, -TERRAIN_DROP + 0.075, -0.75], yaw: Math.PI / 2 },
+    { assetId: 'holiday-kit--cabin-doorway', at: [0, -TERRAIN_DROP + 0.075, -0.26] },
+    { assetId: 'holiday-kit--cabin-roof-snow-chimney', at: [0, 1.075 - TERRAIN_DROP, -0.95], supportY: 1.075 - TERRAIN_DROP, supportPackageId: 'holiday-kit' },
+    { assetId: 'holiday-kit--cabin-fence', at: [-1.9, -TERRAIN_DROP, 1.5] },
+    { assetId: 'holiday-kit--cabin-fence', at: [-0.8, -TERRAIN_DROP, 1.5] },
+    { assetId: 'holiday-kit--tree-decorated-snow', at: [1.8, -TERRAIN_DROP, -1.05] },
+    { assetId: 'holiday-kit--present-a-cube', at: [0.9, -TERRAIN_DROP, 0.65] },
+    { assetId: 'holiday-kit--lantern', at: [-1.85, -TERRAIN_DROP, 0.45] },
+    { assetId: 'holiday-kit--snowman', at: [1.15, -TERRAIN_DROP, 1.05] },
+  ],
+  minigolf: [
+    { assetId: 'minigolf-kit--start', at: [-1.5, -TERRAIN_DROP, 1.25] },
+    { assetId: 'minigolf-kit--straight', at: [-0.5, -TERRAIN_DROP, 1.25] },
+    { assetId: 'minigolf-kit--corner', at: [0.5, -TERRAIN_DROP, 1.25] },
+    { assetId: 'minigolf-kit--straight', at: [0.5, -TERRAIN_DROP, 0.25], yaw: Math.PI / 2 },
+    { assetId: 'minigolf-kit--windmill', at: [0.5, -TERRAIN_DROP, 0.25] },
+    { assetId: 'minigolf-kit--corner', at: [0.5, -TERRAIN_DROP, -0.75], yaw: Math.PI },
+    { assetId: 'minigolf-kit--straight', at: [-0.5, -TERRAIN_DROP, -0.75] },
+    { assetId: 'minigolf-kit--hole-round', at: [-1.5, -TERRAIN_DROP, -0.75] },
+    { assetId: 'minigolf-kit--straight', at: [-1.5, -TERRAIN_DROP, 0.25], yaw: Math.PI / 2 },
+    { assetId: 'minigolf-kit--hole-square', at: [-1.5, -TERRAIN_DROP, 0.25] },
+    { assetId: 'minigolf-kit--ball-red', at: [-1.5, -TERRAIN_DROP + 0.16, 1.2] },
+    { assetId: 'minigolf-kit--flag-red', at: [-1.5, -TERRAIN_DROP, -0.75] },
+    { assetId: 'minigolf-kit--obstacle-diamond', at: [-0.5, -TERRAIN_DROP, -0.75] },
+    { assetId: 'minigolf-kit--ramp', at: [1.55, -TERRAIN_DROP, 0.1] },
+    { assetId: 'minigolf-kit--tunnel-wide', at: [1.55, -TERRAIN_DROP, 1.25] },
+    { assetId: 'minigolf-kit--castle', at: [-2.35, -TERRAIN_DROP, -1.35] },
   ],
   'building-modular': [
     { assetId: 'building-kit--wall-doorway-square', at: [-0.65, 0, -1.3] },
@@ -137,16 +185,22 @@ const COMPOSITIONS: Record<string, Placement[]> = {
 }
 
 const MARKER_POSITIONS: Record<string, [number, number, number]> = {
-  suburban: [0, -TERRAIN_DROP, 2.35],
+  suburban: [0, -TERRAIN_DROP, 1.1],
   cafe: [0.9, -TERRAIN_DROP, 1.3],
-  market: [0, 0, 1.55],
+  market: [0.55, 0, 1.05],
   graveyard: [0, -TERRAIN_DROP, 1.55],
   industrial: [0, 0, 2.1],
   commercial: [1.8, -TERRAIN_DROP, 1.65],
   road: [0, -TERRAIN_DROP, 2.75],
   survival: [0, -TERRAIN_DROP, 1.55],
   holiday: [1.15, -TERRAIN_DROP, 1.55],
+  minigolf: [-1.5, -TERRAIN_DROP, 1.25],
   'building-modular': [0.1, 0, 1.65],
+}
+
+const HUMAN_REFERENCE_POSITIONS: Record<string, [number, number]> = {
+  suburban: [1.72, 0.95],
+  market: [-0.7, 1.02],
 }
 
 function ownedLambert(colour: string, options: Partial<THREE.MeshLambertMaterialParameters> = {}): THREE.MeshLambertMaterial {
@@ -349,12 +403,12 @@ function addPrototypeGround(scene: THREE.Scene, id: string): void {
   const interior = (colour: string) => addZone(scene, [5.2, FLOOR_THICKNESS, 3.4], [0, -FLOOR_THICKNESS / 2, -0.8], colour)
   const exterior = (colour: string) => addZone(scene, [5.2, FLOOR_THICKNESS / 2, 2.7], [0, -TERRAIN_DROP - FLOOR_THICKNESS / 4, 2.25], colour)
   const threshold = (colour: string) => addZone(scene, [5.2, FLOOR_THICKNESS / 2, 0.34], [0, -FLOOR_THICKNESS / 4, 1.25], colour)
-  const continuousExterior = (colour: string) => addZone(scene, [5.4, FLOOR_THICKNESS, 5.8], [0, -TERRAIN_DROP - FLOOR_THICKNESS / 2, 0], colour)
+  const continuousExterior = (colour: string, width = 5.4, depth = 5.8) => addZone(scene, [width, FLOOR_THICKNESS, depth], [0, -TERRAIN_DROP - FLOOR_THICKNESS / 2, 0], colour)
 
   switch (id) {
     case 'suburban':
-      continuousExterior('#88a86f')
-      addZone(scene, [1.5, 0.012, 2.2], [0, -TERRAIN_DROP + 0.01, 1.25], '#9e8f77')
+      continuousExterior('#88a86f', 4.0, 4.4)
+      addZone(scene, [1.5, 0.012, 0.24], [0, -TERRAIN_DROP + 0.01, 2.02], '#9e8f77')
       break
     case 'cafe':
       interior('#b58a62')
@@ -364,8 +418,8 @@ function addPrototypeGround(scene: THREE.Scene, id: string): void {
       break
     case 'market':
       interior('#b6ad99')
-      threshold('#c7b596')
-      exterior('#898d87')
+      addZone(scene, [3.4, FLOOR_THICKNESS / 2, 0.34], [0, -FLOOR_THICKNESS / 4, 1.05], '#c7b596')
+      addZone(scene, [3.4, FLOOR_THICKNESS / 2, 0.84], [0, -TERRAIN_DROP - FLOOR_THICKNESS / 4, 1.64], '#898d87')
       break
     case 'graveyard':
       continuousExterior('#759267')
@@ -391,8 +445,15 @@ function addPrototypeGround(scene: THREE.Scene, id: string): void {
       addZone(scene, [4.4, 0.012, 0.7], [0, -TERRAIN_DROP + 0.01, 0.4], '#b59b6d')
       break
     case 'holiday':
-      continuousExterior('#e2ddd2')
-      addZone(scene, [1.8, 0.012, 2.2], [0, -TERRAIN_DROP + 0.01, 1.35], '#c9c5bb')
+      continuousExterior('#e7e3d9')
+      addZone(scene, [1.0, 0.012, 1.0], [-0.5, -TERRAIN_DROP + 0.01, -1.25], '#c9c5bb')
+      break
+    case 'minigolf':
+      continuousExterior('#83a46b')
+      addZone(scene, [5.0, 0.08, 0.1], [0, -TERRAIN_DROP + 0.04, -2.5], '#b39773')
+      addZone(scene, [5.0, 0.08, 0.1], [0, -TERRAIN_DROP + 0.04, 2.5], '#b39773')
+      addZone(scene, [0.1, 0.08, 5.0], [-2.5, -TERRAIN_DROP + 0.04, 0], '#b39773')
+      addZone(scene, [0.1, 0.08, 5.0], [2.5, -TERRAIN_DROP + 0.04, 0], '#b39773')
       break
     case 'building-modular':
       interior('#b7ad99')
@@ -474,7 +535,8 @@ async function buildPrototype(scene: THREE.Scene, options: LabSceneOptions): Pro
   await Promise.all(jobs)
 
   const markerPosition = MARKER_POSITIONS[prototype.id] ?? [0, -TERRAIN_DROP, 1.5]
-  addHumanReference(scene, 2.2, 1.75, markerPosition[1])
+  const humanPosition = HUMAN_REFERENCE_POSITIONS[prototype.id] ?? [2.2, 1.75]
+  addHumanReference(scene, humanPosition[0], humanPosition[1], markerPosition[1])
   if (options.showOccupantMarker) addOccupantMarker(scene, ...markerPosition)
 }
 

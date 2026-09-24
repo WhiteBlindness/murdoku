@@ -1,7 +1,7 @@
 {
   "reportVersion": 1,
   "baselineSha": "aa384c2f69ab6168786abccf04f713ad3ae24a58",
-  "generatedAt": "2026-09-23T19:51:57.312Z",
+  "generatedAt": "2026-09-24T19:54:34.724Z",
   "coverage": "all-glb",
   "source": {
     "provider": "Kenney",
@@ -1560,6 +1560,144 @@
       }
     },
     {
+      "id": "minigolf-kit",
+      "displayName": "Minigolf Kit",
+      "officialUrl": "https://kenney.nl/assets/minigolf-kit",
+      "zipName": "kenney_minigolf-kit.zip",
+      "zipSha256": "74b7bf5cf82bf8a5225319ade1284600c64f9482ae66f0ccf1f22d2212d5a952",
+      "license": "CC0",
+      "modelCount": 126,
+      "stats": {
+        "modelCount": 126,
+        "measuredModelCount": 126,
+        "complete": true,
+        "totalFileBytes": 1943700,
+        "triangles": {
+          "total": 20046,
+          "perModel": {
+            "min": 6,
+            "median": 112,
+            "p90": 326,
+            "max": 806,
+            "mean": 159.09524
+          }
+        },
+        "vertices": {
+          "total": 33529,
+          "perModel": {
+            "min": 8,
+            "median": 192,
+            "p90": 560,
+            "max": 1408,
+            "mean": 266.10317
+          }
+        },
+        "boundsSizeByAxis": {
+          "x": {
+            "min": 0.06994,
+            "median": 0.9999,
+            "p90": 1.9999,
+            "max": 4.49995,
+            "mean": 1.14352
+          },
+          "y": {
+            "min": 0.06333,
+            "median": 0.23331,
+            "p90": 1.14665,
+            "max": 4,
+            "mean": 0.60652
+          },
+          "z": {
+            "min": 0,
+            "median": 0.9999,
+            "p90": 4,
+            "max": 4.49995,
+            "mean": 1.74067
+          },
+          "maximumAxis": {
+            "min": 0.06994,
+            "median": 0.9999,
+            "p90": 4,
+            "max": 4.49995,
+            "mean": 1.86532
+          }
+        },
+        "pivot": {
+          "atGroundCount": 110,
+          "belowGroundCount": 16,
+          "aboveGroundCount": 0,
+          "offsetY": {
+            "min": -0.76873,
+            "median": 0,
+            "p90": 0,
+            "max": 0,
+            "mean": -0.05417
+          },
+          "originByAxis": {
+            "x": {
+              "min": 0,
+              "median": 0,
+              "p90": 0,
+              "max": 0,
+              "mean": 0
+            },
+            "y": {
+              "min": -1,
+              "median": 0,
+              "p90": 0,
+              "max": 0,
+              "mean": -0.30159
+            },
+            "z": {
+              "min": 0,
+              "median": 0,
+              "p90": 0,
+              "max": 0,
+              "mean": 0
+            }
+          },
+          "boundsMinFromOriginByAxis": {
+            "x": {
+              "min": -4,
+              "median": -0.49995,
+              "p90": -0.30652,
+              "max": -0.03497,
+              "mean": -0.6813
+            },
+            "y": {
+              "min": -0.76873,
+              "median": 0,
+              "p90": 0,
+              "max": 0,
+              "mean": -0.05417
+            },
+            "z": {
+              "min": -1.99081,
+              "median": -0.49579,
+              "p90": 0,
+              "max": 0,
+              "mean": -0.33392
+            }
+          },
+          "nonIdentityTranslationModels": 38,
+          "nonIdentityRotationModels": 0,
+          "nonIdentityScaleModels": 0,
+          "matrixTransformModels": 0
+        },
+        "materials": {
+          "materialCount": 126,
+          "modelsWithMaterials": 126,
+          "modelsWithUnlit": 0,
+          "modelsWithTextureTransform": 126,
+          "textureTransformBindings": 126,
+          "images": 126,
+          "embeddedImages": 0,
+          "externalImages": 126,
+          "colormapImages": 126
+        }
+      }
+    },
+    {
       "id": "modular-buildings",
       "displayName": "Modular Buildings",
       "officialUrl": "https://kenney.nl/assets/modular-buildings",
@@ -2112,8 +2250,8 @@
       }
     }
   ],
-  "modelCount": 1626,
-  "selectedModelCount": 50,
+  "modelCount": 1752,
+  "selectedModelCount": 86,
   "failedModelCount": 0,
   "failures": [],
   "models": [
@@ -4161,6 +4299,160 @@
       }
     },
     {
+      "id": "city-kit-suburban--driveway-long",
+      "packageId": "city-kit-suburban",
+      "name": "driveway-long.glb",
+      "sourceRelativePath": "Models/GLB format/driveway-long.glb",
+      "sourceZipName": "kenney_city-kit-suburban_20.zip",
+      "sourceZipSha256": "5869c35cf30b1c87bdb2d197b6d325eebadd2ef08ea27f04797e8e08d77a9a39",
+      "sourceGlbSha256": "d6fc46e8a5363c87b616eaa65c5dbcffa9026b8af47f979dc6c38cfa91f53459",
+      "officialUrl": "https://kenney.nl/assets/city-kit-suburban",
+      "license": "CC0",
+      "fileBytes": 2952,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.18,
+          0,
+          -0.2
+        ],
+        "max": [
+          0.18,
+          0.01,
+          0.2
+        ],
+        "size": [
+          0.36,
+          0.01,
+          0.4
+        ],
+        "center": [
+          0,
+          0.005,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "driveway-long",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.18,
+          0,
+          -0.2
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 24,
+      "triangleCount": 12,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/city-kit-suburban--driveway-long/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "suburban"
+      ],
+      "labRole": "ground",
+      "publicPath": "/kenney-lab/city-kit-suburban--driveway-long.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 0.02128,
+        "wallHeight": 0.00775,
+        "doorwayHeight": 0.00991
+      }
+    },
+    {
       "id": "city-kit-suburban--driveway-short",
       "packageId": "city-kit-suburban",
       "name": "driveway-short.glb",
@@ -4469,6 +4761,314 @@
       }
     },
     {
+      "id": "city-kit-suburban--fence-low",
+      "packageId": "city-kit-suburban",
+      "name": "fence-low.glb",
+      "sourceRelativePath": "Models/GLB format/fence-low.glb",
+      "sourceZipName": "kenney_city-kit-suburban_20.zip",
+      "sourceZipSha256": "5869c35cf30b1c87bdb2d197b6d325eebadd2ef08ea27f04797e8e08d77a9a39",
+      "sourceGlbSha256": "fe0272d73820bb4c8db3bed408a28cbd5c042da1373142bd13122a1ac9d1a168",
+      "officialUrl": "https://kenney.nl/assets/city-kit-suburban",
+      "license": "CC0",
+      "fileBytes": 18552,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.6375,
+          0,
+          -0.4375
+        ],
+        "max": [
+          0.6375,
+          0.17,
+          0.4
+        ],
+        "size": [
+          1.275,
+          0.17,
+          0.8375
+        ],
+        "center": [
+          0,
+          0.085,
+          -0.01875
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "fence-low",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.6375,
+          0,
+          -0.4375
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 328,
+      "triangleCount": 180,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/city-kit-suburban--fence-low/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "suburban"
+      ],
+      "labRole": "structure",
+      "publicPath": "/kenney-lab/city-kit-suburban--fence-low.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 0.3617,
+        "wallHeight": 0.13183,
+        "doorwayHeight": 0.1684
+      }
+    },
+    {
+      "id": "city-kit-suburban--path-short",
+      "packageId": "city-kit-suburban",
+      "name": "path-short.glb",
+      "sourceRelativePath": "Models/GLB format/path-short.glb",
+      "sourceZipName": "kenney_city-kit-suburban_20.zip",
+      "sourceZipSha256": "5869c35cf30b1c87bdb2d197b6d325eebadd2ef08ea27f04797e8e08d77a9a39",
+      "sourceGlbSha256": "0f657ebadf8c56adcd54335b8da2e54120f539918ea50509812731790ef99c2b",
+      "officialUrl": "https://kenney.nl/assets/city-kit-suburban",
+      "license": "CC0",
+      "fileBytes": 2944,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.1,
+          0,
+          -0.1
+        ],
+        "max": [
+          0.1,
+          0.01,
+          0.1
+        ],
+        "size": [
+          0.2,
+          0.01,
+          0.2
+        ],
+        "center": [
+          0,
+          0.005,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "path-short",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.1,
+          0,
+          -0.1
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 24,
+      "triangleCount": 12,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/city-kit-suburban--path-short/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "suburban"
+      ],
+      "labRole": "path",
+      "publicPath": "/kenney-lab/city-kit-suburban--path-short.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 0.02128,
+        "wallHeight": 0.00775,
+        "doorwayHeight": 0.00991
+      }
+    },
+    {
       "id": "city-kit-suburban--path-stones-messy",
       "packageId": "city-kit-suburban",
       "name": "path-stones-messy.glb",
@@ -4620,6 +5220,314 @@
         "chairHeight": 0.02128,
         "wallHeight": 0.00775,
         "doorwayHeight": 0.00991
+      }
+    },
+    {
+      "id": "city-kit-suburban--tree-large",
+      "packageId": "city-kit-suburban",
+      "name": "tree-large.glb",
+      "sourceRelativePath": "Models/GLB format/tree-large.glb",
+      "sourceZipName": "kenney_city-kit-suburban_20.zip",
+      "sourceZipSha256": "5869c35cf30b1c87bdb2d197b6d325eebadd2ef08ea27f04797e8e08d77a9a39",
+      "sourceGlbSha256": "16d1f95c149bc727a953a473cf20bf21de9bf1a88747c4f9d2eeb4ac7d43e291",
+      "officialUrl": "https://kenney.nl/assets/city-kit-suburban",
+      "license": "CC0",
+      "fileBytes": 5812,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.10522,
+          0,
+          -0.1215
+        ],
+        "max": [
+          0.10522,
+          0.767,
+          0.1215
+        ],
+        "size": [
+          0.21044,
+          0.767,
+          0.243
+        ],
+        "center": [
+          0,
+          0.3835,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "tree-large",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.10522,
+          0,
+          -0.1215
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 80,
+      "triangleCount": 42,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/city-kit-suburban--tree-large/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "suburban"
+      ],
+      "labRole": "vegetation",
+      "publicPath": "/kenney-lab/city-kit-suburban--tree-large.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 1.63191,
+        "wallHeight": 0.59479,
+        "doorwayHeight": 0.75976
+      }
+    },
+    {
+      "id": "city-kit-suburban--tree-small",
+      "packageId": "city-kit-suburban",
+      "name": "tree-small.glb",
+      "sourceRelativePath": "Models/GLB format/tree-small.glb",
+      "sourceZipName": "kenney_city-kit-suburban_20.zip",
+      "sourceZipSha256": "5869c35cf30b1c87bdb2d197b6d325eebadd2ef08ea27f04797e8e08d77a9a39",
+      "sourceGlbSha256": "5f63359e5f392609d7617cc98070855ca1ffd4f4b4bc3978a5ff56ece88a58d6",
+      "officialUrl": "https://kenney.nl/assets/city-kit-suburban",
+      "license": "CC0",
+      "fileBytes": 5812,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.10522,
+          0,
+          -0.1215
+        ],
+        "max": [
+          0.10522,
+          0.567,
+          0.1215
+        ],
+        "size": [
+          0.21044,
+          0.567,
+          0.243
+        ],
+        "center": [
+          0,
+          0.2835,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "tree-small",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.10522,
+          0,
+          -0.1215
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 80,
+      "triangleCount": 42,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/city-kit-suburban--tree-small/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "suburban"
+      ],
+      "labRole": "vegetation",
+      "publicPath": "/kenney-lab/city-kit-suburban--tree-small.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 1.20638,
+        "wallHeight": 0.4397,
+        "doorwayHeight": 0.56165
       }
     },
     {
@@ -7039,6 +7947,468 @@
       }
     },
     {
+      "id": "holiday-kit--cabin-doorway",
+      "packageId": "holiday-kit",
+      "name": "cabin-doorway.glb",
+      "sourceRelativePath": "Models/GLB format/cabin-doorway.glb",
+      "sourceZipName": "kenney_holiday-kit.zip",
+      "sourceZipSha256": "fde4d514d7297388d98058e8933ff614e071886f7ce57f9aea4b00d7698dd769",
+      "sourceGlbSha256": "613fe82e80dcc6302fc49aff1bbacfbd2adeba34f091b8fffb00f0d65bf4b13c",
+      "officialUrl": "https://kenney.nl/assets/holiday-kit",
+      "license": "CC0",
+      "fileBytes": 18124,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.5,
+          0,
+          0.3
+        ],
+        "max": [
+          0.5,
+          1,
+          0.7
+        ],
+        "size": [
+          1,
+          1,
+          0.4
+        ],
+        "center": [
+          0,
+          0.5,
+          0.5
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "cabin-doorway",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.5,
+          0,
+          0.3
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 316,
+      "triangleCount": 200,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/holiday-kit--cabin-doorway/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "holiday"
+      ],
+      "labRole": "structure",
+      "publicPath": "/kenney-lab/holiday-kit--cabin-doorway.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 2.12766,
+        "wallHeight": 0.77548,
+        "doorwayHeight": 0.99056
+      }
+    },
+    {
+      "id": "holiday-kit--cabin-fence",
+      "packageId": "holiday-kit",
+      "name": "cabin-fence.glb",
+      "sourceRelativePath": "Models/GLB format/cabin-fence.glb",
+      "sourceZipName": "kenney_holiday-kit.zip",
+      "sourceZipSha256": "fde4d514d7297388d98058e8933ff614e071886f7ce57f9aea4b00d7698dd769",
+      "sourceGlbSha256": "18f99ef86a3703cc3bd4109d3141e26f481b566ebf29f2efbb472c13d5511152",
+      "officialUrl": "https://kenney.nl/assets/holiday-kit",
+      "license": "CC0",
+      "fileBytes": 7280,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -1.1,
+          0,
+          0.85
+        ],
+        "max": [
+          0,
+          0.4,
+          1.05
+        ],
+        "size": [
+          1.1,
+          0.4,
+          0.2
+        ],
+        "center": [
+          -0.55,
+          0.2,
+          0.95
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "cabin-fence",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -1.1,
+          0,
+          0.85
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 112,
+      "triangleCount": 60,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/holiday-kit--cabin-fence/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "holiday"
+      ],
+      "labRole": "boundary",
+      "publicPath": "/kenney-lab/holiday-kit--cabin-fence.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 0.85106,
+        "wallHeight": 0.31019,
+        "doorwayHeight": 0.39622
+      }
+    },
+    {
+      "id": "holiday-kit--cabin-roof-snow-chimney",
+      "packageId": "holiday-kit",
+      "name": "cabin-roof-snow-chimney.glb",
+      "sourceRelativePath": "Models/GLB format/cabin-roof-snow-chimney.glb",
+      "sourceZipName": "kenney_holiday-kit.zip",
+      "sourceZipSha256": "fde4d514d7297388d98058e8933ff614e071886f7ce57f9aea4b00d7698dd769",
+      "sourceGlbSha256": "e86f6169f36ef852b7b9dac087589b2fede552a822f33fecceae9cf3bb27e3f2",
+      "officialUrl": "https://kenney.nl/assets/holiday-kit",
+      "license": "CC0",
+      "fileBytes": 18780,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.5,
+          -0.14142,
+          -0.7
+        ],
+        "max": [
+          0.81119,
+          1.33687,
+          0.7
+        ],
+        "size": [
+          1.31119,
+          1.4783,
+          1.4
+        ],
+        "center": [
+          0.15559,
+          0.59773,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "cabin-roof-snow-chimney",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.5,
+          -0.14142,
+          -0.7
+        ],
+        "floorContactOffsetY": -0.14142,
+        "touchesGroundAtOrigin": false
+      },
+      "vertexCount": 330,
+      "triangleCount": 188,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/holiday-kit--cabin-roof-snow-chimney/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "holiday"
+      ],
+      "labRole": "structure",
+      "publicPath": "/kenney-lab/holiday-kit--cabin-roof-snow-chimney.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 3.14532,
+        "wallHeight": 1.14639,
+        "doorwayHeight": 1.46434
+      }
+    },
+    {
       "id": "holiday-kit--cabin-roof-snow",
       "packageId": "holiday-kit",
       "name": "cabin-roof-snow.glb",
@@ -7190,6 +8560,160 @@
         "chairHeight": 3.14532,
         "wallHeight": 1.14639,
         "doorwayHeight": 1.46434
+      }
+    },
+    {
+      "id": "holiday-kit--cabin-wall-wreath",
+      "packageId": "holiday-kit",
+      "name": "cabin-wall-wreath.glb",
+      "sourceRelativePath": "Models/GLB format/cabin-wall-wreath.glb",
+      "sourceZipName": "kenney_holiday-kit.zip",
+      "sourceZipSha256": "fde4d514d7297388d98058e8933ff614e071886f7ce57f9aea4b00d7698dd769",
+      "sourceGlbSha256": "ca83e1d7b9fd3ccb7c66830c78c42da5d4bc44bbb9cd268b1bcee823e9d42cb6",
+      "officialUrl": "https://kenney.nl/assets/holiday-kit",
+      "license": "CC0",
+      "fileBytes": 36420,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.5,
+          0,
+          0.35
+        ],
+        "max": [
+          0.5,
+          1,
+          0.76043
+        ],
+        "size": [
+          1,
+          1,
+          0.41043
+        ],
+        "center": [
+          0,
+          0.5,
+          0.55522
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "cabin-wall-wreath",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.5,
+          0,
+          0.35
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 676,
+      "triangleCount": 372,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/holiday-kit--cabin-wall-wreath/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "holiday"
+      ],
+      "labRole": "structure",
+      "publicPath": "/kenney-lab/holiday-kit--cabin-wall-wreath.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 2.12766,
+        "wallHeight": 0.77548,
+        "doorwayHeight": 0.99056
       }
     },
     {
@@ -7347,6 +8871,622 @@
       }
     },
     {
+      "id": "holiday-kit--cabin-window-large",
+      "packageId": "holiday-kit",
+      "name": "cabin-window-large.glb",
+      "sourceRelativePath": "Models/GLB format/cabin-window-large.glb",
+      "sourceZipName": "kenney_holiday-kit.zip",
+      "sourceZipSha256": "fde4d514d7297388d98058e8933ff614e071886f7ce57f9aea4b00d7698dd769",
+      "sourceGlbSha256": "0678ee0347c3553a7afb2cacb5cf905659bd16c8b68d7c3dbaa29c1cd2c9b517",
+      "officialUrl": "https://kenney.nl/assets/holiday-kit",
+      "license": "CC0",
+      "fileBytes": 18168,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.5,
+          0,
+          0.35
+        ],
+        "max": [
+          0.5,
+          1,
+          1.05
+        ],
+        "size": [
+          1,
+          1,
+          0.7
+        ],
+        "center": [
+          0,
+          0.5,
+          0.7
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "cabin-window-large",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.5,
+          0,
+          0.35
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 318,
+      "triangleCount": 194,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/holiday-kit--cabin-window-large/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "holiday"
+      ],
+      "labRole": "structure",
+      "publicPath": "/kenney-lab/holiday-kit--cabin-window-large.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 2.12766,
+        "wallHeight": 0.77548,
+        "doorwayHeight": 0.99056
+      }
+    },
+    {
+      "id": "holiday-kit--floor-wood-snow",
+      "packageId": "holiday-kit",
+      "name": "floor-wood-snow.glb",
+      "sourceRelativePath": "Models/GLB format/floor-wood-snow.glb",
+      "sourceZipName": "kenney_holiday-kit.zip",
+      "sourceZipSha256": "fde4d514d7297388d98058e8933ff614e071886f7ce57f9aea4b00d7698dd769",
+      "sourceGlbSha256": "b6031010c49ce6fc243b85a23776b9584f665bd346a0af554fec191b8e9b43c6",
+      "officialUrl": "https://kenney.nl/assets/holiday-kit",
+      "license": "CC0",
+      "fileBytes": 10668,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.5,
+          0,
+          -0.5
+        ],
+        "max": [
+          0.5,
+          0.075,
+          0.5
+        ],
+        "size": [
+          1,
+          0.075,
+          1
+        ],
+        "center": [
+          0,
+          0.0375,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "floor-wood-snow",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.5,
+          0,
+          -0.5
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 180,
+      "triangleCount": 112,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/holiday-kit--floor-wood-snow/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "holiday"
+      ],
+      "labRole": "ground",
+      "publicPath": "/kenney-lab/holiday-kit--floor-wood-snow.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 0.15957,
+        "wallHeight": 0.05816,
+        "doorwayHeight": 0.07429
+      }
+    },
+    {
+      "id": "holiday-kit--lantern",
+      "packageId": "holiday-kit",
+      "name": "lantern.glb",
+      "sourceRelativePath": "Models/GLB format/lantern.glb",
+      "sourceZipName": "kenney_holiday-kit.zip",
+      "sourceZipSha256": "fde4d514d7297388d98058e8933ff614e071886f7ce57f9aea4b00d7698dd769",
+      "sourceGlbSha256": "42c4851862b3ea223c49e387c10353b4ee3cfb95dc178020bcabd123d0abeb85",
+      "officialUrl": "https://kenney.nl/assets/holiday-kit",
+      "license": "CC0",
+      "fileBytes": 17636,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.2626,
+          0,
+          -0.22742
+        ],
+        "max": [
+          0.2626,
+          1.73728,
+          0.22742
+        ],
+        "size": [
+          0.52519,
+          1.73728,
+          0.45483
+        ],
+        "center": [
+          0,
+          0.86864,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "lantern",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.2626,
+          0,
+          -0.22742
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 306,
+      "triangleCount": 172,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/holiday-kit--lantern/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "holiday"
+      ],
+      "labRole": "clue-object",
+      "publicPath": "/kenney-lab/holiday-kit--lantern.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 3.69634,
+        "wallHeight": 1.34722,
+        "doorwayHeight": 1.72088
+      }
+    },
+    {
+      "id": "holiday-kit--present-a-cube",
+      "packageId": "holiday-kit",
+      "name": "present-a-cube.glb",
+      "sourceRelativePath": "Models/GLB format/present-a-cube.glb",
+      "sourceZipName": "kenney_holiday-kit.zip",
+      "sourceZipSha256": "fde4d514d7297388d98058e8933ff614e071886f7ce57f9aea4b00d7698dd769",
+      "sourceGlbSha256": "6b41be140855d42aeda4bde41fa4eaaea19fb1f2d36289cd10fcd742f2003423",
+      "officialUrl": "https://kenney.nl/assets/holiday-kit",
+      "license": "CC0",
+      "fileBytes": 18944,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.225,
+          0,
+          -0.225
+        ],
+        "max": [
+          0.225,
+          0.57071,
+          0.225
+        ],
+        "size": [
+          0.45,
+          0.57071,
+          0.45
+        ],
+        "center": [
+          0,
+          0.28536,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "present-a-cube",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.225,
+          0,
+          -0.225
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 318,
+      "triangleCount": 238,
+      "nodeCount": 2,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 2,
+      "primitiveCount": 2,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/holiday-kit--present-a-cube/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "holiday"
+      ],
+      "labRole": "clue-object",
+      "publicPath": "/kenney-lab/holiday-kit--present-a-cube.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 1.21428,
+        "wallHeight": 0.44257,
+        "doorwayHeight": 0.56532
+      }
+    },
+    {
       "id": "holiday-kit--snowman",
       "packageId": "holiday-kit",
       "name": "snowman.glb",
@@ -7498,6 +9638,160 @@
         "chairHeight": 2.2647,
         "wallHeight": 0.82542,
         "doorwayHeight": 1.05436
+      }
+    },
+    {
+      "id": "holiday-kit--tree-decorated-snow",
+      "packageId": "holiday-kit",
+      "name": "tree-decorated-snow.glb",
+      "sourceRelativePath": "Models/GLB format/tree-decorated-snow.glb",
+      "sourceZipName": "kenney_holiday-kit.zip",
+      "sourceZipSha256": "fde4d514d7297388d98058e8933ff614e071886f7ce57f9aea4b00d7698dd769",
+      "sourceGlbSha256": "1d21821506f5bed1ebf65c965ebe827470738116763cb5b0e37f7537d62773f1",
+      "officialUrl": "https://kenney.nl/assets/holiday-kit",
+      "license": "CC0",
+      "fileBytes": 85204,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.62475,
+          0,
+          -0.62475
+        ],
+        "max": [
+          0.62475,
+          2.28966,
+          0.62475
+        ],
+        "size": [
+          1.2495,
+          2.28966,
+          1.2495
+        ],
+        "center": [
+          0,
+          1.14483,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "tree-decorated-snow",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.62475,
+          0,
+          -0.62475
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 1636,
+      "triangleCount": 810,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/holiday-kit--tree-decorated-snow/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "holiday"
+      ],
+      "labRole": "vegetation",
+      "publicPath": "/kenney-lab/holiday-kit--tree-decorated-snow.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 4.87162,
+        "wallHeight": 1.77558,
+        "doorwayHeight": 2.26805
       }
     },
     {
@@ -7655,6 +9949,468 @@
       }
     },
     {
+      "id": "mini-market--character-employee",
+      "packageId": "mini-market",
+      "name": "character-employee.glb",
+      "sourceRelativePath": "Models/GLB format/character-employee.glb",
+      "sourceZipName": "kenney_mini-market.zip",
+      "sourceZipSha256": "6f2e69090e359204ace43e4c98dc3fb8639b75e423109672b5c890d194c45203",
+      "sourceGlbSha256": "8774b93a5ff11af146176505035cc351d37a8a69ad0b1fde612bba9c8ffa84cc",
+      "officialUrl": "https://kenney.nl/assets/mini-market",
+      "license": "CC0",
+      "fileBytes": 215836,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.39028,
+          0,
+          -0.21088
+        ],
+        "max": [
+          0.39028,
+          0.72335,
+          0.19049
+        ],
+        "size": [
+          0.78056,
+          0.72335,
+          0.40137
+        ],
+        "center": [
+          0,
+          0.36168,
+          -0.0102
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "character-employee",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.39028,
+          0,
+          -0.21088
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 890,
+      "triangleCount": 520,
+      "nodeCount": 10,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 2,
+      "primitiveCount": 2,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/mini-market--character-employee/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 32,
+      "skinCount": 2,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "market"
+      ],
+      "labRole": "human-scale",
+      "publicPath": "/kenney-lab/mini-market--character-employee.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 1.53904,
+        "wallHeight": 0.56094,
+        "doorwayHeight": 0.71652
+      }
+    },
+    {
+      "id": "mini-market--display-bread",
+      "packageId": "mini-market",
+      "name": "display-bread.glb",
+      "sourceRelativePath": "Models/GLB format/display-bread.glb",
+      "sourceZipName": "kenney_mini-market.zip",
+      "sourceZipSha256": "6f2e69090e359204ace43e4c98dc3fb8639b75e423109672b5c890d194c45203",
+      "sourceGlbSha256": "33a57fee0e331e5e40df5f0dc7af302e93266fd978dda810ab9f0ea4a2c205d1",
+      "officialUrl": "https://kenney.nl/assets/mini-market",
+      "license": "CC0",
+      "fileBytes": 36640,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.35,
+          0,
+          -0.3
+        ],
+        "max": [
+          0.35,
+          0.5,
+          0.3
+        ],
+        "size": [
+          0.7,
+          0.5,
+          0.6
+        ],
+        "center": [
+          0,
+          0.25,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "display-bread",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.35,
+          0,
+          -0.3
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 646,
+      "triangleCount": 362,
+      "nodeCount": 3,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 3,
+      "primitiveCount": 3,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/mini-market--display-bread/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "market"
+      ],
+      "labRole": "clue-object",
+      "publicPath": "/kenney-lab/mini-market--display-bread.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 1.06383,
+        "wallHeight": 0.38774,
+        "doorwayHeight": 0.49528
+      }
+    },
+    {
+      "id": "mini-market--display-fruit",
+      "packageId": "mini-market",
+      "name": "display-fruit.glb",
+      "sourceRelativePath": "Models/GLB format/display-fruit.glb",
+      "sourceZipName": "kenney_mini-market.zip",
+      "sourceZipSha256": "6f2e69090e359204ace43e4c98dc3fb8639b75e423109672b5c890d194c45203",
+      "sourceGlbSha256": "4cc38dcbd0f703d5bc829ff4a627648872dd3f6578f3e7e01fdcee066367873b",
+      "officialUrl": "https://kenney.nl/assets/mini-market",
+      "license": "CC0",
+      "fileBytes": 62976,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.3,
+          0,
+          -0.3
+        ],
+        "max": [
+          0.3,
+          0.51596,
+          0.3
+        ],
+        "size": [
+          0.6,
+          0.51596,
+          0.6
+        ],
+        "center": [
+          0,
+          0.25798,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "display-fruit",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.3,
+          0,
+          -0.3
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 1192,
+      "triangleCount": 650,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/mini-market--display-fruit/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "market"
+      ],
+      "labRole": "clue-object",
+      "publicPath": "/kenney-lab/mini-market--display-fruit.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 1.09779,
+        "wallHeight": 0.40011,
+        "doorwayHeight": 0.51109
+      }
+    },
+    {
       "id": "mini-market--freezer",
       "packageId": "mini-market",
       "name": "freezer.glb",
@@ -7809,6 +10565,160 @@
       }
     },
     {
+      "id": "mini-market--shelf-bags",
+      "packageId": "mini-market",
+      "name": "shelf-bags.glb",
+      "sourceRelativePath": "Models/GLB format/shelf-bags.glb",
+      "sourceZipName": "kenney_mini-market.zip",
+      "sourceZipSha256": "6f2e69090e359204ace43e4c98dc3fb8639b75e423109672b5c890d194c45203",
+      "sourceGlbSha256": "17725a5f680aff17dbc6ac3398ef0339d78b5b76bbfaa29292a5084479c4bd69",
+      "officialUrl": "https://kenney.nl/assets/mini-market",
+      "license": "CC0",
+      "fileBytes": 78444,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.4,
+          0,
+          -0.35
+        ],
+        "max": [
+          0.4,
+          0.86338,
+          0.35
+        ],
+        "size": [
+          0.8,
+          0.86338,
+          0.7
+        ],
+        "center": [
+          0,
+          0.43169,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "shelf-bags",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.4,
+          0,
+          -0.35
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 1308,
+      "triangleCount": 892,
+      "nodeCount": 9,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 9,
+      "primitiveCount": 9,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/mini-market--shelf-bags/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "market"
+      ],
+      "labRole": "storage",
+      "publicPath": "/kenney-lab/mini-market--shelf-bags.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 1.83698,
+        "wallHeight": 0.66953,
+        "doorwayHeight": 0.85523
+      }
+    },
+    {
       "id": "mini-market--shelf-boxes",
       "packageId": "mini-market",
       "name": "shelf-boxes.glb",
@@ -7960,6 +10870,2794 @@
         "chairHeight": 1.80851,
         "wallHeight": 0.65915,
         "doorwayHeight": 0.84198
+      }
+    },
+    {
+      "id": "mini-market--shelf-end",
+      "packageId": "mini-market",
+      "name": "shelf-end.glb",
+      "sourceRelativePath": "Models/GLB format/shelf-end.glb",
+      "sourceZipName": "kenney_mini-market.zip",
+      "sourceZipSha256": "6f2e69090e359204ace43e4c98dc3fb8639b75e423109672b5c890d194c45203",
+      "sourceGlbSha256": "9a6f4528ae127689d538de0fa45c07f58538c8572a1b858cc5e40caceb7d2c69",
+      "officialUrl": "https://kenney.nl/assets/mini-market",
+      "license": "CC0",
+      "fileBytes": 44560,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.4,
+          0,
+          -0.40111
+        ],
+        "max": [
+          0.4,
+          1.05,
+          -0.00111
+        ],
+        "size": [
+          0.8,
+          1.05,
+          0.4
+        ],
+        "center": [
+          0,
+          0.525,
+          -0.20111
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "shelf-end",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.4,
+          0,
+          -0.40111
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 690,
+      "triangleCount": 362,
+      "nodeCount": 8,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 8,
+      "primitiveCount": 8,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/mini-market--shelf-end/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "market"
+      ],
+      "labRole": "storage",
+      "publicPath": "/kenney-lab/mini-market--shelf-end.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 2.23404,
+        "wallHeight": 0.81425,
+        "doorwayHeight": 1.04009
+      }
+    },
+    {
+      "id": "mini-market--shopping-basket",
+      "packageId": "mini-market",
+      "name": "shopping-basket.glb",
+      "sourceRelativePath": "Models/GLB format/shopping-basket.glb",
+      "sourceZipName": "kenney_mini-market.zip",
+      "sourceZipSha256": "6f2e69090e359204ace43e4c98dc3fb8639b75e423109672b5c890d194c45203",
+      "sourceGlbSha256": "a7704926cb56c5a9ab74488230fc7c4d7b914387c59e9c1b6f62376965c0ea7d",
+      "officialUrl": "https://kenney.nl/assets/mini-market",
+      "license": "CC0",
+      "fileBytes": 25864,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.175
+        ],
+        "max": [
+          0.175,
+          0.25,
+          0.175
+        ],
+        "size": [
+          0.35,
+          0.25,
+          0.35
+        ],
+        "center": [
+          0,
+          0.125,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "shopping-basket",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.175,
+          0,
+          -0.175
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 464,
+      "triangleCount": 288,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/mini-market--shopping-basket/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "market"
+      ],
+      "labRole": "clue-object",
+      "publicPath": "/kenney-lab/mini-market--shopping-basket.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 0.53191,
+        "wallHeight": 0.19387,
+        "doorwayHeight": 0.24764
+      }
+    },
+    {
+      "id": "mini-market--shopping-cart",
+      "packageId": "mini-market",
+      "name": "shopping-cart.glb",
+      "sourceRelativePath": "Models/GLB format/shopping-cart.glb",
+      "sourceZipName": "kenney_mini-market.zip",
+      "sourceZipSha256": "6f2e69090e359204ace43e4c98dc3fb8639b75e423109672b5c890d194c45203",
+      "sourceGlbSha256": "8933fdece5c43b619ea6902fa03a5fea9f490486048ae7543cc8b03ee98c98dd",
+      "officialUrl": "https://kenney.nl/assets/mini-market",
+      "license": "CC0",
+      "fileBytes": 34832,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.15,
+          0,
+          -0.25391
+        ],
+        "max": [
+          0.15,
+          0.39056,
+          0.225
+        ],
+        "size": [
+          0.3,
+          0.39056,
+          0.47891
+        ],
+        "center": [
+          0,
+          0.19528,
+          -0.01446
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "shopping-cart",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.15,
+          0,
+          -0.25391
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 638,
+      "triangleCount": 384,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/mini-market--shopping-cart/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "market"
+      ],
+      "labRole": "clue-object",
+      "publicPath": "/kenney-lab/mini-market--shopping-cart.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 0.83098,
+        "wallHeight": 0.30287,
+        "doorwayHeight": 0.38687
+      }
+    },
+    {
+      "id": "mini-market--wall-window",
+      "packageId": "mini-market",
+      "name": "wall-window.glb",
+      "sourceRelativePath": "Models/GLB format/wall-window.glb",
+      "sourceZipName": "kenney_mini-market.zip",
+      "sourceZipSha256": "6f2e69090e359204ace43e4c98dc3fb8639b75e423109672b5c890d194c45203",
+      "sourceGlbSha256": "58b59e2c18459b2190298021506882bc5f521289c694519c1b2cd6439e409cb0",
+      "officialUrl": "https://kenney.nl/assets/mini-market",
+      "license": "CC0",
+      "fileBytes": 15628,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.5,
+          0,
+          -0.3
+        ],
+        "max": [
+          0.5,
+          1,
+          0.3
+        ],
+        "size": [
+          1,
+          1,
+          0.6
+        ],
+        "center": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "wall-window",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.5,
+          0,
+          -0.3
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 252,
+      "triangleCount": 146,
+      "nodeCount": 2,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 2,
+      "primitiveCount": 2,
+      "unreferencedMeshCount": 0,
+      "materialCount": 2,
+      "usedMaterialCount": 2,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/mini-market--wall-window/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        },
+        {
+          "index": 1,
+          "name": "glass",
+          "alphaMode": "BLEND",
+          "doubleSided": false,
+          "unlit": false,
+          "baseColorFactor": [
+            0.87962234,
+            0.8879232,
+            0.921582043,
+            0.5
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.5,
+          "textureBindings": []
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "market"
+      ],
+      "labRole": "structure",
+      "publicPath": "/kenney-lab/mini-market--wall-window.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 2.12766,
+        "wallHeight": 0.77548,
+        "doorwayHeight": 0.99056
+      }
+    },
+    {
+      "id": "mini-market--wall",
+      "packageId": "mini-market",
+      "name": "wall.glb",
+      "sourceRelativePath": "Models/GLB format/wall.glb",
+      "sourceZipName": "kenney_mini-market.zip",
+      "sourceZipSha256": "6f2e69090e359204ace43e4c98dc3fb8639b75e423109672b5c890d194c45203",
+      "sourceGlbSha256": "a926d264ec7d6a4344ee36e732f2f179469bfb727b89e5ada9d61226ff5eff2c",
+      "officialUrl": "https://kenney.nl/assets/mini-market",
+      "license": "CC0",
+      "fileBytes": 4352,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.5,
+          0,
+          -0.3
+        ],
+        "max": [
+          0.5,
+          1,
+          0.3
+        ],
+        "size": [
+          1,
+          1,
+          0.6
+        ],
+        "center": [
+          0,
+          0.5,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "wall",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.5,
+          0,
+          -0.3
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 54,
+      "triangleCount": 32,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/mini-market--wall/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "market"
+      ],
+      "labRole": "structure",
+      "publicPath": "/kenney-lab/mini-market--wall.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 2.12766,
+        "wallHeight": 0.77548,
+        "doorwayHeight": 0.99056
+      }
+    },
+    {
+      "id": "minigolf-kit--ball-red",
+      "packageId": "minigolf-kit",
+      "name": "ball-red.glb",
+      "sourceRelativePath": "Models/GLB format/ball-red.glb",
+      "sourceZipName": "kenney_minigolf-kit.zip",
+      "sourceZipSha256": "74b7bf5cf82bf8a5225319ade1284600c64f9482ae66f0ccf1f22d2212d5a952",
+      "sourceGlbSha256": "37f1d03972f29dcba708f6fcf2fbc186292200fd8774ca1fee85ffbb266a53be",
+      "officialUrl": "https://kenney.nl/assets/minigolf-kit",
+      "license": "CC0",
+      "fileBytes": 58356,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.03497,
+          -0.03492,
+          -0.03497
+        ],
+        "max": [
+          0.03497,
+          0.03477,
+          0.03497
+        ],
+        "size": [
+          0.06994,
+          0.0697,
+          0.06994
+        ],
+        "center": [
+          0,
+          -0.00007,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "ball-red",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.03497,
+          -0.03492,
+          -0.03497
+        ],
+        "floorContactOffsetY": -0.03492,
+        "touchesGroundAtOrigin": false
+      },
+      "vertexCount": 1104,
+      "triangleCount": 572,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/minigolf-kit--ball-red/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "minigolf"
+      ],
+      "labRole": "clue-object",
+      "publicPath": "/kenney-lab/minigolf-kit--ball-red.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 0.1483,
+        "wallHeight": 0.05405,
+        "doorwayHeight": 0.06904
+      }
+    },
+    {
+      "id": "minigolf-kit--castle",
+      "packageId": "minigolf-kit",
+      "name": "castle.glb",
+      "sourceRelativePath": "Models/GLB format/castle.glb",
+      "sourceZipName": "kenney_minigolf-kit.zip",
+      "sourceZipSha256": "74b7bf5cf82bf8a5225319ade1284600c64f9482ae66f0ccf1f22d2212d5a952",
+      "sourceGlbSha256": "3dbbaeab03f4e82cbd4f04a845c8553092a5b86318f0e5bdfb6423a5afe3a470",
+      "officialUrl": "https://kenney.nl/assets/minigolf-kit",
+      "license": "CC0",
+      "fileBytes": 16760,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "max": [
+          0.49995,
+          0.65103,
+          0.49995
+        ],
+        "size": [
+          0.9999,
+          0.65103,
+          0.9999
+        ],
+        "center": [
+          0,
+          0.32551,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "castle",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 290,
+      "triangleCount": 180,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/minigolf-kit--castle/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "minigolf"
+      ],
+      "labRole": "detail",
+      "publicPath": "/kenney-lab/minigolf-kit--castle.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 1.38517,
+        "wallHeight": 0.50486,
+        "doorwayHeight": 0.64488
+      }
+    },
+    {
+      "id": "minigolf-kit--corner",
+      "packageId": "minigolf-kit",
+      "name": "corner.glb",
+      "sourceRelativePath": "Models/GLB format/corner.glb",
+      "sourceZipName": "kenney_minigolf-kit.zip",
+      "sourceZipSha256": "74b7bf5cf82bf8a5225319ade1284600c64f9482ae66f0ccf1f22d2212d5a952",
+      "sourceGlbSha256": "cefbd1036aacccaa09336de0161e792e680cfe5cb41a982ce94f709dc2d3263c",
+      "officialUrl": "https://kenney.nl/assets/minigolf-kit",
+      "license": "CC0",
+      "fileBytes": 3792,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "max": [
+          0.49995,
+          0.14665,
+          0.49995
+        ],
+        "size": [
+          0.9999,
+          0.14665,
+          0.9999
+        ],
+        "center": [
+          0,
+          0.07333,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "corner",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 42,
+      "triangleCount": 24,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/minigolf-kit--corner/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "minigolf"
+      ],
+      "labRole": "ground",
+      "publicPath": "/kenney-lab/minigolf-kit--corner.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 0.31202,
+        "wallHeight": 0.11372,
+        "doorwayHeight": 0.14527
+      }
+    },
+    {
+      "id": "minigolf-kit--flag-red",
+      "packageId": "minigolf-kit",
+      "name": "flag-red.glb",
+      "sourceRelativePath": "Models/GLB format/flag-red.glb",
+      "sourceZipName": "kenney_minigolf-kit.zip",
+      "sourceZipSha256": "74b7bf5cf82bf8a5225319ade1284600c64f9482ae66f0ccf1f22d2212d5a952",
+      "sourceGlbSha256": "8ecd3bda0bf3908b1e4cad753a79be815083ef1c2cf2bec0856ab59e89542167",
+      "officialUrl": "https://kenney.nl/assets/minigolf-kit",
+      "license": "CC0",
+      "fileBytes": 9384,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.35652,
+          0,
+          -0.03903
+        ],
+        "max": [
+          0.03903,
+          1.02489,
+          0.03903
+        ],
+        "size": [
+          0.39555,
+          1.02489,
+          0.07806
+        ],
+        "center": [
+          -0.15874,
+          0.51245,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "flag-red",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.35652,
+          0,
+          -0.03903
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 152,
+      "triangleCount": 86,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/minigolf-kit--flag-red/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "minigolf"
+      ],
+      "labRole": "clue-object",
+      "publicPath": "/kenney-lab/minigolf-kit--flag-red.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 2.18062,
+        "wallHeight": 0.79478,
+        "doorwayHeight": 1.01522
+      }
+    },
+    {
+      "id": "minigolf-kit--hill-square",
+      "packageId": "minigolf-kit",
+      "name": "hill-square.glb",
+      "sourceRelativePath": "Models/GLB format/hill-square.glb",
+      "sourceZipName": "kenney_minigolf-kit.zip",
+      "sourceZipSha256": "74b7bf5cf82bf8a5225319ade1284600c64f9482ae66f0ccf1f22d2212d5a952",
+      "sourceGlbSha256": "a715439f20953349cc100bc4fa8acc7641dcb5688a88dce300a3b77ea170ff3d",
+      "officialUrl": "https://kenney.nl/assets/minigolf-kit",
+      "license": "CC0",
+      "fileBytes": 4716,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "max": [
+          0.49995,
+          0.14665,
+          0.49995
+        ],
+        "size": [
+          0.9999,
+          0.14665,
+          0.9999
+        ],
+        "center": [
+          0,
+          0.07333,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "hill-square",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 60,
+      "triangleCount": 34,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/minigolf-kit--hill-square/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "minigolf"
+      ],
+      "labRole": "ground",
+      "publicPath": "/kenney-lab/minigolf-kit--hill-square.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 0.31202,
+        "wallHeight": 0.11372,
+        "doorwayHeight": 0.14527
+      }
+    },
+    {
+      "id": "minigolf-kit--hole-round",
+      "packageId": "minigolf-kit",
+      "name": "hole-round.glb",
+      "sourceRelativePath": "Models/GLB format/hole-round.glb",
+      "sourceZipName": "kenney_minigolf-kit.zip",
+      "sourceZipSha256": "74b7bf5cf82bf8a5225319ade1284600c64f9482ae66f0ccf1f22d2212d5a952",
+      "sourceGlbSha256": "732c5aec724a13d20f2826c2a5030fa62bf6b749883c2117e6d38bca8e1cd343",
+      "officialUrl": "https://kenney.nl/assets/minigolf-kit",
+      "license": "CC0",
+      "fileBytes": 13116,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "max": [
+          0.49995,
+          0.14665,
+          0.49995
+        ],
+        "size": [
+          0.9999,
+          0.14665,
+          0.9999
+        ],
+        "center": [
+          0,
+          0.07333,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "hole-round",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 228,
+      "triangleCount": 148,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/minigolf-kit--hole-round/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "minigolf"
+      ],
+      "labRole": "clue-object",
+      "publicPath": "/kenney-lab/minigolf-kit--hole-round.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 0.31202,
+        "wallHeight": 0.11372,
+        "doorwayHeight": 0.14527
+      }
+    },
+    {
+      "id": "minigolf-kit--hole-square",
+      "packageId": "minigolf-kit",
+      "name": "hole-square.glb",
+      "sourceRelativePath": "Models/GLB format/hole-square.glb",
+      "sourceZipName": "kenney_minigolf-kit.zip",
+      "sourceZipSha256": "74b7bf5cf82bf8a5225319ade1284600c64f9482ae66f0ccf1f22d2212d5a952",
+      "sourceGlbSha256": "c35ae2627a3254da1e2d6a6e08eba3b875d3a1dcf61dfdfcf89912b4ed489b06",
+      "officialUrl": "https://kenney.nl/assets/minigolf-kit",
+      "license": "CC0",
+      "fileBytes": 6512,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "max": [
+          0.49995,
+          0.14665,
+          0.49995
+        ],
+        "size": [
+          0.9999,
+          0.14665,
+          0.9999
+        ],
+        "center": [
+          0,
+          0.07333,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "hole-square",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 96,
+      "triangleCount": 60,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/minigolf-kit--hole-square/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "minigolf"
+      ],
+      "labRole": "clue-object",
+      "publicPath": "/kenney-lab/minigolf-kit--hole-square.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 0.31202,
+        "wallHeight": 0.11372,
+        "doorwayHeight": 0.14527
+      }
+    },
+    {
+      "id": "minigolf-kit--obstacle-diamond",
+      "packageId": "minigolf-kit",
+      "name": "obstacle-diamond.glb",
+      "sourceRelativePath": "Models/GLB format/obstacle-diamond.glb",
+      "sourceZipName": "kenney_minigolf-kit.zip",
+      "sourceZipSha256": "74b7bf5cf82bf8a5225319ade1284600c64f9482ae66f0ccf1f22d2212d5a952",
+      "sourceGlbSha256": "01d1bb45d2412d843f4160528461f238f98ac08974e952ec9a9cf9bd180cd123",
+      "officialUrl": "https://kenney.nl/assets/minigolf-kit",
+      "license": "CC0",
+      "fileBytes": 4912,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "max": [
+          0.49995,
+          0.14665,
+          0.49995
+        ],
+        "size": [
+          0.9999,
+          0.14665,
+          0.9999
+        ],
+        "center": [
+          0,
+          0.07333,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "obstacle-diamond",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 64,
+      "triangleCount": 34,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/minigolf-kit--obstacle-diamond/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "minigolf"
+      ],
+      "labRole": "obstacle",
+      "publicPath": "/kenney-lab/minigolf-kit--obstacle-diamond.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 0.31202,
+        "wallHeight": 0.11372,
+        "doorwayHeight": 0.14527
+      }
+    },
+    {
+      "id": "minigolf-kit--ramp",
+      "packageId": "minigolf-kit",
+      "name": "ramp.glb",
+      "sourceRelativePath": "Models/GLB format/ramp.glb",
+      "sourceZipName": "kenney_minigolf-kit.zip",
+      "sourceZipSha256": "74b7bf5cf82bf8a5225319ade1284600c64f9482ae66f0ccf1f22d2212d5a952",
+      "sourceGlbSha256": "93a60814facc3db4d144e89f9ff29ddb9972cea6319dafec1dda8eef9836f0a2",
+      "officialUrl": "https://kenney.nl/assets/minigolf-kit",
+      "license": "CC0",
+      "fileBytes": 29488,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "max": [
+          0.49995,
+          0.64665,
+          0.49995
+        ],
+        "size": [
+          0.9999,
+          0.64665,
+          0.9999
+        ],
+        "center": [
+          0,
+          0.32333,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "ramp",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 532,
+      "triangleCount": 368,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/minigolf-kit--ramp/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "minigolf"
+      ],
+      "labRole": "ground",
+      "publicPath": "/kenney-lab/minigolf-kit--ramp.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 1.37585,
+        "wallHeight": 0.50146,
+        "doorwayHeight": 0.64055
+      }
+    },
+    {
+      "id": "minigolf-kit--start",
+      "packageId": "minigolf-kit",
+      "name": "start.glb",
+      "sourceRelativePath": "Models/GLB format/start.glb",
+      "sourceZipName": "kenney_minigolf-kit.zip",
+      "sourceZipSha256": "74b7bf5cf82bf8a5225319ade1284600c64f9482ae66f0ccf1f22d2212d5a952",
+      "sourceGlbSha256": "97995260cf02910b459541846c23375713bbb91dba35f9fa6b2ada0cf5d5f79c",
+      "officialUrl": "https://kenney.nl/assets/minigolf-kit",
+      "license": "CC0",
+      "fileBytes": 5088,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "max": [
+          0.49995,
+          0.14665,
+          0.49995
+        ],
+        "size": [
+          0.9999,
+          0.14665,
+          0.9999
+        ],
+        "center": [
+          0,
+          0.07333,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "start",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 68,
+      "triangleCount": 40,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/minigolf-kit--start/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "minigolf"
+      ],
+      "labRole": "ground",
+      "publicPath": "/kenney-lab/minigolf-kit--start.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 0.31202,
+        "wallHeight": 0.11372,
+        "doorwayHeight": 0.14527
+      }
+    },
+    {
+      "id": "minigolf-kit--straight",
+      "packageId": "minigolf-kit",
+      "name": "straight.glb",
+      "sourceRelativePath": "Models/GLB format/straight.glb",
+      "sourceZipName": "kenney_minigolf-kit.zip",
+      "sourceZipSha256": "74b7bf5cf82bf8a5225319ade1284600c64f9482ae66f0ccf1f22d2212d5a952",
+      "sourceGlbSha256": "bac7537b2ef4ea22439a5b88126f9c2f5eeed2a9eda00bf7ad7142aab2b38e7a",
+      "officialUrl": "https://kenney.nl/assets/minigolf-kit",
+      "license": "CC0",
+      "fileBytes": 4096,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "max": [
+          0.49995,
+          0.14665,
+          0.49995
+        ],
+        "size": [
+          0.9999,
+          0.14665,
+          0.9999
+        ],
+        "center": [
+          0,
+          0.07333,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "straight",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 48,
+      "triangleCount": 28,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/minigolf-kit--straight/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "minigolf"
+      ],
+      "labRole": "ground",
+      "publicPath": "/kenney-lab/minigolf-kit--straight.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 0.31202,
+        "wallHeight": 0.11372,
+        "doorwayHeight": 0.14527
+      }
+    },
+    {
+      "id": "minigolf-kit--tunnel-wide",
+      "packageId": "minigolf-kit",
+      "name": "tunnel-wide.glb",
+      "sourceRelativePath": "Models/GLB format/tunnel-wide.glb",
+      "sourceZipName": "kenney_minigolf-kit.zip",
+      "sourceZipSha256": "74b7bf5cf82bf8a5225319ade1284600c64f9482ae66f0ccf1f22d2212d5a952",
+      "sourceGlbSha256": "420042f3e77f93d75882bcfb3c21baefac2ba739783be859ec4970ed7f4224f8",
+      "officialUrl": "https://kenney.nl/assets/minigolf-kit",
+      "license": "CC0",
+      "fileBytes": 7020,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "max": [
+          0.49995,
+          0.29664,
+          0.49995
+        ],
+        "size": [
+          0.9999,
+          0.29664,
+          0.9999
+        ],
+        "center": [
+          0,
+          0.14832,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "tunnel-wide",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.49995,
+          0,
+          -0.49995
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 106,
+      "triangleCount": 64,
+      "nodeCount": 1,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 1,
+      "primitiveCount": 1,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/minigolf-kit--tunnel-wide/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "minigolf"
+      ],
+      "labRole": "obstacle",
+      "publicPath": "/kenney-lab/minigolf-kit--tunnel-wide.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 0.63115,
+        "wallHeight": 0.23004,
+        "doorwayHeight": 0.29384
+      }
+    },
+    {
+      "id": "minigolf-kit--windmill",
+      "packageId": "minigolf-kit",
+      "name": "windmill.glb",
+      "sourceRelativePath": "Models/GLB format/windmill.glb",
+      "sourceZipName": "kenney_minigolf-kit.zip",
+      "sourceZipSha256": "74b7bf5cf82bf8a5225319ade1284600c64f9482ae66f0ccf1f22d2212d5a952",
+      "sourceGlbSha256": "26481a9811ad5aba42a46dc1848ec6021c22b6f70d6b2109039a8c176d32ab10",
+      "officialUrl": "https://kenney.nl/assets/minigolf-kit",
+      "license": "CC0",
+      "fileBytes": 27096,
+      "coordinateSystem": {
+        "up": "Y",
+        "handedness": "right-handed",
+        "units": "model-units"
+      },
+      "bounds": {
+        "min": [
+          -0.60222,
+          0,
+          -0.49995
+        ],
+        "max": [
+          0.60222,
+          1.55887,
+          0.49995
+        ],
+        "size": [
+          1.20444,
+          1.55887,
+          0.9999
+        ],
+        "center": [
+          0,
+          0.77943,
+          0
+        ]
+      },
+      "pivot": {
+        "type": "gltf-scene-root-origin",
+        "origins": [
+          {
+            "node": "windmill",
+            "nodeIndex": 0,
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "translation": [
+              0,
+              0,
+              0
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "matrix": null
+          }
+        ],
+        "firstRootOrigin": [
+          0,
+          0,
+          0
+        ],
+        "boundsMinFromFirstRoot": [
+          -0.60222,
+          0,
+          -0.49995
+        ],
+        "floorContactOffsetY": 0,
+        "touchesGroundAtOrigin": true
+      },
+      "vertexCount": 470,
+      "triangleCount": 282,
+      "nodeCount": 2,
+      "rootNodeCount": 1,
+      "meshInstanceCount": 2,
+      "primitiveCount": 2,
+      "unreferencedMeshCount": 0,
+      "materialCount": 1,
+      "usedMaterialCount": 1,
+      "hasUnlitMaterial": false,
+      "textureTransformCount": 1,
+      "textureSummary": {
+        "imageCount": 1,
+        "referencedImageCount": 1,
+        "embeddedImageCount": 0,
+        "externalImageCount": 1,
+        "colormapImageCount": 1
+      },
+      "textures": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "mimeType": null,
+          "embedding": "external-uri",
+          "uri": "Textures/colormap.png",
+          "byteLength": null,
+          "references": [
+            {
+              "material": "colormap",
+              "channel": "baseColor"
+            }
+          ],
+          "colormap": true,
+          "publicUri": "/kenney-lab/textures/minigolf-kit--windmill/0-colormap.png"
+        }
+      ],
+      "materials": [
+        {
+          "index": 0,
+          "name": "colormap",
+          "alphaMode": "OPAQUE",
+          "doubleSided": true,
+          "unlit": false,
+          "baseColorFactor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 1,
+          "textureBindings": [
+            "baseColor"
+          ]
+        }
+      ],
+      "animationCount": 0,
+      "skinCount": 0,
+      "extensionsUsed": [
+        "KHR_texture_transform"
+      ],
+      "selectedForPrototype": true,
+      "prototypeTags": [
+        "minigolf"
+      ],
+      "labRole": "obstacle",
+      "publicPath": "/kenney-lab/minigolf-kit--windmill.glb",
+      "scaleRelativeToFurnitureKit": {
+        "chairHeight": 3.31674,
+        "wallHeight": 1.20887,
+        "doorwayHeight": 1.54415
       }
     },
     {

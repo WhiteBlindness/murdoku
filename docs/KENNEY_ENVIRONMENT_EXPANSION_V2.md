@@ -1,6 +1,6 @@
 # Expansão dos ambientes Kenney v2
 
-> **Estado: investigação concluída; integração em produção pendente.** Medimos os 1 626 GLB de 15 pacotes e inspecionámos dez vinhetas reais em computador, mais duas em telemóvel. A classificação final está na secção «Decisão visual». Nenhum pacote novo fica automaticamente aprovado para um caso de produção.
+> **Estado: laboratório atualizado em 24/09/2026; integração em produção pendente.** O seguimento mediu 1 752 GLB de 16 pacotes, selecionou 86 modelos e acrescentou um protótipo de minigolfe. A avaliação revista, com as preferências do proprietário, está em [seguimento do laboratório Kenney](KENNEY_ENVIRONMENT_LAB_FOLLOWUP.md) e atualiza as classificações finais abaixo.
 
 ## Âmbito
 
@@ -17,7 +17,7 @@ Esta missão é um laboratório experimental. Não cria casos finais, não redes
 
 A categoria 3D do catálogo oficial da Kenney tinha 50 entradas em quatro páginas na data da consulta: [página 1](https://kenney.nl/assets/category:3D), [página 2](https://kenney.nl/assets/category:3D/page:2), [página 3](https://kenney.nl/assets/category:3D/page:3) e [página 4](https://kenney.nl/assets/category:3D/page:4). Consultei a licença em cada uma das 50 fichas. Todas apresentam Creative Commons CC0. O inventário anterior, [KENNEY_PACK_SURVEY.md](KENNEY_PACK_SURVEY.md), mantém as ligações diretas às 50 fichas.
 
-As fichas oficiais publicam um campo «Files». Este valor nem sempre corresponde ao número de ficheiros GLB dentro do ZIP. A equipa mediu os 1 626 GLB dos 15 arquivos oficiais, com cobertura completa e zero falhas. O [relatório de medição](reports/kenney-lab-measurements.json) regista, para cada ZIP, o nome, a ficha oficial, a licença CC0 e o hash SHA-256. Guarda também estatísticas agregadas dos 1 626 modelos e registos individuais de 50 modelos selecionados para o laboratório. Não contém uma linha individual persistida para cada um dos 1 626 GLB.
+As fichas oficiais publicam um campo «Files». Este valor nem sempre corresponde ao número de ficheiros GLB dentro do ZIP. Medimos os 1 752 GLB dos 16 arquivos oficiais, com cobertura completa e zero falhas. O [relatório de medição](reports/kenney-lab-measurements.json) regista, para cada ZIP, o nome, a ficha oficial, a licença CC0 e o hash SHA-256. Guarda também estatísticas agregadas dos 1 752 modelos e registos individuais dos 86 modelos selecionados para o laboratório. Não contém uma linha individual persistida para cada GLB não selecionado.
 
 | Pacote e ficha oficial | «Files» na ficha | GLB extraídos | Classe final |
 | --- | ---: | ---: | --- |
@@ -28,16 +28,17 @@ As fichas oficiais publicam um campo «Files». Este valor nem sempre correspond
 | [City Kit (Suburban)](https://kenney.nl/assets/city-kit-suburban) | 40 | 40 | ADAPTADOR |
 | [City Kit (Commercial)](https://kenney.nl/assets/city-kit-commercial) | 50 | 41 | USO ESPECÍFICO, cenário distante |
 | [City Kit (Roads)](https://kenney.nl/assets/city-kit-roads) | 90 | 95 | ADAPTADOR |
-| [Retro Urban Kit](https://kenney.nl/assets/retro-urban-kit) | 120 | 124 | REJEITAR |
+| [Retro Urban Kit](https://kenney.nl/assets/retro-urban-kit) | 120 | 124 | ADAPTADOR, risco elevado |
 | [Mini Market](https://kenney.nl/assets/mini-market) | 20 | 20 | USO ESPECÍFICO |
+| [Minigolf Kit](https://kenney.nl/assets/minigolf-kit) | 125 | 126 | USO ESPECÍFICO |
 | [Food Kit](https://kenney.nl/assets/food-kit) | 200 | 200 | USO ESPECÍFICO |
 | [Graveyard Kit](https://kenney.nl/assets/graveyard-kit) | 90 | 91 | USO ESPECÍFICO |
-| [Survival Kit](https://kenney.nl/assets/survival-kit) | 80 | 80 | REJEITAR, seleção atual |
-| [Holiday Kit](https://kenney.nl/assets/holiday-kit) | 100 | 99 | REJEITAR, seleção atual |
+| [Survival Kit](https://kenney.nl/assets/survival-kit) | 80 | 80 | USO ESPECÍFICO |
+| [Holiday Kit](https://kenney.nl/assets/holiday-kit) | 100 | 99 | USO ESPECÍFICO |
 | [City Kit (Industrial)](https://kenney.nl/assets/city-kit-industrial) | 40 | 37 | USO ESPECÍFICO |
 | [Factory Kit](https://kenney.nl/assets/factory-kit) | 140 | 143 | USO ESPECÍFICO, sem grua no espaço jogável |
 
-A soma é de 1 626 GLB. Este número descreve os ficheiros extraídos dos 15 pacotes selecionados. Não indica quantos modelos devem entrar no repositório. A política do projeto permite apenas os modelos medidos e usados por cenas implementadas.
+A soma é de 1 752 GLB. Este número descreve os ficheiros extraídos dos 16 pacotes selecionados. Não indica quantos modelos devem entrar no repositório. A política do projeto permite apenas os modelos medidos e usados por cenas implementadas.
 
 ## Referências de escala
 
@@ -47,7 +48,7 @@ As dimensões de referência, na ordem largura × altura × profundidade, são: 
 
 ## Medições geométricas
 
-Foram medidos os 1 626 GLB, sem falhas. A tabela resume, por pacote, a mediana e os máximos medidos em largura × altura × profundidade. Cada máximo por eixo é independente: os valores podem corresponder a modelos diferentes e não descrevem necessariamente um único GLB. A coluna de contacto indica quantos modelos têm o chão à origem, abaixo da origem ou acima da origem, por esta ordem. O relatório JSON conserva estas estatísticas agregadas por pacote e os dados individuais dos 50 modelos selecionados para o laboratório. Não apresenta limites e origens individuais para os restantes modelos.
+Foram medidos os 1 752 GLB, sem falhas. A tabela resume, por pacote, a mediana e os máximos medidos em largura × altura × profundidade. Cada máximo por eixo é independente: os valores podem corresponder a modelos diferentes e não descrevem necessariamente um único GLB. A coluna de contacto indica quantos modelos têm o chão à origem, abaixo da origem ou acima da origem, por esta ordem. O relatório JSON conserva estas estatísticas agregadas por pacote e os dados individuais dos 86 modelos selecionados para o laboratório. Não apresenta limites e origens individuais para os restantes modelos.
 
 | Pacote | Mediana L × A × P | Máximos independentes L × A × P | Chão à origem / abaixo / acima |
 | --- | --- | --- | ---: |
@@ -62,6 +63,7 @@ Foram medidos os 1 626 GLB, sem falhas. A tabela resume, por pacote, a mediana e
 | Graveyard Kit | 0,62238 × 0,6689 × 0,39155 | 1,97678 × 2,30246 × 2,43803 | 80 / 5 / 6 |
 | Holiday Kit | 0,90 × 0,6525 × 0,45 | 3,14145 × 2,28966 × 2,68737 | 85 / 9 / 5 |
 | Mini Market | 0,80 × 0,78668 × 0,60 | 1,00 × 1,09254 × 1,00 | 20 / 0 / 0 |
+| Minigolf Kit | 0,9999 × 0,23331 × 0,9999 | 4,49995 × 4,00 × 4,49995 | 110 / 16 / 0 |
 | Modular Buildings | 1,00 × 0,625 × 1,00 | 2,00 × 3,7625 × 2,20 | 101 / 7 / 0 |
 | Nature Kit | 0,61485 × 0,44378 × 0,5547 | 1,2685 × 2,0755 × 1,2685 | 299 / 28 / 2 |
 | Retro Urban Kit | 1,00 × 0,50 × 1,00 | 2,00 × 1,70 × 2,00 | 124 / 0 / 0 |
@@ -76,6 +78,10 @@ Alguns modelos medidos mostram por que a classificação precisa da prova visual
 | Food Kit, cake.glb | 0,6392 × 0,27308 × 0,6392 | Verificar apoio e espaço útil numa superfície-pai real. |
 | Food Kit, glass-wine.glb | 0,22677 × 0,49986 × 0,19693 | A altura ultrapassa ligeiramente a cadeira de referência, com 0,47. |
 | Mini Market, cash-register.glb | 0,85 × 0,5949 × 0,85 | A largura exige uma superfície maior do que várias mesas do catálogo. |
+| Mini Market, shelf-boxes.glb | 0,80 × 0,85 × 0,70 | Quase à altura da figura de referência; compõe corredores e áreas de stock no protótipo. |
+| City Kit (Suburban), building-type-a.glb | 1,30 × 0,83354 × 1,02814 | Quase à altura da figura de referência, com 0,95; adaptar escala ou arquitetura se tiver de alojar pessoas. |
+| Holiday Kit, cabin-wall.glb | 1,00 × 1,00 × 0,30 | Assenta na origem e aproxima-se da altura da figura; a peça de telhado precisa de recentrar o pivô em 0,14142 u. |
+| Minigolf Kit, straight.glb | 0,9999 × 0,14665 × 0,9999 | Módulo de terreno quase 1 u; 110 modelos tocam o chão à origem e 16 ficam abaixo dela. |
 | Survival Kit, tent.glb | 0,56076 × 0,49137 × 0,561 | Cabe em largura na célula de 0,8, mas ainda precisa de validação de apoio, colisão e material. |
 | Factory Kit, crane.glb | 1,92603 × 3,55332 × 3,68025 | A altura é cerca de 2,75 vezes a parede de referência; manter fora do interior jogável até prova. |
 
@@ -83,7 +89,7 @@ Estas medidas não autorizam escala por objeto nem colocação direta. A composi
 
 ## Matriz técnica e de compatibilidade
 
-A geometria dos 15 pacotes foi medida. A matriz seguinte conserva as hipóteses técnicas formuladas antes da revisão das vinhetas. A secção «Decisão visual» substitui essas hipóteses onde a prova visual as contrariou. «DIRETO» aplica-se apenas ao subconjunto já integrado; «ADAPTADOR» exige adaptação isolada; «USO ESPECÍFICO» reserva o pacote a um arquétipo; «REJEITAR» impede a adoção com a seleção testada. Uma escalada de sistema («SYSTEM ESCALATION») é necessária quando a proposta exigir alterar capacidades fundamentais.
+A geometria dos 16 pacotes foi medida. A matriz seguinte conserva as hipóteses técnicas formuladas antes da revisão das vinhetas. A secção «Decisão visual» e o [seguimento do laboratório](KENNEY_ENVIRONMENT_LAB_FOLLOWUP.md) atualizam a avaliação. «DIRETO» aplica-se apenas ao subconjunto já integrado; «ADAPTADOR» exige adaptação isolada; «USO ESPECÍFICO» reserva o pacote a um arquétipo; «REJEITAR» impede a adoção com a seleção testada. Uma escalada de sistema («SYSTEM ESCALATION») é necessária quando a proposta exigir alterar capacidades fundamentais.
 
 | Pacote | Arquétipo a explorar | Relação possível com as pistas | Compatibilidade preliminar e validações pendentes |
 | --- | --- | --- | --- |
@@ -94,7 +100,7 @@ A geometria dos 15 pacotes foi medida. A matriz seguinte conserva as hipóteses 
 | City Kit (Suburban) | Moradia suburbana e jardim frontal | Portões e caminhos podem orientar a leitura espacial, sem criar pistas de percurso. | Avaliar casas como composição exterior. Começar por vedações, caminhos e elementos pequenos se a escala e os materiais forem compatíveis. ADAPTADOR. |
 | City Kit (Commercial) | Fachada de comércio, hotel ou quarteirão | O exterior enquadra a cena; os edifícios não substituem as divisões jogáveis. | Os edifícios completos podem tapar a casa em corte. Testar como volume de contexto na câmara atual. ADAPTADOR. |
 | City Kit (Roads) | Rua, passeio, entrada de serviço ou frente urbana | A rua pode contextualizar a cena. Não introduz circulação, distância ou vizinhança como mecânica de pista. | A mediana da largura e profundidade é 1,00, diferente da célula de 0,8. Uma malha urbana própria ou percurso lógico exige SYSTEM ESCALATION. ADAPTADOR apenas para contexto compatível com a cena atual. |
-| Retro Urban Kit | Beco ou interior urbano retro | A decoração pode servir de ambiente, sem criar pistas baseadas em píxeis ou interação. | A textura e a leitura retro divergem da linguagem visual atual. Partilha ainda o risco de textura descrito abaixo. NÃO RECOMENDADO até existir direção visual aprovada. |
+| Retro Urban Kit | Beco ou interior urbano retro | A decoração pode servir de ambiente, sem criar pistas baseadas em píxeis ou interação. | A textura e a leitura retro divergem da linguagem visual atual. ADAPTADOR de risco elevado; testar uma rua isolada com material de transição. |
 | Mini Market | Mercearia ou supermercado de bairro | Prateleiras e produtos podem distinguir zonas. Os objetos não têm significado mecânico sem suporte no sistema de pistas. | Usar primeiro como mobiliário isolado, sem adotar as paredes como estrutura. Validar apoios, pegadas e oclusão num protótipo. USO ESPECÍFICO. |
 | Food Kit | Café, restaurante, bar ou cozinha | Alimentos são adereços narrativos. As pistas continuam a usar divisões, linhas, colunas e pisos suportados. | Objetos pequenos precisam de uma superfície-pai declarada. Não usar elevação manual. Validar apoios e leitura. USO ESPECÍFICO. |
 | Graveyard Kit | Cemitério, jardim memorial ou perímetro exterior | Túmulos podem ser elementos de história visual, não objetos interrogáveis pelo sistema atual. | Avaliar escala, concentração fora da zona jogável e oclusão das células. Reservar para um caso-piloto próprio. USO ESPECÍFICO. |
@@ -105,7 +111,7 @@ A geometria dos 15 pacotes foi medida. A matriz seguinte conserva as hipóteses 
 
 ### Materiais
 
-A inspeção preliminar dos GLB revela duas famílias: Furniture Kit e Nature Kit não usam texturas; os outros 13 pacotes usam mapas de cor e KHR_texture_transform. Retro Urban Kit também usa KHR_materials_unlit, além das texturas. Nenhum dos 13 pacotes texturados usa o modo de alfa MASK.
+A inspeção preliminar dos GLB revela duas famílias: Furniture Kit e Nature Kit não usam texturas; os outros 14 pacotes usam mapas de cor e KHR_texture_transform. Retro Urban Kit também usa KHR_materials_unlit, além das texturas. Nenhum dos 14 pacotes texturados usa o modo de alfa MASK.
 
 | Pacote | Materiais e transparência observados | Consequência para a compatibilidade |
 | --- | --- | --- |
@@ -123,7 +129,7 @@ A inspeção preliminar dos GLB revela duas famílias: Furniture Kit e Nature Ki
 | Holiday Kit | 99 modelos com mapas; sem materiais BLEND. Inclui componentes de cabana. | USO ESPECÍFICO. Reservar para cenas sazonais e rever luz e paleta. |
 | Factory Kit | 143 modelos com mapas; 11 materiais BLEND. A janela `machine-window` tem opacidade de cerca de 10%. | USO ESPECÍFICO. Rever sombras nas superfícies transparentes antes de adotar uma oficina. |
 | Survival Kit | 80 modelos com mapas; sem materiais BLEND. Inclui estruturas e objetos de acampamento. | USO ESPECÍFICO. Rever escala e materiais numa cena exterior. |
-| Retro Urban Kit | 124 modelos com KHR_materials_unlit e texturas; 237 associações de materiais mapeados e 20 materiais BLEND. | NÃO RECOMENDADO. As texturas de tijolo e o aspeto retro divergem da paleta atual; a conversão também eliminaria mapas e alfa. |
+| Retro Urban Kit | 124 modelos com KHR_materials_unlit e texturas; 237 associações de materiais mapeados e 20 materiais BLEND. | ADAPTADOR, dificuldade elevada. As texturas de tijolo e o aspeto retro divergem da paleta atual; testar uma pequena frente urbana isolada antes de considerar a produção. |
 
 O ficheiro `renderer.ts` conserva cor, transparência, opacidade e face dos materiais ao convertê-los para Lambert, mas elimina os mapas e a propriedade `alphaTest`. Só trata como vidro noturno opaco um material cujo nome seja exatamente `glass`. Todas as malhas transparentes recebem `castShadow` e `receiveShadow`; não há tratamento específico de sombras para materiais transparentes. Assim, um GLB válido não prova que a textura, a transparência ou as sombras aparecem corretamente no jogo.
 
@@ -133,7 +139,7 @@ O laboratório comparou Building Kit como envelope de casa, City Kit (Roads) e e
 
 ### Limitações ainda abertas
 
-Os hashes dos ZIP e a medição geométrica dos 1 626 GLB estão concluídos. O relatório conserva estatísticas agregadas por pacote e dados individuais dos 50 modelos selecionados; os restantes detalhes individuais podem ser reproduzidos a partir dos arquivos oficiais. As capturas de laboratório mostram apoio, escala, materiais e leitura, mas não constituem uma validação de colisões, ocupação lógica ou oclusão com pessoas e sobreposições reais.
+Os hashes dos ZIP e a medição geométrica dos 1 752 GLB estão concluídos. O relatório conserva estatísticas agregadas por pacote e dados individuais dos 86 modelos selecionados; os restantes detalhes individuais podem ser reproduzidos a partir dos arquivos oficiais. As capturas de laboratório mostram apoio, escala, materiais e leitura, mas não constituem uma validação de colisões, ocupação lógica ou oclusão com pessoas e sobreposições reais.
 
 O laboratório usa uma cena Three.js isolada que replica os parâmetros relevantes da câmara, luz, sombras e tom. O adaptador experimental conserva mapas de cor, ao contrário do renderizador de produção. Por isso, o aspeto final de um novo pacote só ficará provado depois de uma proposta de integração aprovada e de um teste num caso de produção próprio. Não alterámos o renderizador nesta missão.
 
@@ -150,7 +156,7 @@ Os protótipos não criam regras novas. O motor atual relaciona pessoas com divi
 
 ## Plano de protótipos
 
-O ficheiro de dados do laboratório define dez grupos de protótipo e seleciona 50 modelos para as vinhetas: casa suburbana com jardim; café ou restaurante; mini-mercado; cemitério; oficina ou fábrica; fachada comercial; frente urbana e estrada; acampamento Survival; cabana Holiday; e transição Building Kit/Modular Buildings. Todos carregaram e foram vistos no laboratório. A seleção continua experimental.
+O ficheiro de dados do laboratório define onze grupos de protótipo e seleciona 86 modelos: casa suburbana; café; supermercado de bairro; cemitério; oficina ou fábrica; fachada comercial; frente urbana e estrada; acampamento; aldeia de Natal; minigolfe; e transição Building Kit/Modular Buildings. Todos carregaram e foram vistos no laboratório. A seleção continua experimental.
 
 O comparador implementado usa cadeira, porta, parede, bancada, banco e árvore do catálogo atual, além de régua e diagnóstico de volume. As [capturas](reference/kenney-environment-expansion-v2/README.md) sustentam a decisão visual deste relatório.
 
@@ -169,7 +175,7 @@ O [índice de evidência visual](reference/kenney-environment-expansion-v2/READM
 
 ## Ordem de trabalho recomendada
 
-1. **Concluído:** verificar as fichas oficiais, licenças CC0, hashes dos 15 ZIPs e medir os 1 626 GLB. Manter a distinção entre «Files» oficial e ficheiros GLB extraídos.
+1. **Concluído:** verificar as fichas oficiais, licenças CC0, hashes dos 16 ZIPs e medir os 1 752 GLB. Manter a distinção entre «Files» oficial e ficheiros GLB extraídos.
 2. Resolver o risco de material texturado em investigação isolada, sem alterar o renderizador como parte da produção normal.
 3. **Concluído para o laboratório:** rever o comparador com os modelos de referência atuais e parâmetros de câmara e luz comparáveis; capturar o resultado. O laboratório usa um renderizador isolado, não o do jogo.
 4. **Concluído para o laboratório:** selecionar poucos modelos por finalidade e montar vinhetas pequenas. Evitar importar pacotes completos.
@@ -179,7 +185,7 @@ O [índice de evidência visual](reference/kenney-environment-expansion-v2/READM
 
 ## Decisão visual
 
-Inspecionei o laboratório no navegador a 1 440 × 1 100 e a 390 × 844. As [15 capturas](reference/kenney-environment-expansion-v2/README.md) documentam o comparador, as dez vinhetas e duas vistas móveis. O laboratório apresenta sempre a escala nativa como ponto de partida; o fator experimental não modifica os modelos do jogo. A revisão abaixo avalia os modelos escolhidos, não cada um dos 1 626 GLB individualmente.
+Inspecionei o laboratório no navegador a 1 440 × 1 100 e a 390 × 844. As [15 capturas iniciais](reference/kenney-environment-expansion-v2/README.md) documentam o comparador, as dez vinhetas e duas vistas móveis. O laboratório apresenta sempre a escala nativa como ponto de partida; o fator experimental não modifica os modelos do jogo. A revisão abaixo avalia os modelos escolhidos, não cada um dos 1 752 GLB individualmente. A revisão visual posterior dos quatro dioramas prioritários está resumida no [seguimento](KENNEY_ENVIRONMENT_LAB_FOLLOWUP.md).
 
 | Pacote | Classe final | Decisão e limite observado |
 | --- | --- | --- |
@@ -187,17 +193,18 @@ Inspecionei o laboratório no navegador a 1 440 × 1 100 e a 390 × 844. As [15 
 | Nature Kit | DIRETO, subconjunto integrado | A árvore, os arbustos e a vedação convivem bem com a base Furniture no [cemitério](reference/kenney-environment-expansion-v2/kenney-v2-graveyard.png). |
 | Building Kit | ADAPTADOR | A parede de 2,40 u e o telhado de 2,39 u não cabem no sistema interior de parede de 1,28953 u. Servem como estudo de envelope exterior próprio, não como peças intercambiáveis. |
 | Modular Buildings | ADAPTADOR | A casa completa é demasiado pequena junto da parede Building no [teste de conjunto](reference/kenney-environment-expansion-v2/kenney-v2-building-modular.png). Usar como família exterior independente após fixar uma escala e um corte coerentes. |
-| City Kit (Suburban) | ADAPTADOR | Vedação e caminho funcionam como contexto; a casa de 0,83354 u de altura fica menor do que a figura de 0,95 u. Exige escala de família e revisão da paleta do telhado. |
+| City Kit (Suburban) | ADAPTADOR | A composição suburbana está aprovada para exploração. A casa à escala 1,00 tem 0,83354 u de altura, quase a figura de 0,95 u; exige adaptação de escala ou arquitetura própria para um caso com pessoas. É uma limitação dimensional, não uma rejeição estética. |
 | City Kit (Commercial) | USO ESPECÍFICO | O edifício completo de três pisos aparece pequeno junto da figura e não oferece corte. Apenas fachada distante ou contexto, sem substituir o interior jogável. |
 | City Kit (Industrial) | USO ESPECÍFICO | Edifício de contexto para armazém/oficina; a comparação com a maquinaria Factory não demonstrou uma escala comum. |
 | City Kit (Roads) | ADAPTADOR | Peças rodoviárias têm malha de 1,00 u, diferente da célula de 0,8 u. A [vinheta](reference/kenney-environment-expansion-v2/kenney-v2-roads.png) não fechou a frente de rua; precisa de camada urbana composta e contínua, fora da grelha lógica. |
-| Retro Urban Kit | REJEITAR | A textura de asfalto gasto e o tratamento mais pixelizado quebram a linguagem da cena. A combinação com Roads revelou emendas e cor incoerentes. |
-| Mini Market | USO ESPECÍFICO | Prateleiras e arca são legíveis numa [loja](reference/kenney-environment-expansion-v2/kenney-v2-market.png). A caixa registadora de 0,85 u precisa de balcão e passagem validados; as paredes do pacote não ficam aprovadas. |
+| Retro Urban Kit | ADAPTADOR, dificuldade elevada | A textura de asfalto gasto e o tratamento mais pixelizado quebram a linguagem da cena. A combinação com Roads revelou emendas e cor incoerentes; fica em ensaio isolado até encontrar uma transição de superfície convincente. |
+| Mini Market | USO ESPECÍFICO | Prateleiras, expositores, arca, paredes, caixa, cesta e carrinho compõem o novo supermercado. Validar corredores e balcão com pessoas antes de criar um caso. |
 | Food Kit | USO ESPECÍFICO | O bolo nativo mede 0,6392 u de largura e domina a mesa; a [adaptação experimental a 0,30×](reference/kenney-environment-expansion-v2/kenney-v2-cafe-adapted.png) restitui uma relação plausível. Exige fator por família/uso, superfícies-pai e material texturado. |
 | Graveyard Kit | USO ESPECÍFICO | O [cemitério](reference/kenney-environment-expansion-v2/kenney-v2-graveyard.png) é a vinheta mais coerente, com caminho, agrupamento de campas e Nature Kit. O jazigo e as lápides altas ainda exigem prova com pessoas e pistas. |
 | Factory Kit | USO ESPECÍFICO | Pequenas máquinas e caixas podem vestir uma oficina. A grua de 3,55332 u [domina o plano](reference/kenney-environment-expansion-v2/kenney-v2-industrial.png) e fica rejeitada dentro da área jogável. |
-| Survival Kit | REJEITAR, seleção testada | A tenda de 0,56076 u e a cama de campanha ficam demasiado pequenas perante a figura; o [acampamento](reference/kenney-environment-expansion-v2/kenney-v2-survival.png) não constitui um local de caso coerente na escala atual. Outra seleção exigiria novo ensaio. |
-| Holiday Kit | REJEITAR, seleção testada | A [cabana montada](reference/kenney-environment-expansion-v2/kenney-v2-holiday.png) não forma um volume credível; o boneco de neve concorre com a figura. Não produzir uma cena sazonal a partir deste conjunto sem novo projeto arquitetónico. |
+| Survival Kit | USO ESPECÍFICO | A seleção anterior é pequena perante a figura; o utilizador quer explorar melhor este grupo. Procurar uma composição de cabana/abrigo e vegetação antes de decidir a escala de um caso. |
+| Holiday Kit | USO ESPECÍFICO | A cabana com paredes, telhado nevado e chaminé, árvore decorada, presentes, vedação e boneco de neve forma uma aldeia de Natal legível. O telhado exige prova de corte para não tapar pistas e pessoas. |
+| Minigolf Kit | USO ESPECÍFICO | A nova [vinheta de minigolfe](http://127.0.0.1:5180/?kenneyLab=1) liga percurso, obstáculos, rampas, buracos, bandeira e bola. Testar zonas como buracos/campos; não criar semântica de pista para tacadas ou movimento. |
 
 ### O que as vinhetas permitem construir
 
@@ -208,16 +215,16 @@ Inspecionei o laboratório no navegador a 1 440 × 1 100 e a 390 × 844. As [15 
 | Café | Sala de mesas, serviço e entrada; cozinha num ensaio posterior. | Bolo, chávenas e copos podem narrar uma pista que já refira a divisão, nunca criar nova regra de objeto. | Candidato a caso completo após adaptar Food e completar a arquitetura. A escala 0,30× funciona nas mesas testadas, mas os detalhes ficam pequenos em telemóvel e as sobreposições não foram validadas. |
 | Casa suburbana | Frente de moradia, jardim, entrada e caminho. | Vedação e vegetação orientam o local, sem semântica lógica nova. | Apenas revestimento exterior nesta seleção: a casa nativa é menor do que a figura. A grelha pode manter-se invisível se o interior continuar canónico. |
 | Fachada comercial e indústria | Frente de rua, armazém ou zona de serviço ao fundo. | Fachadas identificam o local; pequenas caixas/máquinas podem vestir zonas. | Contexto exterior apenas. Edifícios monolíticos ocultariam pessoas e pistas se substituíssem a casa em corte. |
-| Building + Modular, Roads, Survival, Holiday | Arquétipos por estudar de novo, não casos recomendados. | Não há novos objetos de pista aprovados. | Os ensaios atuais não sustentam uma planta legível com grelha invisível e pessoas. |
+| Suburbana, Natal, supermercado e minigolfe | Moradia com jardim e entrada; aldeia sazonal; loja com corredores e stock; percurso de minigolfe. | Acessórios reconhecíveis podem vestir zonas; pistas continuam limitadas às relações já suportadas pelo motor. | Candidatos a puzzles completos depois de validar ocupação humana, acessos, cortes e escala. O minigolfe deve usar a grelha apenas como estrutura interna, sem a exibir. |
 
 ### Adaptadores e prioridade
 
-1. **Primeiro:** protótipo de caso de loja ou café com arquitetura Furniture existente. Selecionar poucos objetos Mini Market/Food, definir fator de família, superfície-pai, rotação e pegada física. A escala experimental de Food é uma medição inicial, não um valor global aprovado.
-2. **Segundo:** ensaio arquitetónico exterior do cemitério. Definir entrada, zonas, caminhos e limites físicos, depois testar pessoas, sombras e sobreposições na câmara do jogo. Não acrescentar pistas de lápide ou percurso.
-3. **Terceiro:** adaptar um único sistema de fachada exterior, Building ou Modular, e elementos Suburban/Roads compatíveis. Não misturar famílias de paredes de alturas diferentes por conveniência.
-4. **Mais tarde:** testar maquinaria Factory de baixo perfil e City Industrial como fundo de oficina. Excluir a grua do tabuleiro. Retro Urban e as seleções Survival/Holiday testadas não entram no plano de produção.
+1. **Primeiro:** aprofundar a casa suburbana e a aldeia de Natal. A casa Suburban, com 0,83354 u de altura, fica quase à altura da figura de 0,95 u. A estética é aprovada para exploração, mas a família precisa de escala ou arquitetura própria para alojar pessoas e pistas.
+2. **Segundo:** transformar o supermercado em planta jogável. Definir balcão, corredores, stock e saída; validar a figura Mini Market de 0,72335 u e a caixa de 0,5949 u junto da referência canónica.
+3. **Terceiro:** testar um caso de minigolfe com buracos como zonas e percurso apenas como composição visual. Manter a lógica dentro das relações existentes e a grelha invisível.
+4. **Depois:** completar café, cemitério, Survival e fachadas Urban/Building. Manter Retro Urban isolado até resolver a diferença de textura, paleta e junção à estrada normal.
 
-O adaptador técnico necessário para os 13 pacotes texturados deve preservar `map`, a transformação `KHR_texture_transform`, alfa e identidade do material, tratar vidro por pacote e limitar sombras de superfícies transparentes. A adaptação de escala deve ser explícita por família e contexto, com apoio físico declarado; nenhuma peça pode receber elevação livre para esconder uma incompatibilidade. O laboratório implementa esse ensaio de forma isolada. A sua passagem ao renderizador de produção exige a escalada de sistema indicada abaixo, revisão visual e validação de casos próprios.
+O adaptador técnico necessário para os 14 pacotes texturados deve preservar `map`, a transformação `KHR_texture_transform`, alfa e identidade do material, tratar vidro por pacote e limitar sombras de superfícies transparentes. A adaptação de escala deve ser explícita por família e contexto, com apoio físico declarado; nenhuma peça pode receber elevação livre para esconder uma incompatibilidade. O laboratório implementa esse ensaio de forma isolada. A sua passagem ao renderizador de produção exige a escalada de sistema indicada abaixo, revisão visual e validação de casos próprios.
 
 ## Trabalho delegado e revisão
 

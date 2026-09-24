@@ -5,11 +5,13 @@ import { isLabAssetPath, manifest, parseManifest } from '../src/lab/manifest'
 
 describe('Kenney environment lab manifest', () => {
   it('covers the expected package and prototype families with local model copies', () => {
-    expect(manifest.packages).toHaveLength(15)
-    expect(manifest.prototypes).toHaveLength(10)
+    expect(manifest.packages).toHaveLength(16)
+    expect(manifest.prototypes).toHaveLength(11)
 
     const packageIds = new Set(manifest.packages.map((pack) => pack.id))
     const assetIds = new Set(manifest.assets.map((asset) => asset.id))
+    expect(packageIds.has('minigolf-kit')).toBe(true)
+    expect(manifest.prototypes.find((prototype) => prototype.id === 'minigolf')?.packIds).toContain('minigolf-kit')
     for (const prototype of manifest.prototypes) {
       expect(prototype.packIds.every((id) => packageIds.has(id))).toBe(true)
       expect(prototype.assetIds.length).toBeGreaterThan(0)
