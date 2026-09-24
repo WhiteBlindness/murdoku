@@ -30,38 +30,47 @@ function renderVictory(overrides: Partial<React.ComponentProps<typeof VictoryScr
   )
 }
 
-// ── Task 2: replay is opt-in ──────────────────────────────────────────────────
+function openClueReview() {
+  fireEvent.click(screen.getByRole('button', { name: /review clues/i }))
+  return screen.getByRole('region', { name: 'Clue replay' })
+}
+
+// ── Clue review disclosure and navigation ────────────────────────────────────
 
 describe('VictoryScreen clue replay', () => {
-  it('does not show the replay panel on initial render (opt-in only)', () => {
+  it('keeps the clue review collapsed until requested', () => {
     renderVictory()
+    expect(screen.getByRole('button', { name: 'Review clues' })).toHaveAttribute('aria-expanded', 'false')
     expect(screen.queryByRole('region', { name: 'Clue replay' })).not.toBeInTheDocument()
   })
 
-  it('shows a REVIEW CLUES button that opens the replay panel', () => {
+  it('opens the review panel and exposes its disclosure state to assistive technology', () => {
     renderVictory()
-    const btn = screen.getByRole('button', { name: 'Review how the clues solved the case' })
-    expect(btn).toBeInTheDocument()
-    fireEvent.click(btn)
-    expect(screen.getByRole('region', { name: 'Clue replay' })).toBeInTheDocument()
-  })
+    const btn = screen.getByRole('button', { name: 'Review clues' })
+    const panelId = btn.getAttribute('aria-controls')
 
-  it('hides the REVIEW CLUES button after the panel opens', () => {
-    renderVictory()
-    fireEvent.click(screen.getByRole('button', { name: 'Review how the clues solved the case' }))
-    expect(screen.queryByRole('button', { name: 'Review how the clues solved the case' })).not.toBeInTheDocument()
+    fireEvent.click(btn)
+    const panel = screen.getByRole('region', { name: 'Clue replay' })
+    expect(btn).toHaveAttribute('aria-expanded', 'true')
+    expect(btn).toHaveAccessibleName('Hide clue review')
+    expect(panel).toHaveAttribute('id', panelId)
+    expect(panel).toBeInTheDocument()
+
+    fireEvent.click(btn)
+    expect(btn).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.queryByRole('region', { name: 'Clue replay' })).not.toBeInTheDocument()
   })
 
   it('shows the first suspect clue text in the replay panel', () => {
     renderVictory()
-    fireEvent.click(screen.getByRole('button', { name: 'Review how the clues solved the case' }))
+    openClueReview()
     // The first non-victim suspect is p0 (Ada Stone) with clue "She was in the Study."
     expect(screen.getByText('She was in the Study.')).toBeInTheDocument()
   })
 
   it('steps to the next suspect on NEXT click', () => {
     renderVictory()
-    fireEvent.click(screen.getByRole('button', { name: 'Review how the clues solved the case' }))
+    openClueReview()
     fireEvent.click(screen.getByRole('button', { name: 'Next suspect' }))
     // Should now show p1 (Bram Vale) clue
     expect(screen.getByText('He was in row 2.')).toBeInTheDocument()
@@ -69,7 +78,7 @@ describe('VictoryScreen clue replay', () => {
 
   it('steps back on PREV click', () => {
     renderVictory()
-    fireEvent.click(screen.getByRole('button', { name: 'Review how the clues solved the case' }))
+    openClueReview()
     fireEvent.click(screen.getByRole('button', { name: 'Next suspect' }))
     fireEvent.click(screen.getByRole('button', { name: 'Previous suspect' }))
     // Back to p0
@@ -78,24 +87,24 @@ describe('VictoryScreen clue replay', () => {
 
   it('PREV is disabled on the first step', () => {
     renderVictory()
-    fireEvent.click(screen.getByRole('button', { name: 'Review how the clues solved the case' }))
+    openClueReview()
     expect(screen.getByRole('button', { name: 'Previous suspect' })).toBeDisabled()
   })
 
   it('NEXT is disabled on the last step', () => {
     renderVictory()
-    fireEvent.click(screen.getByRole('button', { name: 'Review how the clues solved the case' }))
-    // Advance to last step (p0, p1, p2 — 3 suspects with clues: p0 and p1 have clues, p2 has none in fixture)
-    // p0 has "room" clue, p1 has "row" clue — 2 steps total
+    openClueReview()
+    // Advance to the last step (p0, p1 and p2: three suspects; only p0 and p1 have clues)
+    // p0 has a "room" clue and p1 has a "row" clue, so there are two steps.
     fireEvent.click(screen.getByRole('button', { name: 'Next suspect' }))
     // Now on last step
     expect(screen.getByRole('button', { name: 'Next suspect' })).toBeDisabled()
   })
 
-  it('does not write any storage — VictoryScreen is read-only in replay mode', () => {
+  it('does not write to storage because clue review is read-only', () => {
     const setSpy = vi.spyOn(Storage.prototype, 'setItem')
     renderVictory()
-    fireEvent.click(screen.getByRole('button', { name: 'Review how the clues solved the case' }))
+    openClueReview()
     fireEvent.click(screen.getByRole('button', { name: 'Next suspect' }))
     // No localStorage.setItem called due to replay
     // (Other calls for unrelated saves are not tested here; we verify
@@ -109,18 +118,13 @@ describe('VictoryScreen clue replay', () => {
 
   it('shows the step counter inside the replay panel', () => {
     renderVictory()
-    fireEvent.click(screen.getByRole('button', { name: 'Review how the clues solved the case' }))
-    const panel = screen.getByRole('region', { name: 'Clue replay' })
-    // The counter is the second p.font-mono in the header (after "CLUE BREAKDOWN")
-    const paras = panel.querySelectorAll('p.font-mono')
-    const counter = Array.from(paras).find(p => /\d+ \/ \d+/.test(p.textContent ?? ''))
-    expect(counter?.textContent).toMatch(/1 \/ \d+/)
+    const panel = openClueReview()
+    expect(panel).toHaveTextContent('1 / 2')
   })
 
   it('shows board target description for positioned clues', () => {
     renderVictory()
-    fireEvent.click(screen.getByRole('button', { name: 'Review how the clues solved the case' }))
-    const panel = screen.getByRole('region', { name: 'Clue replay' })
+    const panel = openClueReview()
     // Ada Stone has a 'room' clue → POINTS AT section and "the Study" inside panel
     expect(panel.textContent).toMatch(/POINTS AT/i)
     expect(panel.textContent).toContain('the Study')
