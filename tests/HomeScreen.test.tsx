@@ -4,7 +4,7 @@ import HomeScreen from '../src/components/HomeScreen'
 import type { InProgressSummary } from '../src/core/ux'
 import { makePuzzle } from './fixtures'
 
-// Two-floor override — Easy difficulty with floors:2 proves we derive from
+// Two-floor override: Easy difficulty with floors:2 proves we derive from
 // data, not from a hardcoded difficulty list.
 const TWO_FLOOR = { floors: 2 as const }
 
@@ -90,7 +90,7 @@ describe('storey filter on landing page', () => {
     renderWithMixedTiers()
     const allBtn = screen.getByRole('button', { name: /^all$/i })
     expect(allBtn).toHaveAttribute('aria-pressed', 'true')
-    // The filter button group — use aria-pressed presence to distinguish the
+    // The filter button group: use aria-pressed presence to distinguish the
     // group control from tier row elements.
     const twoFloorBtns = screen.getAllByRole('button', { name: /2 floors/i })
     const twoBtn = twoFloorBtns.find(b => b.hasAttribute('aria-pressed'))!
@@ -101,7 +101,7 @@ describe('storey filter on landing page', () => {
   })
 
   it('renders an empty state rather than a blank gap when filter matches nothing', () => {
-    // Single-storey only catalog — "2 floors" filter leaves nothing.
+    // Single-storey only catalogue: the "2 floors" filter leaves nothing.
     const puzzles = [
       makePuzzle({ id: 'easy-1', difficulty: 'Easy' }),
     ]
@@ -276,18 +276,12 @@ describe('HomeScreen landing layout', () => {
     expect(cap.className).toMatch(/max-w-\[1200px\]/)
   })
 
-  it('board preview on landing is inert and aria-hidden (never focusable)', () => {
+  it('shows the house illustration with a useful text alternative', () => {
     renderHome()
-    // There may be two BoardPreview instances (mobile + desktop) — both must
-    // carry inert and aria-hidden so no cell enters the tab order.
-    const previews = screen.queryAllByTestId('board-preview')
-    // At least one preview must exist.
-    expect(previews.length).toBeGreaterThan(0)
-    previews.forEach(preview => {
-      expect(preview).toHaveAttribute('aria-hidden', 'true')
-      // `inert` is a boolean attribute — presence is what matters.
-      expect(preview.hasAttribute('inert')).toBe(true)
-    })
+    expect(screen.getByRole('img', {
+      name: /isometric view of the rooms in a murdoku house/i,
+    })).toBeInTheDocument()
+    expect(screen.getByText(/the house is part of the evidence/i)).toBeInTheDocument()
   })
 
   it('renders every required landing section', () => {
@@ -304,12 +298,9 @@ describe('HomeScreen landing layout', () => {
     expect(screen.getByText(/cases solved/i)).toBeInTheDocument()
   })
 
-  it('board preview desktop wrapper is hidden on mobile (lg:block)', () => {
+  it('links the introduction to the instructions section', () => {
     renderHome()
-    const desktopWrapper = screen.getByTestId('board-preview-desktop')
-    // The desktop preview wrapper uses `hidden lg:block` so it is invisible
-    // below lg — screen readers and mobile users do not encounter a duplicate.
-    expect(desktopWrapper.className).toMatch(/hidden/)
-    expect(desktopWrapper.className).toMatch(/lg:block/)
+    expect(screen.getByRole('link', { name: /how to play/i })).toHaveAttribute('href', '#how-it-works')
+    expect(screen.getByRole('region', { name: /how it works/i })).toHaveAttribute('id', 'how-it-works')
   })
 })
