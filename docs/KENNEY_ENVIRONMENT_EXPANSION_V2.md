@@ -165,15 +165,15 @@ Para cada protótipo, registar:
 7. leitura em computador e telemóvel;
 8. decisão visual final de GPT-6 Sol High.
 
-O [índice de evidência visual](reference/kenney-environment-expansion-v2/README.md) lista as capturas ainda por obter.
+O [índice de evidência visual](reference/kenney-environment-expansion-v2/README.md) reúne as capturas obtidas.
 
 ## Ordem de trabalho recomendada
 
 1. **Concluído:** verificar as fichas oficiais, licenças CC0, hashes dos 15 ZIPs e medir os 1 626 GLB. Manter a distinção entre «Files» oficial e ficheiros GLB extraídos.
 2. Resolver o risco de material texturado em investigação isolada, sem alterar o renderizador como parte da produção normal.
-3. Completar e rever o comparador com os modelos de referência atuais e a mesma escala, câmara, luz e método de renderização do jogo; capturar o resultado.
-4. Selecionar poucos modelos por finalidade e montar vinhetas pequenas. Evitar importar pacotes completos.
-5. Validar apoio, colisão, oclusão, transições de interior/exterior, cortes e visibilidade em computador e telemóvel.
+3. **Concluído para o laboratório:** rever o comparador com os modelos de referência atuais e parâmetros de câmara e luz comparáveis; capturar o resultado. O laboratório usa um renderizador isolado, não o do jogo.
+4. **Concluído para o laboratório:** selecionar poucos modelos por finalidade e montar vinhetas pequenas. Evitar importar pacotes completos.
+5. **Pendente para produção:** validar apoio, colisão, oclusão, transições de interior/exterior, cortes e visibilidade com pessoas e sobreposições reais.
 6. **Concluído para o laboratório:** rever visualmente as dez vinhetas e registar as capturas.
 7. **Concluído para o laboratório:** classificar como DIRETO, ADAPTADOR, USO ESPECÍFICO ou REJEITAR. A adoção em produção continua a exigir uma proposta própria.
 
