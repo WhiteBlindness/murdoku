@@ -44,6 +44,8 @@ Os quatro dioramas foram inspecionados em `http://127.0.0.1:5180/?kenneyLab=1`, 
 
 O catálogo atual já permite experimentar uma moradia, uma aldeia sazonal, um supermercado e um percurso de minigolfe sem alterar o sistema de puzzles. Os objetos apenas distinguem visualmente zonas. As pistas continuam limitadas às relações que o jogo já suporta.
 
+As propostas para converter estas vinhetas em casos completos, com função de cada zona, mistura de pacotes e limites de escala, estão em [Casos possíveis a partir do laboratório Kenney](KENNEY_PRODUCTION_CASE_CONCEPTS.md). O minigolfe passa a ser pensado como um estabelecimento com bilheteira, oficina e dois percursos, em vez de uma amostra isolada de obstáculos.
+
 ## Limites técnicos e roteiro
 
 Furniture Kit e Nature Kit são as únicas famílias da amostra sem mapas de cor. Os outros 14 pacotes usam texturas e `KHR_texture_transform`. A janela do Mini Market tem transparência e alguns conjuntos incluem superfícies semitransparentes. O laboratório ensaia o carregamento e os materiais à parte; o renderizador de produção ainda não conserva este fluxo. A integração de texturas na produção exige uma escalada de sistema e revisão própria. Cada família também precisa de regras explícitas de escala, pivô, contacto com o chão, superfície de apoio e sombra.
