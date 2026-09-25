@@ -296,3 +296,45 @@ describe('GameScreen placement arming', () => {
     expect(document.querySelectorAll('[data-placement-cue]').length).toBeGreaterThan(0)
   })
 })
+
+describe('GameScreen primary actions', () => {
+  it('keeps undo, redo, hint, and submit connected to their game actions', () => {
+    localStorage.setItem('murdoku_seen_help', '1')
+    const onUndo = vi.fn()
+    const onRedo = vi.fn()
+    const onHint = vi.fn()
+    const onSubmit = vi.fn()
+
+    renderGame(undefined, {
+      canUndo: true,
+      canRedo: true,
+      hintsLeft: 2,
+      onUndo,
+      onRedo,
+      onHint,
+      onSubmit,
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Undo' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Redo' }))
+    fireEvent.click(screen.getByRole('button', { name: /Hint/i }))
+    fireEvent.click(screen.getByRole('button', { name: /Submit Solution/i }))
+
+    expect(onUndo).toHaveBeenCalledOnce()
+    expect(onRedo).toHaveBeenCalledOnce()
+    expect(onHint).toHaveBeenCalledOnce()
+    expect(onSubmit).toHaveBeenCalledOnce()
+  })
+
+  it('shows the theme control and forwards a theme change request', () => {
+    localStorage.setItem('murdoku_seen_help', '1')
+    const onToggleTheme = vi.fn()
+    renderGame(undefined, { onToggleTheme, resolvedTheme: 'dark' })
+
+    const toggle = screen.getAllByTestId('theme-toggle')[0]
+    expect(toggle).toHaveAccessibleName('Switch to light theme')
+    fireEvent.click(toggle)
+
+    expect(onToggleTheme).toHaveBeenCalledOnce()
+  })
+})

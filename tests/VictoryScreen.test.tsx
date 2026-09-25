@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import VictoryScreen from '../src/components/VictoryScreen'
+import { getAllPuzzles } from '../src/core/catalog'
 import { makePuzzle } from './fixtures'
 
 function renderVictory(overrides: Partial<React.ComponentProps<typeof VictoryScreen>> = {}) {
@@ -128,5 +129,31 @@ describe('VictoryScreen clue replay', () => {
     // Ada Stone has a 'room' clue → POINTS AT section and "the Study" inside panel
     expect(panel.textContent).toMatch(/POINTS AT/i)
     expect(panel.textContent).toContain('the Study')
+  })
+})
+
+describe('VictoryScreen navigation and theme', () => {
+  it('offers next-case and case-library navigation and keeps the theme control available', () => {
+    const puzzle = getAllPuzzles()[0]!
+    const onNext = vi.fn()
+    const onHome = vi.fn()
+    const onToggleTheme = vi.fn()
+
+    renderVictory({
+      puzzle,
+      murderer: puzzle.murdererId,
+      onNext,
+      onHome,
+      onToggleTheme,
+      resolvedTheme: 'dark',
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /Switch to light theme/i }))
+    fireEvent.click(screen.getByRole('button', { name: /Open the next case/i }))
+    fireEvent.click(screen.getByRole('button', { name: /All cases/i }))
+
+    expect(onToggleTheme).toHaveBeenCalledOnce()
+    expect(onNext).toHaveBeenCalledOnce()
+    expect(onHome).toHaveBeenCalledOnce()
   })
 })

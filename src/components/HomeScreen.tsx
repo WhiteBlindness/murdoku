@@ -77,6 +77,8 @@ export default function HomeScreen({
         onSetMode={onSetMode}
         onSelect={onSelect}
         onBack={() => setView('landing')}
+        resolvedTheme={resolvedTheme}
+        onToggleTheme={onToggleTheme}
       />
     )
   }
@@ -93,7 +95,7 @@ export default function HomeScreen({
       >
 
         <nav aria-label="Main navigation" className="site-home__masthead pt-safe flex items-center justify-between">
-          <a href="#main" className="site-home__wordmark focus-ring" aria-label="Alibi, home">ALIBI<span> / CASE FILES</span></a>
+          <a href="#main" className="site-home__wordmark focus-ring" aria-label="Alibi, home">ALIBI<span> / MURDOKU CASE FILES</span></a>
           <button
             onClick={onOpenReleases}
             className="site-home__updates focus-ring"
@@ -108,14 +110,17 @@ export default function HomeScreen({
             <div className="site-home__intro">
               <p className="site-home__eyebrow"><span aria-hidden>01</span> The reconstruction desk</p>
               <h1 id="home-title" className="site-home__title">ALIBI<span>.</span></h1>
-              <p className="site-home__dek">A murder mystery, solved room by room.</p>
-              <p className="site-home__rule">Read the clues, place every suspect once in each row and column, then find who stayed with the victim.</p>
-              <a className="site-home__how-link" href="#how-it-works">How to play <span aria-hidden>↓</span></a>
+              <p className="site-home__dek">Every room holds a reason.</p>
+              <p className="site-home__rule">Read the witness accounts. Rebuild the night, then find who was alone with the victim.</p>
+              <div className="site-home__hero-actions">
+                <a className="site-home__browse-action focus-ring" href="#tiers-heading">Browse cases <span aria-hidden>↗</span></a>
+                <a className="site-home__how-link" href="#how-it-works">How to play <span aria-hidden>↓</span></a>
+              </div>
             </div>
 
             <div className="site-home__dispatch">
               <figure className="site-home__scene">
-                <img src="/assets/site-home-dollhouse.png" alt="Isometric view of the rooms in a Murdoku house." />
+                <img src="/assets/site-home-dollhouse-cutout.png" alt="Isometric view of the rooms in a Murdoku house." />
                 <figcaption><span aria-hidden>◆</span> The house is part of the evidence</figcaption>
               </figure>
               {resumablePuzzle && inProgress ? (
@@ -156,7 +161,7 @@ export default function HomeScreen({
         {/* ── Difficulty tiers — main navigation ── */}
         <section aria-labelledby="tiers-heading" className="site-home__tiers">
           <div className="site-home__tiers-heading">
-            <div className="site-home__section-heading"><p className="site-home__eyebrow"><span aria-hidden>03</span> Choose a file</p><h2 id="tiers-heading">Case tiers</h2></div>
+            <div className="site-home__section-heading"><p className="site-home__eyebrow"><span aria-hidden>03</span> The case archive</p><h2 id="tiers-heading">Case tiers</h2></div>
             {/* Storey filter — three-state button group. Matches the ModeBtn
                 interaction pattern: no native radio, each button carries
                 aria-pressed so assistive technology reads the active state.
@@ -198,7 +203,7 @@ export default function HomeScreen({
               })
               if (!visibleDiffs.length) {
                 return (
-                  <p
+                    <p
                     className="site-home__empty"
                     role="status"
                   >
@@ -251,7 +256,7 @@ export default function HomeScreen({
                       )}
                     </div>
                     <span className="site-home__tier-count">
-                      {solvedInTier}/{tierPuzzles.length}
+                      <span>{solvedInTier}</span><span aria-hidden> / </span>{tierPuzzles.length}<small>closed</small>
                     </span>
                     <span className="site-home__tier-arrow" aria-hidden>→</span>
                   </button>
@@ -301,10 +306,12 @@ interface TierScreenProps {
   onSetMode: (m: GameMode) => void
   onSelect: (id: string) => void
   onBack: () => void
+  resolvedTheme: string
+  onToggleTheme: () => void
 }
 
 function TierScreen({
-  difficulty, puzzles, completedIds, records, mode, onSetMode, onSelect, onBack,
+  difficulty, puzzles, completedIds, records, mode, onSetMode, onSelect, onBack, resolvedTheme, onToggleTheme,
 }: TierScreenProps) {
   const [query, setQuery] = useState('')
 
@@ -342,6 +349,7 @@ function TierScreen({
             <span>{tierPuzzles.length ? Math.round((solvedInTier / tierPuzzles.length) * 100) : 0}%</span>
             <small>complete</small>
           </div>
+          <ThemeToggle resolved={resolvedTheme} onToggle={onToggleTheme} />
         </nav>
 
         <section aria-label="Choose a play mode" className="site-tier__mode-section">
@@ -402,7 +410,7 @@ function TierScreen({
                   aria-label={`${p.caseNumber}: ${p.title}, ${p.size} by ${p.size}, ${(p.floors ?? 1)} floor${(p.floors ?? 1) === 1 ? '' : 's'}, ${p.people.length} people, ${solved ? 'completed' : isNext ? 'next case' : 'open case'}${records[p.id] ? `, best time ${fmt(records[p.id].bestSeconds)}` : ''}`}
                 >
                   <span className="site-tier__case-kicker">{p.caseNumber}</span>
-                  <span className="site-tier__case-state">{solved ? 'Closed' : isNext ? 'Next file' : 'Open file'}</span>
+                  <span className="site-tier__case-state"><span className="site-tier__case-state-mark" aria-hidden />{solved ? 'Case closed' : isNext ? 'Next in sequence' : 'Ready to open'}</span>
                   <h2>{p.title}</h2>
                   <span className="site-tier__case-meta">
                     <span><LayoutGrid size={13} aria-hidden />{p.size}×{p.size}</span>

@@ -303,4 +303,13 @@ describe('HomeScreen landing layout', () => {
     expect(screen.getByRole('link', { name: /how to play/i })).toHaveAttribute('href', '#how-it-works')
     expect(screen.getByRole('region', { name: /how it works/i })).toHaveAttribute('id', 'how-it-works')
   })
+
+  it('exposes an accessible theme control and forwards its change request', () => {
+    const onToggleTheme = vi.fn()
+    renderHome({ onToggleTheme, resolvedTheme: 'dark' })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Switch to light theme' }))
+
+    expect(onToggleTheme).toHaveBeenCalledOnce()
+  })
 })

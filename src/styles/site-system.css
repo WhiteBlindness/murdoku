@@ -1,19 +1,30 @@
-/* Investigation desk palette. These roles style only the application shell.
-   Scene materials, camera output and board overlays retain their own tokens. */
+/* Product shell only. Scene rendering and its tokens remain independent. */
 :root {
-  --site-ink: #242437;
-  --site-deep: #151724;
-  --site-paper: #ebe3db;
-  --site-paper-strong: #fff1e4;
-  --site-paper-ink: #2b2835;
-  --site-paper-muted: #5c5864;
-  --site-brass: #f4b96b;
-  --site-brass-dark: #855048;
-  --site-rule: rgba(255, 224, 197, 0.25);
-  --site-conflict: #aa4354;
-  --site-success: #19796e;
-  --site-teal: #4ec9c0;
-  --site-coral: #e57465;
+  --site-ink: #1b1c29;
+  --site-deep: #171a28;
+  --site-paper: #f0e8db;
+  --site-paper-strong: #fff8ee;
+  --site-paper-ink: #24222b;
+  --site-paper-muted: #5b5861;
+  --site-brass: #f1b766;
+  --site-brass-dark: #80512e;
+  --site-rule: rgba(255, 239, 218, .23);
+  --site-conflict: #c45460;
+  --site-success: #3bb8a8;
+  --site-teal: #65d1c9;
+  --site-coral: #ef8270;
+  --site-shell-text: #fff8ee;
+  --site-shell-copy: #e5dae0;
+  --site-shell-muted: #b9afb9;
+  --site-shell-header: #1b1d2a;
+  --site-shell-panel: #252634;
+  --site-shell-panel-hover: #303140;
+  --site-shell-gradient: radial-gradient(ellipse 70% 65% at 75% 32%, rgba(44, 98, 113, .43), transparent 78%), radial-gradient(ellipse 75% 58% at 7% 0%, rgba(93, 49, 75, .35), transparent 74%), linear-gradient(145deg, #1d1b2b, #1b2635 68%, #1e1d2d);
+  --site-accent: #f1b766;
+  --site-accent-ink: #2b2030;
+  --site-highlight: #65d1c9;
+  --site-danger: #ef8270;
+  --site-focus: #ffd58e;
   --site-space-1: 4px;
   --site-space-2: 8px;
   --site-space-3: 12px;
@@ -23,119 +34,55 @@
   --site-space-12: 48px;
 }
 
-.site-display {
-  font-family: 'Barlow Condensed', ui-sans-serif, system-ui, sans-serif;
-  font-weight: 700;
-  line-height: 0.98;
-  letter-spacing: -0.012em;
+@media (prefers-color-scheme: light) {
+  :root:not(.theme-dark) {
+    --site-deep: #f1eee8;
+    --site-shell-text: #222534;
+    --site-shell-copy: #434654;
+    --site-shell-muted: #656873;
+    --site-shell-header: #f5f2ec;
+    --site-shell-panel: #fffaf2;
+    --site-shell-panel-hover: #f4eee4;
+    --site-shell-gradient: radial-gradient(ellipse 65% 58% at 80% 28%, rgba(154, 205, 199, .35), transparent 75%), radial-gradient(ellipse 55% 50% at 7% 0%, rgba(232, 177, 154, .27), transparent 75%), linear-gradient(145deg, #fbf7ef, #e7edf0 70%, #ece8ed);
+    --site-rule: rgba(37, 44, 59, .22);
+    --site-accent: #8e4c24;
+    --site-accent-ink: #fff9f1;
+    --site-highlight: #116f70;
+    --site-danger: #a22d41;
+    --site-focus: #774414;
+    --site-brass: #8e4c24;
+    --site-teal: #116f70;
+    --site-coral: #a22d41;
+  }
 }
 
-.site-copy {
-  font-family: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
-  line-height: 1.52;
+:root.theme-light {
+  --site-deep: #f1eee8;
+  --site-shell-text: #222534;
+  --site-shell-copy: #434654;
+  --site-shell-muted: #656873;
+  --site-shell-header: #f5f2ec;
+  --site-shell-panel: #fffaf2;
+  --site-shell-panel-hover: #f4eee4;
+  --site-shell-gradient: radial-gradient(ellipse 65% 58% at 80% 28%, rgba(154, 205, 199, .35), transparent 75%), radial-gradient(ellipse 55% 50% at 7% 0%, rgba(232, 177, 154, .27), transparent 75%), linear-gradient(145deg, #fbf7ef, #e7edf0 70%, #ece8ed);
+  --site-rule: rgba(37, 44, 59, .22);
+  --site-accent: #8e4c24;
+  --site-accent-ink: #fff9f1;
+  --site-highlight: #116f70;
+  --site-danger: #a22d41;
+  --site-focus: #774414;
+  --site-brass: #8e4c24;
+  --site-teal: #116f70;
+  --site-coral: #a22d41;
 }
 
-.site-data {
-  font-family: 'Courier Prime', ui-monospace, SFMono-Regular, monospace;
-  font-variant-numeric: tabular-nums;
-}
+.site-display { font-family: 'Barlow Condensed', ui-sans-serif, system-ui, sans-serif; font-weight: 700; line-height: .98; letter-spacing: -.012em; }
+.site-copy { font-family: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif; line-height: 1.52; }
+.site-data { font-family: 'Courier Prime', ui-monospace, SFMono-Regular, monospace; font-variant-numeric: tabular-nums; }
+.site-control { min-height: 44px; font-family: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif; font-weight: 700; letter-spacing: .025em; }
+.site-control:focus-visible, .site-home button:focus-visible, .site-tier button:focus-visible, .site-game-root button:focus-visible, .site-victory button:focus-visible { outline: 3px solid var(--site-focus); outline-offset: 3px; }
+.site-home, .site-tier, .site-game-root, .site-victory { color: var(--site-shell-text); background: var(--site-shell-gradient); }
 
-.site-control {
-  min-height: 44px;
-  font-family: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.025em;
-}
-
-.site-control:focus-visible {
-  outline: 2px solid var(--site-brass);
-  outline-offset: 3px;
-}
-
-/* Deep violet ink and bright signals echo the scene's peach, timber and green. */
-html .site-home,
-html .site-tier {
-  --home-copy: #d9cfdb;
-  --home-muted: #b2a8bb;
-  background-image:
-    radial-gradient(ellipse 54% 48% at 82% 7%, rgba(94, 180, 178, 0.18), transparent 72%),
-    radial-gradient(ellipse 60% 40% at 4% 2%, rgba(226, 106, 105, 0.14), transparent 76%);
-}
-
-html .site-home__title span {
-  color: var(--site-coral);
-}
-
-html .site-home__primary-action {
-  color: #fff8ed;
-  background: #167a7a;
-  border-color: #6ed3c8;
-}
-
-html .site-home__primary-action:hover {
-  background: #23928f;
-}
-
-html .site-home__dispatch-sheet,
-html .site-home__daily {
-  border-top: 4px solid var(--site-coral);
-}
-
-html .site-home__scene {
-  border-color: #4ec9c0;
-}
-
-html .site-game-header {
-  background: #242437;
-}
-
-html .site-game-header h1 {
-  color: var(--site-paper-strong);
-}
-
-html .site-sequence {
-  border-top: 3px solid #167a7a;
-}
-
-html .site-sequence-person[aria-pressed='true'],
-html .site-suspect-card.is-selected {
-  border-color: #167a7a;
-  box-shadow: inset 3px 0 #167a7a;
-}
-
-html .site-sequence-person[aria-pressed='true'] .site-sequence-number {
-  background: #167a7a;
-  border-color: #167a7a;
-  color: white;
-}
-
-html .site-suspect-action[aria-pressed='true'] {
-  color: #126665;
-  border-color: #167a7a;
-  background: rgba(22, 122, 122, 0.12);
-}
-
-html .site-victory__document {
-  border-top: 6px solid #167a7a;
-}
-
-html .site-victory__seal {
-  color: #fff1e4;
-  background: #a74755;
-  border-color: #a74755;
-  box-shadow: 4px 5px 0 rgba(43, 40, 53, 0.14);
-}
-
-html .site-victory__next-button {
-  color: #fff8ed;
-  background: #167a7a;
-  border-color: #126a6a;
-}
-
-html .site-victory__next-button:hover {
-  background: #23928f;
-}
-
-html .site-victory__next-label {
-  color: rgba(255, 248, 237, 0.8);
+@media (prefers-reduced-motion: reduce) {
+  .site-home *, .site-tier *, .site-game-root *, .site-victory * { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }

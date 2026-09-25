@@ -9,7 +9,7 @@ interface Props {
   onSelectPerson: (id: string) => void
 }
 
-/** Compact, selectable sequence index for the active case. */
+/** Compact, selectable cast index. The selected person's full clue lives in the dossier. */
 export default function CaseProgressStrip({
   puzzle,
   selectedPerson,
@@ -27,10 +27,9 @@ export default function CaseProgressStrip({
       className="site-sequence"
     >
       <div className="site-sequence-heading">
-        <h2 id="case-progress-heading">Sequence</h2>
-        <span aria-live="polite">{placedCount}/{puzzle.people.length} placed</span>
+        <h2 id="case-progress-heading">People</h2>
+        <span aria-live="polite">{placedCount} of {puzzle.people.length} placed</span>
       </div>
-      {nextPerson && <p className="site-sequence-hint">Next suggested: {nextPerson.name}</p>}
       <ol className="site-sequence-list" aria-label="People in the reconstruction sequence">
         {puzzle.people.map((person, index) => {
           const placed = Boolean(placedOf[person.id])
@@ -38,7 +37,10 @@ export default function CaseProgressStrip({
           const selected = selectedPerson === person.id
           const suggested = !placed && person.id === nextPerson?.id
           const state = conflicted ? 'conflict' : placed ? 'placed' : suggested ? 'next' : 'open'
-          const stateLabel = conflicted ? 'conflict' : placed ? 'placed' : suggested ? 'next suggested' : 'open'
+          const stateLabel = conflicted ? 'conflict' : placed ? 'placed' : suggested ? 'next' : 'open'
+          const portraitIndex = [...person.id].reduce((sum, character) => sum + character.charCodeAt(0), 0) % 8
+          const portraitColumn = portraitIndex % 4
+          const portraitRow = Math.floor(portraitIndex / 4)
 
           return (
             <li key={person.id}>
@@ -52,6 +54,15 @@ export default function CaseProgressStrip({
                 data-state={state}
                 className="site-sequence-person focus-ring"
               >
+                <span
+                  aria-hidden="true"
+                  className="site-sequence-portrait contact-sheet-portrait"
+                  style={{
+                    backgroundImage: 'url("/assets/contact-sheet.jpg")',
+                    backgroundSize: '400% 200%',
+                    backgroundPosition: `${portraitColumn * 33.333}% ${portraitRow * 100}%`,
+                  }}
+                />
                 <span aria-hidden="true" className="site-sequence-number">{index + 1}</span>
                 <span className="site-sequence-copy">
                   <span className="site-sequence-name">{person.name}</span>
@@ -63,7 +74,7 @@ export default function CaseProgressStrip({
                         : suggested
                           ? <CircleDashed size={12} aria-hidden="true" />
                           : <UserRound size={12} aria-hidden="true" />}
-                    <span>{suggested ? 'next' : stateLabel}</span>
+                    <span>{stateLabel}</span>
                     {person.isVictim && <span className="site-victim-label">Victim</span>}
                   </span>
                 </span>

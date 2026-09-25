@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, BookOpen } from 'lucide-react'
+import { BadgeCheck, ChevronLeft, ChevronRight, BookOpen } from 'lucide-react'
 import type { Puzzle } from '../core/types'
 import { roomIdAt } from '../core/engine'
 import { getAllPuzzles } from '../core/catalog'
@@ -8,6 +8,7 @@ import { buildShareText, copyShareText } from '../core/share'
 import { loadStreak } from '../core/daily'
 import { resolveClueHighlights } from '../core/ux'
 import type { ClueHighlight } from '../core/ux'
+import ThemeToggle from './ThemeToggle'
 import '../styles/site-victory.css'
 
 interface Props {
@@ -22,16 +23,24 @@ interface Props {
   onNext: () => void
   onPlayUnsolved: (id: string) => void
   onHome: () => void
+  resolvedTheme?: string
+  onToggleTheme?: () => void
 }
 
-export default function VictoryScreen({ puzzle, murderer, timer, elapsedSeconds, hintsLeft, completedIds, onNext, onPlayUnsolved, onHome }: Props) {
+export default function VictoryScreen({
+  puzzle, murderer, timer, elapsedSeconds, hintsLeft, completedIds,
+  onNext, onPlayUnsolved, onHome,
+  resolvedTheme = 'dark', onToggleTheme = () => {},
+}: Props) {
   const [showReplay, setShowReplay] = useState(false)
   const killer = puzzle.people.find(p => p.id === murderer)!
   const victim = puzzle.people.find(p => p.id === puzzle.victimId)!
   const room = puzzle.rooms.find(r => r.id === roomIdAt(puzzle, puzzle.solution[puzzle.victimId]))
   const allPuzzles = getAllPuzzles()
   const order = allPuzzles.map(p => p.id)
-  const hasNext = order.indexOf(puzzle.id) < order.length - 1
+  const currentIndex = order.indexOf(puzzle.id)
+  const nextPuzzle = allPuzzles[currentIndex + 1]
+  const hasNext = currentIndex >= 0 && currentIndex < order.length - 1
   const unsolved = allPuzzles.find(p => !completedIds.includes(p.id) && p.id !== puzzle.id)
   const hasUnsolved = !hasNext && !!unsolved
   const reduceMotion = useReducedMotion()
@@ -65,47 +74,53 @@ export default function VictoryScreen({ puzzle, murderer, timer, elapsedSeconds,
             <span className="site-victory__brand-mark" aria-hidden="true">A</span>
             <span>Alibi <span className="site-victory__brand-divider">/</span> Case file</span>
           </div>
-          <p className="site-victory__case-ref">Case {puzzle.caseNumber}</p>
+          <div className="site-victory__masthead-tools">
+            <p className="site-victory__case-ref">{puzzle.caseNumber}</p>
+            <ThemeToggle resolved={resolvedTheme} onToggle={onToggleTheme} className="site-victory__theme-toggle" />
+          </div>
         </header>
 
         <section className="site-victory__lead" aria-labelledby="victory-title">
           <div className="site-victory__lead-copy">
-            <p className="site-victory__eyebrow">Final report <span aria-hidden="true">/</span> Investigation complete</p>
-            <h1 id="victory-title" className="site-victory__title">Case closed</h1>
-            <p className="site-victory__summary">The evidence has been assembled. The perpetrator is identified.</p>
-            <div className="site-victory__subject">
-              <span className="site-victory__field-label">Perpetrator</span>
-              <h2>{killer.name}</h2>
-            </div>
+            <h1 id="victory-title" className="site-victory__title"><span>Case</span><span>closed.</span></h1>
+            <p className="site-victory__summary">Every clue found its place. The final reconstruction reveals who was left alone with the victim.</p>
           </div>
-          <div className="site-victory__seal" aria-hidden="true">
-            <span>File</span>
-            <strong>Closed</strong>
-            <span className="site-victory__seal-rule" aria-hidden="true" />
-            <span>Verified</span>
+          <div className="site-victory__verdict">
+            <div className="site-victory__verdict-heading">
+              <span className="site-victory__field-label">Perpetrator</span>
+              <BadgeCheck size={24} strokeWidth={1.7} aria-hidden="true" />
+            </div>
+            <h2>{killer.name}</h2>
+            <p>Identified from the evidence</p>
           </div>
         </section>
 
-        <section className="site-victory__facts" aria-label="Case record">
-          <Stat label="Victim" value={victim.name} />
-          <Stat label="Scene" value={room?.name ?? 'Not recorded'} />
-          <Stat label="Time" value={timer} />
-          <Stat label="Hints used" value={`${3 - hintsLeft} of 3`} />
+        <section className="site-victory__record" aria-label="Case record">
+          <div className="site-victory__record-heading">
+            <BadgeCheck size={17} strokeWidth={1.8} aria-hidden="true" />
+            <span>Reconstruction verified</span>
+          </div>
+          <div className="site-victory__facts">
+            <Stat label="Victim" value={victim.name} />
+            <Stat label="Scene" value={room?.name ?? 'Not recorded'} />
+            <Stat label="Time" value={timer} />
+            <Stat label="Hints used" value={`${3 - hintsLeft} of 3`} />
+          </div>
         </section>
 
         <footer className="site-victory__actions">
           <div className="site-victory__next-wrap">
             {hasNext && (
-              <button onClick={onNext} className="site-victory__next-button">
-                <span className="site-victory__next-copy">Continue the inquiry</span>
-                <span className="site-victory__next-label">Next case</span>
+              <button type="button" onClick={onNext} className="site-victory__next-button">
+                <span className="site-victory__next-copy">Open the next case</span>
+                <span className="site-victory__next-label">{nextPuzzle?.caseNumber ?? ''}{nextPuzzle?.title ? ` · ${nextPuzzle.title}` : ''}</span>
                 <ChevronRight size={19} strokeWidth={1.8} aria-hidden />
               </button>
             )}
             {hasUnsolved && unsolved && (
-              <button onClick={() => onPlayUnsolved(unsolved.id)} className="site-victory__next-button">
-                <span className="site-victory__next-copy">Continue the inquiry</span>
-                <span className="site-victory__next-label">Another case</span>
+              <button type="button" onClick={() => onPlayUnsolved(unsolved.id)} className="site-victory__next-button">
+                <span className="site-victory__next-copy">Choose another case</span>
+                <span className="site-victory__next-label">Continue your investigations</span>
                 <ChevronRight size={19} strokeWidth={1.8} aria-hidden />
               </button>
             )}

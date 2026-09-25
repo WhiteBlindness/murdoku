@@ -15,6 +15,7 @@ import CaseProgressStrip from './CaseProgressStrip'
 import CaseNotes from './CaseNotes'
 import HowToPlay from './HowToPlay'
 import FurniturePicker from './FurniturePicker'
+import ThemeToggle from './ThemeToggle'
 import '../styles/site-game.css'
 
 interface Props {
@@ -52,6 +53,8 @@ interface Props {
   onBack: () => void
   /** Switch active floor — only called when puzzle.floors === 2. */
   onSwitchFloor?: (floor: 0 | 1) => void
+  resolvedTheme?: string
+  onToggleTheme?: () => void
 }
 
 const DIFF_COLOR: Record<string, string> = {
@@ -83,6 +86,7 @@ export default function GameScreen(props: Props) {
   } = props
   const cluesOf: Record<string, string[]> = {}
   for (const ct of puzzle.clues) (cluesOf[ct.clue.person] ||= []).push(ct.text)
+  const activeSuspect = puzzle.people.find(person => person.id === selectedPerson) ?? null
   const placedCount = Object.keys(placedOf).length
   const detective = mode === 'detective'
   // Locating a clue on the board is HELP, so it is opt-in per suspect and never
@@ -509,7 +513,7 @@ export default function GameScreen(props: Props) {
       */}
       <div
         data-testid="game-content-cap"
-        className="flex flex-col flex-1 min-h-0 lg:max-w-[1400px] lg:w-full lg:mx-auto"
+        className="flex flex-col flex-1 min-h-0 lg:max-w-[1400px] lg:w-full lg:mx-auto lg:px-5"
       >
 
       {/* ── Header — two genuinely different layouts ───────────────────────
@@ -523,8 +527,8 @@ export default function GameScreen(props: Props) {
       <header
         className="site-game-header case-masthead pt-safe flex-shrink-0 h-16 items-center
           grid grid-cols-[auto_1fr_auto] gap-0 px-2
-          lg:grid-cols-[minmax(0,7fr)_minmax(340px,3fr)] lg:px-0 lg:gap-0"
-        style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
+          lg:grid-cols-[minmax(0,1fr)_minmax(320px,390px)] lg:px-0 lg:gap-0"
+        style={{ borderBottom: '1px solid var(--site-rule)' }}
       >
 
         {/* ── MOBILE: back button ── DESKTOP: hidden (back lives in col-1 below) */}
@@ -541,7 +545,7 @@ export default function GameScreen(props: Props) {
             centring here centres the TITLE on the board column rather than on
             the viewport — the viewport centring is what put the title 210px to
             the right of the board it names. */}
-        <div className="min-w-0 flex items-center justify-center lg:h-full lg:px-3 lg:relative">
+          <div className="min-w-0 flex items-center justify-center lg:h-full lg:px-3 lg:relative">
 
           {/* Back — desktop only, absolute-left so it doesn't push the title off-centre */}
           <button
@@ -553,7 +557,7 @@ export default function GameScreen(props: Props) {
 
           {/* Title block — centred within col 1 on desktop, centred in mobile track */}
           <div className="text-center min-w-0 px-1 flex flex-col justify-center">
-            <h1 className="font-display text-text-primary text-sm sm:text-base font-bold leading-snug uppercase tracking-wide truncate">
+            <h1 className="font-display text-sm sm:text-base font-bold leading-snug uppercase tracking-wide truncate">
               {puzzle.title}
             </h1>
             {/* Badges — visible sm+ on mobile; always visible on desktop */}
@@ -564,14 +568,14 @@ export default function GameScreen(props: Props) {
               >
                 {puzzle.difficulty.toUpperCase()}
               </span>
-              <span className="text-text-muted text-[10px] font-mono whitespace-nowrap tracking-wider">
+              <span className="text-[10px] font-mono whitespace-nowrap tracking-wider">
                 {puzzle.size}×{puzzle.size}
               </span>
               <span
                 className="text-[10px] font-mono tracking-[0.15em] px-1.5 whitespace-nowrap"
                 style={{
-                  color: detective ? 'var(--color-accent-text)' : 'var(--color-text-muted)',
-                  background: detective ? 'color-mix(in srgb, var(--color-accent) 14%, transparent)' : 'transparent',
+              color: detective ? 'var(--site-highlight)' : 'var(--site-shell-muted)',
+              background: detective ? 'color-mix(in srgb, var(--site-highlight) 14%, transparent)' : 'transparent',
                 }}
               >
                 {detective ? 'DETECTIVE' : 'CLASSIC'}
@@ -584,8 +588,8 @@ export default function GameScreen(props: Props) {
             className="lg:hidden ml-2 flex-shrink-0 font-mono text-[11px] tabular-nums whitespace-nowrap px-1.5 py-0.5 leading-none"
             title="Suspects placed"
             style={{
-              color: 'var(--color-accent-text)',
-              border: '1px solid color-mix(in srgb, var(--color-accent) 42%, transparent)',
+              color: 'var(--site-highlight)',
+              border: '1px solid color-mix(in srgb, var(--site-highlight) 48%, transparent)',
             }}
           >
             <span className="sr-only">Suspects placed: </span>{placedCount}/{puzzle.people.length}
@@ -593,7 +597,10 @@ export default function GameScreen(props: Props) {
         </div>
 
         {/* ── MOBILE col 3: overflow menu trigger ── DESKTOP: hidden */}
-        <div className="lg:hidden relative flex-shrink-0">
+        <div className="site-mobile-header-tools lg:hidden relative flex-shrink-0 flex items-center gap-1">
+          {props.resolvedTheme && props.onToggleTheme && (
+            <ThemeToggle resolved={props.resolvedTheme} onToggle={props.onToggleTheme} className="site-game-theme-toggle" />
+          )}
           <button
             ref={menuTriggerRef}
             onClick={() => setMenuOpen(v => !v)}
@@ -617,19 +624,20 @@ export default function GameScreen(props: Props) {
             <div
                 ref={menuPanelRef}
                 role="menu"
-                className="absolute right-0 top-[calc(100%+4px)] z-40 min-w-[200px] border bg-bg-surface py-1"
+                className="site-mobile-menu absolute right-0 top-[calc(100%+4px)] z-40 min-w-[200px] border py-1"
                 style={{
-                  borderColor: 'var(--color-border-strong)',
-                  boxShadow: 'var(--shadow-elevated)',
+                  borderColor: 'var(--site-rule)',
+                  boxShadow: '0 14px 36px rgba(10, 12, 24, .26)',
+                  background: 'var(--site-shell-panel)',
                 }}
               >
                 {/* Timer readout */}
-                <div className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-border-subtle)' }}>
-                  <p className="text-[10px] font-mono text-text-muted tracking-[0.2em] uppercase mb-1">Time elapsed</p>
+                <div className="px-4 py-2 border-b" style={{ borderColor: 'var(--site-rule)' }}>
+                  <p className="text-[10px] font-mono tracking-[0.12em] uppercase mb-1">Time elapsed</p>
                   {!hideTimer ? (
-                    <span className="font-mono text-accent-text text-xl tabular-nums tracking-widest">{timer}</span>
+                    <span className="font-mono text-xl tabular-nums tracking-widest" style={{ color: 'var(--site-highlight)' }}>{timer}</span>
                   ) : (
-                    <span className="font-mono text-text-muted text-xl tracking-widest">— : — —</span>
+                    <span className="font-mono text-xl tracking-widest">--:--</span>
                   )}
                 </div>
 
@@ -638,7 +646,7 @@ export default function GameScreen(props: Props) {
                   role="menuitem"
                   onClick={() => { props.onToggleTimer(); closeMenu() }}
                   aria-label={hideTimer ? 'Show timer' : 'Hide timer'}
-                  className="focus-ring w-full text-left px-4 py-3 flex items-center gap-3 text-[13px] font-mono text-text-secondary hover:text-text-primary hover:bg-bg-elevated transition-colors"
+                  className="focus-ring w-full text-left px-4 py-3 flex items-center gap-3 text-[13px] font-mono transition-colors"
                 >
                   {hideTimer ? <EyeOff size={16} /> : <Eye size={16} />}
                   {hideTimer ? 'Show timer' : 'Hide timer'}
@@ -649,7 +657,7 @@ export default function GameScreen(props: Props) {
                   role="menuitem"
                   onClick={() => { setHelp(true); closeMenu() }}
                   aria-label="How to play"
-                  className="focus-ring w-full text-left px-4 py-3 flex items-center gap-3 text-[13px] font-mono text-text-secondary hover:text-text-primary hover:bg-bg-elevated transition-colors"
+                  className="focus-ring w-full text-left px-4 py-3 flex items-center gap-3 text-[13px] font-mono transition-colors"
                 >
                   <HelpCircle size={16} />
                   How to play
@@ -659,19 +667,19 @@ export default function GameScreen(props: Props) {
         </div>
 
         {/* ── DESKTOP col 2: placement count + timer + controls (dossier column) */}
-        <div className="hidden lg:flex items-center justify-end gap-1.5 px-3 h-full border-l" style={{ borderColor: 'var(--color-border-subtle)' }}>
+        <div className="hidden lg:flex items-center justify-end gap-1.5 px-3 h-full border-l" style={{ borderColor: 'var(--site-rule)' }}>
           <span
             className="font-mono text-[11px] tabular-nums whitespace-nowrap px-1.5 py-0.5 leading-none"
             title="Suspects placed"
             style={{
-              color: 'var(--color-accent-text)',
-              border: '1px solid color-mix(in srgb, var(--color-accent) 42%, transparent)',
+              color: 'var(--site-highlight)',
+              border: '1px solid color-mix(in srgb, var(--site-highlight) 48%, transparent)',
             }}
           >
             <span className="sr-only">Suspects placed: </span>{placedCount}/{puzzle.people.length}
           </span>
           {!hideTimer && (
-            <span className="font-mono text-accent-text text-sm tabular-nums tracking-widest">
+            <span className="font-mono text-sm tabular-nums tracking-widest" style={{ color: 'var(--site-highlight)' }}>
               {timer}
             </span>
           )}
@@ -691,6 +699,9 @@ export default function GameScreen(props: Props) {
           >
             <HelpCircle size={19} />
           </button>
+          {props.resolvedTheme && props.onToggleTheme && (
+            <ThemeToggle resolved={props.resolvedTheme} onToggle={props.onToggleTheme} className="site-game-theme-toggle" />
+          )}
         </div>
       </header>
 
@@ -702,12 +713,11 @@ export default function GameScreen(props: Props) {
       <div
         className={[
           'site-game-workspace relative flex-1 flex flex-col min-h-0',
-          // lg: two-column grid
-          'lg:grid lg:grid-cols-[minmax(0,7fr)_minmax(340px,3fr)] lg:grid-rows-[auto_minmax(0,1fr)] lg:min-h-0',
+          'lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(320px,390px)] lg:grid-rows-[auto_minmax(0,1fr)] lg:min-h-0',
         ].join(' ')}
       >
 
-        <div className="site-sequence-slot order-1 lg:order-none lg:col-start-2 lg:row-start-1">
+        <div className="site-sequence-slot order-1 lg:order-none lg:col-start-1 lg:col-span-2 lg:row-start-1">
           <CaseProgressStrip
             puzzle={puzzle}
             placedOf={placedOf}
@@ -816,22 +826,9 @@ export default function GameScreen(props: Props) {
           className={[
             'contents site-scene-column',
             // lg: real grid column — non-scrolling, board fills the height
-            'lg:flex lg:flex-col lg:min-h-0 lg:overflow-hidden lg:col-start-1 lg:row-start-1 lg:row-span-2',
+            'lg:flex lg:flex-col lg:min-h-0 lg:overflow-hidden lg:col-start-1 lg:row-start-2',
           ].join(' ')}
         >
-          {/* ── Instruction line (mobile: order 0, desktop: inside centre) ── */}
-          <p
-            className={[
-              'px-5 py-2 text-center text-text-muted text-[12px] font-mono tracking-wide flex-shrink-0',
-              // hide on mobile — board is reachable sooner; HowToPlay overlay + ? button cover it
-              'hidden lg:block order-0',
-            ].join(' ')}
-          >
-            {detective
-              ? 'Place to lock a row & column. Draft to pencil candidates. Assist to cross off provably empty cells. Hints unavailable — every placement must be yours to prove.'
-              : 'Each person is in exactly one row and one column. Read the clues, place everyone, use hints if needed, then submit.'}
-          </p>
-
           {/* ── Board slot ────────────────────────────────────────────────
               Single MapGrid instance — no mobile/desktop fork.
 
@@ -856,9 +853,9 @@ export default function GameScreen(props: Props) {
                           aria-pressed={activeFloor === f}
                           className="focus-ring flex-1 min-h-[44px] border px-3 font-display text-[13px] font-medium uppercase tracking-[0.08em] transition-colors"
                           style={{
-                            borderColor: activeFloor === f ? 'var(--color-accent-strong)' : 'var(--color-border-strong)',
-                            background: activeFloor === f ? 'var(--color-accent)' : 'transparent',
-                            color: activeFloor === f ? 'var(--color-on-accent)' : 'var(--color-text-secondary)',
+                            borderColor: activeFloor === f ? 'var(--site-accent)' : 'var(--site-rule)',
+                            background: activeFloor === f ? 'var(--site-accent)' : 'transparent',
+                            color: activeFloor === f ? 'var(--site-accent-ink)' : 'var(--site-shell-copy)',
                           }}
                         >
                           {f === 0 ? 'Ground floor' : 'Upstairs'}
@@ -871,8 +868,8 @@ export default function GameScreen(props: Props) {
                           key={view}
                           onClick={() => setStoreyView(view)}
                           aria-pressed={storeyView === view}
-                          className="focus-ring min-h-[44px] font-mono text-[10px] uppercase tracking-[0.12em] transition-colors"
-                          style={{ color: storeyView === view ? 'var(--color-accent)' : 'var(--color-text-muted)' }}
+                          className="focus-ring min-h-[44px] font-mono text-[10px] uppercase tracking-[0.08em] transition-colors"
+                          style={{ color: storeyView === view ? 'var(--site-highlight)' : 'var(--site-shell-muted)' }}
                         >
                           {view === 'ghost' ? 'Ghosted context' : 'Exploded overview'}
                         </button>
@@ -959,7 +956,7 @@ export default function GameScreen(props: Props) {
               Desktop: flex-shrink-0 at the bottom of the scene column.
               FurniturePicker lives here so it's beside the board.
           */}
-          <div className="site-action-toolbar command-rail order-4 flex-shrink-0 w-full px-3 py-2 flex flex-col gap-2">
+          <div className="site-action-toolbar command-rail order-5 flex-shrink-0 w-full px-3 py-2 flex flex-col gap-2">
             {/* FurniturePicker — transient, in the scene column */}
             <AnimatePresence>
               {showDecor && (
@@ -980,7 +977,7 @@ export default function GameScreen(props: Props) {
             </AnimatePresence>
 
             {/* Mode row — Place / Draft / Mark */}
-            <div className="flex gap-2 justify-center [&>button]:flex-1 sm:[&>button]:flex-none lg:justify-start">
+            <div className="site-tool-modes flex gap-2 justify-center [&>button]:flex-1 sm:[&>button]:flex-none lg:justify-start">
               <ToolBtn
                 active={tool === 'place'}
                 onClick={activatePlaceTool}
@@ -1006,7 +1003,7 @@ export default function GameScreen(props: Props) {
             </div>
 
             {/* Actions grid — Undo / Redo / Clear / Hint / Decorate */}
-            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:justify-center lg:justify-start">
+            <div className="site-tool-utilities grid grid-cols-5 gap-2 sm:flex sm:flex-wrap sm:justify-center lg:justify-start">
               <ToolBtn onClick={props.onUndo} disabled={!props.canUndo} icon={<Undo2 size={16} />} label="Undo" />
               <ToolBtn onClick={props.onRedo} disabled={!props.canRedo} icon={<Redo2 size={16} />} label="Redo" />
               <ToolBtn onClick={() => setConfirmClear(true)} icon={<Trash2 size={16} />} label="Clear" />
@@ -1046,9 +1043,9 @@ export default function GameScreen(props: Props) {
         <div
           className={[
             'contents site-dossier-column',
-            'lg:flex lg:flex-col lg:min-h-0 lg:border-l lg:col-start-2 lg:row-start-2',
+            'lg:flex lg:flex-col lg:min-h-0 lg:col-start-2 lg:row-start-2',
           ].join(' ')}
-          style={{ borderColor: 'var(--color-border-subtle)' } as React.CSSProperties}
+          style={{ borderColor: 'var(--site-rule)' } as React.CSSProperties}
         >
 
           {/* Case meta at lg (two-col) — folded rail content at top of dossier.
@@ -1080,41 +1077,29 @@ export default function GameScreen(props: Props) {
             Mobile: order-2 — between board and toolbar in the single column.
             Desktop: flex-1 overflow-y-auto — fills dossier column, scrolls.
           */}
-          <div className="site-suspect-list order-5 lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
-              <div className="site-suspect-list-inner relative p-3 lg:p-4 flex flex-col gap-3">
-
-              {/* Suspects label */}
-              <p className="text-[10px] text-text-muted font-mono uppercase tracking-[0.2em]">
-                {detective
-                  ? 'Suspects · select · draft · check off solved clues'
-                  : 'Suspects · select · place · use hints to nudge'}
-              </p>
-
-              {/* Suspect cards — single column on all breakpoints in the dossier */}
-              <div className="site-suspect-cards grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
-                {puzzle.people.map(person => (
-                  <SuspectCard
-                    key={person.id}
-                    person={person}
-                    clues={cluesOf[person.id] ?? []}
-                    satisfiedClues={satisfiedClueFlags(puzzle, person.id, placedOf, clueHolds)}
-                    selected={selectedPerson === person.id}
-                    placed={!!placedOf[person.id]}
-                    locked={!!placedOf[person.id]?.locked}
-                    conflicted={conflicts.has(person.id)}
-                    resolved={resolvedClues.includes(person.id)}
-                    showCheck={detective}
-                    located={locatedPerson === person.id}
-                    canLocate={resolveClueHighlights(puzzle, person.id).length > 0}
-                    onSelect={() => selectForPlacement(person.id)}
-                    onToggleResolved={() => props.onToggleClue(person.id)}
-                    onToggleLocate={() => setLocatedPerson(current => current === person.id ? null : person.id)}
-                  />
-                ))}
-              </div>
-
-              <CaseNotes caseId={puzzle.id} />
-
+          <div className="site-suspect-list order-4 lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
+            <div className="site-suspect-list-inner relative p-3 lg:p-4 flex flex-col gap-3">
+              {activeSuspect ? (
+                <SuspectCard
+                  key={activeSuspect.id}
+                  person={activeSuspect}
+                  clues={cluesOf[activeSuspect.id] ?? []}
+                  satisfiedClues={satisfiedClueFlags(puzzle, activeSuspect.id, placedOf, clueHolds)}
+                  selected
+                  placed={!!placedOf[activeSuspect.id]}
+                  locked={!!placedOf[activeSuspect.id]?.locked}
+                  conflicted={conflicts.has(activeSuspect.id)}
+                  resolved={resolvedClues.includes(activeSuspect.id)}
+                  showCheck={detective}
+                  located={locatedPerson === activeSuspect.id}
+                  canLocate={resolveClueHighlights(puzzle, activeSuspect.id).length > 0}
+                  onSelect={() => selectForPlacement(activeSuspect.id)}
+                  onToggleResolved={() => props.onToggleClue(activeSuspect.id)}
+                  onToggleLocate={() => setLocatedPerson(current => current === activeSuspect.id ? null : activeSuspect.id)}
+                />
+              ) : (
+                <p className="site-select-person-prompt">Select a person above to read their clue and place them in the scene.</p>
+              )}
             </div>
           </div>
 
@@ -1126,8 +1111,13 @@ export default function GameScreen(props: Props) {
               would also produce a transient horizontal scrollbar at 390px.
           */}
           <div className="site-submit-area command-rail order-6 flex-shrink-0 p-3 lg:p-4 flex flex-col gap-2 border-t"
-            style={{ borderColor: 'var(--color-border-subtle)' }}
+            style={{ borderColor: 'var(--site-rule)' }}
           >
+            <p className="site-submit-context" aria-live="polite">
+              {placedCount === puzzle.people.length
+                ? 'Everyone is placed. Review the scene, then make your accusation.'
+                : `${puzzle.people.length - placedCount} ${puzzle.people.length - placedCount === 1 ? 'person' : 'people'} left to place`}
+            </p>
             {/* ── Accuse — the dramatic beat ─────────────────────────────── */}
             <motion.button
               /* No `key` here on purpose — see the effect above. The class is
@@ -1140,7 +1130,7 @@ export default function GameScreen(props: Props) {
               {/* Count the CAST, not the board. These were the same number
                   while every N x N board had exactly N suspects; now a 10x10
                   Master case has 6 people and this read "0/10". */}
-              Accuse — Submit Solution ({placedCount}/{puzzle.people.length})
+              Accuse: submit solution ({placedCount}/{puzzle.people.length})
             </motion.button>
 
             {/* ── Feedback message ─────────────────────────────────────────
@@ -1158,9 +1148,9 @@ export default function GameScreen(props: Props) {
                   exit={{ opacity: 0 }}
                   className="min-h-[44px] text-[12px] font-mono px-3 py-2 text-center w-full tracking-wide"
                   style={{
-                    color: 'var(--color-danger-text)',
-                    backgroundColor: 'color-mix(in srgb, var(--color-danger) 14%, transparent)',
-                    borderLeft: '2px solid var(--color-danger)',
+                    color: 'var(--site-danger)',
+                    backgroundColor: 'color-mix(in srgb, var(--site-danger) 13%, transparent)',
+                    border: '1px solid color-mix(in srgb, var(--site-danger) 38%, transparent)',
                   }}
                 >
                   {feedback === 'incomplete'
@@ -1169,10 +1159,14 @@ export default function GameScreen(props: Props) {
                     ? 'That row or column is already taken by another suspect.'
                     : brokenRule
                     ? `${correctCount} of ${puzzle.people.length} in the right spot. This is broken: "${brokenRule}"`
-                    : `Not quite — ${correctCount} of ${puzzle.people.length} are in the right spot. Keep deducing.`}
+                    : `Not quite: ${correctCount} of ${puzzle.people.length} are in the right spot. Keep deducing.`}
                 </motion.button>
               )}
             </AnimatePresence>
+          </div>
+
+          <div className="site-notebook-rail order-7 flex-shrink-0">
+            <CaseNotes caseId={puzzle.id} />
           </div>
 
         </div>{/* end dossier column */}
@@ -1305,25 +1299,27 @@ function ToolBtn({ active, toggled, disabled, cta, onClick, icon, label, title }
       onClick={onClick}
       disabled={disabled}
       title={title}
-      aria-pressed={active || toggled}
+      aria-pressed={active !== undefined ? active : toggled}
       className="focus-ring flex items-center justify-center gap-1.5 px-3.5 min-h-[44px] border text-[13px] font-display font-medium transition-colors whitespace-nowrap uppercase tracking-[0.08em]"
       style={{
         borderColor: active
-          ? 'var(--color-accent)'
+          ? 'var(--site-accent)'
           : (toggled || cta)
-          ? 'color-mix(in srgb, var(--color-accent) 65%, transparent)'
-          : 'var(--color-border-strong)',
+          ? 'color-mix(in srgb, var(--site-highlight) 65%, transparent)'
+          : 'var(--site-rule)',
         backgroundColor: active
-          ? 'color-mix(in srgb, var(--color-accent) 22%, transparent)'
-          : 'var(--color-bg-surface)',
+          ? 'var(--site-accent)'
+          : toggled
+          ? 'color-mix(in srgb, var(--site-highlight) 14%, var(--site-shell-panel))'
+          : 'var(--site-shell-panel)',
         color: active
-          ? 'var(--color-accent-text)'
+          ? 'var(--site-accent-ink)'
           : (toggled || cta)
-          ? 'var(--color-accent-text)'
-          : 'var(--color-text-secondary)',
+          ? 'var(--site-highlight)'
+          : 'var(--site-shell-copy)',
         borderStyle: toggled && !active ? 'dashed' : 'solid',
         opacity: disabled ? 0.35 : 1,
-        boxShadow: active ? 'var(--shadow-cut)' : 'none',
+        boxShadow: 'none',
       }}
     >
       {icon}{label}
