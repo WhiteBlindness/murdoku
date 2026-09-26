@@ -9,10 +9,10 @@ const productionRoot = path.join(root, 'public', 'kenney3d')
 const reportPath = path.join(root, 'docs', 'reports', 'kenney-lab-measurements.json')
 const catalogPath = path.join(root, 'src', 'scene3d', 'catalog.generated.ts')
 
-// Keep this manifest aligned with PACK_ADAPTERS in src/scene3d/packAdapters.ts.
-// Each source was measured in the V2 lab report before it enters production.
+// Manter este manifesto alinhado com PACK_ADAPTERS em src/scene3d/packAdapters.ts.
+// Cada modelo foi medido no relatório do laboratório V2 antes da integração.
 const assets = [
-  { model: 'graveyard_cryptSmall', source: 'graveyard-kit--crypt-small', scale: 1 },
+  { model: 'graveyard_cryptSmall', source: 'graveyard-kit--crypt-small', scale: 0.9 },
   { model: 'graveyard_grave', source: 'graveyard-kit--grave', scale: 1 },
   { model: 'graveyard_gravestoneCross', source: 'graveyard-kit--gravestone-cross', scale: 1 },
   { model: 'miniMarket_shelfBoxes', source: 'mini-market--shelf-boxes', scale: 1 },

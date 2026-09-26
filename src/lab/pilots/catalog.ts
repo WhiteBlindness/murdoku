@@ -15,7 +15,7 @@ function pilotKey(value: string | null): DevPilotKey | undefined {
   return undefined
 }
 
-/** Return only the pilot requested by a development URL. */
+/** Devolve apenas o piloto pedido pelo endereço de desenvolvimento. */
 export function getSelectedDevPilot(): Puzzle | undefined {
   if (!import.meta.env.DEV || typeof window === 'undefined') return undefined
 

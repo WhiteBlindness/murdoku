@@ -7,7 +7,7 @@ import { MODEL_BOUNDS, type KenneyModel } from '../src/scene3d/catalog.generated
 import { adaptPackMaterial, PACK_ADAPTERS, packAdapterFor } from '../src/scene3d/packAdapters'
 
 const EXPECTED_ASSETS = {
-  graveyard_cryptSmall: { source: 'graveyard-kit--crypt-small', scale: 1, size: [1.35, 1, 1.4] },
+  graveyard_cryptSmall: { source: 'graveyard-kit--crypt-small', scale: 0.9, size: [1.215, 0.9, 1.26] },
   graveyard_grave: { source: 'graveyard-kit--grave', scale: 1, size: [0.724, 0.114, 1.241] },
   graveyard_gravestoneCross: { source: 'graveyard-kit--gravestone-cross', scale: 1, size: [0.45, 0.915, 0.33] },
   miniMarket_shelfBoxes: { source: 'mini-market--shelf-boxes', scale: 1, size: [0.8, 0.85, 0.7] },

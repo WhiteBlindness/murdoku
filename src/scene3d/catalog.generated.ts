@@ -63,7 +63,7 @@ export const MODEL_BOUNDS = {
   food_glassWine: { size: [0.068, 0.15, 0.059], min: [-0.034, 0, -0.03] },
   food_plateDinner: { size: [0.268, 0.066, 0.268], min: [-0.134, 0, -0.134] },
   grass_leafsLarge: { size: [0.476, 0.143, 0.487], min: [-0.242, -0.05, -0.243] },
-  graveyard_cryptSmall: { size: [1.35, 1, 1.4], min: [-0.675, 0, -0.7] },
+  graveyard_cryptSmall: { size: [1.215, 0.9, 1.26], min: [-0.608, 0, -0.63] },
   graveyard_grave: { size: [0.724, 0.114, 1.241], min: [-0.382, 0, -0.609] },
   graveyard_gravestoneCross: { size: [0.45, 0.915, 0.33], min: [-0.225, 0, -0.165] },
   hoodLarge: { size: [0.43, 0.37, 0.285], min: [0, 0, -0.285] },

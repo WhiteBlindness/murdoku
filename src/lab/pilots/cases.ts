@@ -46,7 +46,7 @@ export const shopPilot: AuthoredCaseSpec = {
   furniture: [
     { type: 'counter', row: 0, col: 0, w: 2, h: 1, rotation: 0 },
     { type: 'fridge', row: 0, col: 5 },
-    { type: 'clock', row: 2, col: 4 },
+    { type: 'plant', row: 2, col: 4 },
     { type: 'bookshelf', row: 3, col: 0, w: 2, h: 1, rotation: 0 },
     { type: 'box', row: 4, col: 2 },
     { type: 'table', row: 3, col: 3 },
@@ -76,7 +76,7 @@ export const cafePilot: AuthoredCaseSpec = {
     { type: 'stove', row: 0, col: 5 },
     { type: 'table', row: 3, col: 3 },
     { type: 'chair', row: 4, col: 3 },
-    { type: 'clock', row: 5, col: 5 },
+    { type: 'box', row: 5, col: 4 },
   ],
   people: solution,
   maxDirectness: 3,

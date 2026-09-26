@@ -3,14 +3,14 @@ import type { KenneyModel } from './catalog.generated'
 
 export interface PackAssetAdapter {
   sourceAssetId: string
-  /** Uniform scale baked into the GLB by scripts/kenney-pack-adapt.mjs. */
+  /** Escala uniforme incorporada no GLB por scripts/kenney-pack-adapt.mjs. */
   packScale: number
   material: 'textured-lambert'
 }
 
-/** Production adapters for the measured V2 lab subset. */
+/** Adaptadores de produção para o subconjunto medido no laboratório V2. */
 export const PACK_ADAPTERS = {
-  graveyard_cryptSmall: { sourceAssetId: 'graveyard-kit--crypt-small', packScale: 1, material: 'textured-lambert' },
+  graveyard_cryptSmall: { sourceAssetId: 'graveyard-kit--crypt-small', packScale: 0.9, material: 'textured-lambert' },
   graveyard_grave: { sourceAssetId: 'graveyard-kit--grave', packScale: 1, material: 'textured-lambert' },
   graveyard_gravestoneCross: { sourceAssetId: 'graveyard-kit--gravestone-cross', packScale: 1, material: 'textured-lambert' },
   miniMarket_shelfBoxes: { sourceAssetId: 'mini-market--shelf-boxes', packScale: 1, material: 'textured-lambert' },
@@ -28,7 +28,7 @@ export function packAdapterFor(model: KenneyModel | string): PackAssetAdapter | 
     : undefined
 }
 
-/** Convert only adapted pack materials, retaining their texture and alpha state. */
+/** Converte apenas os materiais adaptados e conserva textura e transparência. */
 export function adaptPackMaterial(source: THREE.Material): THREE.MeshLambertMaterial {
   const sourceMaps = source as THREE.MeshStandardMaterial
   const sourceColor = (source as THREE.MeshBasicMaterial).color
