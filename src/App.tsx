@@ -37,13 +37,15 @@ function AppInner() {
 
   useEffect(() => { window.scrollTo(0, 0) }, [game.screen, aux])
 
-  // Dev deep link: `?case=<id>` opens a case directly so the scene QA loop
+  // Dev deep link: `?case=<id>` or `?pilot=<name>` opens a case directly so the scene QA loop
   // (screenshots, diagnostics) does not have to click through the catalog.
   // Only honoured once, on the home screen, and never in production builds.
   const deepLinked = useRef(false)
   useEffect(() => {
     if (!import.meta.env.DEV || deepLinked.current) return
-    const id = new URLSearchParams(window.location.search).get('case')
+    const params = new URLSearchParams(window.location.search)
+    const pilot = params.get('pilot')
+    const id = params.get('case') ?? (pilot && ['cemetery', 'shop', 'cafe'].includes(pilot) ? `pilot-${pilot}` : null)
     if (!id || game.screen !== 'home' || !game.puzzles.some(p => p.id === id)) return
     deepLinked.current = true
     game.start(id, game.mode)

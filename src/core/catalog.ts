@@ -2,6 +2,7 @@ import { generatePuzzle, reseed } from './generate'
 import { buildAuthoredPuzzle } from './authored'
 import { AUTHORED_CASES } from '../data/cases'
 import type { Puzzle, Difficulty } from './types'
+import { getSelectedDevPilot } from '../lab/pilots/catalog'
 
 // ============================================================================
 // The catalog: a stable, seeded set of puzzles. Because generation is
@@ -152,6 +153,12 @@ export function initCatalog(): void {
   writeCache(puzzles)
 }
 
+function withSelectedDevPilot(list: Puzzle[]): Puzzle[] {
+  const pilot = getSelectedDevPilot()
+  if (!pilot || list.some(puzzle => puzzle.id === pilot.id)) return list
+  return [...list, pilot]
+}
+
 /**
  * Build the catalog without freezing the tab.
  *
@@ -164,9 +171,9 @@ export function initCatalog(): void {
 export async function initCatalogAsync(
   onProgress?: (done: number, total: number) => void,
 ): Promise<Puzzle[]> {
-  if (puzzles.length) return puzzles
+  if (puzzles.length) return withSelectedDevPilot(puzzles)
   const cached = readCache()
-  if (cached) { puzzles = cached; return puzzles }
+  if (cached) { puzzles = cached; return withSelectedDevPilot(puzzles) }
 
   const specs = plan()
   const list: Puzzle[] = []
@@ -179,12 +186,12 @@ export async function initCatalogAsync(
   }
   puzzles = list
   writeCache(puzzles)
-  return puzzles
+  return withSelectedDevPilot(puzzles)
 }
 
 export function getAllPuzzles(): Puzzle[] {
   if (!puzzles.length) initCatalog()
-  return puzzles
+  return withSelectedDevPilot(puzzles)
 }
 
 export function getPuzzleById(id: string): Puzzle | undefined {
