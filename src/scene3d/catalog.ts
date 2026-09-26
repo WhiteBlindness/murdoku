@@ -180,6 +180,17 @@ export const MODEL_META: Partial<Record<KenneyModel, ModelMeta>> = {
   grass_leafsLarge: { support: 'flat' },
   path_stone: { support: 'flat' },
   path_stoneCircle: { support: 'flat' },
+  // ---- selected Kenney V3 packs ---------------------------------------------
+  graveyard_cryptSmall: F([], { tall: true }),
+  graveyard_grave: F([], { loose: true }),
+  graveyard_gravestoneCross: F([], { tall: true, loose: true }),
+  miniMarket_shelfBoxes: F([], { tall: true }),
+  miniMarket_freezer: F([]),
+  miniMarket_cashRegister: P(['counter']),
+  food_cake: P(['table', 'counter'], { loose: true }),
+  food_plateDinner: P(['table', 'counter'], { loose: true }),
+  food_cupCoffee: P(['table', 'counter'], { loose: true }),
+  food_glassWine: P(['table', 'counter'], { loose: true }),
   // ---- floor coverings -----------------------------------------------------------
   rugRectangle: { support: 'flat', represents: ['rug'] },
   rugRound: { support: 'flat', represents: ['rug'] },

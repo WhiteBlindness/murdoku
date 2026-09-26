@@ -14,6 +14,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { CELL, FLOOR_THICKNESS, type StoreyView, type Vec3 } from './units'
 import type { ResolvedScene, ResolvedObject, Box3 } from './resolve'
 import type { KenneyModel } from './catalog.generated'
+import { adaptPackMaterial, packAdapterFor } from './packAdapters'
 import { companionFloorBoxes, companionWallBoxesThroughStairwell } from './companionGeometry'
 import { floorPatches } from './floorGeometry'
 import { explodedConnectionSegments } from './explodedConnection'
@@ -95,6 +96,7 @@ function loadModel(name: KenneyModel): Promise<THREE.Group> {
         // Kenney exports KHR_materials_unlit; GLTFLoader gives MeshBasicMaterial,
         // which ignores lights and shadows. Rebuild as lit flat colour.
         const rebuild = (src: THREE.Material) => {
+          if (packAdapterFor(name)) return adaptPackMaterial(src)
           const b = src as THREE.MeshBasicMaterial
           // Window glass is translucent in the kit, which would show the page
           // behind the house. The case plays at night: opaque midnight glass.
