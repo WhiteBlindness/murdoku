@@ -21,7 +21,7 @@ O catálogo define 60 casos em seis níveis de dificuldade, desde grelhas de 6×
 - **Catálogo estável:** sementes e identificadores consistentes permitem guardar o progresso e reutilizar puzzles após recarregar a página.
 - **Jogo offline:** a aplicação é instalável como PWA e guarda o progresso no dispositivo.
 
-## Arquitectura
+## Arquitetura
 
 ```text
 src/core/       tipos, motor de pistas, solver, gerador e catálogo
