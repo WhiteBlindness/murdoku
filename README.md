@@ -1,58 +1,58 @@
 # Murdoku
 
-Puzzle de dedução criminal: usa as pistas para colocar suspeitos e vítima numa planta da casa, e identifica quem fica a sós com a vítima.
+A deduction puzzle where clues help place suspects and a victim around a house, then identify who was alone with the victim.
 
-**Estado:** *Live*. A demonstração publicada apresenta o nome **Alibi**; o repositório continua a chamar-se Murdoku.
+**Status:** Live. The published demo is branded **Alibi**; the repository remains Murdoku.
 
-[**Abrir a demonstração**](https://murdoku-seven.vercel.app) · [**Consultar o código**](https://github.com/WhiteBlindness/murdoku)
+[**Play the demo**](https://murdoku-seven.vercel.app) · [**Browse the source**](https://github.com/WhiteBlindness/murdoku)
 
-## Porque existe
+## Why it exists
 
-O jogo transforma pistas textuais e relações espaciais num problema de lógica verificável. Cada pessoa ocupa uma linha e uma coluna; as pistas restringem as posições até existir uma única disposição válida. O jogador marca células impossíveis, testa hipóteses e apresenta uma acusação.
+The game turns written clues and spatial relationships into a logic problem with a verifiable solution. Each person occupies a row and a column. Clues restrict possible positions until one valid arrangement remains. Players mark impossible cells, test hypotheses, and make an accusation.
 
-## Como funciona
+## How it works
 
-O catálogo define 60 casos em seis níveis de dificuldade, desde grelhas de 6×6 até cenários com dois pisos. O motor pode gerar casos de forma determinística a partir de uma semente ou carregar casos escritos à mão. Antes de apresentar um puzzle, o solver verifica se a solução é única.
+The catalogue contains 60 cases across six difficulty levels, from 6×6 grids to two-floor layouts. The engine can generate cases deterministically from a seed or load hand-authored cases. A solver checks that each puzzle has a unique solution before the game presents it.
 
-## Destaques de engenharia
+## Engineering highlights
 
-- **Motor separado da interface:** tipos, pistas, geração, solver e catálogo vivem em TypeScript puro em `src/core`; React apresenta o estado do jogo.
-- **Geração validada:** o gerador constrói uma solução, cria pistas verdadeiras e usa um solver de retrocesso para rejeitar puzzles ambíguos.
-- **Catálogo estável:** sementes e identificadores consistentes permitem guardar o progresso e reutilizar puzzles após recarregar a página.
-- **Jogo offline:** a aplicação é instalável como PWA e guarda o progresso no dispositivo.
+- **Game rules are separate from the interface:** clue types, generation, solver, and catalogue live in TypeScript under `src/core`; React renders the game state.
+- **Generated puzzles are checked:** the generator starts with a solution, creates true clues, then uses a backtracking solver to reject ambiguous puzzles.
+- **Stable catalogue:** consistent seeds and IDs let the game save progress and reuse puzzles after a reload.
+- **Offline play:** the app is installable as a PWA and stores progress on the device.
 
-## Arquitetura
+## Architecture
 
 ```text
-src/core/       tipos, motor de pistas, solver, gerador e catálogo
-src/hooks/      estado do jogo e tema
-src/components/ grelha, pistas, suspeitos e ecrãs do jogo
-src/styles/     variáveis e temas visuais
+src/core/       types, clue engine, solver, generator, and catalogue
+src/hooks/      game state and theme
+src/components/ grid, clues, suspects, and game screens
+src/styles/     variables and themes
 ```
 
-A interface React consome o motor sem conter as regras de dedução. Esta separação permite testar a lógica sem renderizar componentes.
+The React interface uses the game engine without owning deduction rules. This keeps the logic testable without rendering components.
 
-## Tecnologias
+## Stack
 
 TypeScript · React · Vite · Vitest · Vite PWA
 
-## Executar localmente
+## Run locally
 
-Requer Node.js e npm.
+Requires Node.js and npm.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Para criar a versão de produção e pré-visualizá-la localmente:
+Build and preview the production version locally:
 
 ```bash
 npm run build
 npm run preview
 ```
 
-## Testes
+## Tests
 
 ```bash
 npm test
@@ -60,4 +60,4 @@ npm run test:coverage
 npm run lint
 ```
 
-O teste dedicado ao catálogo é `npm run verify`.
+Run `npm run verify` to check the catalogue.
