@@ -23,11 +23,17 @@ A referência Kenney V3 permanece separada deste ramo. Os dez modelos novos est�
 
 ## Lote 1: implementação e revisão visual
 
-As seis cenas foram escritas à mão e registadas no catálogo. As divisões, o mobiliário lógico, as pistas e as soluções dos quebra-cabeças não foram alterados. GPT-6 Luna reviu as capturas de computador e telemóvel; GPT-6 Sol inspeccionou pessoalmente as seis cenas renderizadas e aceitou o lote.
+As seis cenas foram escritas à mão e registadas no catálogo. As divisões, o mobiliário lógico, as pistas e as soluções dos quebra-cabeças foram preservados. GPT-6 Luna reviu as capturas de computador e telemóvel; GPT-6 Sol inspecionou pessoalmente as cenas renderizadas e aceitou o lote.
 
-O lote foi publicado em `sol/full-catalogue-scene-production-v1` no *commit* `76dd586`.
+O lote 1 foi publicado em `sol/full-catalogue-scene-production-v1` no *commit* `76dd586`.
 
-`npm run validate:production` passou os seis testes de pré-produção. `npm run lint` e `npm run build` também passaram. A bateria completa passou 447 testes e ignorou 5; uma falha ficou em `easy-2#0`, fora deste lote, por ocultar as células `(3,5)` e `(5,4)`. A cena `easy-2` não foi alterada neste lote e permanece por rever.
+## Lote 2: implementação e revisão visual
+
+Foram concluídas seis cenas escritas à mão, de `easy-2` a `easy-7`. As cinco cenas novas foram registadas no catálogo, e a cena existente de `easy-2` foi corrigida para mostrar as células `(3,5)` e `(5,4)`. A lógica dos casos permaneceu intacta. As seis cenas foram abertas no navegador e revistas em computador (1440×900) e telemóvel (390×844). GPT-6 Luna fez a primeira revisão visual; GPT-6 Sol inspecionou os resultados renderizados e aceitou o lote.
+
+O lote 2 está registado no *commit* `f64a54b` e será publicado em `sol/full-catalogue-scene-production-v1`.
+
+`npm test -- tests/IsoBoard.test.tsx --reporter=dot` passou 51 testes. `npm run validate:production` passou os seis controlos de pré-produção. `npm run lint` e `npm run build` passaram. A bateria completa passou 453 testes e ignorou 5.
 
 ## Auditoria da dependência entre pisos
 
@@ -83,12 +89,12 @@ Legenda da lista de controlo: I = implementação; V = validador; B = inspeção
 | `very-easy-7` | The Uninvited | Very Easy | 6×6 | IMPLEMENTED / HAND-AUTHORED | Casa urbana com cozinha estreita | Interior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `76dd586` | I:[x] V:[x] B:[x] C:[x] P:[x] | Frigorífico compacto mantém a célula visível. |
 | `very-easy-8` | A Cold Reception | Very Easy | 6×6 | IMPLEMENTED / HAND-AUTHORED | Sala de jantar, escritório e alpendre | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `76dd586` | I:[x] V:[x] B:[x] C:[x] P:[x] | Tapete lógico sob a mesa da sala de jantar. |
 | `easy-1` | The Last Nightcap | Easy | 7×7 | PROTECTED / EXISTING | Residência | Interior | 1 | V4 aprovado | `aa384c2` (base) | n/a | Referência protegida; não redesenhar. |
-| `easy-2` | Death Before Dinner | Easy | 7×7 | IMPLEMENTED / HAND-AUTHORED | Casa com despensa, cozinha e jardim lateral | Interior + exterior | 1 | Revisão pendente; a bateria assinala 2 células ocultas | `31bbf36` | I:[x] V:[ ] B:[ ] C:[x] P:[x] | Não foi alterada no lote 1. |
-| `easy-3` | The Silent Guest | Easy | 7×7 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `easy-4` | No Way Out | Easy | 7×7 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `easy-5` | The Final Curtain | Easy | 7×7 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `easy-6` | A Grave Mistake | Easy | 7×7 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `easy-7` | The Vanishing Act | Easy | 7×7 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
+| `easy-2` | Death Before Dinner | Easy | 7×7 | IMPLEMENTED / HAND-AUTHORED | Casa com despensa, cozinha e jardim lateral | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f64a54b` | I:[x] V:[x] B:[x] C:[x] P:[x] | O lava-loiça e a cadeira foram deslocados para mostrar as células `(3,5)` e `(5,4)`. |
+| `easy-3` | The Silent Guest | Easy | 7×7 | IMPLEMENTED / HAND-AUTHORED | Casa de receção com quatro divisões | Interior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f64a54b` | I:[x] V:[x] B:[x] C:[x] P:[x] | Lógica do caso preservada. |
+| `easy-4` | No Way Out | Easy | 7×7 | IMPLEMENTED / HAND-AUTHORED | Casa com corredor, jardim frontal e jardim lateral | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f64a54b` | I:[x] V:[x] B:[x] C:[x] P:[x] | Dois espaços exteriores distintos. |
+| `easy-5` | The Final Curtain | Easy | 7×7 | IMPLEMENTED / HAND-AUTHORED | Casa com corredor, pátio central murado e alpendre | Interior + pátio | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f64a54b` | I:[x] V:[x] B:[x] C:[x] P:[x] | Lógica do caso preservada. |
+| `easy-6` | A Grave Mistake | Easy | 7×7 | IMPLEMENTED / HAND-AUTHORED | Casa em L com jardim exterior a norte | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f64a54b` | I:[x] V:[x] B:[x] C:[x] P:[x] | Lógica do caso preservada. |
+| `easy-7` | The Vanishing Act | Easy | 7×7 | IMPLEMENTED / HAND-AUTHORED | Casa organizada em quatro zonas com pátio central | Interior + pátio | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f64a54b` | I:[x] V:[x] B:[x] C:[x] P:[x] | O jardim frontal funciona como pátio da casa. |
 | `easy-8` | The Missing Key | Easy | 7×7 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 | `easy-9` | Ashes in the Study | Easy | 7×7 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 | `easy-10` | The Seventh Guest | Easy | 7×7 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
@@ -135,4 +141,4 @@ Legenda da lista de controlo: I = implementação; V = validador; B = inspeção
 | `master-7` | The Final Alibi | Master | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 | `master-8` | Nobody Was Home | Master | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 
-**Cenas procedimentais ainda ativas: 56.**
+**Cenas procedimentais ainda ativas: 45.**
