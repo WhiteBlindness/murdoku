@@ -31,7 +31,7 @@ O lote 1 foi publicado em `sol/full-catalogue-scene-production-v1` no *commit* `
 
 Foram concluídas seis cenas escritas à mão, de `easy-2` a `easy-7`. As cinco cenas novas foram registadas no catálogo, e a cena existente de `easy-2` foi corrigida para mostrar as células `(3,5)` e `(5,4)`. A lógica dos casos permaneceu intacta. As seis cenas foram abertas no navegador e revistas em computador (1440×900) e telemóvel (390×844). GPT-6 Luna fez a primeira revisão visual; GPT-6 Sol inspecionou os resultados renderizados e aceitou o lote.
 
-O lote 2 está registado no *commit* `f64a54b` e será publicado em `sol/full-catalogue-scene-production-v1`.
+O lote 2 está registado no *commit* `f64a54b` e foi publicado em `sol/full-catalogue-scene-production-v1`.
 
 `npm test -- tests/IsoBoard.test.tsx --reporter=dot` passou 51 testes. `npm run validate:production` passou os seis controlos de pré-produção. `npm run lint` e `npm run build` passaram. A bateria completa passou 453 testes e ignorou 5.
 
