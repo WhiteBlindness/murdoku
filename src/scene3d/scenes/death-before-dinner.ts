@@ -48,7 +48,8 @@ export const deathBeforeDinner: SceneSpec = {
     { id: 'dining-chair-east', model: 'chair', at: [5.95, 1.45], facing: 'W' },
     { id: 'dining-chair-south', model: 'chair', at: [4.85, 1.95], facing: 'N' },
     { id: 'south-counter', model: 'kitchenCabinet', logic: 'counter@3,4', against: { wall: 'office-divider', side: 'N', at: 5.25 } },
-    { id: 'south-sink', model: 'kitchenSink', logic: 'counter@3,4', against: { wall: 'office-divider', side: 'N', at: 5.8 } },
+    // Keep the counter run, but leave the standee centre at (3,5) in view.
+    { id: 'south-sink', model: 'kitchenSink', logic: 'counter@3,4', against: { wall: 'office-divider', side: 'N', at: 5.9 } },
     { id: 'east-stove', model: 'kitchenStoveElectric', logic: 'stove@3,6', at: [6.5, 3.5], facing: 'W' },
     { id: 'coffee-machine', model: 'kitchenCoffeeMachine', on: { parent: 'south-counter' } },
 
@@ -56,7 +57,8 @@ export const deathBeforeDinner: SceneSpec = {
     // separate reading corner rather than floating beside the work position.
     { id: 'office-desk', model: 'desk', logic: 'desk@6,4', against: { wall: 'south', at: 4.5 } },
     { id: 'laptop', model: 'laptop', on: { parent: 'office-desk' } },
-    { id: 'desk-chair', model: 'chairDesk', at: [4.55, 5.75], facing: 'S' },
+    // The chair remains at the desk, clear of the standee centre at (5,4).
+    { id: 'desk-chair', model: 'chairDesk', at: [4.55, 5.2], facing: 'S' },
     { id: 'office-bookcase', model: 'bookcaseOpenLow', against: { wall: 'east', at: 4.7 } },
     { id: 'office-books', model: 'books', on: { parent: 'office-bookcase' } },
     { id: 'reading-chair', model: 'loungeChair', logic: 'chair@6,6', at: [6.35, 6.65], facing: 'W' },

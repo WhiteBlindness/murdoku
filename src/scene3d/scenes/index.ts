@@ -10,6 +10,11 @@ import { deathBeforeDinner } from './death-before-dinner'
 import { aFatalRehearsal } from './a-fatal-rehearsal'
 import { checkmate } from './checkmate'
 import { theBrokenVase } from './the-broken-vase'
+import { theSilentGuest } from './the-silent-guest'
+import { noWayOut } from './no-way-out'
+import { theFinalCurtain } from './the-final-curtain'
+import { aGraveMistake } from './a-grave-mistake'
+import { theVanishingAct } from './the-vanishing-act'
 import { theLockedStudy } from './the-locked-study'
 import { theUninvited } from './the-uninvited'
 import { aColdReception } from './a-cold-reception'
@@ -19,8 +24,9 @@ export const AUTHORED_SCENES: Record<string, SceneSpec> = Object.fromEntries(
   [
     midnightDelivery, theEmptyChair, theLastNightcap,
     twoStoreyReferenceGround, twoStoreyReferenceUpper, deathBeforeDinner,
-    aFatalRehearsal, checkmate, theBrokenVase,
+    aFatalRehearsal, checkmate, theBrokenVase, theSilentGuest, noWayOut,
     theLockedStudy, theUninvited, aColdReception,
+    theFinalCurtain, aGraveMistake, theVanishingAct,
   ]
     .map(s => [`${s.puzzleId}#${s.floor ?? 0}`, s]),
 )
