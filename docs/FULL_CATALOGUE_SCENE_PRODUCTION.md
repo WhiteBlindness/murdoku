@@ -35,6 +35,14 @@ O lote 2 está registado no *commit* `f64a54b` e foi publicado em `sol/full-cata
 
 `npm test -- tests/IsoBoard.test.tsx --reporter=dot` passou 51 testes. `npm run validate:production` passou os seis controlos de pré-produção. `npm run lint` e `npm run build` passaram. A bateria completa passou 453 testes e ignorou 5.
 
+## Lote 3: implementação e revisão visual
+
+Foram concluídas seis cenas escritas à mão, de `easy-8` a `medium-3`. O lote combina casas com pátio, casa de jantar com cozinha, moradia estreita com salas separadas e uma galeria com salão central aberto. GPT-6 Luna preparou e reviu as propostas arquitetónicas; GPT-6 Sol reviu o lote em conjunto e inspecionou pessoalmente as cenas finais.
+
+As seis cenas foram abertas no navegador e revistas em computador (1440×900), telemóvel (390×844) e vista de diagnóstico. A lógica dos casos e todas as células de mobiliário lógico foram preservadas. Nos casos com relógio, o modelo Kenney V3 `radio` representa visualmente o objeto lógico `clock`, porque o conjunto aprovado não inclui um modelo de relógio.
+
+O lote 3 foi publicado em `sol/full-catalogue-scene-production-v1` no *commit* `f292eb1`. `npm test -- --reporter=dot` passou 459 testes e ignorou 5; `npm run validate:production`, `npm run lint`, `npm run build` e `node scripts/measure-puzzles.mjs --check` passaram.
+
 ## Auditoria da dependência entre pisos
 
 A contagem de pisos não foi inferida da dificuldade. Foram construídos os 60 casos a partir da versão determinística do catálogo e inspecionadas as pistas, a solução, as divisões e o mobiliário. Nos 30 casos atualmente com dois pisos, a solução coloca pessoas nos dois. Cada um contém também quatro divisões e 9 a 19 peças lógicas no piso superior. Retirar esse piso, mesmo nos seis casos sem uma pista vertical literal, altera o espaço de posições, a identidade das divisões e a solução matemática. Por isso, os 29 casos por produzir deste grupo exigem arquitetura de dois pisos se a lógica permanecer intacta.
@@ -95,12 +103,12 @@ Legenda da lista de controlo: I = implementação; V = validador; B = inspeção
 | `easy-5` | The Final Curtain | Easy | 7×7 | IMPLEMENTED / HAND-AUTHORED | Casa com corredor, pátio central murado e alpendre | Interior + pátio | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f64a54b` | I:[x] V:[x] B:[x] C:[x] P:[x] | Lógica do caso preservada. |
 | `easy-6` | A Grave Mistake | Easy | 7×7 | IMPLEMENTED / HAND-AUTHORED | Casa em L com jardim exterior a norte | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f64a54b` | I:[x] V:[x] B:[x] C:[x] P:[x] | Lógica do caso preservada. |
 | `easy-7` | The Vanishing Act | Easy | 7×7 | IMPLEMENTED / HAND-AUTHORED | Casa organizada em quatro zonas com pátio central | Interior + pátio | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f64a54b` | I:[x] V:[x] B:[x] C:[x] P:[x] | O jardim frontal funciona como pátio da casa. |
-| `easy-8` | The Missing Key | Easy | 7×7 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `easy-9` | Ashes in the Study | Easy | 7×7 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `easy-10` | The Seventh Guest | Easy | 7×7 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `medium-1` | A Toast to Murder | Medium | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `medium-2` | The Torn Letter | Medium | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `medium-3` | Shadows in the Hall | Medium | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
+| `easy-8` | The Missing Key | Easy | 7×7 | IMPLEMENTED / HAND-AUTHORED | Moradia compacta com pátio de entrada, despensa, escritório e alpendre | Interior + pátio | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f292eb1` | I:[x] V:[x] B:[x] C:[x] P:[x] | Rádio Kenney V3 representa o relógio lógico; célula preservada. |
+| `easy-9` | Ashes in the Study | Easy | 7×7 | IMPLEMENTED / HAND-AUTHORED | Casa com escritório, cozinha de serviço e jardim interior | Interior + exterior + pátio | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f292eb1` | I:[x] V:[x] B:[x] C:[x] P:[x] | Lógica do caso preservada. |
+| `easy-10` | The Seventh Guest | Easy | 7×7 | IMPLEMENTED / HAND-AUTHORED | Casa de convidados com pátio, cozinha e sala de jantar | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f292eb1` | I:[x] V:[x] B:[x] C:[x] P:[x] | Lógica do caso preservada. |
+| `medium-1` | A Toast to Murder | Medium | 8×8 | IMPLEMENTED / HAND-AUTHORED | Casa de receção com escritório, sala de jantar e jardim frontal | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f292eb1` | I:[x] V:[x] B:[x] C:[x] P:[x] | Mesa e cadeiras agrupadas na sala de jantar. |
+| `medium-2` | The Torn Letter | Medium | 8×8 | IMPLEMENTED / HAND-AUTHORED | Moradia estreita com corredor, cozinha, sala de jantar e escritório | Interior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f292eb1` | I:[x] V:[x] B:[x] C:[x] P:[x] | Três rádios representam as três células de relógio lógico. |
+| `medium-3` | Shadows in the Hall | Medium | 8×8 | IMPLEMENTED / HAND-AUTHORED | Galeria de entrada, salão central, alpendre e jardim | Interior + pátio + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f292eb1` | I:[x] V:[x] B:[x] C:[x] P:[x] | Salão central aberto mantém o percurso legível. |
 | `medium-4` | The Poisoned Pen | Medium | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 | `medium-5` | One Last Waltz | Medium | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 | `medium-6` | The Butler’s Secret | Medium | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
@@ -141,4 +149,4 @@ Legenda da lista de controlo: I = implementação; V = validador; B = inspeção
 | `master-7` | The Final Alibi | Master | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 | `master-8` | Nobody Was Home | Master | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 
-**Cenas procedimentais ainda ativas: 45.**
+**Cenas procedimentais ainda ativas: 38.**
