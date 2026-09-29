@@ -263,6 +263,12 @@ describe('scene registry and fallback', () => {
       'easy-5',
       'easy-6',
       'easy-7',
+      'easy-8',
+      'easy-9',
+      'easy-10',
+      'medium-1',
+      'medium-2',
+      'medium-3',
     ]) {
       expect(hasAuthoredScene(puzzleId), puzzleId).toBe(true)
     }
