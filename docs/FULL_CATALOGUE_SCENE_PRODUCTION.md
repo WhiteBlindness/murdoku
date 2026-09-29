@@ -25,6 +25,8 @@ A referência Kenney V3 permanece separada deste ramo. Os dez modelos novos est�
 
 As seis cenas foram escritas à mão e registadas no catálogo. As divisões, o mobiliário lógico, as pistas e as soluções dos quebra-cabeças não foram alterados. GPT-6 Luna reviu as capturas de computador e telemóvel; GPT-6 Sol inspeccionou pessoalmente as seis cenas renderizadas e aceitou o lote.
 
+O lote foi publicado em `sol/full-catalogue-scene-production-v1` no *commit* `76dd586`.
+
 `npm run validate:production` passou os seis testes de pré-produção. `npm run lint` e `npm run build` também passaram. A bateria completa passou 447 testes e ignorou 5; uma falha ficou em `easy-2#0`, fora deste lote, por ocultar as células `(3,5)` e `(5,4)`. A cena `easy-2` não foi alterada neste lote e permanece por rever.
 
 ## Auditoria da dependência entre pisos
@@ -74,12 +76,12 @@ Legenda da lista de controlo: I = implementação; V = validador; B = inspeção
 |---|---|---|---:|---|---|---|---:|---|---|---|---|
 | `very-easy-1` | Midnight Delivery | Very Easy | 6×6 | PROTECTED / EXISTING | Apartamento urbano | Interior | 1 | V4 aprovado | `aa384c2` (base) | n/a | Referência protegida; não redesenhar. |
 | `very-easy-2` | The Empty Chair | Very Easy | 6×6 | PROTECTED / EXISTING | Casa com jardim | Interior + exterior | 1 | V4 aprovado | `aa384c2` (base) | n/a | Referência protegida; não redesenhar. |
-| `very-easy-3` | A Fatal Rehearsal | Very Easy | 6×6 | IMPLEMENTED / HAND-AUTHORED | Anexo e jardim de ensaio | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | a registar | I:[x] V:[x] B:[x] C:[ ] P:[ ] | Lógica do caso preservada. |
-| `very-easy-4` | Checkmate | Very Easy | 6×6 | IMPLEMENTED / HAND-AUTHORED | Cozinha de clube com jardim | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | a registar | I:[x] V:[x] B:[x] C:[ ] P:[ ] | Lógica do caso preservada. |
-| `very-easy-5` | The Broken Vase | Very Easy | 6×6 | IMPLEMENTED / HAND-AUTHORED | Escritório, alpendre e pátio murado | Interior + pátio | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | a registar | I:[x] V:[x] B:[x] C:[ ] P:[ ] | Sem modelo aprovado de jarra partida. |
-| `very-easy-6` | The Locked Study | Very Easy | 6×6 | IMPLEMENTED / HAND-AUTHORED | Residência com pátio e alcova de estudo | Interior + pátio | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | a registar | I:[x] V:[x] B:[x] C:[ ] P:[ ] | Lógica do caso preservada. |
-| `very-easy-7` | The Uninvited | Very Easy | 6×6 | IMPLEMENTED / HAND-AUTHORED | Casa urbana com cozinha estreita | Interior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | a registar | I:[x] V:[x] B:[x] C:[ ] P:[ ] | Frigorífico compacto mantém a célula visível. |
-| `very-easy-8` | A Cold Reception | Very Easy | 6×6 | IMPLEMENTED / HAND-AUTHORED | Sala de jantar, escritório e alpendre | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | a registar | I:[x] V:[x] B:[x] C:[ ] P:[ ] | Tapete lógico sob a mesa da sala de jantar. |
+| `very-easy-3` | A Fatal Rehearsal | Very Easy | 6×6 | IMPLEMENTED / HAND-AUTHORED | Anexo e jardim de ensaio | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `76dd586` | I:[x] V:[x] B:[x] C:[x] P:[x] | Lógica do caso preservada. |
+| `very-easy-4` | Checkmate | Very Easy | 6×6 | IMPLEMENTED / HAND-AUTHORED | Cozinha de clube com jardim | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `76dd586` | I:[x] V:[x] B:[x] C:[x] P:[x] | Lógica do caso preservada. |
+| `very-easy-5` | The Broken Vase | Very Easy | 6×6 | IMPLEMENTED / HAND-AUTHORED | Escritório, alpendre e pátio murado | Interior + pátio | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `76dd586` | I:[x] V:[x] B:[x] C:[x] P:[x] | Sem modelo aprovado de jarra partida. |
+| `very-easy-6` | The Locked Study | Very Easy | 6×6 | IMPLEMENTED / HAND-AUTHORED | Residência com pátio e alcova de estudo | Interior + pátio | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `76dd586` | I:[x] V:[x] B:[x] C:[x] P:[x] | Lógica do caso preservada. |
+| `very-easy-7` | The Uninvited | Very Easy | 6×6 | IMPLEMENTED / HAND-AUTHORED | Casa urbana com cozinha estreita | Interior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `76dd586` | I:[x] V:[x] B:[x] C:[x] P:[x] | Frigorífico compacto mantém a célula visível. |
+| `very-easy-8` | A Cold Reception | Very Easy | 6×6 | IMPLEMENTED / HAND-AUTHORED | Sala de jantar, escritório e alpendre | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `76dd586` | I:[x] V:[x] B:[x] C:[x] P:[x] | Tapete lógico sob a mesa da sala de jantar. |
 | `easy-1` | The Last Nightcap | Easy | 7×7 | PROTECTED / EXISTING | Residência | Interior | 1 | V4 aprovado | `aa384c2` (base) | n/a | Referência protegida; não redesenhar. |
 | `easy-2` | Death Before Dinner | Easy | 7×7 | IMPLEMENTED / HAND-AUTHORED | Casa com despensa, cozinha e jardim lateral | Interior + exterior | 1 | Revisão pendente; a bateria assinala 2 células ocultas | `31bbf36` | I:[x] V:[ ] B:[ ] C:[x] P:[x] | Não foi alterada no lote 1. |
 | `easy-3` | The Silent Guest | Easy | 7×7 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
