@@ -7,10 +7,21 @@ import { theLastNightcap } from './the-last-nightcap'
 import { twoStoreyReferenceGround } from './two-storey-reference-ground'
 import { twoStoreyReferenceUpper } from './two-storey-reference-upper'
 import { deathBeforeDinner } from './death-before-dinner'
+import { aFatalRehearsal } from './a-fatal-rehearsal'
+import { checkmate } from './checkmate'
+import { theBrokenVase } from './the-broken-vase'
+import { theLockedStudy } from './the-locked-study'
+import { theUninvited } from './the-uninvited'
+import { aColdReception } from './a-cold-reception'
 
 /** Authored scenes, keyed by `${puzzleId}#${floor}`. */
 export const AUTHORED_SCENES: Record<string, SceneSpec> = Object.fromEntries(
-  [midnightDelivery, theEmptyChair, theLastNightcap, twoStoreyReferenceGround, twoStoreyReferenceUpper, deathBeforeDinner]
+  [
+    midnightDelivery, theEmptyChair, theLastNightcap,
+    twoStoreyReferenceGround, twoStoreyReferenceUpper, deathBeforeDinner,
+    aFatalRehearsal, checkmate, theBrokenVase,
+    theLockedStudy, theUninvited, aColdReception,
+  ]
     .map(s => [`${s.puzzleId}#${s.floor ?? 0}`, s]),
 )
 

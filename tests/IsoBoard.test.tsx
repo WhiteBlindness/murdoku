@@ -248,10 +248,20 @@ describe('every authored scene passes the validator against its real puzzle', ()
 })
 
 describe('scene registry and fallback', () => {
-  it('serves the authored scene for Midnight Delivery and a valid fallback for every other case', () => {
-    expect(hasAuthoredScene('very-easy-1')).toBe(true)
-    expect(hasAuthoredScene('very-easy-3')).toBe(false)
-    const other = { ...buildAuthoredPuzzle(AUTHORED_CASES['very-easy-2'], 'Case No. II'), id: 'very-easy-3' }
+  it('serves authored scenes for produced cases and a valid fallback for unknown cases', () => {
+    for (const puzzleId of [
+      'very-easy-1',
+      'very-easy-3',
+      'very-easy-4',
+      'very-easy-5',
+      'very-easy-6',
+      'very-easy-7',
+      'very-easy-8',
+    ]) {
+      expect(hasAuthoredScene(puzzleId), puzzleId).toBe(true)
+    }
+    const other = { ...buildAuthoredPuzzle(AUTHORED_CASES['very-easy-2'], 'Case No. II'), id: 'un-authored-case' }
+    expect(hasAuthoredScene(other.id)).toBe(false)
     const spec = sceneFor(other, 0)
     expect(spec.walls).toEqual([])
     const scene = resolveScene(spec, other.size)
