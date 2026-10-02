@@ -43,6 +43,29 @@ As seis cenas foram abertas no navegador e revistas em computador (1440×900), t
 
 O lote 3 foi publicado em `sol/full-catalogue-scene-production-v1` no *commit* `f292eb1`. `npm test -- --reporter=dot` passou 459 testes e ignorou 5; `npm run validate:production`, `npm run lint`, `npm run build` e `node scripts/measure-puzzles.mjs --check` passaram.
 
+## Lote 4: decisão arquitetónica
+
+As seis propostas mantêm um só piso e respeitam as divisões, as peças lógicas e as respetivas células. A arquitetura varia entre uma moradia de campo com galeria de jantar e jardim murado (`medium-4`), uma moradia estreita com galeria de entrada, pátio frontal e jardim (`medium-5`), uma residência de serviço organizada em quadrantes (`medium-6`), uma casa térrea em L com ala de jantar e cozinha de serviço (`medium-7`), um bungalow com gabinete, alpendre e jardim traseiro (`medium-8`) e uma moradia estreita com sala, corredor e jardim lateral (`medium-9`).
+
+Os objetos lógicos `clock` são representados por rádios Kenney V3 nas células previstas, pois o conjunto aprovado não contém um relógio. O título `Whispers Upstairs` não justifica um segundo piso: a solução de `medium-7` é térrea. Também não foi acrescentado um espelho partido literal a `medium-8`, porque esse objeto não faz parte do conjunto aprovado.
+
+## Lote 4: implementação e revisão visual
+
+As seis cenas foram escritas à mão e registadas no catálogo. GPT-6 Luna reviu as vistas de computador e não pediu correções. GPT-6 Sol inspecionou pessoalmente as seis cenas renderizadas em computador (1440×1000) e telemóvel (390×844), reviu também as vistas de diagnóstico e aceitou o lote. As cenas preservam as células e a semântica dos casos.
+
+O lote 4 está registado no *commit* `466cd39`. `npm run validate:production` passou os seis controlos; `npm test -- tests/IsoBoard.test.tsx --reporter=dot` passou 63 testes. A bateria completa passou 465 testes e ignorou 5. `npm run lint`, `npm run build` e `node scripts/measure-puzzles.mjs --check` passaram.
+
+## Lote 4: ambientes aprovados
+
+| Caso | Ambiente | Organização e razão |
+|---|---|---|
+| `medium-4` | Moradia de campo, galeria de jantar e jardim murado | O corredor a sul recebe as pistas de relógio; o jardim de entrada e o jardim murado distinguem chegada e zona privada. |
+| `medium-5` | Moradia estreita com galeria, pátio frontal e jardim | O percurso longitudinal acomoda a sequência de quatro relógios no corredor, sem os misturar com a faixa de jantar. |
+| `medium-6` | Residência de serviço com escritório e dois pátios | A organização em quadrantes separa o escritório e a sala de jantar, com pátio de chegada e jardim murado. |
+| `medium-7` | Casa térrea em L com corredor, sala de jantar e cozinha de serviço | O jardim frontal acompanha a ala de jantar; o corredor transversal liga as divisões sem escadas nem piso superior. |
+| `medium-8` | Bungalow com gabinete, alpendre e jardim traseiro | O gabinete e o corredor cruzado estruturam o interior; o jardim traseiro completa a planta sem introduzir um adereço que não existe no catálogo. |
+| `medium-9` | Moradia estreita com sala, alpendre e jardim lateral | A sala e o corredor mantêm as células de relógio nos espaços definidos pela lógica; o alpendre e o jardim dão variedade à fachada. |
+
 ## Auditoria da dependência entre pisos
 
 A contagem de pisos não foi inferida da dificuldade. Foram construídos os 60 casos a partir da versão determinística do catálogo e inspecionadas as pistas, a solução, as divisões e o mobiliário. Nos 30 casos atualmente com dois pisos, a solução coloca pessoas nos dois. Cada um contém também quatro divisões e 9 a 19 peças lógicas no piso superior. Retirar esse piso, mesmo nos seis casos sem uma pista vertical literal, altera o espaço de posições, a identidade das divisões e a solução matemática. Por isso, os 29 casos por produzir deste grupo exigem arquitetura de dois pisos se a lógica permanecer intacta.
@@ -109,12 +132,12 @@ Legenda da lista de controlo: I = implementação; V = validador; B = inspeção
 | `medium-1` | A Toast to Murder | Medium | 8×8 | IMPLEMENTED / HAND-AUTHORED | Casa de receção com escritório, sala de jantar e jardim frontal | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f292eb1` | I:[x] V:[x] B:[x] C:[x] P:[x] | Mesa e cadeiras agrupadas na sala de jantar. |
 | `medium-2` | The Torn Letter | Medium | 8×8 | IMPLEMENTED / HAND-AUTHORED | Moradia estreita com corredor, cozinha, sala de jantar e escritório | Interior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f292eb1` | I:[x] V:[x] B:[x] C:[x] P:[x] | Três rádios representam as três células de relógio lógico. |
 | `medium-3` | Shadows in the Hall | Medium | 8×8 | IMPLEMENTED / HAND-AUTHORED | Galeria de entrada, salão central, alpendre e jardim | Interior + pátio + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna | `f292eb1` | I:[x] V:[x] B:[x] C:[x] P:[x] | Salão central aberto mantém o percurso legível. |
-| `medium-4` | The Poisoned Pen | Medium | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `medium-5` | One Last Waltz | Medium | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `medium-6` | The Butler’s Secret | Medium | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `medium-7` | Whispers Upstairs | Medium | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `medium-8` | The Cracked Mirror | Medium | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `medium-9` | A Debt Repaid | Medium | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
+| `medium-4` | The Poisoned Pen | Medium | 8×8 | IMPLEMENTED / HAND-AUTHORED | Moradia de campo, galeria de jantar e jardim murado | Interior + exterior + pátio | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna (computador) | `466cd39` | I:[x] V:[x] B:[x] C:[x] P:[x] | Rádio Kenney V3 representa o relógio lógico na célula prevista. |
+| `medium-5` | One Last Waltz | Medium | 8×8 | IMPLEMENTED / HAND-AUTHORED | Moradia estreita com galeria, pátio frontal e jardim | Interior + exterior + pátio | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna (computador) | `466cd39` | I:[x] V:[x] B:[x] C:[x] P:[x] | Quatro rádios representam os relógios lógicos no corredor. |
+| `medium-6` | The Butler’s Secret | Medium | 8×8 | IMPLEMENTED / HAND-AUTHORED | Residência de serviço com escritório e dois pátios | Interior + exterior + pátio | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna (computador) | `466cd39` | I:[x] V:[x] B:[x] C:[x] P:[x] | Lógica do caso preservada. |
+| `medium-7` | Whispers Upstairs | Medium | 8×8 | IMPLEMENTED / HAND-AUTHORED | Casa térrea em L com corredor, jantar e cozinha de serviço | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna (computador) | `466cd39` | I:[x] V:[x] B:[x] C:[x] P:[x] | A planta térrea respeita o modelo lógico de um piso. |
+| `medium-8` | The Cracked Mirror | Medium | 8×8 | IMPLEMENTED / HAND-AUTHORED | Bungalow com gabinete, alpendre e jardim traseiro | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna (computador) | `466cd39` | I:[x] V:[x] B:[x] C:[x] P:[x] | Não existe modelo aprovado de espelho partido. |
+| `medium-9` | A Debt Repaid | Medium | 8×8 | IMPLEMENTED / HAND-AUTHORED | Moradia estreita com sala, alpendre e jardim lateral | Interior + exterior | 1 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna (computador) | `466cd39` | I:[x] V:[x] B:[x] C:[x] P:[x] | Rádios representam os relógios lógicos nas células previstas. |
 | `medium-10` | The Second Shot | Medium | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 | `medium-11` | Nobody Left | Medium | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 | `medium-12` | A Quiet Alibi | Medium | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 1 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
@@ -149,4 +172,4 @@ Legenda da lista de controlo: I = implementação; V = validador; B = inspeção
 | `master-7` | The Final Alibi | Master | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 | `master-8` | Nobody Was Home | Master | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 
-**Cenas procedimentais ainda ativas: 38.**
+**Cenas procedimentais ainda ativas: 32.**
