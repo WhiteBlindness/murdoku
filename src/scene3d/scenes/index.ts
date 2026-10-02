@@ -24,6 +24,12 @@ import { theSeventhGuest } from './the-seventh-guest'
 import { aToastToMurder } from './a-toast-to-murder'
 import { theTornLetter } from './the-torn-letter'
 import { shadowsInTheHall } from './shadows-in-the-hall'
+import { thePoisonedPen } from './the-poisoned-pen'
+import { oneLastWaltz } from './one-last-waltz'
+import { theButlersSecret } from './the-butlers-secret'
+import { whispersUpstairs } from './whispers-upstairs'
+import { theCrackedMirror } from './the-cracked-mirror'
+import { aDebtRepaid } from './a-debt-repaid'
 
 /** Authored scenes, keyed by `${puzzleId}#${floor}`. */
 export const AUTHORED_SCENES: Record<string, SceneSpec> = Object.fromEntries(
@@ -35,6 +41,8 @@ export const AUTHORED_SCENES: Record<string, SceneSpec> = Object.fromEntries(
     theFinalCurtain, aGraveMistake, theVanishingAct,
     theMissingKey, ashesInTheStudy, theSeventhGuest,
     aToastToMurder, theTornLetter, shadowsInTheHall,
+    thePoisonedPen, oneLastWaltz, theButlersSecret,
+    whispersUpstairs, theCrackedMirror, aDebtRepaid,
   ]
     .map(s => [`${s.puzzleId}#${s.floor ?? 0}`, s]),
 )
