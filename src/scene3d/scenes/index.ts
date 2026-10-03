@@ -39,6 +39,8 @@ import { theLastTrainGround } from './the-last-train-ground'
 import { theLastTrainUpper } from './the-last-train-upper'
 import { roomWithoutADoorGround } from './room-without-a-door-ground'
 import { roomWithoutADoorUpper } from './room-without-a-door-upper'
+import { theUnlitLampGround } from './the-unlit-lamp-ground'
+import { theUnlitLampUpper } from './the-unlit-lamp-upper'
 
 /** Authored scenes, keyed by `${puzzleId}#${floor}`. */
 export const AUTHORED_SCENES: Record<string, SceneSpec> = Object.fromEntries(
@@ -56,6 +58,7 @@ export const AUTHORED_SCENES: Record<string, SceneSpec> = Object.fromEntries(
     ashesAtMidnightGround, ashesAtMidnightUpper,
     theLastTrainGround, theLastTrainUpper,
     roomWithoutADoorGround, roomWithoutADoorUpper,
+    theUnlitLampGround, theUnlitLampUpper,
   ]
     .map(s => [`${s.puzzleId}#${s.floor ?? 0}`, s]),
 )
