@@ -87,9 +87,31 @@ Depois de a revisão detetar que o `Front Yard` de `hard-2` aparecia como interi
 
 O lote 5 foi registado nos *commits* `2cf8b5c` e `14ce9e2`. `npm run validate:production` passou os seis controlos; `npm test -- --reporter=dot` passou 474 testes e ignorou 5. `npm run lint`, `npm run build` e `node scripts/measure-puzzles.mjs --check` passaram. O lote foi publicado em `sol/full-catalogue-scene-production-v1`.
 
+## Lote 6: hard-7 implementado e escaladas estruturais
+
+A cena de `hard-7` foi escrita à mão nos dois pisos, sem alterar as pistas, as divisões lógicas, as peças de mobiliário ou a solução. O piso térreo organiza a sala, o vestíbulo de entrada, o átrio e a cozinha. No piso superior, o estudo, o quarto, a casa de banho e o escritório ligam-se por galerias secas ao patamar da escada. O vestíbulo fechado dá apoio estrutural ao piso superior sem colocar lajes sobre jardins ou outras áreas exteriores.
+
+GPT-6 Luna reviu a circulação, a leitura das pistas, as guardas da abertura da escada, a casa de banho e a disposição em telemóvel. GPT-6 Sol inspecionou as imagens reais do Microsoft Edge e aceitou a cena em computador (1600×1200) e telemóvel (390×844). A passagem junto ao candeeiro lógico mede 0,672 m; as peças da casa de banho não colidem com as portas. A interação foi testada até à acusação correta e à persistência local do caso resolvido.
+
+As provas visuais incluem [piso térreo](reference/sol-catalogue/hard-7-ground-environment.png), [piso superior](reference/sol-catalogue/hard-7-upper-environment.png), [vista explodida](reference/sol-catalogue/hard-7-exploded-overview.png), [diagnósticos dos dois pisos](reference/sol-catalogue/hard-7-ground-diagnostic.png) e [capturas de telemóvel](reference/sol-catalogue/hard-7-mobile-ground.png). O lote 6 passou os 6 controlos de produção, os 476 testes (5 ignorados), o lint, a compilação e a verificação de atualidade do relatório dos quebra-cabeças.
+
+Os outros cinco casos deste lote permanecem em escalada de sistema. No total, 113 células do piso superior ocupam a projeção de zonas exteriores no piso térreo. A arquitetura aprovada em `docs/MULTI_STOREY_ARCHITECTURE.md` não permite apoiar um piso interior sobre jardins, pátios ou alpendres exteriores, e o modelo atual apenas reconhece piso interior como apoio.
+
+| Caso | Células sem apoio estrutural | Sobreposição exigida pela planta solucionada |
+|---|---:|---|
+| `hard-5` | 20 | Divisões do piso superior em `r0–4,c0–3` sobre o `Front Yard`; Carol (`r1,c1`) e Bella (`r0,c3`) ficam por cima do jardim. |
+| `hard-6` | 15 | Casa de banho do piso superior em `r5–7,c0–4` sobre o `Front Yard`; Priya (`r7,c1`) e Evangeline (`r6,c0`) ocupam esse piso. |
+| `hard-8` | 15 | Quarto (`r3–4,c0–2`, 6 células) e casa de banho (`r5–7,c0–2`, 9 células) sobre o `Garden`. |
+| `hard-9` | 15 | Estudo (`r5–7,c3–4`, 6 células) e sala (`r5–7,c5–7`, 9 células) sobre o `Front Yard`; a solução também coloca Nadia e Evangeline no jardim térreo. |
+| `hard-10` | 48 | Estudo (12 células), casa de banho (12), cozinha (4) e quarto (20) sobre `Front Yard`, `Garden` e `Porch`; Evangeline (`r6,c4`) fica no quarto superior sobre o alpendre. |
+
+Reclassificar as zonas exteriores como interiores altera o ambiente; deslocar divisões ou pessoas altera o caso; e aceitar lajes sem apoio contradiz a regra estrutural atual. Nenhuma destas opções é uma correção de produção válida. A menor abstração reutilizável que permitiria manter a lógica seria um modelo explícito e mensurável de caminhos de carga, com vigas, pilares e limites de vão representados na cena e verificados por uma trajetória contínua de cargas. Isso exigiria alterações ao esquema, à geometria dos pisos, às ligações entre pisos e à validação, bem como uma decisão sobre permitir essa estrutura sobre zonas exteriores. Não foram alterados o esquema, o renderizador, o validador, o solucionador nem os dados dos casos.
+
+O lote 6 fica parcial: `hard-7` está implementado e aceite; `hard-5`, `hard-6`, `hard-8`, `hard-9` e `hard-10` mantêm a cena de recurso enquanto a escalada não tiver resolução. A produção do lote seguinte fica suspensa por esta dependência estrutural.
+
 ## Auditoria da dependência entre pisos
 
-A contagem de pisos não foi inferida da dificuldade. Foram construídos os 60 casos a partir da versão determinística do catálogo e inspecionadas as pistas, a solução, as divisões e o mobiliário. Nos 30 casos atualmente com dois pisos, a solução coloca pessoas nos dois. Cada um contém também quatro divisões e 9 a 19 peças lógicas no piso superior. Retirar esse piso, mesmo nos seis casos sem uma pista vertical literal, altera o espaço de posições, a identidade das divisões e a solução matemática. Por isso, os 26 casos ainda por produzir deste grupo exigem arquitetura de dois pisos se a lógica permanecer intacta.
+A contagem de pisos não foi inferida da dificuldade. Foram construídos os 60 casos a partir da versão determinística do catálogo e inspecionadas as pistas, a solução, as divisões e o mobiliário. Nos 30 casos atualmente com dois pisos, a solução coloca pessoas nos dois. Cada um contém também quatro divisões e 9 a 19 peças lógicas no piso superior. Retirar esse piso, mesmo nos seis casos sem uma pista vertical literal, altera o espaço de posições, a identidade das divisões e a solução matemática. Na auditoria inicial, 26 casos deste grupo ainda não tinham cena autorada. O lote 6 concluiu `hard-7`; cinco casos mantêm-se em escalada estrutural e os restantes continuam por produzir.
 
 Na coluna das pistas, «não explícitas» significa apenas ausência dos tipos `floor`, `above` e `below`. As pistas sobre divisões e mobiliário continuam a ser avaliadas no piso da posição candidata.
 
@@ -166,12 +188,12 @@ Legenda da lista de controlo: I = implementação; V = validador; B = inspeção
 | `hard-2` | Ashes at Midnight | Hard | 8×8 | IMPLEMENTED / HAND-AUTHORED | Moradia de dois pisos com alpendre, pátio frontal e galeria exterior | Interior + exterior | 2 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna (Edge, 1600×1200) | `2cf8b5c`, `14ce9e2` | I:[x] V:[x] B:[x] C:[x] P:[x] | `Front Yard` exterior; galeria aberta com guardas nas margens expostas. |
 | `hard-3` | The Last Train | Hard | 8×8 | IMPLEMENTED / HAND-AUTHORED | Moradia de dois pisos com alpendre e jardim envidraçado | Interior + exterior | 2 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna (Edge, 1600×1200) | `2cf8b5c` | I:[x] V:[x] B:[x] C:[x] P:[x] | Lógica do caso preservada. |
 | `hard-4` | Room Without a Door | Hard | 8×8 | IMPLEMENTED / HAND-AUTHORED | Moradia de dois pisos com pátio de entrada plantado | Interior + pátio | 2 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna (Edge, 1600×1200) | `2cf8b5c` | I:[x] V:[x] B:[x] C:[x] P:[x] | Lógica do caso preservada. |
-| `hard-5` | The Cold Kettle | Hard | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `hard-6` | A Name in Pencil | Hard | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `hard-7` | The Unlit Lamp | Hard | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `hard-8` | Three Empty Glasses | Hard | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `hard-9` | The Late Arrival | Hard | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
-| `hard-10` | A Story Rehearsed | Hard | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
+| `hard-5` | The Cold Kettle | Hard | 8×8 | SYSTEM ESCALATION / FALLBACK | Suspensa por escalada | Interior + exterior | 2 | Escalada de sistema; sem inspeção de cena | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | 20 células do piso superior sobre o `Front Yard`; aguarda decisão estrutural. |
+| `hard-6` | A Name in Pencil | Hard | 8×8 | SYSTEM ESCALATION / FALLBACK | Suspensa por escalada | Interior + exterior | 2 | Escalada de sistema; sem inspeção de cena | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | 15 células da casa de banho superior sobre o `Front Yard`; aguarda decisão estrutural. |
+| `hard-7` | The Unlit Lamp | Hard | 8×8 | IMPLEMENTED / HAND-AUTHORED | Moradia de dois pisos com vestíbulo de entrada fechado | Interior | 2 | Aceite por GPT-6 Sol; revisto por GPT-6 Luna (Edge, 1600×1200 e 390×844) | `2b2f69c`, `fffc82a` | I:[x] V:[x] B:[x] C:[x] P:[x] | Lógica preservada; vistas finais em `docs/reference/sol-catalogue/hard-7-*.png`. |
+| `hard-8` | Three Empty Glasses | Hard | 8×8 | SYSTEM ESCALATION / FALLBACK | Suspensa por escalada | Interior + exterior | 2 | Escalada de sistema; sem inspeção de cena | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | 15 células de quarto e casa de banho sobre o `Garden`; aguarda decisão estrutural. |
+| `hard-9` | The Late Arrival | Hard | 8×8 | SYSTEM ESCALATION / FALLBACK | Suspensa por escalada | Interior + exterior | 2 | Escalada de sistema; sem inspeção de cena | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | 15 células de estudo e sala sobre o `Front Yard`; aguarda decisão estrutural. |
+| `hard-10` | A Story Rehearsed | Hard | 8×8 | SYSTEM ESCALATION / FALLBACK | Suspensa por escalada | Interior + exterior | 2 | Escalada de sistema; sem inspeção de cena | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | 48 células de quatro divisões superiores sobre zonas exteriores; aguarda decisão estrutural. |
 | `hard-11` | The Missing Hour | Hard | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 | `hard-12` | Nothing Was Taken | Hard | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 | `expert-1` | The Open Window | Expert | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
@@ -193,4 +215,4 @@ Legenda da lista de controlo: I = implementação; V = validador; B = inspeção
 | `master-7` | The Final Alibi | Master | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 | `master-8` | Nobody Was Home | Master | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 
-**Cenas procedimentais ainda ativas: 26.**
+**Cenas procedimentais ainda ativas: 25.**
