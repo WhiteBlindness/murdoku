@@ -275,8 +275,17 @@ describe('scene registry and fallback', () => {
       'medium-7',
       'medium-8',
       'medium-9',
+      'medium-10',
+      'medium-11',
+      'medium-12',
+      'hard-2',
+      'hard-3',
+      'hard-4',
     ]) {
       expect(hasAuthoredScene(puzzleId), puzzleId).toBe(true)
+    }
+    for (const puzzleId of ['hard-2', 'hard-3', 'hard-4']) {
+      expect(hasAuthoredScene(puzzleId, 1), `${puzzleId} upper storey`).toBe(true)
     }
     const other = { ...buildAuthoredPuzzle(AUTHORED_CASES['very-easy-2'], 'Case No. II'), id: 'un-authored-case' }
     expect(hasAuthoredScene(other.id)).toBe(false)

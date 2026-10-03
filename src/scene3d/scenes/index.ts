@@ -30,6 +30,15 @@ import { theButlersSecret } from './the-butlers-secret'
 import { whispersUpstairs } from './whispers-upstairs'
 import { theCrackedMirror } from './the-cracked-mirror'
 import { aDebtRepaid } from './a-debt-repaid'
+import { theSecondShot } from './the-second-shot'
+import { nobodyLeft } from './nobody-left'
+import { aQuietAlibi } from './a-quiet-alibi'
+import { ashesAtMidnightGround } from './ashes-at-midnight-ground'
+import { ashesAtMidnightUpper } from './ashes-at-midnight-upper'
+import { theLastTrainGround } from './the-last-train-ground'
+import { theLastTrainUpper } from './the-last-train-upper'
+import { roomWithoutADoorGround } from './room-without-a-door-ground'
+import { roomWithoutADoorUpper } from './room-without-a-door-upper'
 
 /** Authored scenes, keyed by `${puzzleId}#${floor}`. */
 export const AUTHORED_SCENES: Record<string, SceneSpec> = Object.fromEntries(
@@ -43,6 +52,10 @@ export const AUTHORED_SCENES: Record<string, SceneSpec> = Object.fromEntries(
     aToastToMurder, theTornLetter, shadowsInTheHall,
     thePoisonedPen, oneLastWaltz, theButlersSecret,
     whispersUpstairs, theCrackedMirror, aDebtRepaid,
+    theSecondShot, nobodyLeft, aQuietAlibi,
+    ashesAtMidnightGround, ashesAtMidnightUpper,
+    theLastTrainGround, theLastTrainUpper,
+    roomWithoutADoorGround, roomWithoutADoorUpper,
   ]
     .map(s => [`${s.puzzleId}#${s.floor ?? 0}`, s]),
 )
