@@ -1,30 +1,22 @@
-# Scene migration plan — the remaining cases
+# Plano de produção das cenas
 
-Three scenes are authored and validated: `very-easy-1` (golden master), `very-easy-2` (courtyard pilot), `easy-1` (7×7 pilot). Every other case renders through the procedural fallback (`scenes/fallback.ts`): shell, no partitions, one default model per logical furnishing at its footprint centre. The fallback is playable and honest; it is not the product.
+O estado atual e a ordem dos lotes estão registados em `FULL_CATALOGUE_SCENE_PRODUCTION.md`. Esse documento é a referência para o inventário, as decisões arquitetónicas, a validação e a aceitação visual.
 
-This plan is written for an agent that is capable but should not improvise foundations (Opus). It repeats nothing from `ISOMETRIC_SCENE_SYSTEM.md`; read that first and keep it open.
+## Inventário atualizado
 
-## Inventory
+O catálogo contém 60 casos. Quatro cenas de referência permanecem protegidas. Os lotes 1 a 5 acrescentaram 30 cenas escritas à mão; restam 26 casos com recurso ao cenário procedimental.
 
-| Tier | Cases | Size | Storeys | Notes |
-| --- | --- | --- | --- | --- |
-| Very Easy | 8 (1 done, 1 pilot) | 6×6 | 1 | authored data for #1–#2, generated for #3–#8 |
-| Easy | 10 (1 pilot) | 7×7 | 1 | generated |
-| Medium | 12 | 8×8 | 1 | generated |
-| Hard / Expert / Master | 30 | 8×8 | 2 | generated; each storey is its own scene spec (`floor: 0` and `floor: 1`) |
+| Categoria | Estado |
+| --- | --- |
+| `very-easy-1`, `very-easy-2`, `easy-1`, `hard-1` | Cenas protegidas de referência |
+| Lotes 1 a 5 | 30 cenas de produção concluídas |
+| Lote 6 | `hard-5` a `hard-10`, seis casos de dois pisos |
 
-Generated cases are deterministic (seeded from the catalog plan), so a scene authored against `easy-3` today matches `easy-3` tomorrow. Dump a case's rooms, furniture, solution and clues with the snippet in §"Tooling" before authoring.
+Os 26 casos por produzir exigem dois pisos. O piso superior faz parte da solução lógica, mesmo quando as pistas não mencionam diretamente relações verticais.
 
-## Batch order
+## Próximos lotes
 
-1. **Batch A — Very Easy 3–8** (6 scenes, 6×6). Same board size as the golden master; most rooms map onto the Midnight Delivery vocabulary.
-2. **Batch B — Easy 2–10** (9 scenes, 7×7). Central halls and gardens appear; the Nightcap pilot is the reference.
-3. **Batch C — Medium 1–12** (12 scenes, 8×8). Larger rooms; expect more décor per room and two furniture groups per room.
-4. **Batch D — ground floors of Hard/Expert/Master** (30 scenes, 8×8, `floor: 0`).
-5. **Batch E — upper floors** (30 scenes, `floor: 1`), after `TWO_STOREY_FEASIBILITY.md` decisions are taken (stairs placement is a system feature, not a per-scene guess).
-
-Do not interleave batches. Each batch ends with a batch gate before the next starts.
-
+O lote seguinte abrange `hard-5` a `hard-10`. Depois, a produção continua pelos restantes casos `hard`, `expert` e `master`, sem alterar a lógica dos quebra-cabeças nem os componentes fundamentais do sistema. Cada lote termina com validação, revisão visual por GPT-6 Luna, aceitação visual por GPT-6 Sol e atualização do registo de produção.
 ## Per-scene workflow (exactly this, every time)
 
 1. **Read the case.** Room rectangles, furniture list with footprints and rotations, solution cells, clue texts. Note which furniture carries clues (the clue texts name them) — those objects must be unmistakable.
