@@ -19,6 +19,17 @@ describe('production preflight', () => {
     expect(puzzles).toHaveLength(60)
   })
 
+  it('uses paired hand-authored scenes for every completed hard case', () => {
+    const missing: string[] = []
+    for (const puzzleId of ['hard-5', 'hard-6', 'hard-8', 'hard-9', 'hard-10']) {
+      for (const floor of [0, 1]) {
+        if (!AUTHORED_SCENES[`${puzzleId}#${floor}`]) missing.push(`${puzzleId}#${floor}`)
+      }
+    }
+
+    expect(missing, `missing hand-authored storeys: ${missing.join(', ')}`).toEqual([])
+  })
+
   it('accepts every puzzle with no hard production error', () => {
     const failures = puzzles.flatMap(puzzle => validatePuzzleForProduction(puzzle).issues
       .filter(issue => issue.severity === 'error')
