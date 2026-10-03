@@ -9,8 +9,7 @@ export const ashesAtMidnightUpper: SceneSpec = {
     landing: [6.939375, 2.10625, 7.689375, 3.09375],
     halls: [
       { id: 'study-run', bounds: [7.0, 2.1, 7.75, 4.9] },
-      { id: 'bedroom-spur', bounds: [3.2, 4.1, 7.0, 5.0] },
-      { id: 'bath-spur', bounds: [3.2, 5.0, 7.0, 5.8] },
+      { id: 'bed-bath-gallery', bounds: [3.2, 4.1, 7.0, 5.8] },
     ],
     roomAccessTargets: [
       { id: 'study-door', bounds: [7.0, 3.0, 7.75, 4.0] },
@@ -26,9 +25,9 @@ export const ashesAtMidnightUpper: SceneSpec = {
   ] },
   floors: [
     { id: 'bedroom-floor', cells: [0, 0, 3, 4], material: 'wood' },
-    { id: 'study-floor', cells: [4, 0, 7, 4], material: 'wood' },
+    { id: 'study-floor', cells: [4, 0, 7, 3], material: 'wood' },
     { id: 'bathroom-tile', cells: [0, 5, 3, 7], material: 'tile' },
-    { id: 'upper-hall-floor', cells: [4, 5, 7, 7], material: 'wood' },
+    { id: 'upper-gallery-floor', cells: [4, 4, 7, 7], material: 'stone', kind: 'exterior' },
   ],
   walls: [
     { id: 'bedroom-study', from: [4, 0], to: [4, 5], height: 'half', openings: [
@@ -37,7 +36,9 @@ export const ashesAtMidnightUpper: SceneSpec = {
     ] },
     { id: 'bedroom-bath', from: [0, 5], to: [4, 5], height: 'half', openings: [{ at: 3.6, width: 0.8, kind: 'door' }] },
     { id: 'bathroom-hall', from: [4, 5], to: [4, 8], height: 'half', openings: [{ at: 6, width: 2, kind: 'door' }] },
-    { id: 'study-hall', from: [4, 5], to: [8, 5], height: 'half', openings: [{ at: 6.7, width: 1.2, kind: 'open' }] },
+    { id: 'study-gallery-transition', from: [4, 4], to: [8, 4], height: 'half', openings: [{ at: 6.9, width: 1.8, kind: 'open' }] },
+    { id: 'gallery-east-railing', from: [8, 5], to: [8, 8], height: 'half', treatment: 'railing', freeEnds: ['from', 'to'] },
+    { id: 'gallery-south-railing', from: [4, 8], to: [8, 8], height: 'half', treatment: 'railing', freeEnds: ['from', 'to'] },
     { id: 'stairwell-west-guard', from: [4.660625, 2.10625], to: [4.660625, 3.09375], height: 'half', treatment: 'railing', freeEnds: ['from', 'to'] },
     { id: 'stairwell-north-guard', from: [4.660625, 2.02625], to: [6.939375, 2.02625], height: 'half', treatment: 'railing', freeEnds: ['from', 'to'] },
     { id: 'stairwell-south-guard', from: [4.660625, 3.17375], to: [6.939375, 3.17375], height: 'half', treatment: 'railing', freeEnds: ['from', 'to'] },

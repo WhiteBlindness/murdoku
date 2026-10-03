@@ -1,6 +1,6 @@
 import type { SceneSpec } from '../schema'
 
-// Moradia de dois pisos com entrada envidraçada e escada para o estudo.
+// Moradia de dois pisos com alpendre coberto e pátio frontal.
 export const ashesAtMidnightGround: SceneSpec = {
   puzzleId: 'hard-2',
   floor: 0,
@@ -16,7 +16,7 @@ export const ashesAtMidnightGround: SceneSpec = {
     { id: 'covered-porch', cells: [0, 0, 2, 3], material: 'stone' },
     { id: 'dining-room', cells: [3, 0, 7, 3], material: 'wood' },
     { id: 'kitchen', cells: [0, 4, 3, 7], material: 'tile' },
-    { id: 'glazed-entry-room', cells: [4, 4, 7, 7], material: 'tile' },
+    { id: 'front-yard', cells: [4, 4, 7, 7], material: 'grass', kind: 'exterior' },
   ],
   walls: [
     { id: 'north-porch-dining', from: [3, 0], to: [3, 4], height: 'half', openings: [{ at: 0.9, width: 1.2, kind: 'open' }] },
