@@ -15,6 +15,7 @@ import { CELL, FLOOR_THICKNESS, type StoreyView, type Vec3 } from './units'
 import type { ResolvedScene, ResolvedObject, Box3 } from './resolve'
 import type { KenneyModel } from './catalog.generated'
 import { companionFloorBoxes, companionWallBoxesThroughStairwell } from './companionGeometry'
+import { exteriorSupportMembers } from './exteriorSupport'
 import { floorPatches } from './floorGeometry'
 import { explodedConnectionSegments } from './explodedConnection'
 
@@ -38,6 +39,9 @@ const FLOOR_SLAB: Record<string, { top: string; edge: string }> = {
 }
 /** Kenney `wood` material (229,153,100) — window frames and thresholds. */
 const FRAME_WOOD = '#e59964'
+const SUPPORT_FACE = '#92704d'
+const SUPPORT_CAP = '#b08a5f'
+const SUPPORT_GHOST = '#a88a60'
 const FOUNDATION = '#c9b493'
 /** Neutral placeholder the renderer starts from; every visible colour is set
  *  from the DESIGN.md scene tokens before a frame is shown. */
@@ -131,7 +135,7 @@ function boxMesh(box: Box3, face: string, cap: string): THREE.Mesh {
   return m
 }
 
-function ghostBox(box: Box3, offsetY: number, opacity: number): THREE.LineSegments {
+function ghostBox(box: Box3, offsetY: number, opacity: number, colour = '#c9ab72'): THREE.LineSegments {
   const w = box.max[0] - box.min[0], h = box.max[1] - box.min[1], d = box.max[2] - box.min[2]
   const boxGeometry = new THREE.BoxGeometry(w, h, d)
   const edges = new THREE.EdgesGeometry(boxGeometry)
@@ -140,7 +144,7 @@ function ghostBox(box: Box3, offsetY: number, opacity: number): THREE.LineSegmen
   const mesh = new THREE.LineSegments(
     edges,
     new THREE.LineBasicMaterial({
-      color: '#c9ab72', transparent: true, opacity, depthWrite: false,
+      color: colour, transparent: true, opacity, depthWrite: false,
     }),
   )
   mesh.position.set(box.min[0] + w / 2, box.min[1] + h / 2 + offsetY, box.min[2] + d / 2)
@@ -260,6 +264,13 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
       requestRender()
     }))
   }
+  // Grounded frame members carry the upper slab without adding floor or navigation cells.
+  for (const member of exteriorSupportMembers(scene)) {
+    const mesh = boxMesh(member.box, SUPPORT_FACE, SUPPORT_CAP)
+    if (member.kind === 'joist') mesh.castShadow = false
+    world.add(mesh)
+    diagGroup.add(helperFor(member.box, '#8a6641'))
+  }
   // thresholds: a half-height step on the low side of every opening to lower ground
   for (const t of scene.thresholds) world.add(boxMesh(t, FOUNDATION, FOUNDATION))
   // walls
@@ -335,6 +346,9 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
       world.add(patch)
     }
     for (const slab of companionFloorBoxes(other)) world.add(ghostBox(slab, companion.offsetY, ghostOpacity))
+    for (const member of exteriorSupportMembers(other)) {
+      world.add(ghostBox(member.box, companion.offsetY, ghostOpacity, SUPPORT_GHOST))
+    }
     for (const wall of other.walls) {
       for (const piece of wall.visualPieces ?? wall.pieces) world.add(ghostBox(piece, companion.offsetY, ghostOpacity))
       for (const frameBox of wall.frames) world.add(ghostBox(frameBox, companion.offsetY, ghostOpacity))

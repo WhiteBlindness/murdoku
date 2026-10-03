@@ -33,9 +33,10 @@ import {
 import { MODEL_BOUNDS, type KenneyModel } from './catalog.generated'
 import { metaOf, type ModelMeta } from './catalog'
 import { resolveDoorGeometry, type DoorMember } from './doorGeometry'
-import type { CirculationSpec, Facing, FloorMaterial, FurnitureSpec, PlanRect, SceneSpec, OpeningSpec, ShellWall, ZoneKind } from './schema'
+import type { CirculationSpec, ExteriorSupportBaySpec, Facing, FloorMaterial, FurnitureSpec, PlanRect, SceneSpec, OpeningSpec, ShellWall, ZoneKind } from './schema'
 import { resolveFootprint, resolveStairwell } from './floorGeometry'
 import { railingPieces } from './railingGeometry'
+import { resolveExteriorSupportBays } from './exteriorSupport'
 
 export interface Box3 { min: Vec3; max: Vec3 }
 export interface Rect { minX: number; maxX: number; minZ: number; maxZ: number }
@@ -116,6 +117,9 @@ export interface ResolvedScene {
   floorY: number[][]
   /** Whether this storey has physical floor at each logical cell. */
   floorPresent: boolean[][]
+  /** Authored load-bearing frames, separate from floor occupancy and zone classification. */
+  exteriorSupportBays: ExteriorSupportBaySpec[]
+  exteriorSupportProblems: string[]
   /** Step boxes on the low side of openings between different ground heights. */
   thresholds: Box3[]
   /** Upper-floor cells with no slab (the stair arrives here), as [col0,row0,col1,row1]. */
@@ -230,6 +234,7 @@ export function resolveScene(spec: SceneSpec, n: number): ResolvedScene {
   const thresholds: Box3[] = []
   const footprint = resolveFootprint(spec, n)
   const stairwell = resolveStairwell(spec, n)
+  const exteriorSupport = resolveExteriorSupportBays(spec.exteriorSupportBays, n, spec.floor ?? 0)
   problems.push(...footprint.problems, ...stairwell.problems)
   const floorPresent = footprint.present
 
@@ -560,6 +565,8 @@ export function resolveScene(spec: SceneSpec, n: number): ResolvedScene {
     puzzleId: spec.puzzleId,
     floor: spec.floor ?? 0,
     n, side, frame, walls, objects, floorMaterial, zoneKind, floorY, floorPresent, thresholds,
+    exteriorSupportBays: exteriorSupport.bays,
+    exteriorSupportProblems: exteriorSupport.problems,
     stairwell: spec.stairwell,
     stairwellBounds: stairwell.bounds,
     stairwellSource: stairwell.source,

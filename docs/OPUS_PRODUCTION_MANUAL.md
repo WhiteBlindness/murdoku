@@ -4,8 +4,9 @@ Este é o contrato canónico para produzir casos e cenas Murdoku. Lê-o na ínte
 
 Antes de criar ou modificar uma cena com vários pisos, é também obrigatória a
 leitura integral de [`MULTI_STOREY_ARCHITECTURE.md`](MULTI_STOREY_ARCHITECTURE.md).
-Esse contrato distingue a pegada construída, a laje, o vão, o patamar e a
-circulação. A grelha lógica nunca autoriza pavimento superior sobre jardim.
+Esse contrato distingue a pegada construída, a laje, o vão, o patamar, a
+circulação e o apoio estrutural. A grelha lógica nunca autoriza pavimento
+superior sobre jardim; esse apoio tem de estar representado e validado.
 
 O Opus é um trabalhador de produção. Não é o arquiteto do motor. Um lote normal cria conteúdo dentro do sistema aprovado; não redefine pistas, projeção, física, escala, renderização, validadores ou regras do jogo.
 
@@ -182,7 +183,9 @@ uma fachada real. O teste mede presença de laje e tipo de zona, não o nome da
 divisão nem a cor do pavimento. No piloto `hard-1`, a casa é interior em 8 × 8
 células e `Conservatory` ocupa apenas o quadrante sudeste; a retração sobre
 jardim é coberta pelo *fixture* independente
-`tests/fixtures/multistoreyGarden.ts`.
+`tests/fixtures/multistoreyGarden.ts`. O jardim não suporta a laje por si só;
+uma estrutura `exteriorSupportBays` pode criar um caminho de carga explícito,
+mantendo terreno exterior e piso jogável como conceitos separados.
 
 ### 6.7 Circulação e visibilidade
 
@@ -210,6 +213,15 @@ e [`circulationGeometry.ts`](../src/scene3d/circulationGeometry.ts), com as
 regras de par e fronteira em [`validate.ts`](../src/scene3d/validate.ts). A planta
 do piloto está separada em [`two-storey-reference-ground.ts`](../src/scene3d/scenes/two-storey-reference-ground.ts)
 e [`two-storey-reference-upper.ts`](../src/scene3d/scenes/two-storey-reference-upper.ts).
+
+Quando a laje superior atravessa terreno exterior, declara no rés-do-chão
+`exteriorSupportBays`. Cada retângulo inclusivo de células pode ter até 3 × 3
+células e tem de assentar em terreno exterior ou de pátio, corresponder a laje
+interior superior completa e ficar fora do vão da escada. A resolução deriva
+colunas, vigas perimetrais e barrotes; os validadores rejeitam apoio sem
+fundação, sobreposição, apoio órfão, balanços descobertos e colisões com móveis
+ou escadas. Este campo não acrescenta pavimento, navegação nem ocupação no
+rés-do-chão. A omissão mantém as cenas antigas válidas sem metadados artificiais.
 
 Na referência atual, o rés-do-chão e o piso superior usam
 `storeyFootprint: { kind: 'full' }` e o vão é

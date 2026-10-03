@@ -9,6 +9,7 @@
 
 import { CELL, STOREY_HEIGHT, type Vec3 } from './units'
 import { parseLogic, type Box3, type Rect, type ResolvedObject, type ResolvedScene, type ResolvedWall } from './resolve'
+import { exteriorSupportMembers } from './exteriorSupport'
 import { furnitureCells, type Puzzle } from '../core/types'
 import { resolvedObjectVisibilityBoxes } from './stairVisibility'
 import { planRectToWorld, validPlanRect, worldRectCoveredByFloor, type WorldRect } from './floorGeometry'
@@ -31,6 +32,9 @@ export interface Violation {
     | 'stairwell-missing' | 'stairwell-size-mismatch' | 'stair-floor-mismatch'
     | 'stair-slab-blocked' | 'stair-landing-blocked' | 'upper-floor-inaccessible'
     | 'upper-floor-unsupported'
+    | 'exterior-support-invalid' | 'exterior-support-ground-missing'
+    | 'exterior-support-zone-mismatch' | 'exterior-support-orphan' | 'exterior-support-upper-mismatch' | 'exterior-support-collision'
+    | 'exterior-support-solution-clearance'
     | 'circulation-missing' | 'circulation-malformed' | 'circulation-too-narrow'
     | 'circulation-blocked' | 'circulation-disconnected'
     | 'object-hidden' | 'cell-hidden' | 'tall-back-exposed'
@@ -93,6 +97,7 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
   const warn = (code: Violation['code'], subject: string, message: string) => out.push({ code, severity: 'warning', subject, message })
 
   for (const p of scene.problems) err('unresolved', 'scene', p)
+  for (const p of scene.exteriorSupportProblems ?? []) err('exterior-support-invalid', 'exterior-support', p)
 
   // ---- structural walls: one thickness per run, inserts on the wall line ----------
   for (const w of scene.walls) {
@@ -146,6 +151,17 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
   const furniture = scene.objects.filter(o => o.kind === 'furniture' || o.kind === 'stairs')
   const solids = furniture.filter(solidObject)
   const byId = new Map(scene.objects.map(o => [o.id, o]))
+  const supportMembers = exteriorSupportMembers(scene)
+  const supportColumns = supportMembers.filter(member => member.kind === 'column')
+  for (const member of supportMembers) {
+    const obstruction = scene.objects.find(object =>
+      (object.kind === 'furniture' || object.kind === 'stairs')
+      && overlaps(member.box, object.box, 0.004))
+    if (obstruction) {
+      err('exterior-support-collision', member.id,
+        member.id + ' intersects ' + obstruction.id + ' (' + obstruction.model + ')')
+    }
+  }
 
   // ---- every architectural/object footprint must have real floor support ------
   const hasFloorBesideWall = (wall: ResolvedWall, along: number) => {
@@ -280,8 +296,12 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
         }
       }
       const obstacle = solids.find(object => !object.parentId && rectOverlap(object.footprint, clear, 0.005))
-      if (crossedWall || obstacle) {
-        err('circulation-blocked', item.id, `${item.id} is blocked by ${crossedWall ? `wall ${crossedWall}` : `${obstacle!.id} (${obstacle!.model})`}`)
+      const supportColumn = supportColumns.find(({ box }) =>
+        rectOverlap({ minX: box.min[0], maxX: box.max[0], minZ: box.min[2], maxZ: box.max[2] }, clear, 0.005))
+      if (crossedWall || obstacle || supportColumn) {
+        const blocker = crossedWall ? `wall ${crossedWall}`
+          : obstacle ? `${obstacle.id} (${obstacle.model})` : supportColumn!.id
+        err('circulation-blocked', item.id, `${item.id} is blocked by ${blocker}`)
       }
       if (item.minimumWidth && Math.min(clear.maxX - clear.minX, clear.maxZ - clear.minZ) < 0.6 - EPS) {
         err('circulation-too-narrow', item.id, `${item.id} has less than 0.600 clear world units between finished faces`)
@@ -314,6 +334,13 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
         if (px + half > box.min[0] && px - half < box.max[0] && pz + half > box.min[2] && pz - half < box.max[2]) return false
       }
       for (const o of solids) if (!o.parentId && px > o.footprint.minX && px < o.footprint.maxX && pz > o.footprint.minZ && pz < o.footprint.maxZ) return false
+      const row = Math.min(scene.n - 1, Math.floor(pz / CELL))
+      const col = Math.min(scene.n - 1, Math.floor(px / CELL))
+      const groundY = scene.floorY[row]?.[col]
+      if (groundY !== undefined && supportColumns.some(({ box }) => box.min[1] <= groundY + EPS
+        && box.max[1] > groundY + EPS
+        && px + half > box.min[0] && px - half < box.max[0]
+        && pz + half > box.min[2] && pz - half < box.max[2])) return false
       return true
     }
     for (let i = 0; i < m; i++) for (let j = 0; j < m; j++) blocked[i * m + j] = walkable((j + 0.5) * step, (i + 0.5) * step) ? 0 : 1
@@ -379,12 +406,21 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
     const p = scene.frame.cellCentre(r, c, scene.floorY[r][c])
     if (!worldRectCoveredByFloor(scene, { minX: p[0] - 0.001, maxX: p[0] + 0.001, minZ: p[2] - 0.001, maxZ: p[2] + 0.001 })) continue
     const occupant = solids.find(o => !o.parentId && p[0] > o.footprint.minX && p[0] < o.footprint.maxX && p[2] > o.footprint.minZ && p[2] < o.footprint.maxZ)
-    const blockers = [...wallBoxes, ...solids.filter(o => o !== occupant && !o.parentId).flatMap(resolvedObjectVisibilityBoxes)]
     // A suspect standee carries its portrait badge at chest height (~0.45).
-    // If the badge centre is hidden at the cell centre, the player cannot see
-    // who stands there without help. Feet behind a low object are fine.
-    if (blockers.some(b => rayHitsBox([p[0], p[1] + 0.45, p[2]], dir, b) !== null)) {
-      warn('cell-hidden', `${r},${c}`, `cell (${r},${c}) is hidden from the camera at standee height`)
+    // This is a 3D camera sightline advisory. The playable board's portrait
+    // marker is a DOM overlay and is checked separately in browser QA.
+    const badge = [p[0], p[1] + 0.45, p[2]] as Vec3
+    const wallBlockers = visibleWalls.filter(({ box }) => rayHitsBox(badge, dir, box) !== null)
+      .map(({ wall }) => `wall:${wall.id}`)
+    const objectBlockers = solids.filter(object => object !== occupant && !object.parentId
+      && resolvedObjectVisibilityBoxes(object).some(box => rayHitsBox(badge, dir, box) !== null))
+      .map(object => `object:${object.id}`)
+    const supportBlockers = supportColumns.filter(({ box }) => rayHitsBox(badge, dir, box) !== null)
+      .map(member => `support:${member.id}`)
+    const blockers = [...wallBlockers, ...objectBlockers, ...supportBlockers].sort()
+    if (blockers.length) {
+      warn('cell-hidden', `${r},${c}`,
+        `cell (${r},${c}) has a blocked 3D sightline at standee height: ${blockers.join(', ')}`)
     }
   }
   // ---- tall objects keep their backs to the back walls ----------------------------------
@@ -404,6 +440,13 @@ export function validateScene(scene: ResolvedScene, puzzle?: Puzzle): Violation[
       const x = (cell.col + 0.5) * CELL, z = (cell.row + 0.5) * CELL
       if (!worldRectCoveredByFloor(scene, { minX: x - 0.001, maxX: x + 0.001, minZ: z - 0.001, maxZ: z + 0.001 })) {
         err('solution-floor-missing', personId, `${personId}'s solved position (${cell.row},${cell.col}) has no floor`)
+      }
+      const groundY = scene.floorY[cell.row]?.[cell.col]
+      if (groundY !== undefined && supportColumns.some(({ box }) => box.min[1] <= groundY + EPS
+        && box.max[1] > groundY + EPS
+        && x > box.min[0] && x < box.max[0] && z > box.min[2] && z < box.max[2])) {
+        err('exterior-support-solution-clearance', personId,
+          `${personId}'s solved cell (${cell.row},${cell.col}) is occupied by an exterior support column`)
       }
     }
     const logical = puzzle.furniture.filter(f => (f.floor ?? 0) === scene.floor)

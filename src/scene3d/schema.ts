@@ -137,6 +137,13 @@ export type StoreyFootprintSpec =
   | { kind: 'full' }
   | { kind: 'cell-rects'; rects: CellRect[] }
 
+/** A grounded post-and-beam bay carrying an upper interior slab over exterior ground. */
+export interface ExteriorSupportBaySpec {
+  id: string
+  /** Inclusive lower-storey cells; each side may span at most three cells. */
+  cells: CellRect
+}
+
 export interface CirculationSpec {
   /** Clear physical step-off area at the stair head. */
   landing: PlanRect
@@ -171,6 +178,8 @@ export interface SceneSpec {
    *  exterior terrain; building support is the footprint intersected with interior zones.
    *  Omission preserves legacy full-board scenes. */
   storeyFootprint?: StoreyFootprintSpec
+  /** Ground-storey post-and-beam frames supporting matching upper interior cells over exterior land. */
+  exteriorSupportBays?: ExteriorSupportBaySpec[]
   /** Ground-floor only: the staircase to the storey above. */
   stairs?: StairsSpec
   /** Upper floors only: cells with no slab — the stair arrives here.

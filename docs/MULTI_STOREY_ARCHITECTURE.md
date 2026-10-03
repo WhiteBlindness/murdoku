@@ -85,8 +85,9 @@ representação histórica, sem permitir declarações contraditórias.
 
 Conservar apenas o sistema atual obrigaria a retirar pavimento útil por causa
 da grelha ou a chamar «patamar» a uma área privada. Essa alternativa é rejeitada.
-Não são introduzidos balanços estruturais, varandas, terceiro piso ou gerador
-de casas. Jardim e pátio não constituem apoio para um piso interior superior.
+Esta decisão não introduziu balanços estruturais, varandas, terceiro piso ou
+gerador de casas. Um jardim ou pátio sem estrutura declarada não suporta um
+piso interior superior.
 
 Impacto previsto: esquema, resolução da laje/envelope, consumo da mesma laje
 pelo renderizador ativo e fantasma, validação geométrica, testes e documentação.
@@ -185,10 +186,11 @@ A omissão conserva o comportamento histórico das cenas de um piso; um novo
 par de pisos de produção deve declarar ambas as pegadas.
 
 A pegada de terreno não equivale à pegada construída. Uma célula exterior pode
-estar presente no rés-do-chão sem constituir apoio para o piso superior.
-O apoio exige simultaneamente presença física e classificação interior no
-piso inferior. Retirar laje superior faz-se pela pegada, nunca pintando-a de
-relva ou mudando o nome da divisão lógica.
+estar presente no rés-do-chão sem constituir apoio para o piso superior. O
+apoio normal exige presença física e classificação interior no piso inferior.
+Uma estrutura exterior explicitamente declarada pode suportar uma laje superior
+interior sem converter o terreno em pavimento jogável. Retirar uma laje faz-se
+pela pegada, nunca pintando-a de relva ou mudando o nome da divisão lógica.
 
 `stairwellBounds` usa limites físicos contínuos `[x0, z0, x1, z1]`, em unidades
 de célula e com os limites máximos exclusivos. Na referência atual,
@@ -225,12 +227,29 @@ Uma zona `floors` classificada como `interior` é pavimento acabado; `exterior`
 é terreno rebaixado; `courtyard` é terreno rebaixado dentro do envelope.
 Relva ou terra sem `kind` assumem `exterior`.
 
-Uma pegada de terreno no rés-do-chão não é apoio construído. `validateUpperSupport`
-aceita uma célula superior interior apenas quando o piso inferior está presente,
-é interior e cobre toda a área física. O *fixture* reutilizável
-`tests/fixtures/multistoreyGarden.ts` demonstra uma retração superior sobre
-jardim e deve continuar a ser a regressão dessa regra. `hard-1` não tem jardim:
-a casa tem 8 × 8 células e o `Conservatory` ocupa apenas o quadrante sudeste,
+Uma pegada de terreno no rés-do-chão não é, por si só, apoio construído.
+`validateUpperSupport` aceita uma célula superior interior quando o piso
+inferior contém pavimento interior contínuo, ou quando um dos elementos
+declarados em `exteriorSupportBays` cobre a célula e tem uma cadeia de apoio
+válida até ao terreno. A estrutura exterior não acrescenta células a
+`floorPresent`, não altera
+`zoneKind` nem cria acessos de navegação.
+
+`exteriorSupportBays` declara no piso térreo retângulos inclusivos de células
+exteriores ou de pátio. Cada lado pode abranger no máximo três células. Cada
+elemento tem de assentar em terreno existente, sem se sobrepor a outro, e
+corresponder exatamente a uma laje interior superior completa. Os elementos
+que se tocam apenas por um vértice mantêm pilares independentes. Vãos de escada,
+áreas interiores inferiores, lajes superiores exteriores e estruturas órfãs
+são rejeitados. Células superiores fora do apoio interior ou dos módulos
+declarados continuam a falhar, pelo que balanços sem apoio permanecem inválidos.
+O resolvedor deriva colunas até ao terreno, vigas perimetrais e barrotes sob a
+laje. O validador rejeita interseções com mobiliário e escadas. A omissão do
+campo mantém o comportamento anterior das cenas que já têm apoio válido.
+
+`tests/fixtures/multistoreyGarden.ts` continua a demonstrar uma retração
+superior sobre jardim sem estrutura de apoio. `hard-1` não tem jardim: a casa
+tem 8 × 8 células e o `Conservatory` ocupa apenas o quadrante sudeste,
 classificado como interior. A referência usa pegada completa nos dois pisos.
 
 Cada fronteira entre uma célula interior presente e uma célula sem laje ou
@@ -246,14 +265,17 @@ do pavimento.
 
 Desenha os dois pisos em conjunto antes de mobilar. Identifica primeiro o
 edifício real no rés-do-chão e todos os jardins, caminhos e pátios. A pegada
-superior só pode ocupar área construída inferior. Uma retração retira parte
-da pegada; não se representa como um jardim suspenso nem como um material de
-pavimento diferente. Não existem balanços ou terraços implicitamente autorizados.
+superior só pode ocupar área apoiada: construção interior inferior ou estrutura
+exterior declarada. Uma retração retira parte da pegada; não se representa como
+um jardim suspenso nem como um material de pavimento diferente. Não existem
+balanços implicitamente autorizados.
 
 O vão pertence ao volume do edifício, mas não contém laje. Pavimento interior,
 terreno exterior e ausência de piso são conceitos diferentes. Um relvado
 inferior não recebe teto, paredes ou móveis superiores por ocupar células da
-grelha. Janelas só pertencem a segmentos reais do envelope desse piso.
+grelha. Quando uma estrutura declarada suporta uma laje sobre o relvado,
+colunas e vigas tornam o caminho de carga visível sem criar piso interior no
+terreno. Janelas só pertencem a segmentos reais do envelope desse piso.
 
 ### Escada, patamar e circulação
 
@@ -336,7 +358,7 @@ The Last Nightcap. Testes aprovados não são aprovação visual.
 ### Erros que obrigam a rejeição
 
 - Dois quadrados completos sobrepostos sem decisão de pegada.
-- Jardim coberto por piso interior superior.
+- Piso interior superior sobre terreno exterior sem apoio estrutural explícito e válido.
 - Escada que termina no conjunto de cama ou secretária.
 - Patamar sem distribuição ou com passagem apertada e sem função residencial.
 - Vão coberto por laje, tapete ou mobiliário.
@@ -348,9 +370,10 @@ The Last Nightcap. Testes aprovados não são aprovação visual.
 
 ### Escalada futura
 
-Uma necessidade de varanda, balanço, novo sistema de escadas ou outra forma de
-apoio exige «SYSTEM ESCALATION»: descreve a limitação, mostra a falha concreta,
-compara alternativas no sistema existente e propõe a menor abstração reutilizável.
+Uma necessidade de balanço, varanda ou apoio que não caiba em
+`exteriorSupportBays`, bem como um novo sistema de escadas, exige «SYSTEM
+ESCALATION»: descreve a limitação, mostra a falha concreta, compara alternativas
+no sistema existente e propõe a menor abstração reutilizável.
 Não cries indicadores específicos de um caso. A presente missão autoriza a
 alteração descrita acima; essa autorização não se transfere automaticamente
 para futuros lotes de produção.

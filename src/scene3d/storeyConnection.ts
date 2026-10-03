@@ -1,5 +1,6 @@
 import type { ResolvedScene, Rect } from './resolve'
 import type { Violation } from './validate'
+import type { PlanRect } from './schema'
 import { CELL } from './units'
 import { planRectToWorld, validPlanRect, worldRectCoveredByFloor } from './floorGeometry'
 
@@ -58,15 +59,70 @@ export function validatePhysicalConnection(lower: ResolvedScene, upper: Resolved
   return issues
 }
 
-/** Exterior ground and absent lower slabs never support ordinary upper floor. */
+/** Indoor slabs or explicitly framed exterior bays support upper interior floor. */
 export function validateUpperSupport(lower: ResolvedScene, upper: ResolvedScene): Violation[] {
   const issues: Violation[] = []
+  const error = (code: Violation['code'], subject: string, message: string) => {
+    issues.push({ code, severity: 'error', subject, message })
+  }
+  for (const problem of lower.exteriorSupportProblems ?? []) error('exterior-support-invalid', 'exterior-support', problem)
+  for (const problem of upper.exteriorSupportProblems ?? []) error('exterior-support-invalid', 'exterior-support', problem)
+
+  const supportedExteriorCells = new Set<string>()
+  for (const bay of lower.exteriorSupportBays ?? []) {
+    const [col0, row0, col1, row1] = bay.cells
+    let grounded = true
+    let upperSlabMatches = true
+    let hasUpperFloor = false
+    for (let row = row0; row <= row1; row++) for (let col = col0; col <= col1; col++) {
+      if (!lower.floorPresent[row]?.[col]) {
+        grounded = false
+        error('exterior-support-ground-missing', bay.id + ':' + row + ',' + col,
+          'Support bay ' + bay.id + ' has no ground at (' + row + ',' + col + ') to anchor its columns')
+      } else if (lower.zoneKind[row][col] === 'interior') {
+        grounded = false
+        error('exterior-support-zone-mismatch', bay.id + ':' + row + ',' + col,
+          'Support bay ' + bay.id + ' must stand on exterior or courtyard ground at (' + row + ',' + col + ')')
+      }
+      if (!upper.floorPresent[row]?.[col]) {
+        upperSlabMatches = false
+      } else {
+        hasUpperFloor = true
+        if (upper.zoneKind[row][col] !== 'interior') {
+          upperSlabMatches = false
+          error('exterior-support-zone-mismatch', bay.id + ':' + row + ',' + col,
+            'Support bay ' + bay.id + ' may carry only upper interior floor at (' + row + ',' + col + ')')
+        }
+      }
+    }
+    const bayBounds: PlanRect = [col0, row0, col1 + 1, row1 + 1]
+    if (upper.stairwellBounds && planRectsOverlap(bayBounds, upper.stairwellBounds)) {
+      upperSlabMatches = false
+      error('exterior-support-upper-mismatch', bay.id, 'Support bay ' + bay.id + ' intersects the upper stair opening')
+    }
+    if (!hasUpperFloor || !upperSlabMatches) {
+      error('exterior-support-orphan', bay.id, 'Support bay ' + bay.id + ' does not match a complete upper interior slab')
+    }
+    if (grounded && upperSlabMatches && hasUpperFloor) {
+      for (let row = row0; row <= row1; row++) for (let col = col0; col <= col1; col++) {
+        supportedExteriorCells.add(row + ',' + col)
+      }
+    }
+  }
+
   for (let row = 0; row < upper.n; row++) for (let col = 0; col < upper.n; col++) {
     if (!upper.floorPresent[row][col] || upper.zoneKind[row][col] !== 'interior') continue
     const supported = lower.floorPresent[row][col] && lower.zoneKind[row][col] === 'interior'
       && worldRectCoveredByFloor(lower, { minX: col * CELL, maxX: (col + 1) * CELL, minZ: row * CELL, maxZ: (row + 1) * CELL })
-    if (!supported) issues.push({ code: 'upper-floor-unsupported', severity: 'error', subject: `${row},${col}`,
-      message: `Upper interior (${row},${col}) has no built support below` })
+    const exteriorSupported = supportedExteriorCells.has(row + ',' + col)
+    if (!supported && !exteriorSupported) issues.push({ code: 'upper-floor-unsupported', severity: 'error', subject: row + ',' + col,
+      message: 'Upper interior (' + row + ',' + col + ') has no built support below' })
   }
   return issues
+}
+
+function planRectsOverlap(a: PlanRect, b: PlanRect): boolean {
+  const EPS = 1e-6
+  return a[0] < b[2] - EPS && a[2] > b[0] + EPS
+    && a[1] < b[3] - EPS && a[3] > b[1] + EPS
 }
