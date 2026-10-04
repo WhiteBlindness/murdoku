@@ -1,0 +1,53 @@
+import type { SceneSpec } from '../schema'
+
+// A side garden separates the entry hall from the office; the south yard
+// continues around it as open ground beneath the measured support frame.
+export const aQuietConfessionGround: SceneSpec = {
+  puzzleId: 'expert-10',
+  floor: 0,
+  storeyFootprint: { kind: 'full' },
+  entry: { wall: 'west', at: 6 },
+  stairs: { model: 'stairsOpen', at: [6.5, 1.97], facing: 'N' },
+  exteriorSupportBays: [
+    { id: 'garden-north', cells: [2, 0, 3, 2] },
+    { id: 'garden-middle', cells: [2, 3, 3, 5] },
+    { id: 'garden-south', cells: [2, 6, 3, 7] },
+    { id: 'front-yard-west', cells: [4, 5, 5, 7] },
+    { id: 'front-yard-east', cells: [6, 5, 7, 7] },
+  ],
+  shell: { features: [
+    { wall: 'north', at: 6, kind: 'window' },
+    { wall: 'west', at: 2.5, kind: 'window' },
+  ] },
+  floors: [
+    { id: 'hallway-floor', cells: [0, 0, 1, 7], material: 'stone' },
+    { id: 'garden-ground', cells: [2, 0, 3, 7], material: 'grass', kind: 'exterior' },
+    { id: 'office-floor', cells: [4, 0, 7, 4], material: 'wood' },
+    { id: 'front-yard-ground', cells: [4, 5, 7, 7], material: 'dirt', kind: 'exterior' },
+  ],
+  walls: [
+    { id: 'hall-garden', from: [2, 0], to: [2, 8], height: 'half', openings: [{ at: 6.4, width: 1, kind: 'door' }] },
+    { id: 'garden-office', from: [4, 0], to: [4, 5], height: 'half', openings: [{ at: 2, width: 1, kind: 'door' }] },
+    { id: 'office-front-yard', from: [4, 5], to: [8, 5], height: 'half', openings: [{ at: 4.75, width: 1, kind: 'door' }] },
+  ],
+  furniture: [
+    { id: 'hall-entry-rug', model: 'rugRectangle', logic: 'rug@3,0', at: [1, 4], facing: 'E' },
+    { id: 'hall-clock', model: 'speaker', logic: 'clock@2,1', at: [1.5, 2.5] },
+    { id: 'hall-plant-south', model: 'pottedPlant', logic: 'plant@1,0', at: [0.5, 1.5] },
+    { id: 'hall-plant-north', model: 'pottedPlant', logic: 'plant@0,0', at: [0.5, 0.5] },
+
+    { id: 'garden-shrub-north', model: 'plant_bushSmall', logic: 'shrub@0,3', at: [3.5, 0.5] },
+    { id: 'garden-shrub-clue', model: 'plant_bushSmall', logic: 'shrub@4,2', at: [2.5, 4.5] },
+    { id: 'garden-plant', model: 'pottedPlant', logic: 'plant@3,3', at: [3.5, 3.5] },
+    { id: 'garden-shrub-south', model: 'plant_bushSmall', logic: 'shrub@7,3', at: [3.5, 7.5] },
+
+    { id: 'office-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@0,4', against: { wall: 'north', at: 4.8 } },
+    { id: 'office-chair', model: 'chair', logic: 'chair@0,7', at: [7.5, 0.6], facing: 'W' },
+    { id: 'office-clock', model: 'speaker', logic: 'clock@4,5', at: [5.5, 4.2] },
+    { id: 'office-desk', model: 'desk', logic: 'desk@4,6', at: [6.5, 4.35], facing: 'N' },
+
+    { id: 'yard-shrub-west', model: 'plant_bushSmall', logic: 'shrub@5,4', at: [4.5, 5.8] },
+    { id: 'yard-plant-east', model: 'pottedPlant', logic: 'plant@5,7', at: [7.5, 5.5] },
+    { id: 'yard-shrub-south', model: 'plant_bushSmall', logic: 'shrub@7,5', at: [5.5, 7.5] },
+  ],
+}

@@ -62,6 +62,36 @@ import { theMissingHourGround } from './the-missing-hour-ground'
 import { theMissingHourUpper } from './the-missing-hour-upper'
 import { aWitnessRecantsGround } from './a-witness-recants-ground'
 import { aWitnessRecantsUpper } from './a-witness-recants-upper'
+import { dustOnTheSillGround } from './dust-on-the-sill-ground'
+import { dustOnTheSillUpper } from './dust-on-the-sill-upper'
+import { theBorrowedKnifeGround } from './the-borrowed-knife-ground'
+import { theBorrowedKnifeUpper } from './the-borrowed-knife-upper'
+import { aQuietConfessionGround } from './a-quiet-confession-ground'
+import { aQuietConfessionUpper } from './a-quiet-confession-upper'
+import { noOneHeardGround } from './no-one-heard-ground'
+import { noOneHeardUpper } from './no-one-heard-upper'
+import { theTornLedgerGround } from './the-torn-ledger-ground'
+import { theTornLedgerUpper } from './the-torn-ledger-upper'
+import { aClockStoppedGround } from './a-clock-stopped-ground'
+import { aClockStoppedUpper } from './a-clock-stopped-upper'
+import { theSecondStudyGround } from './the-second-study-ground'
+import { theSecondStudyUpper } from './the-second-study-upper'
+import { theSpareKeyGround } from './the-spare-key-ground'
+import { theSpareKeyUpper } from './the-spare-key-upper'
+import { shadowsAtTheDoorGround } from './shadows-at-the-door-ground'
+import { shadowsAtTheDoorUpper } from './shadows-at-the-door-upper'
+import { theLastGuestGround } from './the-last-guest-ground'
+import { theLastGuestUpper } from './the-last-guest-upper'
+import { aDebtUnsettledGround } from './a-debt-unsettled-ground'
+import { aDebtUnsettledUpper } from './a-debt-unsettled-upper'
+import { theSilentKitchenGround } from './the-silent-kitchen-ground'
+import { theSilentKitchenUpper } from './the-silent-kitchen-upper'
+import { twoSetsOfPrintsGround } from './two-sets-of-prints-ground'
+import { twoSetsOfPrintsUpper } from './two-sets-of-prints-upper'
+import { theFinalAlibiGround } from './the-final-alibi-ground'
+import { theFinalAlibiUpper } from './the-final-alibi-upper'
+import { nobodyWasHomeGround } from './nobody-was-home-ground'
+import { nobodyWasHomeUpper } from './nobody-was-home-upper'
 /** Authored scenes, keyed by `${puzzleId}#${floor}`. */
 export const AUTHORED_SCENES: Record<string, SceneSpec> = Object.fromEntries(
   [
@@ -89,6 +119,21 @@ export const AUTHORED_SCENES: Record<string, SceneSpec> = Object.fromEntries(
     theLockedPantryGround, theLockedPantryUpper,
     theMissingHourGround, theMissingHourUpper,
     aWitnessRecantsGround, aWitnessRecantsUpper,
+    dustOnTheSillGround, dustOnTheSillUpper,
+    theBorrowedKnifeGround, theBorrowedKnifeUpper,
+    aQuietConfessionGround, aQuietConfessionUpper,
+    noOneHeardGround, noOneHeardUpper,
+    theTornLedgerGround, theTornLedgerUpper,
+    aClockStoppedGround, aClockStoppedUpper,
+    theSecondStudyGround, theSecondStudyUpper,
+    theSpareKeyGround, theSpareKeyUpper,
+    shadowsAtTheDoorGround, shadowsAtTheDoorUpper,
+    theLastGuestGround, theLastGuestUpper,
+    aDebtUnsettledGround, aDebtUnsettledUpper,
+    theSilentKitchenGround, theSilentKitchenUpper,
+    twoSetsOfPrintsGround, twoSetsOfPrintsUpper,
+    theFinalAlibiGround, theFinalAlibiUpper,
+    nobodyWasHomeGround, nobodyWasHomeUpper,
   ]
     .map(s => [`${s.puzzleId}#${s.floor ?? 0}`, s]),
 )

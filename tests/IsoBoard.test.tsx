@@ -13,6 +13,7 @@ import { MODEL_BOUNDS } from '../src/scene3d/catalog.generated'
 import { metaOf } from '../src/scene3d/catalog'
 import type { SceneSpec } from '../src/scene3d/schema'
 import { emptyMarks, makePuzzle } from './fixtures'
+import { reviewedCatalogueSightlines } from './fixtures/reviewedCatalogueSightlines'
 
 const midnight = () => buildAuthoredPuzzle(AUTHORED_CASES['very-easy-1'], 'Case No. I')
 
@@ -81,6 +82,14 @@ const reviewedCellHidden: Record<string, string[]> = {
     '4,3|cell (4,3) has a blocked 3D sightline at standee height: object:bathroom-floor-lamp',
   ],
 }
+
+const catalogueSightlineReview = new Set([
+  'hard-11', 'hard-12',
+  'expert-1', 'expert-2', 'expert-3', 'expert-4', 'expert-5',
+  'expert-6', 'expert-7', 'expert-8', 'expert-9', 'expert-10',
+  'master-1', 'master-2', 'master-3', 'master-4', 'master-5',
+  'master-6', 'master-7', 'master-8',
+])
 
 // ============================================================================
 // These tests encode INVARIANTS of the scene system, not the current numbers.
@@ -296,9 +305,13 @@ describe('every authored scene passes the validator against its real puzzle', ()
       const resolved = resolveScene(spec, puzzle!.size)
       const floor = (spec.floor ?? 0) as 0 | 1
       const views = (puzzle!.floors ?? 1) > 1
-        ? (['ghost', 'exploded'] as const).map(view => ({
+        ? (catalogueSightlineReview.has(spec.puzzleId)
+          ? (['normal', 'ghost', 'exploded'] as const)
+          : (['ghost', 'exploded'] as const)).map(view => ({
             view,
-            scene: { ...resolved, frame: makeStoreyFrame(puzzle!.size, floor, view) },
+            scene: view === 'normal'
+              ? resolved
+              : { ...resolved, frame: makeStoreyFrame(puzzle!.size, floor, view) },
           }))
         : [{ view: 'single-floor' as const, scene: resolved }]
       for (const { view, scene } of views) {
@@ -307,7 +320,7 @@ describe('every authored scene passes the validator against its real puzzle', ()
         const context = `${key} floor ${floor} view ${view}`
         expect(errors, `${context}: ${errors.join(' | ')}`).toEqual([])
         const hidden = report.filter(v => v.code === 'cell-hidden').map(v => `${v.subject}|${v.message}`)
-        const reviewed = reviewedCellHidden[key] ?? []
+        const reviewed = reviewedCatalogueSightlines[`${key}@${view}`] ?? reviewedCellHidden[key] ?? []
         expect(hidden, `${context}: ${hidden.join(' | ')}`).toEqual(reviewed)
       }
     })
