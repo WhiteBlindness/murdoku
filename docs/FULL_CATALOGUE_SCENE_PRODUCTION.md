@@ -150,7 +150,7 @@ Na verificação final, `npm test -- --reporter=dot` passou 506 testes e ignorou
 
 ## Auditoria da dependência entre pisos
 
-A contagem de pisos não foi inferida da dificuldade. Foram construídos os 60 casos a partir da versão determinística do catálogo e inspecionadas as pistas, a solução, as divisões e o mobiliário. Nos 30 casos atualmente com dois pisos, a solução coloca pessoas nos dois. Cada um contém também quatro divisões e 9 a 19 peças lógicas no piso superior. Retirar esse piso, mesmo nos seis casos sem uma pista vertical literal, altera o espaço de posições, a identidade das divisões e a solução matemática. Na auditoria inicial, 26 casos deste grupo ainda não tinham cena autorada. Os lotes 6 e 7 concluíram `hard-7` e os cinco casos com apoio exterior; 20 casos de vários pisos continuam por produzir.
+A contagem de pisos não foi inferida da dificuldade. Foram construídos os 60 casos a partir da versão determinística do catálogo e inspecionadas as pistas, a solução, as divisões e o mobiliário. Nos 30 casos atualmente com dois pisos, a solução coloca pessoas nos dois. Cada um contém também quatro divisões e 9 a 19 peças lógicas no piso superior. Retirar esse piso, mesmo nos seis casos sem uma pista vertical literal, altera o espaço de posições, a identidade das divisões e a solução matemática. Na auditoria inicial, 26 casos deste grupo ainda não tinham cena autorada. Os lotes 6 e 7 concluíram `hard-7` e os cinco casos com apoio exterior; o lote atual acrescentou `hard-11`, `hard-12` e `expert-1` a `expert-3`. Restam 15 casos de vários pisos por produzir.
 
 Na coluna das pistas, «não explícitas» significa apenas ausência dos tipos `floor`, `above` e `below`. As pistas sobre divisões e mobiliário continuam a ser avaliadas no piso da posição candidata.
 
@@ -254,4 +254,4 @@ Legenda da lista de controlo: I = implementação; V = validador; B = inspeção
 | `master-7` | The Final Alibi | Master | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 | `master-8` | Nobody Was Home | Master | 8×8 | PENDING / FALLBACK | Por definir | Por decidir | 2 | Pendente | - | I:[ ] V:[ ] B:[ ] C:[ ] P:[ ] | Autoria, validação e inspeção visual por fazer. |
 
-**Cenas procedimentais ainda ativas: 20.**
+**Cenas procedimentais ainda ativas: 15.**
