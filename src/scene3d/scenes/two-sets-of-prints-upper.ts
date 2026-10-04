@@ -66,12 +66,3 @@ export const twoSetsOfPrintsUpper: SceneSpec = {
     { id: 'dining-chair', model: 'chair', logic: 'chair@6,7', at: [7.5, 6.5], facing: 'S' },
   ],
 }
-
-
-
-
-
-
-
-
-

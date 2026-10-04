@@ -67,4 +67,3 @@ export const aDebtUnsettledUpper: SceneSpec = {
     { id: 'study-lamp', model: 'lampRoundFloor', logic: 'lamp@7,5', at: [5.5, 7.4], facing: 'S' },
   ],
 }
-

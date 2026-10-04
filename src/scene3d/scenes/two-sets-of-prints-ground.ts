@@ -59,11 +59,3 @@ export const twoSetsOfPrintsGround: SceneSpec = {
     { id: 'office-clock', model: 'radio', logic: 'clock@7,6', on: { parent: 'office-clock-table' } },
   ],
 }
-
-
-
-
-
-
-
-

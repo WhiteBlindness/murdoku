@@ -87,4 +87,3 @@ export const nobodyWasHomeUpper: SceneSpec = {
     { id: 'bedroom-lamp-greta', model: 'lampRoundFloor', logic: 'lamp@3,5', at: [5.5, 3.85], facing: 'S' },
   ],
 }
-

@@ -310,7 +310,7 @@ Os avisos de linha de visão foram revistos por célula e bloqueador, sem os des
 
 ### Verificação final
 
-A suite completa passou 546 testes e ignorou 5 (551 no total). O controlo de produção passou 7 de 7 testes; `npm run verify` passou 64 testes. Também passaram `npm run lint`, `npm run build`, `node scripts/measure-puzzles.mjs --check` e `npm run report:puzzles`, que gerou o relatório dos 60 casos.
+A bateria completa de testes passou 546 testes e ignorou 5 (551 no total). O controlo de produção passou 7 de 7 testes; `npm run verify` passou 64 testes. Também passaram `npm run lint`, `npm run build`, `node scripts/measure-puzzles.mjs --check` e `npm run report:puzzles`, que gerou o relatório dos 60 casos.
 
 ### Desempenho
 

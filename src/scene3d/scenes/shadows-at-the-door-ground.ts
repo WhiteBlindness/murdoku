@@ -67,7 +67,3 @@ export const shadowsAtTheDoorGround: SceneSpec = {
     { id: 'garden-shrub-south-east', model: 'plant_bushSmall', logic: 'shrub@6,7', at: [7.5, 6.5], facing: 'S' },
   ],
 }
-
-
-
-

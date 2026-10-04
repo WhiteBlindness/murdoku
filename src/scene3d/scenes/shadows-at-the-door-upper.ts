@@ -68,6 +68,3 @@ export const shadowsAtTheDoorUpper: SceneSpec = {
     { id: 'bathroom-bathtub-east', model: 'bathtub', logic: 'bathtub@3,7', at: [7.5, 3.2], facing: 'W' },
   ],
 }
-
-
-

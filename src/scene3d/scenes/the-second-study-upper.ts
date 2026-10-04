@@ -125,10 +125,3 @@ export const theSecondStudyUpper: SceneSpec = {
     { id: 'bed', model: 'bedDouble', against: { wall: 'south', at: 2.5 } },
   ],
 }
-
-
-
-
-
-
-

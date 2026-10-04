@@ -87,4 +87,3 @@ export const nobodyWasHomeGround: SceneSpec = {
     { id: 'garden-shrub-oscar', model: 'plant_bushSmall', logic: 'shrub@4,1', at: [1.5, 4.5], facing: 'S' },
   ],
 }
-

@@ -85,8 +85,3 @@ export const theTornLedgerUpper: SceneSpec = {
     { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@7,7', at: [7.5, 7.5], facing: 'S' },
   ],
 }
-
-
-
-
-

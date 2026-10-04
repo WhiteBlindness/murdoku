@@ -63,4 +63,3 @@ export const theLastGuestGround: SceneSpec = {
     { id: 'dining-lamp-idris-anchor', model: 'lampRoundFloor', logic: 'lamp@6,5', at: [5.5, 6.5] },
   ],
 }
-

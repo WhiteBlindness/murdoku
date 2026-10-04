@@ -64,12 +64,3 @@ export const theTornLedgerGround: SceneSpec = {
     { id: 'kitchen-table-lena', model: 'table', logic: 'table@7,4', at: [5, 7.5], facing: 'S' },
   ],
 }
-
-
-
-
-
-
-
-
-

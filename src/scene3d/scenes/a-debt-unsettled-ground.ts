@@ -70,4 +70,3 @@ export const aDebtUnsettledGround: SceneSpec = {
     { id: 'dining-chair-south', model: 'chair', at: [6.5, 7.35], facing: 'W' },
   ],
 }
-

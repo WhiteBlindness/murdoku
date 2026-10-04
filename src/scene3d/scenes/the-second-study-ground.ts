@@ -85,9 +85,3 @@ export const theSecondStudyGround: SceneSpec = {
     { id: 'dining-west-lamp', model: 'lampRoundFloor', logic: 'lamp@5,0', at: [0.5, 5.5], facing: 'S' },
   ],
 }
-
-
-
-
-
-
