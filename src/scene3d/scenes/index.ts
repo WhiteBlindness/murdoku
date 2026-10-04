@@ -52,6 +52,16 @@ import { theLateArrivalGround } from './the-late-arrival-ground'
 import { theLateArrivalUpper } from './the-late-arrival-upper'
 import { aStoryRehearsedGround } from './a-story-rehearsed-ground'
 import { aStoryRehearsedUpper } from './a-story-rehearsed-upper'
+import { nothingWasTakenGround } from './nothing-was-taken-ground'
+import { nothingWasTakenUpper } from './nothing-was-taken-upper'
+import { theOpenWindowGround } from './the-open-window-ground'
+import { theOpenWindowUpper } from './the-open-window-upper'
+import { theLockedPantryGround } from './the-locked-pantry-ground'
+import { theLockedPantryUpper } from './the-locked-pantry-upper'
+import { theMissingHourGround } from './the-missing-hour-ground'
+import { theMissingHourUpper } from './the-missing-hour-upper'
+import { aWitnessRecantsGround } from './a-witness-recants-ground'
+import { aWitnessRecantsUpper } from './a-witness-recants-upper'
 /** Authored scenes, keyed by `${puzzleId}#${floor}`. */
 export const AUTHORED_SCENES: Record<string, SceneSpec> = Object.fromEntries(
   [
@@ -74,6 +84,11 @@ export const AUTHORED_SCENES: Record<string, SceneSpec> = Object.fromEntries(
     threeEmptyGlassesGround, threeEmptyGlassesUpper,
     theLateArrivalGround, theLateArrivalUpper,
     aStoryRehearsedGround, aStoryRehearsedUpper,
+    nothingWasTakenGround, nothingWasTakenUpper,
+    theOpenWindowGround, theOpenWindowUpper,
+    theLockedPantryGround, theLockedPantryUpper,
+    theMissingHourGround, theMissingHourUpper,
+    aWitnessRecantsGround, aWitnessRecantsUpper,
   ]
     .map(s => [`${s.puzzleId}#${s.floor ?? 0}`, s]),
 )
