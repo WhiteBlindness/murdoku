@@ -5,7 +5,7 @@ import {
   HelpCircle, Eye, EyeOff, Info, Palette, Wand2, MoreHorizontal,
 } from 'lucide-react'
 import type { Puzzle, CellMark, GameMode, Furniture, FurnitureType } from '../core/types'
-import { findFailingClues, resolveClueHighlights, satisfiedClueFlags } from '../core/ux'
+import { findFailingClues, resolveClueHighlights, resolveCluePreviewFloor, satisfiedClueFlags } from '../core/ux'
 import { clueHolds } from '../core/engine'
 import type { Tool } from '../hooks/useGame'
 import { makeFrame, makeStoreyFrame, type StoreyView } from '../scene3d/units'
@@ -92,7 +92,17 @@ export default function GameScreen(props: Props) {
   // layout regions can only be positioned by guessed percentages, and it landed
   // in open space at every viewport that wasn't the one it was tuned on.
   const [locatedPerson, setLocatedPerson] = useState<string | null>(null)
-  const clueHighlight = locatedPerson ? resolveClueHighlights(puzzle, locatedPerson) : null
+  const activeFloor = props.activeFloor ?? 0
+  const clueHighlight = locatedPerson ? resolveClueHighlights(puzzle, locatedPerson, activeFloor) : null
+  const toggleCluePreview = (personId: string) => {
+    if (locatedPerson === personId) {
+      setLocatedPerson(null)
+      return
+    }
+    const floor = resolveCluePreviewFloor(puzzle, personId)
+    if (floor !== null && floor !== activeFloor) props.onSwitchFloor?.(floor)
+    setLocatedPerson(personId)
+  }
   const clueHighlightLabel = locatedPerson
     ? cluesOf[locatedPerson]?.join(' · ') || 'Selected suspect clue'
     : undefined
@@ -312,7 +322,6 @@ export default function GameScreen(props: Props) {
   // otherwise the rule is invisible and the second storey is just scenery.
   const floors = props.puzzle.floors ?? 1
   const twoFloor = floors > 1 && !!props.marksPerFloor
-  const activeFloor = props.activeFloor ?? 0
   const otherFloor = activeFloor === 0 ? 1 : 0
   const boardFrame = twoFloor ? makeStoreyFrame(puzzle.size, activeFloor, storeyView) : makeFrame(puzzle.size)
   const ghostMarks = twoFloor ? (props.marksPerFloor?.[otherFloor] ?? null) : null
@@ -1106,7 +1115,7 @@ export default function GameScreen(props: Props) {
                     canLocate={resolveClueHighlights(puzzle, person.id).length > 0}
                     onSelect={() => selectForPlacement(person.id)}
                     onToggleResolved={() => props.onToggleClue(person.id)}
-                    onToggleLocate={() => setLocatedPerson(current => current === person.id ? null : person.id)}
+                    onToggleLocate={() => toggleCluePreview(person.id)}
                   />
                 ))}
               </div>

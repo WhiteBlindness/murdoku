@@ -39,6 +39,25 @@ function renderGame(overrides?: Parameters<typeof makePuzzle>[0], propOverrides?
   )
 }
 
+describe('GameScreen clue preview', () => {
+  it('switches to the clue floor without selecting or placing a suspect', () => {
+    localStorage.setItem('murdoku_seen_help', '1')
+    const onSwitchFloor = vi.fn()
+    const onSelectPerson = vi.fn()
+    const onCell = vi.fn()
+    renderGame({ floors: 2, clues: [
+      { clue: { kind: 'floor', person: 'p0', floorNum: 1 }, text: 'Upstairs.' },
+      { clue: { kind: 'row', person: 'p0', row: 2 }, text: 'In row 3.' },
+    ] }, { activeFloor: 0, onSwitchFloor, onSelectPerson, onCell })
+    fireEvent.click(screen.getByRole('button', { name: "Show Ada Stone's clue on the board" }))
+    expect(onSwitchFloor).toHaveBeenCalledExactlyOnceWith(1)
+    expect(onSelectPerson).not.toHaveBeenCalled()
+    expect(onCell).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: "Hide Ada Stone's clue on the board" }))
+    expect(onSwitchFloor).toHaveBeenCalledTimes(1)
+  })
+})
+
 describe('GameScreen destructive confirmations', () => {
   it('exposes an accessible clear dialog, focuses Cancel, and closes on Escape', async () => {
     localStorage.setItem('murdoku_seen_help', '1')

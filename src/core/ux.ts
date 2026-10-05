@@ -227,11 +227,35 @@ function highlightForClue(puzzle: Puzzle, clue: Clue): ClueHighlight | null {
  * room > furniture > coordinate order, silently dropping the rest. Showing one
  * of two constraints is worse than showing none: it reads as the whole answer.
  */
-export function resolveClueHighlights(puzzle: Puzzle, personId: string): ClueHighlight[] {
+export function resolveClueHighlights(puzzle: Puzzle, personId: string, activeFloor?: 0 | 1): ClueHighlight[] {
+  const previewFloor = resolveCluePreviewFloor(puzzle, personId)
+  if (activeFloor !== undefined && previewFloor !== null && activeFloor !== previewFloor) return []
   return puzzle.clues
     .filter(({ clue }) => clue.person === personId)
     .map(({ clue }) => highlightForClue(puzzle, clue))
     .filter((highlight): highlight is ClueHighlight => highlight !== null)
+}
+
+/** Use clue facts and their furniture candidates to select a floor, never the answer. */
+export function resolveCluePreviewFloor(puzzle: Puzzle, personId: string): 0 | 1 | null {
+  if ((puzzle.floors ?? 1) < 2) return null
+  const clues = puzzle.clues.filter(({ clue }) => clue.person === personId).map(({ clue }) => clue)
+  const floors = clues.flatMap(clue => {
+    if (clue.kind === 'floor') return [clue.floorNum]
+    if (clue.kind === 'room') {
+      const room = puzzle.rooms.find(room => room.id === clue.roomId)
+      return room ? [room.floor ?? 0] : []
+    }
+    return []
+  })
+  const furnitureFloors = floors.length ? [] : clues.flatMap(clue => {
+    const types = clue.kind === 'besideAny' ? clue.furniture
+      : clue.kind === 'onFurniture' || clue.kind === 'onlyOnFurniture' || clue.kind === 'besideFurniture'
+        ? [clue.furniture] : []
+    return puzzle.furniture.filter(piece => types.includes(piece.type)).map(piece => piece.floor ?? 0)
+  })
+  const unique = [...new Set(floors.length ? floors : furnitureFloors)]
+  return unique.length === 1 && (unique[0] === 0 || unique[0] === 1) ? unique[0] : null
 }
 
 /** Back-compatible single-target accessor: the first drawable target. */
