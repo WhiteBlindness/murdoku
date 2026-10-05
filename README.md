@@ -19,7 +19,7 @@ npm run preview  # pré-visualização da versão de produção
 ## Funcionalidades
 
 - 60 casos determinísticos distribuídos por seis níveis, de Muito fácil a Mestre.
-- Quatro casos com cenas 3D escritas à mão, incluindo um caso completo de dois pisos, e uma cena de recurso para os restantes casos.
+- 60 casos com cenas 3D escritas à mão, incluindo 30 casos de dois pisos. Não há cenas procedimentais no catálogo.
 - Vista isométrica com paredes e aberturas físicas, sombras, mobiliário Kenney medido e associação entre objetos lógicos e visuais.
 - Piso ativo com contexto fantasma não interativo e panorama explodido opcional nos casos de dois pisos.
 - Colocar, marcar com X, desfazer, limpar, pedir ajuda e acusar, com avisos de conflito entre linhas e colunas.
@@ -49,6 +49,7 @@ Antes de criar ou modificar um caso ou uma cena 3D, lê `docs/OPUS_PRODUCTION_MA
 - `docs/ISOMETRIC_SCENE_SYSTEM.md`, para arquitetura e composição;
 - `docs/KENNEY_PACK_SURVEY.md`, para seleção de recursos;
 - `docs/KENNEY_ENVIRONMENT_EXPANSION.md`, para o roteiro de ambientes.
+- [Auditoria visual final](docs/FINAL_VISUAL_AUDIT.md), com cobertura dos 60 casos, correções e resultados de validação.
 
 Controlos rápidos:
 
@@ -62,9 +63,11 @@ Controlo integral:
 ```bash
 npm test
 npm run validate:production
+npm run verify
 node scripts/measure-puzzles.mjs --check
 npm run lint
 npm run build
+npm run report:puzzles
 ```
 
 ## Temas
