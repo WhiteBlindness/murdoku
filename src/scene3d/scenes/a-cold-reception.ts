@@ -41,7 +41,7 @@ export const aColdReception: SceneSpec = {
     { id: 'dining-table', model: 'tableRound', at: [4.1, 4.15], facing: 'E' },
     { id: 'dining-chair-east', model: 'chair', logic: 'chair@3,5', at: [5.4, 3.95], facing: 'W' },
     { id: 'dining-chair-south', model: 'chair', at: [4.9, 4.55], facing: 'N' },
-    { id: 'dining-rug', model: 'rugRound', logic: 'rug@3,3', at: [4.1, 4.15] },
+    { id: 'dining-rug', model: 'rugRectangle', logic: 'rug@3,3', at: [4, 4] },
     { id: 'dining-lamp-table', model: 'sideTable', logic: 'lamp@5,3', against: { wall: 'south', at: 3.45 } },
     { id: 'dining-lamp', model: 'lampRoundTable', logic: 'lamp@5,3', on: { parent: 'dining-lamp-table' } },
     { id: 'dining-sideboard', model: 'cabinetTelevisionDoors', against: { wall: 'south', at: 5.15 } },
