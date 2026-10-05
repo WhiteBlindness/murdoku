@@ -9,6 +9,8 @@ npm run build    # versão de produção em dist/
 npm run preview  # pré-visualização da versão de produção
 ```
 
+A demonstração pública usa o nome **Alibi**: [jogar](https://murdoku-seven.vercel.app).
+
 ## Como funciona
 
 - A casa divide-se em células e divisões, com mobiliário a que as pistas podem fazer referência.
@@ -38,6 +40,8 @@ src/styles/     variáveis semânticas e estilos
 tests/          testes unitários, de integração e de pré-validação
 docs/           decisões, manuais, relatórios e referências visuais
 ```
+
+O catálogo usa sementes e identificadores estáveis para preservar o progresso entre sessões. O solucionador verifica que cada conjunto de pistas admite uma única solução.
 
 O motor em `src/core` não depende do React. A camada visual consome o mesmo contrato lógico e valida separadamente a arquitetura da cena.
 
