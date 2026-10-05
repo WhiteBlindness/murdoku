@@ -1,4 +1,4 @@
-import { AlertTriangle, Check, CircleDashed, UserRound } from 'lucide-react'
+import { AlertTriangle, Check, CircleDashed, ChevronsRight, UserRound } from 'lucide-react'
 import type { Puzzle } from '../core/types'
 
 interface Props {
@@ -49,9 +49,18 @@ export default function CaseProgressStrip({
             {nextPerson ? `Next suggested: ${nextPerson.name}` : 'All people placed — review the account before accusing.'}
           </p>
         </div>
-        <p className="flex-shrink-0 font-mono text-[11px] tabular-nums tracking-widest" style={{ color: '#62400B' }} aria-live="polite">
-          {placedCount} / {puzzle.people.length} placed
-        </p>
+        <div className="flex flex-shrink-0 items-center gap-2">
+          <p className="font-mono text-[11px] tabular-nums tracking-widest" style={{ color: '#62400B' }} aria-live="polite">
+            {placedCount} / {puzzle.people.length} placed
+          </p>
+          <span
+            className="inline-flex items-center text-[#62400B] sm:hidden"
+            role="img"
+            aria-label="Deslize horizontalmente para ver as restantes pessoas"
+          >
+            <ChevronsRight size={14} aria-hidden="true" />
+          </span>
+        </div>
       </div>
 
       <ol

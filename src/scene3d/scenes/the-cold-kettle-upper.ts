@@ -1,0 +1,68 @@
+import type { SceneSpec } from '../schema'
+
+// O patamar central liga o corredor, o estudo, o quarto e as divisões de serviço.
+export const theColdKettleUpper: SceneSpec = {
+  puzzleId: 'hard-5',
+  floor: 1,
+  storeyFootprint: { kind: 'full' },
+  stairwellBounds: [5.60625, 0.860625, 6.59375, 3.139375],
+  circulation: {
+    landing: [5.60625, 3.139375, 6.59375, 3.95],
+    halls: [
+      { id: 'study-cross-hall', bounds: [2.0, 3.2, 7.5, 3.95] },
+      { id: 'west-hall-branch', bounds: [1.0, 0.25, 1.8, 3.95] },
+      { id: 'west-study-link', bounds: [1.3, 3.2, 2.8, 3.95] },
+      { id: 'east-hall-branch', bounds: [6.7, 0.25, 7.5, 3.95] },
+      { id: 'bedroom-access-hall', bounds: [2.2, 3.5, 3.0, 5.2] },
+      { id: 'bedroom-cross-hall', bounds: [2.2, 4.3, 6.2, 5.05] },
+      { id: 'bathroom-transfer', bounds: [5.2, 4.3, 6.1, 6.8] },
+    ],
+    roomAccessTargets: [
+      { id: 'hallway-west-access', bounds: [1.0, 0.25, 1.8, 1.0] },
+      { id: 'hallway-east-access', bounds: [6.7, 0.25, 7.5, 1.0] },
+      { id: 'study-access', bounds: [1.0, 2.15, 1.8, 2.9] },
+      { id: 'bedroom-access', bounds: [2.2, 4.2, 3.0, 4.95] },
+      { id: 'bathroom-access', bounds: [5.3, 6.2, 6.1, 6.9] },
+    ],
+  },
+  shell: { features: [
+    { wall: 'north', at: 1.4, kind: 'window' },
+    { wall: 'north', at: 6.7, kind: 'window' },
+    { wall: 'west', at: 6.5, kind: 'window' },
+  ] },
+  floors: [
+    { id: 'hallway', cells: [0, 0, 7, 1], material: 'wood' },
+    { id: 'study', cells: [0, 2, 7, 3], material: 'wood' },
+    { id: 'bedroom', cells: [0, 4, 7, 5], material: 'wood' },
+    { id: 'bathroom', cells: [0, 6, 7, 7], material: 'tile' },
+  ],
+  walls: [
+    { id: 'hall-study-west', from: [0, 2], to: [5.60625, 2], openings: [{ at: 1.5, width: 1.2, kind: 'door' }] },
+    { id: 'hall-study-east', from: [6.59375, 2], to: [8, 2], openings: [{ at: 7.25, width: 1.2, kind: 'open' }] },
+    { id: 'study-bedroom', from: [0, 4], to: [8, 4], openings: [
+      { at: 2.6, width: 1.2, kind: 'door' },
+      { at: 5.6, width: 1.2, kind: 'open' },
+    ] },
+    { id: 'bedroom-bathroom', from: [0, 6], to: [8, 6], openings: [{ at: 5.7, width: 1.2, kind: 'door' }] },
+    { id: 'stairwell-west-guard', from: [5.60625, 0.860625], to: [5.60625, 3.0], height: 'half', treatment: 'railing', freeEnds: ['to'] },
+    { id: 'stairwell-east-guard', from: [6.59375, 0.860625], to: [6.59375, 3.0], height: 'half', treatment: 'railing', freeEnds: ['to'] },
+    { id: 'stairwell-north-guard', from: [5.60625, 0.860625], to: [6.59375, 0.860625], height: 'half', treatment: 'railing' },
+  ],
+  furniture: [
+    { id: 'hallway-clock', model: 'speaker', logic: 'clock@0,2', at: [2.5, 0.5] },
+    { id: 'hallway-plant', model: 'flower_redA', logic: 'plant@0,3', at: [3.5, 0.5] },
+    { id: 'hallway-plant-south', model: 'flower_yellowA', logic: 'plant@1,5', at: [5.25, 1.5] },
+    { id: 'hallway-rug', model: 'rugRectangle', logic: 'rug@0,6', at: [7.2, 1.0], facing: 'E' },
+    { id: 'study-bookcase', model: 'bookcaseOpenLow', logic: 'bookshelf@2,0', at: [0.5, 2.5], facing: 'N' },
+    { id: 'study-desk', model: 'desk', logic: 'desk@2,3', at: [3.5, 2.5], facing: 'N' },
+    { id: 'study-box', model: 'cardboardBoxClosed', logic: 'box@2,5', at: [5.25, 2.5] },
+    { id: 'study-lamp', model: 'lampRoundFloor', logic: 'lamp@2,7', at: [7.82, 2.9] },
+    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@4,0', at: [1.0, 5.0], facing: 'E' },
+    { id: 'bedroom-clock', model: 'speaker', logic: 'clock@5,6', at: [6.5, 5.5] },
+    { id: 'bedroom-rug', model: 'rugRectangle', logic: 'rug@4,3', at: [4.0, 5.0], facing: 'E' },
+    { id: 'bathroom-bathtub', model: 'bathtub', logic: 'bathtub@7,1', at: [2.0, 7.5], facing: 'S' },
+    { id: 'bathroom-shower', model: 'shower', logic: 'shower@7,3', at: [3.5, 7.5], facing: 'S' },
+    { id: 'bathroom-toilet-south', model: 'toilet', logic: 'toilet@7,4', at: [4.5, 7.5], facing: 'N' },
+    { id: 'bathroom-toilet-north', model: 'toilet', logic: 'toilet@6,4', at: [4.5, 6.5], facing: 'S' },
+  ],
+}
