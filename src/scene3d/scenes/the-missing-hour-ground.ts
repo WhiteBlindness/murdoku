@@ -36,7 +36,7 @@ export const theMissingHourGround: SceneSpec = {
   walls: [
     { id: 'kitchen-office-partition', from: [4, 0], to: [4, 4], height: 'half', openings: [{ at: 1.8, width: 1.15, kind: 'door' }] },
     { id: 'front-rear-partition', from: [0, 4], to: [8, 4], height: 'half', openings: [
-      { at: 0.6, width: 1, kind: 'door' },
+      { at: 0.55, width: 0.9, kind: 'door' },
       { at: 6.5, width: 1.2, kind: 'door' },
     ] },
     { id: 'living-dining-north-screen', from: [3, 4], to: [3, stairwellBounds[1] - stairPartitionClearance], height: 'half', freeEnds: ['to'] },
@@ -48,11 +48,11 @@ export const theMissingHourGround: SceneSpec = {
     { id: 'kitchen-chair-south-a', model: 'chairCushion', at: [0.7, 1.2], facing: 'N' },
     { id: 'kitchen-chair-south-b', model: 'chairCushion', at: [1.3, 1.2], facing: 'N' },
     { id: 'kitchen-chair-east', model: 'chairCushion', at: [1.95, 0.55], facing: 'W' },
-    { id: 'kitchen-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@3,1', against: { wall: 'front-rear-partition', side: 'N', at: 1.37 }, facing: 'N' },
-    { id: 'kitchen-sink', model: 'kitchenSink', against: { wall: 'front-rear-partition', side: 'N', at: 1.91 }, facing: 'N' },
-    { id: 'kitchen-cabinet-a', model: 'kitchenCabinet', against: { wall: 'front-rear-partition', side: 'N', at: 2.45 }, facing: 'N' },
-    { id: 'kitchen-cabinet-b', model: 'kitchenCabinetDrawer', against: { wall: 'front-rear-partition', side: 'N', at: 2.99 }, facing: 'N' },
-    { id: 'kitchen-stove', model: 'kitchenStove', logic: 'stove@3,3', against: { wall: 'front-rear-partition', side: 'N', at: 3.53 }, facing: 'N' },
+    { id: 'kitchen-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@3,1', against: { wall: 'front-rear-partition', side: 'N', at: 1.3 }, facing: 'N' },
+    { id: 'kitchen-sink', model: 'kitchenSink', against: { wall: 'front-rear-partition', side: 'N', at: 1.84 }, facing: 'N' },
+    { id: 'kitchen-cabinet-a', model: 'kitchenCabinet', against: { wall: 'front-rear-partition', side: 'N', at: 2.38 }, facing: 'N' },
+    { id: 'kitchen-cabinet-b', model: 'kitchenCabinetDrawer', against: { wall: 'front-rear-partition', side: 'N', at: 2.92 }, facing: 'N' },
+    { id: 'kitchen-stove', model: 'kitchenStove', logic: 'stove@3,3', against: { wall: 'front-rear-partition', side: 'N', at: 3.46 }, facing: 'N' },
 
     // Escritório: secretária com a cadeira à frente e estantes na parede nascente.
     { id: 'office-desk', model: 'desk', logic: 'desk@2,4', at: [4.6, 2.9], facing: 'E' },
