@@ -303,6 +303,9 @@ export function createSceneRenderer(canvas: HTMLCanvasElement, scene: ResolvedSc
         const keep = root.getObjectByName(o.part)
         if (keep) {
           root.traverse(n => { if ((n as THREE.Mesh).isMesh && !isDescendantOf(n, keep)) n.visible = false })
+          // The cached clone carries the world matrices of the un-pivoted model; measure the
+          // pane from fresh ones or it is re-centred half a unit off and ends up inside the wall.
+          g.updateMatrixWorld(true)
           const bb = new THREE.Box3().setFromObject(keep)
           const sz = bb.getSize(new THREE.Vector3())
           root.position.set(root.position.x - (bb.min.x + sz.x / 2), root.position.y - bb.min.y, root.position.z - (bb.min.z + sz.z / 2))

@@ -403,6 +403,18 @@ export function resolveScene(spec: SceneSpec, n: number): ResolvedScene {
       foundationPieces.push({ min: [c * CELL - half, lo, z - half], max: [(c + 1) * CELL + half, hi, z + half] })
     }
   }
+  // A shell run stands on the finished floor (y = 0). Where the ground behind it is lowered
+  // (a courtyard on the grid edge) the wall would hover above a see-through gap, so a skirt
+  // closes the gap from the ground up to the wall base.
+  for (let i = 0; i < n; i++) {
+    const skirts: Array<{ r: number; c: number; box: (y: number) => Box3 }> = [
+      { r: 0, c: i, box: y => ({ min: [i * CELL - half, y, -half], max: [(i + 1) * CELL + half, 0, half] }) },
+      { r: n - 1, c: i, box: y => ({ min: [i * CELL - half, y, side - half], max: [(i + 1) * CELL + half, 0, side + half] }) },
+      { r: i, c: 0, box: y => ({ min: [-half, y, i * CELL - half], max: [half, 0, (i + 1) * CELL + half] }) },
+      { r: i, c: n - 1, box: y => ({ min: [side - half, y, i * CELL - half], max: [side + half, 0, (i + 1) * CELL + half] }) },
+    ]
+    for (const sk of skirts) if (inEnvelope(sk.r, sk.c) && floorY[sk.r][sk.c] < 0) foundationPieces.push(sk.box(floorY[sk.r][sk.c]))
+  }
   if (foundationPieces.length) {
     walls.push({
       id: 'foundation', kind: 'foundation', axis: 'x', from: [0, 0], to: [0, 0],
