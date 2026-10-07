@@ -23,15 +23,15 @@ export const dustOnTheSillUpper: SceneSpec = {
     landing: [stairwellBounds[2], stairwellBounds[1], 4.8, stairwellBounds[3]],
     halls: [
       { id: 'bathroom-gallery', bounds: [4, 0.05, 4.8, 7.95] },
-      { id: 'study-cross-gallery', bounds: [2.9, 0.5, 7.1, 1.25] },
-      { id: 'study-east-gallery', bounds: [7.05, 0.35, 7.9, 3.6] },
+      { id: 'study-cross-gallery', bounds: [2.9, 0.5, 7.15, 1.25] },
+      { id: 'study-east-gallery', bounds: [7.15, 0.35, 7.9, 3.6] },
       { id: 'bathroom-entry-bridge', bounds: [4.425, 4, 5.175, 4.75] },
     ],
     roomAccessTargets: [
       { id: 'bedroom-entry', bounds: [2.1, 0.35, 3, 1.25] },
       { id: 'study-entry', bounds: [3, 0.35, 4.4, 1.25] },
       { id: 'bathroom-entry', bounds: [5.175, 4, 5.925, 4.75] },
-      { id: 'pantry-entry', bounds: [7.05, 3.1, 7.9, 3.8] },
+      { id: 'pantry-entry', bounds: [7.15, 3.1, 7.9, 3.8] },
     ],
   },
   shell: { features: [
@@ -47,7 +47,7 @@ export const dustOnTheSillUpper: SceneSpec = {
   walls: [
     { id: 'bedroom-study', from: [3, 0], to: [3, 3], height: 'half', openings: [{ at: 0.8, width: 1, kind: 'door' }] },
     { id: 'study-bathroom', from: [3, 3], to: [6, 3], height: 'half', openings: [{ at: 4.4, width: 0.8, kind: 'open' }] },
-    { id: 'study-pantry', from: [6, 3], to: [8, 3], height: 'half', openings: [{ at: 7.45, width: 0.9, kind: 'door' }] },
+    { id: 'study-pantry', from: [6, 3], to: [8, 3], height: 'half', openings: [{ at: 7.55, width: 0.9, kind: 'door' }] },
     { id: 'bathroom-gallery', from: [4.8, 3], to: [4.8, 8], height: 'half', openings: [{ at: 4.4, width: 1, kind: 'door' }] },
     { id: 'bathroom-pantry', from: [6, 3], to: [6, 8], height: 'half' },
     { id: 'study-desk-back', from: [6, 2], to: [6, 3], height: 'half', freeEnds: ['from'] },
@@ -73,9 +73,13 @@ export const dustOnTheSillUpper: SceneSpec = {
     { id: 'bathroom-shower-south', model: 'shower', logic: 'shower@6,5', against: { wall: 'bathroom-gallery', at: 6.5, side: 'E' } },
 
     { id: 'pantry-box-clue', model: 'cardboardBoxClosed', logic: 'box@3,6', at: [6.5, 3.5] },
-    { id: 'pantry-counter-sink', model: 'kitchenSink', logic: 'counter@5,6', against: { wall: 'bathroom-pantry', at: 5.5, side: 'E' } },
-    { id: 'pantry-counter-prep', model: 'kitchenCabinet', logic: 'counter@5,6', against: { wall: 'bathroom-pantry', at: 6.5, side: 'E' } },
-    { id: 'pantry-fridge', model: 'kitchenFridge', logic: 'fridge@7,7', at: [7.5, 7.4], facing: 'S' },
-    { id: 'pantry-clock', model: 'speaker', logic: 'clock@6,0', at: [0.5, 6.5] },
+    // Copa: lava-loiça, placa e bancada contínuas; frigorífico baixo contra a parede nascente.
+    { id: 'pantry-counter-sink', model: 'kitchenSink', logic: 'counter@5,6', against: { wall: 'bathroom-pantry', at: 5.46, side: 'E' } },
+    { id: 'pantry-stove', model: 'kitchenStove', against: { wall: 'bathroom-pantry', at: 6.0, side: 'E' } },
+    { id: 'pantry-counter-prep', model: 'kitchenCabinet', logic: 'counter@5,6', against: { wall: 'bathroom-pantry', at: 6.54, side: 'E' } },
+    { id: 'pantry-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@7,7', against: { wall: 'east', at: 7.3 }, facing: 'W' },
+    { id: 'bathroom-sink', model: 'bathroomSink', against: { wall: 'south', at: 5.25 }, facing: 'N' },
+    { id: 'pantry-clock-table', model: 'sideTable', at: [0.5, 6.5], facing: 'E' },
+    { id: 'pantry-clock', model: 'radio', logic: 'clock@6,0', on: { parent: 'pantry-clock-table' } },
   ],
 }

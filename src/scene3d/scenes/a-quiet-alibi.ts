@@ -47,6 +47,10 @@ export const aQuietAlibi: SceneSpec = {
 
     { id: 'living-television-north', model: 'cabinetTelevision', logic: 'tv@2,7', at: [7.5, 2.5], facing: 'W' },
     { id: 'living-television-south', model: 'cabinetTelevision', logic: 'tv@3,7', at: [7.5, 3.5], facing: 'W' },
+    // Screens on the media wall, and a sofa that actually faces them.
+    { id: 'living-screen-north', model: 'televisionModern', logic: 'tv@2,7', on: { parent: 'living-television-north' } },
+    { id: 'living-screen-south', model: 'televisionModern', logic: 'tv@3,7', on: { parent: 'living-television-south' } },
+    { id: 'living-media-sofa', model: 'loungeSofa', at: [6.15, 2.75], facing: 'E' },
     { id: 'living-sofa', model: 'loungeSofa', logic: 'sofa@6,5', at: [6.4, 6.5], facing: 'N' },
     { id: 'living-rug-north', model: 'rugRectangle', logic: 'rug@0,6', at: [6.5, 1], facing: 'E' },
     { id: 'living-rug-south', model: 'rugRectangle', logic: 'rug@4,5', at: [5.8, 4.55], facing: 'E' },

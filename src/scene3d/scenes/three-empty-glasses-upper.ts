@@ -35,7 +35,7 @@ export const threeEmptyGlassesUpper: SceneSpec = {
     ],
   },
   shell: { features: [
-    { wall: 'north', at: 1.5, kind: 'window' },
+    { wall: 'west', at: 2.3, kind: 'window' },
     { wall: 'north', at: 6.5, kind: 'window' },
     { wall: 'west', at: 6.5, kind: 'window' },
   ] },
@@ -55,7 +55,7 @@ export const threeEmptyGlassesUpper: SceneSpec = {
     { id: 'stairwell-south-guard', from: [well[0], well[3]], to: [well[2], well[3]], height: 'half', treatment: 'railing', freeEnds: ['from', 'to'] },
   ],
   furniture: [
-    { id: 'bedroom-bed', model: 'bedDouble', at: [1.5, 1.55], facing: 'N' },
+    { id: 'bedroom-bed', model: 'bedDouble', against: { wall: 'north', at: 1.5 } },
     { id: 'bedroom-clock-west-table', model: 'sideTable', at: [3.48, 2.25] },
     { id: 'bedroom-clock-west', model: 'radio', logic: 'clock@2,3', on: { parent: 'bedroom-clock-west-table' } },
     { id: 'bedroom-clock-south-table', model: 'sideTable', at: [2.05, 4.0625] },
@@ -64,14 +64,16 @@ export const threeEmptyGlassesUpper: SceneSpec = {
     { id: 'bedroom-lamp-north', model: 'lampRoundFloor', logic: 'lamp@0,2', at: [2.5, 0.5] },
 
     { id: 'study-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@2,4', at: [4.25, 2.5], facing: 'E' },
-    { id: 'study-desk', model: 'desk', logic: 'desk@1,4', at: [4.525, 1.9], facing: 'S' },
-    { id: 'study-chair', model: 'chairDesk', at: [6.2, 3.25], facing: 'W' },
+    { id: 'study-bookshelf-books', model: 'books', on: { parent: 'study-bookshelf' } },
+    { id: 'study-desk', model: 'desk', logic: 'desk@1,4', against: { wall: 'bedroom-study', side: 'E', at: 1.5 }, facing: 'E' },
+    { id: 'study-chair', model: 'chairDesk', at: [4.95, 1.5], facing: 'W' },
     { id: 'study-box', model: 'cardboardBoxClosed', logic: 'box@3,7', at: [7.8, 3.85] },
     { id: 'study-lamp', model: 'lampRoundFloor', logic: 'lamp@4,4', at: [4.85, 4.6] },
 
     { id: 'bathroom-tub', model: 'bathtub', logic: 'bathtub@7,0', at: [0.8, 7.1], facing: 'E' },
     { id: 'bathroom-shower-east', model: 'showerRound', logic: 'shower@7,3', at: [3.5, 7.45], facing: 'S' },
-    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@5,2', at: [2.5, 5.85], facing: 'W' },
+    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@5,2', against: { wall: 'bedroom-bathroom', side: 'S', at: 2.5 }, facing: 'S' },
+    { id: 'bathroom-sink', model: 'bathroomSink', against: { wall: 'bedroom-bathroom', side: 'S', at: 3.35 }, facing: 'S' },
     { id: 'bathroom-shower-north', model: 'showerRound', logic: 'shower@5,4', at: [4.45, 5.5], facing: 'S' },
 
     { id: 'hallway-plant', model: 'pottedPlant', logic: 'plant@5,7', at: [7.5, 5.85] },

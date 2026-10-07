@@ -29,8 +29,6 @@ export const aToastToMurder: SceneSpec = {
     { id: 'dining-lamp-east-table', model: 'sideTable', at: [5.5, 1.5] },
     { id: 'dining-lamp-east', model: 'lampRoundTable', logic: 'lamp@1,5', on: { parent: 'dining-lamp-east-table' } },
     { id: 'dining-table', model: 'table', at: [4.1, 4.1], facing: 'E' },
-    { id: 'dining-chair-west', model: 'chair', at: [3.4, 4.25], facing: 'E' },
-    { id: 'dining-chair-north', model: 'chair', at: [4.7, 3.0], facing: 'S' },
     { id: 'dining-viraj-chair', model: 'chair', logic: 'chair@4,5', at: [5.52, 4.5], facing: 'W' },
     { id: 'dining-desk-extra', model: 'desk', logic: 'desk@3,0', at: [0.5, 3.5], facing: 'E' },
 

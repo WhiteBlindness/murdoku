@@ -35,7 +35,7 @@ export const thePoisonedPen: SceneSpec = {
     { id: 'garden-plant-west', model: 'flower_purpleA', logic: 'plant@3,2', at: [2.5, 3.5] },
     { id: 'garden-shrub-south', model: 'plant_bushSmall', logic: 'shrub@5,3', at: [3.5, 5.5] },
     { id: 'garden-shrub-east', model: 'plant_bushSmall', logic: 'shrub@4,4', at: [4.05, 4.5] },
-    { id: 'garden-plant-south', model: 'flower_yellowA', logic: 'plant@5,2', at: [2.5, 5.5] },
+    { id: 'garden-plant-south', model: 'pottedPlant', logic: 'plant@5,2', at: [2.4, 5.35] },
 
     { id: 'hall-rug-west', model: 'rugRectangle', logic: 'rug@6,1', at: [2.0, 7.0], facing: 'E' },
     { id: 'hall-clock-table-west', model: 'sideTable', at: [3.5, 7.5] },

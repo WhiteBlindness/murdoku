@@ -32,7 +32,9 @@ export const ashesAtMidnightGround: SceneSpec = {
 
     { id: 'dining-rug', model: 'rugRectangle', logic: 'rug@0,4', at: [4.5, 0.6], facing: 'S' },
     { id: 'dining-table', model: 'tableCloth', logic: 'table@0,6', at: [6.65, 0.7], facing: 'N' },
-    { id: 'dining-chair', model: 'chair', logic: 'chair@1,3', at: [3.75, 1.55], facing: 'W' },
+    { id: 'dining-chair', model: 'chair', logic: 'chair@1,3', at: [3.75, 1.55], facing: 'E' },
+    // A reading corner on the rug: the chair now has a table to sit at.
+    { id: 'dining-reading-table', model: 'tableCoffee', at: [4.5, 1.2], facing: 'E' },
     { id: 'dining-lamp', model: 'lampRoundFloor', logic: 'lamp@3,6', at: [6.5, 3.25] },
 
     { id: 'kitchen-table', model: 'table', logic: 'table@4,0', at: [0.6, 4.55], facing: 'N' },
@@ -40,6 +42,7 @@ export const ashesAtMidnightGround: SceneSpec = {
     { id: 'kitchen-stove', model: 'kitchenStove', logic: 'stove@6,3', at: [3.45, 6.5], facing: 'S' },
     { id: 'kitchen-counter-a', model: 'kitchenCabinet', logic: 'counter@6,0', at: [0.4, 6.45], facing: 'N' },
     { id: 'kitchen-counter-b', model: 'kitchenCabinetDrawer', logic: 'counter@6,0', at: [0.95, 6.45], facing: 'N' },
+    { id: 'kitchen-sink', model: 'kitchenSink', at: [1.5, 6.45], facing: 'N' },
 
     { id: 'entry-shrub-west', model: 'plant_bushSmall', logic: 'shrub@6,4', at: [4.45, 6.45] },
     { id: 'entry-shrub-north', model: 'plant_bushSmall', logic: 'shrub@5,4', at: [4.8, 5.45] },

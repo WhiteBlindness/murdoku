@@ -6,7 +6,7 @@ import type { SceneSpec } from '../schema'
 export const theSilentGuest: SceneSpec = {
   puzzleId: 'easy-3',
   floor: 0,
-  entry: { wall: 'west', at: 4.0 },
+  entry: { wall: 'north', at: 0.65 },
   shell: {
     features: [
       { wall: 'north', at: 1.6, kind: 'window' },
@@ -34,8 +34,8 @@ export const theSilentGuest: SceneSpec = {
     { id: 'office-chair', model: 'chairDesk', logic: 'chair@1,3', at: [3.45, 1.55], facing: 'E' },
     { id: 'office-clock', model: 'speaker', logic: 'clock@1,6', against: { wall: 'east', at: 1.2 } },
 
-    // Living room: a vertical sofa faces a compact media console.
-    { id: 'living-sofa', model: 'loungeSofa', logic: 'sofa@1,2', at: [2.5, 1.8], facing: 'E' },
+    // Living room: the front door opens here; the sofa faces the media console on the west wall.
+    { id: 'living-sofa', model: 'loungeSofa', logic: 'sofa@1,2', at: [2.5, 1.8], facing: 'W' },
     { id: 'living-media', model: 'cabinetTelevision', against: { wall: 'west', at: 2.85 } },
     { id: 'living-tv', model: 'televisionVintage', logic: 'tv@3,0', on: { parent: 'living-media' } },
     { id: 'living-clock', model: 'speaker', logic: 'clock@0,2', against: { wall: 'north', at: 2.5 } },
@@ -51,6 +51,6 @@ export const theSilentGuest: SceneSpec = {
     { id: 'pantry-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@6,2', at: [2.35, 6.5], facing: 'S' },
   ],
   rugs: [
-    { id: 'entry-mat', model: 'rugDoormat', at: [0.4, 5.3], facing: 'E' },
+    { id: 'entry-mat', model: 'rugDoormat', at: [0.65, 0.35] },
   ],
 }

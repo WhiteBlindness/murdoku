@@ -34,16 +34,20 @@ export const theVanishingAct: SceneSpec = {
   ],
   furniture: [
     // A two-module counter keeps the 1×2 logical position legible.
-    { id: 'kitchen-counter-a', model: 'kitchenCabinet', logic: 'counter@2,3', at: [3.05, 2.25] },
-    { id: 'kitchen-counter-b', model: 'kitchenCabinetDrawer', logic: 'counter@2,3', at: [3.05, 3.35] },
-    { id: 'kitchen-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@0,1', at: [1.5, 0.5], facing: 'S' },
+    { id: 'kitchen-counter-a', model: 'kitchenCabinet', logic: 'counter@2,3', against: { wall: 'kitchen-yard', side: 'W', at: 2.3 } },
+    { id: 'kitchen-sink-run', model: 'kitchenSink', logic: 'counter@2,3', against: { wall: 'kitchen-yard', side: 'W', at: 2.85 } },
+    { id: 'kitchen-counter-b', model: 'kitchenCabinetDrawer', logic: 'counter@2,3', against: { wall: 'kitchen-yard', side: 'W', at: 3.4 } },
+    // Cooking wall on the north side: stove, prep sink and fridge in one run.
+    { id: 'kitchen-stove', model: 'kitchenStove', against: { wall: 'north', at: 0.35 } },
+    { id: 'kitchen-prep-sink', model: 'kitchenSink', against: { wall: 'north', at: 0.93 } },
+    { id: 'kitchen-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@0,1', against: { wall: 'north', at: 1.5 } },
     { id: 'kitchen-table', model: 'table', logic: 'table@0,2', at: [2.65, 0.8], facing: 'E' },
 
     // The garden clue shrubs are low and offset inside their own cells.
     { id: 'yard-shrub-east', model: 'plant_bushSmall', logic: 'shrub@2,6', at: [6.68, 2.55] },
     { id: 'yard-flowers-north', model: 'flower_yellowA', logic: 'plant@0,4', at: [4.75, 0.25] },
     { id: 'yard-flowers-east', model: 'flower_purpleA', logic: 'plant@1,6', at: [6.55, 1.5] },
-    { id: 'yard-shrub-victim', model: 'plant_bushSmall', logic: 'shrub@3,4', at: [4.28, 3.47] },
+    { id: 'yard-shrub-victim', model: 'plant_bush', logic: 'shrub@3,4', at: [4.4, 3.2] },
     { id: 'yard-shrub-killer', model: 'plant_bushSmall', logic: 'shrub@1,5', at: [5.72, 1.45] },
 
     { id: 'porch-chair', model: 'chair', logic: 'chair@5,3', at: [3.2, 5.55], facing: 'W' },

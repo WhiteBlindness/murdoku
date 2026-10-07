@@ -24,7 +24,10 @@ export const theButlersSecret: SceneSpec = {
     { id: 'garden-plant-south', model: 'flower_purpleA', logic: 'plant@2,2', at: [2.5, 2.5] },
 
     { id: 'office-desk', model: 'desk', logic: 'desk@3,4', at: [4.5, 3.5], facing: 'E' },
-    { id: 'office-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@3,7', at: [7.5, 4.0], facing: 'W' },
+    { id: 'office-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@3,7', at: [7.55, 3.45], facing: 'W' },
+    { id: 'office-bookshelf-b', model: 'bookcaseOpenLow', logic: 'bookshelf@3,7', at: [7.55, 4.08], facing: 'W' },
+    { id: 'office-bookshelf-books', model: 'books', on: { parent: 'office-bookshelf' } },
+    { id: 'office-bookshelf-books-b', model: 'books', on: { parent: 'office-bookshelf-b' } },
     { id: 'office-clock-table', model: 'sideTable', at: [5.5, 4.5] },
     { id: 'office-clock', model: 'radio', logic: 'clock@4,5', on: { parent: 'office-clock-table' } },
     { id: 'office-chair', model: 'chair', logic: 'chair@4,4', at: [4.5, 4.5], facing: 'N' },

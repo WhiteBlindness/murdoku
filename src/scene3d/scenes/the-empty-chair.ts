@@ -33,7 +33,7 @@ export const theEmptyChair: SceneSpec = {
   floors: [{ id: 'garden', cells: [0, 3, 5, 5], material: 'grass', kind: 'exterior' }],
   walls: [
     // living | office, door near the middle
-    { id: 'spine', from: [4, 0], to: [4, 3], openings: [{ at: 1.9, kind: 'door' }] },
+    { id: 'spine', from: [4, 0], to: [4, 3], openings: [{ at: 1.3, kind: 'door' }] },
     // living | garden: waist-high wall with wide patio opening
     { id: 'patio', from: [0, 3], to: [4, 3], height: 'half', openings: [{ at: 2.6, width: 1.3, kind: 'open' }] },
     // office | garden: waist-high wall the low bookcases back onto
@@ -52,9 +52,9 @@ export const theEmptyChair: SceneSpec = {
     { id: 'desk', model: 'desk', logic: 'desk@0,5', against: { wall: 'east', at: 0.55 } },
     { id: 'laptop', model: 'laptop', on: { parent: 'desk' } },
     { id: 'desk-chair', model: 'chairDesk', at: [5.15, 0.55], facing: 'E' },
-    { id: 'shelf-a', model: 'bookcaseOpenLow', logic: 'bookshelf@2,4', against: { wall: 'office-garden', side: 'N', at: 4.3 } },
-    { id: 'shelf-b', model: 'bookcaseOpenLow', logic: 'bookshelf@2,4', against: { wall: 'office-garden', side: 'N', at: 4.8 } },
-    { id: 'books', model: 'books', on: { parent: 'shelf-a' } },
+    // A full bookcase facing the room, so the clue object reads as a bookshelf from the camera.
+    { id: 'shelf-a', model: 'bookcaseOpen', logic: 'bookshelf@2,4', against: { wall: 'spine', side: 'E', at: 2.5 } },
+    { id: 'books', model: 'books', on: { parent: 'shelf-a', surface: 'shelf2' } },
     { id: 'office-plant', model: 'pottedPlant', at: [5.55, 2.4] },
     // ---- garden ------------------------------------------------------------------
     // four logical plants, four different species, each pulled off its cell

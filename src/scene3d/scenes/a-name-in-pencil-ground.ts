@@ -33,7 +33,7 @@ export const aNameInPencilGround: SceneSpec = {
   ],
   furniture: [
     { id: 'living-sofa-south', model: 'loungeSofaLong', logic: 'sofa@5,5', at: [5.75, 5.2], facing: 'N' },
-    { id: 'living-tv-north', model: 'cabinetTelevision', logic: 'tv@0,6', at: [6.5, 0.5], facing: 'N' },
+    { id: 'living-tv-north', model: 'cabinetTelevision', logic: 'tv@0,6', against: { wall: 'north', at: 6.5 } },
     { id: 'living-clock-north', model: 'speaker', logic: 'clock@1,7', at: [7.5, 1.5] },
     { id: 'living-clock-south', model: 'speaker', logic: 'clock@7,5', at: [5.5, 7.5] },
     { id: 'living-tv-south', model: 'cabinetTelevision', logic: 'tv@4,5', at: [6.1, 4.3], facing: 'N' },
@@ -41,7 +41,11 @@ export const aNameInPencilGround: SceneSpec = {
     { id: 'yard-plant-west', model: 'flower_purpleA', logic: 'plant@5,4', at: [4.5, 5.5] },
     { id: 'yard-shrub-northwest', model: 'plant_bushSmall', logic: 'shrub@5,0', at: [0.5, 5.5] },
     { id: 'yard-plant-south', model: 'flower_yellowA', logic: 'plant@7,4', at: [4.5, 7.5] },
-    { id: 'dining-chair', model: 'chair', logic: 'chair@3,0', at: [0.5, 3.5], facing: 'N' },
+    { id: 'dining-chair', model: 'chair', logic: 'chair@3,0', at: [0.8, 3.55], facing: 'N' },
+    // A dining table for the chair, with two more places laid.
+    { id: 'dining-table', model: 'tableCloth', at: [0.85, 2.7], facing: 'E' },
+    { id: 'dining-chair-north', model: 'chair', at: [0.8, 1.85], facing: 'S' },
+    { id: 'dining-chair-east', model: 'chair', at: [1.6, 2.7], facing: 'W' },
     { id: 'dining-lamp-north', model: 'lampRoundFloor', logic: 'lamp@1,2', at: [2.5, 1.5] },
     { id: 'dining-lamp-south', model: 'lampRoundFloor', logic: 'lamp@2,2', at: [2.5, 2.5] },
     { id: 'hall-plant', model: 'flower_redA', logic: 'plant@3,4', at: [4.5, 3.05] },

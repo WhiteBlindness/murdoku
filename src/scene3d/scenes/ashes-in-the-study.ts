@@ -18,7 +18,8 @@ export const ashesInTheStudy: SceneSpec = {
     { id: 'office-garden', from: [3, 4], to: [7, 4], height: 'half', openings: [{ at: 5.7, width: 1.15, kind: 'open' }] },
   ],
   furniture: [
-    { id: 'study-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@0,3', at: [4.0, 0.45], facing: 'S' },
+    { id: 'study-bookshelf', model: 'bookcaseOpen', logic: 'bookshelf@0,3', against: { wall: 'north', at: 3.9 } },
+    { id: 'study-bookshelf-books', model: 'books', on: { parent: 'study-bookshelf', surface: 'shelf2' } },
     { id: 'study-desk', model: 'desk', logic: 'desk@1,6', at: [6.35, 1.45], facing: 'W' },
     { id: 'study-chair', model: 'chair', logic: 'chair@1,3', at: [3.75, 1.5], facing: 'E' },
     { id: 'study-clock', model: 'speaker', logic: 'clock@3,3', at: [3.45, 3.45] },

@@ -50,21 +50,7 @@ export const aWitnessRecantsGround: SceneSpec = {
       from: [5, 0],
       to: [5, 8],
       height: 'half',
-      openings: [{ at: 1.5, width: 1.2, kind: 'open' }],
-    },
-    {
-      id: 'dining-pantry-west-return',
-      from: [5, 5],
-      to: [5.5, 5],
-      height: 'half',
-      freeEnds: ['to'],
-    },
-    {
-      id: 'dining-pantry-east-return',
-      from: [7.5, 5],
-      to: [8, 5],
-      height: 'half',
-      freeEnds: ['from'],
+      openings: [{ at: 2.5, width: 1.2, kind: 'open' }],
     },
   ],
   furniture: [
@@ -80,8 +66,16 @@ export const aWitnessRecantsGround: SceneSpec = {
     { id: 'hall-clock-west', model: 'speaker', logic: 'clock@0,1', at: [1.5, 0.5] },
     { id: 'dining-floor-lamp', model: 'lampRoundFloor', logic: 'lamp@3,5', at: [5.5, 3.5] },
     { id: 'dining-table', model: 'table', logic: 'table@4,5', at: [5.7, 4.3], facing: 'E' },
-    { id: 'dining-chair', model: 'chair', logic: 'chair@0,5', at: [5.5, 0.5], facing: 'E' },
+    // Recanto de refeições: banco estofado contra a parede norte, mesa e cadeira na cabeceira.
+    { id: 'dining-banquette', model: 'loungeSofa', against: { wall: 'north', at: 6.6 } },
+    { id: 'dining-nook-table', model: 'table', at: [6.55, 1.0], facing: 'N' },
+    { id: 'dining-chair', model: 'chair', logic: 'chair@0,5', at: [5.6, 0.95], facing: 'E' },
     { id: 'pantry-box', model: 'cardboardBoxClosed', logic: 'box@7,7', at: [7.5, 7.5] },
     { id: 'pantry-fridge', model: 'kitchenFridge', logic: 'fridge@6,7', at: [7.5, 6.5], facing: 'S' },
+    // Copa aberta para a sala: bancada com lava-loiça e placa na parede sul.
+    { id: 'pantry-cabinet-west', model: 'kitchenCabinet', against: { wall: 'south', at: 5.36 }, facing: 'N' },
+    { id: 'pantry-sink', model: 'kitchenSink', against: { wall: 'south', at: 5.9 }, facing: 'N' },
+    { id: 'pantry-stove', model: 'kitchenStove', against: { wall: 'south', at: 6.44 }, facing: 'N' },
+    { id: 'pantry-cabinet-east', model: 'kitchenCabinetDrawer', against: { wall: 'south', at: 6.98 }, facing: 'N' },
   ],
 }

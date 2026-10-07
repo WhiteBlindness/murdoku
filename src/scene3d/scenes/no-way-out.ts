@@ -40,7 +40,7 @@ export const noWayOut: SceneSpec = {
     { id: 'front-plant-victim', model: 'flower_yellowA', logic: 'plant@0,2', at: [2.5, 0.5] },
     { id: 'front-plant-east', model: 'flower_redA', logic: 'plant@0,3', at: [3.5, 0.5] },
     { id: 'front-shrub-yuki', model: 'plant_bushDetailed', logic: 'shrub@2,1', at: [1.5, 2.5] },
-    { id: 'front-shrub-east', model: 'plant_bushSmall', logic: 'shrub@1,3', at: [3.5, 1.5] },
+    { id: 'front-shrub-east', model: 'plant_bush', logic: 'shrub@1,3', at: [3.35, 1.4] },
     { id: 'garden-plant', model: 'flower_purpleA', logic: 'plant@5,2', at: [2.5, 5.5] },
     { id: 'garden-shrub-north', model: 'plant_bushLarge', logic: 'shrub@6,4', at: [4.5, 6.5] },
     { id: 'garden-shrub-evangeline', model: 'plant_bush', logic: 'shrub@6,0', at: [0.5, 6.5] },

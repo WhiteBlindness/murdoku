@@ -17,7 +17,7 @@ export const theUninvited: SceneSpec = {
   ],
   walls: [
     { id: 'dining-kitchen', from: [2, 0], to: [2, 6], height: 'half', openings: [{ at: 4.55, kind: 'door' }] },
-    { id: 'kitchen-gallery', from: [4, 0], to: [4, 6], height: 'half', openings: [{ at: 3.65, kind: 'door' }] },
+    { id: 'kitchen-gallery', from: [4, 0], to: [4, 6], height: 'half', openings: [{ at: 4.6, kind: 'door' }] },
   ],
   furniture: [
     // Sala de jantar a oeste.
@@ -33,12 +33,14 @@ export const theUninvited: SceneSpec = {
     { id: 'kitchen-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@2,2', against: { wall: 'dining-kitchen', side: 'E', at: 2.2 } },
     { id: 'kitchen-counter-a', model: 'kitchenCabinet', logic: 'counter@2,3', against: { wall: 'kitchen-gallery', side: 'W', at: 2.35 } },
     { id: 'kitchen-sink', model: 'kitchenSink', logic: 'counter@2,3', against: { wall: 'kitchen-gallery', side: 'W', at: 2.95 } },
+    // The logical counter covers two cells; the run continues over the second one.
+    { id: 'kitchen-counter-b', model: 'kitchenCabinetDrawer', logic: 'counter@2,3', against: { wall: 'kitchen-gallery', side: 'W', at: 3.55 } },
     { id: 'kitchen-microwave', model: 'kitchenMicrowave', on: { parent: 'kitchen-counter-a' } },
 
     // Galeria de entrada a leste. O centro fica livre para circulação.
     { id: 'gallery-console', model: 'sideTable', against: { wall: 'kitchen-gallery', side: 'E', at: 1.15 } },
     { id: 'gallery-clock', model: 'radio', logic: 'clock@0,4', on: { parent: 'gallery-console' } },
-    { id: 'gallery-plant-a', model: 'pottedPlant', logic: 'plant@5,4', at: [4.35, 5.1] },
+    { id: 'gallery-plant-a', model: 'pottedPlant', logic: 'plant@5,4', at: [4.8, 5.15] },
     { id: 'gallery-plant-b', model: 'plant_bushSmall', logic: 'plant@5,5', at: [5.45, 5.1], yaw: 8 },
   ],
   rugs: [

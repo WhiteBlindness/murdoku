@@ -8,7 +8,7 @@ export const theLockedStudy: SceneSpec = {
   shell: {
     features: [
       { wall: 'north', at: 4.7, kind: 'window' },
-      { wall: 'west', at: 5.2, kind: 'window' },
+      { wall: 'west', at: 4.5, kind: 'window' },
     ],
   },
   floors: [
@@ -32,7 +32,6 @@ export const theLockedStudy: SceneSpec = {
     // Sala de jantar e os dois candeeiros lógicos.
     { id: 'dining-table', model: 'tableRound', at: [4.3, 3.4], facing: 'E' },
     { id: 'dining-chair-east', model: 'chair', logic: 'chair@3,5', at: [5.35, 3.45], facing: 'W' },
-    { id: 'dining-chair-west', model: 'chair', at: [3.35, 3.45], facing: 'E' },
     { id: 'reading-table', model: 'sideTable', logic: 'lamp@2,5', at: [5.25, 2.2], facing: 'S' },
     { id: 'reading-lamp', model: 'lampRoundTable', logic: 'lamp@2,5', on: { parent: 'reading-table' } },
     { id: 'buffet', model: 'cabinetTelevisionDoors', against: { wall: 'east', at: 4.55 } },
@@ -54,5 +53,7 @@ export const theLockedStudy: SceneSpec = {
     { id: 'entry-mat', model: 'rugDoormat', at: [1.25, 1.0], facing: 'E' },
     { id: 'courtyard-path-a', model: 'path_stone', at: [1.5, 2.35], facing: 'E' },
     { id: 'courtyard-path-b', model: 'path_stone', at: [2.25, 3.2], facing: 'S' },
+    // The light tabletop matches the wood floor; a rug gives the dining group its own ground.
+    { id: 'dining-rug', model: 'rugRound', at: [4.3, 3.4] },
   ],
 }

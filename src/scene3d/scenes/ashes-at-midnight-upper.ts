@@ -35,7 +35,7 @@ export const ashesAtMidnightUpper: SceneSpec = {
       { at: 4.4, width: 1.2, kind: 'open' },
     ] },
     { id: 'bedroom-bath', from: [0, 5], to: [4, 5], height: 'half', openings: [{ at: 3.6, width: 0.8, kind: 'door' }] },
-    { id: 'bathroom-hall', from: [4, 5], to: [4, 8], height: 'half', openings: [{ at: 6, width: 2, kind: 'door' }] },
+    { id: 'bathroom-hall', from: [4, 5], to: [4, 8], height: 'half', openings: [{ at: 5.4, width: 0.8, kind: 'door' }] },
     { id: 'study-gallery-transition', from: [4, 4], to: [8, 4], height: 'half', openings: [{ at: 6.9, width: 1.8, kind: 'open' }] },
     { id: 'gallery-east-railing', from: [8, 5], to: [8, 8], height: 'half', treatment: 'railing', freeEnds: ['from', 'to'] },
     { id: 'gallery-south-railing', from: [4, 8], to: [8, 8], height: 'half', treatment: 'railing', freeEnds: ['from', 'to'] },
@@ -44,7 +44,9 @@ export const ashesAtMidnightUpper: SceneSpec = {
     { id: 'stairwell-south-guard', from: [4.660625, 3.17375], to: [6.939375, 3.17375], height: 'half', treatment: 'railing', freeEnds: ['from', 'to'] },
   ],
   furniture: [
-    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@2,0', at: [1.25, 2.5], facing: 'W' },
+    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@2,0', against: { wall: 'west', at: 3.0 } },
+    { id: 'bedroom-nightstand', model: 'cabinetBedDrawerTable', against: { wall: 'west', at: 1.95 } },
+    { id: 'bedroom-bedside-lamp', model: 'lampRoundTable', on: { parent: 'bedroom-nightstand' } },
     { id: 'bedroom-lamp-west', model: 'lampRoundFloor', logic: 'lamp@4,0', at: [0.25, 4.25] },
     { id: 'bedroom-clock-table', model: 'sideTable', at: [2.4, 4.5] },
     { id: 'bedroom-clock', model: 'radio', logic: 'clock@4,2', on: { parent: 'bedroom-clock-table' } },
@@ -52,11 +54,12 @@ export const ashesAtMidnightUpper: SceneSpec = {
 
     { id: 'study-box', model: 'cardboardBoxClosed', logic: 'box@0,4', at: [4.3, 0.5] },
     { id: 'study-bookcase', model: 'bookcaseOpen', logic: 'bookshelf@1,7', at: [7.55, 1.5], facing: 'E' },
-    { id: 'study-desk', model: 'desk', logic: 'desk@3,4', at: [4.8, 3.5], facing: 'N' },
+    { id: 'study-desk', model: 'desk', logic: 'desk@3,4', at: [4.8, 3.5], facing: 'S' },
 
     { id: 'bathroom-tub', model: 'bathtub', logic: 'bathtub@5,2', at: [2.3, 5.5], facing: 'N' },
     { id: 'bathroom-shower', model: 'shower', logic: 'shower@7,2', at: [2.5, 7.45], facing: 'S' },
     { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@6,3', at: [3.2, 6.95], facing: 'N' },
+    { id: 'bathroom-washbasin', model: 'bathroomSink', against: { wall: 'west', at: 6.0 } },
 
     { id: 'hall-clock-table', model: 'sideTable', at: [4.98, 6.15], facing: 'E' },
     { id: 'hall-clock', model: 'radio', logic: 'clock@5,4', on: { parent: 'hall-clock-table' } },

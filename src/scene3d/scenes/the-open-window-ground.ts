@@ -14,7 +14,7 @@ export const theOpenWindowGround: SceneSpec = {
       { wall: 'west', at: 2.5, kind: 'window' },
     ],
   },
-  stairs: { model: 'stairsOpen', at: [6.6, 3.5], facing: 'N' },
+  stairs: { model: 'stairsOpen', at: [6.6, 3.5], facing: 'S' },
   exteriorSupportBays: [
     { id: 'spine-north', cells: [4, 0, 5, 2] },
     { id: 'spine-centre', cells: [4, 3, 5, 5] },
@@ -23,7 +23,10 @@ export const theOpenWindowGround: SceneSpec = {
   floors: [
     { id: 'hallway-wood', cells: [0, 0, 1, 7], material: 'wood' },
     { id: 'kitchen-tile', cells: [2, 0, 3, 7], material: 'tile' },
-    { id: 'front-yard-spine', cells: [4, 0, 5, 7], material: 'grass', kind: 'exterior' },
+    { id: 'front-yard-spine-north', cells: [4, 0, 5, 0], material: 'grass', kind: 'exterior' },
+    // Caminho lajeado coberto entre a cozinha e a porta do escritório.
+    { id: 'front-yard-path', cells: [4, 1, 5, 1], material: 'stone', kind: 'exterior' },
+    { id: 'front-yard-spine-south', cells: [4, 2, 5, 7], material: 'grass', kind: 'exterior' },
     { id: 'office-wood', cells: [6, 0, 7, 7], material: 'wood' },
   ],
   walls: [
@@ -52,7 +55,7 @@ export const theOpenWindowGround: SceneSpec = {
       from: [6, 0],
       to: [6, 8],
       height: 'half',
-      openings: [{ at: 5.5, width: 1.2, kind: 'door' }],
+      openings: [{ at: 1.5, width: 1.0, kind: 'door' }],
     },
   ],
   furniture: [
@@ -65,8 +68,13 @@ export const theOpenWindowGround: SceneSpec = {
     { id: 'kitchen-sink', model: 'kitchenSink', logic: 'counter@0,2', at: [3.3, 0.5], facing: 'S' },
     { id: 'kitchen-coffee-machine', model: 'kitchenCoffeeMachine', on: { parent: 'kitchen-counter' } },
     { id: 'kitchen-table', model: 'table', logic: 'table@1,2', at: [3, 1.5], facing: 'E' },
-    { id: 'kitchen-stove', model: 'kitchenStove', logic: 'stove@3,2', at: [2.5, 3.5], facing: 'E' },
-    { id: 'kitchen-fridge', model: 'kitchenFridge', logic: 'fridge@5,3', at: [3.1, 5.5], facing: 'S' },
+    { id: 'kitchen-chair-north', model: 'chairCushion', at: [2.4, 1.15], facing: 'E' },
+    { id: 'kitchen-chair-south', model: 'chairCushion', at: [2.4, 1.7], facing: 'E' },
+    // Placa e bancadas em linha contra a parede da entrada; o frigorífico fecha o triângulo de trabalho.
+    { id: 'kitchen-stove', model: 'kitchenStove', logic: 'stove@3,2', against: { wall: 'hall-kitchen', side: 'E', at: 3.5 }, facing: 'E' },
+    { id: 'kitchen-run-a', model: 'kitchenCabinet', against: { wall: 'hall-kitchen', side: 'E', at: 4.04 }, facing: 'E' },
+    { id: 'kitchen-run-b', model: 'kitchenCabinetDrawer', against: { wall: 'hall-kitchen', side: 'E', at: 4.58 }, facing: 'E' },
+    { id: 'kitchen-fridge', model: 'kitchenFridge', logic: 'fridge@5,3', at: [3.4, 6.2], facing: 'S' },
 
     { id: 'spine-shrub-north', model: 'plant_bushSmall', logic: 'shrub@0,4', at: [4.9, 0.5], facing: 'E' },
     { id: 'spine-shrub-centre-west', model: 'plant_bushSmall', logic: 'shrub@3,4', at: [4.5, 3.5], facing: 'S' },
@@ -74,8 +82,12 @@ export const theOpenWindowGround: SceneSpec = {
     { id: 'spine-shrub-south', model: 'plant_bushSmall', logic: 'shrub@5,4', at: [4.9, 5.5], facing: 'S' },
     { id: 'spine-plant-south', model: 'pottedPlant', logic: 'plant@6,4', at: [4.5, 6.5], facing: 'E' },
 
-    { id: 'office-chair', model: 'loungeChair', logic: 'chair@6,6', at: [6.8, 6.5], facing: 'E' },
-    { id: 'office-desk', model: 'desk', logic: 'desk@7,6', at: [6.7, 7.2], facing: 'N' },
-    { id: 'office-bookcase', model: 'bookcaseOpenLow', logic: 'bookshelf@5,7', at: [7.5, 6], facing: 'S' },
+    // Canto de trabalho a sul: uma estante alta separa-o do pé da escada.
+    { id: 'office-chair', model: 'chairDesk', logic: 'chair@6,6', at: [6.5, 6.95], facing: 'S' },
+    { id: 'office-desk', model: 'desk', logic: 'desk@7,6', at: [6.5, 7.6], facing: 'N' },
+    { id: 'office-bookcase', model: 'bookcaseOpen', logic: 'bookshelf@5,7', at: [7.5, 6.42], facing: 'S' },
+    { id: 'office-bookcase-books', model: 'books', on: { parent: 'office-bookcase', surface: 'shelf2' } },
+    { id: 'office-bookcase-low', model: 'bookcaseOpenLow', logic: 'bookshelf@5,7', against: { wall: 'east', at: 5.5 }, facing: 'W' },
+    { id: 'office-bookcase-low-books', model: 'books', on: { parent: 'office-bookcase-low' } },
   ],
 }

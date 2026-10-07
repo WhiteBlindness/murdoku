@@ -45,13 +45,15 @@ export const theLastTrainUpper: SceneSpec = {
     { id: 'hall-east-south', from: [5, 4.0], to: [5, 8], height: 'half', freeEnds: ['from'], openings: [
       { at: 5.4, width: 1.2, kind: 'door' },
     ] },
-    { id: 'study-bathroom', from: [5, 4], to: [8, 4], height: 'half', openings: [{ at: 6.5, width: 1.2, kind: 'door' }] },
+    { id: 'study-bathroom', from: [5, 4], to: [8, 4], height: 'half' },
     { id: 'stairwell-west-guard', from: [5.25625, 0.95], to: [5.25625, 2.95], height: 'half', treatment: 'railing', freeEnds: ['from', 'to'] },
     { id: 'stairwell-east-guard', from: [6.24375, 0.95], to: [6.24375, 2.95], height: 'half', treatment: 'railing', freeEnds: ['from', 'to'] },
     { id: 'stairwell-north-guard', from: [6.1, 0.780625], to: [6.24375, 0.780625], height: 'half', treatment: 'railing', freeEnds: ['from', 'to'] },
   ],
   furniture: [
-    { id: 'bedroom-bed', model: 'bedDouble', at: [1.25, 4.45], facing: 'W' },
+    { id: 'bedroom-bed', model: 'bedDouble', against: { wall: 'west', at: 4.45 } },
+    { id: 'bedroom-nightstand', model: 'cabinetBedDrawerTable', against: { wall: 'west', at: 3.4 } },
+    { id: 'bedroom-bedside-lamp', model: 'lampRoundTable', on: { parent: 'bedroom-nightstand' } },
     { id: 'bedroom-rug', model: 'rugRectangle', logic: 'rug@2,0', at: [0.65, 2.5], facing: 'E' },
     { id: 'bedroom-lamp', model: 'lampRoundFloor', logic: 'lamp@0,0', at: [0.35, 0.45] },
     { id: 'bedroom-clock-west-table', model: 'sideTable', at: [0.55, 7.35] },
@@ -72,5 +74,6 @@ export const theLastTrainUpper: SceneSpec = {
     { id: 'study-box', model: 'cardboardBoxClosed', logic: 'box@3,7', at: [7.35, 3.5] },
     { id: 'bathroom-bathtub', model: 'bathtub', logic: 'bathtub@7,6', at: [6.4, 7.35], facing: 'N' },
     { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@5,7', at: [7.35, 5.45], facing: 'W' },
+    { id: 'bathroom-washbasin', model: 'bathroomSink', against: { wall: 'study-bathroom', side: 'S', at: 6.2 } },
   ],
 }

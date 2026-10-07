@@ -47,6 +47,16 @@ export const dustOnTheSillGround: SceneSpec = {
     { id: 'entry-hall-plant', model: 'pottedPlant', logic: 'plant@3,7', at: [7.5, 3.5] },
 
     { id: 'dining-table', model: 'table', logic: 'table@5,3', at: [4.5, 6.25], facing: 'N' },
+    { id: 'dining-chair-north', model: 'chairCushion', at: [4.65, 5.68], facing: 'S' },
+    { id: 'dining-chair-south-west', model: 'chairCushion', at: [4.2, 6.85], facing: 'N' },
+    { id: 'dining-chair-south-east', model: 'chairCushion', at: [4.8, 6.85], facing: 'N' },
+    { id: 'dining-chair-east', model: 'chairCushion', at: [5.4, 6.25], facing: 'W' },
+    // Cozinha em linha na parede poente da sala de jantar, ao lado do pé da escada.
+    { id: 'kitchen-fridge', model: 'kitchenFridge', against: { wall: 'west', at: 5.4 }, facing: 'E' },
+    { id: 'kitchen-cabinet-north', model: 'kitchenCabinet', against: { wall: 'west', at: 5.94 }, facing: 'E' },
+    { id: 'kitchen-stove', model: 'kitchenStove', against: { wall: 'west', at: 6.48 }, facing: 'E' },
+    { id: 'kitchen-sink', model: 'kitchenSink', against: { wall: 'west', at: 7.02 }, facing: 'E' },
+    { id: 'kitchen-cabinet-south', model: 'kitchenCabinetDrawer', against: { wall: 'west', at: 7.56 }, facing: 'E' },
     { id: 'dining-chair', model: 'chair', logic: 'chair@7,2', at: [2.5, 7.5], facing: 'W' },
     { id: 'dining-lamp-south', model: 'lampRoundFloor', logic: 'lamp@7,6', at: [6.5, 7.5] },
     { id: 'dining-lamp-clue', model: 'lampRoundFloor', logic: 'lamp@5,7', at: [7.5, 5.5] },

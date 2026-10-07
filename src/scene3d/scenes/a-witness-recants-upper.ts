@@ -50,7 +50,7 @@ export const aWitnessRecantsUpper: SceneSpec = {
       to: [4, 8],
       height: 'half',
       openings: [
-        { at: 1.5, width: 1.2, kind: 'open' },
+        { at: 1.5, width: 1.2, kind: 'door' },
         { at: 6.8, width: 1.0, kind: 'open' },
       ],
     },
@@ -87,27 +87,33 @@ export const aWitnessRecantsUpper: SceneSpec = {
     },
   ],
   furniture: [
-    { id: 'study-desk', model: 'desk', logic: 'desk@0,0', at: [0.5, 0.5], facing: 'N' },
-    { id: 'study-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@3,0', at: [0.5, 3.5], facing: 'S' },
+    // Escritório de leitura: secretária na parede norte, estante alta e candeeiro.
+    { id: 'study-desk', model: 'desk', logic: 'desk@0,0', against: { wall: 'north', at: 0.6 } },
+    { id: 'study-bookshelf', model: 'bookcaseOpen', logic: 'bookshelf@3,0', against: { wall: 'west', at: 3.45 }, facing: 'E' },
+    { id: 'study-bookshelf-books', model: 'books', on: { parent: 'study-bookshelf', surface: 'shelf2' } },
     { id: 'study-lamp', model: 'lampRoundFloor', logic: 'lamp@0,2', at: [2.5, 0.5], facing: 'S' },
     { id: 'study-box', model: 'cardboardBoxClosed', logic: 'box@1,0', at: [0.5, 1.5] },
-
+    // Quarto: cama de cabeceira a sul com mesa de cabeceira e candeeiro; o tapete fica aos pés da cama.
+    { id: 'bedroom-bed', model: 'bedDouble', against: { wall: 'south', at: 1.6 }, facing: 'N' },
+    { id: 'bedroom-nightstand', model: 'sideTable', at: [0.6, 7.68], facing: 'N' },
     { id: 'bedroom-clock-north', model: 'speaker', logic: 'clock@5,3', at: [3.0, 5.5] },
     { id: 'bedroom-lamp-south', model: 'lampRoundFloor', logic: 'lamp@7,2', at: [2.5, 7.5], facing: 'S' },
     { id: 'bedroom-clock-south', model: 'speaker', logic: 'clock@7,3', at: [3.0, 7.5] },
     { id: 'bedroom-rug', model: 'rugRectangle', logic: 'rug@4,0', at: [1.6, 5.5], facing: 'E' },
-
+    // Casa de banho: louças contra as paredes e lavatório na parede norte.
     { id: 'bathroom-tub-north', model: 'bathtub', logic: 'bathtub@0,4', at: [5.0, 0.5], facing: 'S' },
-    { id: 'bathroom-toilet-west', model: 'toilet', logic: 'toilet@2,4', at: [4.55, 2.5], facing: 'S' },
+    { id: 'bathroom-sink', model: 'bathroomSink', against: { wall: 'north', at: 6.5 }, facing: 'S' },
+    { id: 'bathroom-toilet-west', model: 'toilet', logic: 'toilet@2,4', against: { wall: 'west-east-wings', side: 'E', at: 2.5 }, facing: 'E' },
     { id: 'bathroom-shower-south', model: 'showerRound', logic: 'shower@2,7', at: [7.5, 2.5], facing: 'S' },
     { id: 'bathroom-shower-north', model: 'showerRound', logic: 'shower@0,7', at: [7.5, 0.5], facing: 'S' },
     { id: 'bathroom-tub-evangeline', model: 'bathtub', logic: 'bathtub@3,4', at: [4.85, 3.5], facing: 'S' },
     { id: 'bathroom-toilet-tomas', model: 'toilet', logic: 'toilet@2,6', at: [6.5, 2.5], facing: 'S' },
-
-    { id: 'office-chair-north', model: 'chair', logic: 'chair@4,7', at: [7.5, 4.5], facing: 'E' },
-    { id: 'office-desk', model: 'desk', logic: 'desk@4,5', at: [5.5, 4.5], facing: 'E' },
-    { id: 'office-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@5,4', at: [4.5, 5.5], facing: 'E' },
+    // Escritório: secretária encostada à divisória com a estante ao lado; poltrona de leitura no canto.
+    { id: 'office-chair-north', model: 'chair', logic: 'chair@4,7', at: [7.5, 4.5], facing: 'S' },
+    { id: 'office-desk', model: 'desk', logic: 'desk@4,5', against: { wall: 'bathroom-office-divider', side: 'S', at: 5.4 }, facing: 'S' },
+    { id: 'office-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@5,4', against: { wall: 'west-east-wings', side: 'E', at: 5.5 }, facing: 'E' },
+    { id: 'office-bookshelf-books', model: 'books', on: { parent: 'office-bookshelf' } },
     { id: 'office-clock', model: 'speaker', logic: 'clock@6,7', at: [7.5, 6.5] },
-    { id: 'office-greta-chair', model: 'chair', logic: 'chair@7,5', at: [5.5, 7.5], facing: 'S' },
+    { id: 'office-greta-chair', model: 'chair', logic: 'chair@7,5', at: [5.5, 7.5], facing: 'N' },
   ],
 }

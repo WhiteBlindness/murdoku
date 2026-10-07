@@ -42,7 +42,9 @@ export const theLastNightcap: SceneSpec = {
     { id: 'hall-plant', model: 'pottedPlant', logic: 'plant@1,4', at: [4.15, 1.4] },
     { id: 'hall-console', model: 'sideTable', logic: 'clock@3,4', against: { wall: 'hall-kitchen', side: 'W', at: 2.8 } },
     { id: 'hall-clock', model: 'radio', logic: 'clock@3,4', on: { parent: 'hall-console' } },
-    { id: 'hall-speaker', model: 'speaker', logic: 'clock@4,4', against: { wall: 'hall-kitchen', side: 'W', at: 4.5 } },
+    // A radio facing the room on its own small table, so the second clock reads from the camera.
+    { id: 'hall-speaker', model: 'sideTable', logic: 'clock@4,4', at: [4.6, 4.3], facing: 'S' },
+    { id: 'hall-radio', model: 'radio', logic: 'clock@4,4', on: { parent: 'hall-speaker' } },
     // décor never stands south-east of a cell centre it does not occupy: it would hide the standee there
     { id: 'hall-plant-2', model: 'pottedPlant', logic: 'plant@5,3', at: [3.3, 5.05] },
     // ---- kitchen (galley along the cut-away east edge) ----------------------------

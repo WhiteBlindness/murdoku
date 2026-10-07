@@ -24,7 +24,7 @@ export const aStoryRehearsedUpper: SceneSpec = {
   shell: { features: [
     { wall: 'north', at: 1.5, kind: 'window' },
     { wall: 'north', at: 6.3, kind: 'window' },
-    { wall: 'west', at: 6.5, kind: 'window' },
+    { wall: 'west', at: 4.4, kind: 'window' },
   ] },
   floors: [
     { id: 'study', cells: [0, 0, 7, 1], material: 'wood', kind: 'interior' },
@@ -35,7 +35,9 @@ export const aStoryRehearsedUpper: SceneSpec = {
   walls: [
     { id: 'study-bathroom', from: [0, 2], to: [8, 2], height: 'half', openings: [{ at: 1.9, width: 1.3, kind: 'door' }] },
     { id: 'bathroom-west-screen', from: [2.4375, 2], to: [2.4375, 3.75], height: 'half', freeEnds: ['to'] },
-    { id: 'bathroom-south-screen', from: [3.4, 3.75], to: [8, 3.75], height: 'half', freeEnds: ['from'], openings: [{ at: 5.2, width: 0.9, kind: 'door' }] },
+    { id: 'bathroom-south-screen', from: [2.4375, 3.75], to: [8, 3.75], height: 'half', openings: [{ at: 5.2, width: 0.9, kind: 'door' }, { at: 7.25, kind: 'door' }] },
+    // A separate WC, opening into the bedroom, so the second toilet is an en-suite rather than a fixture in the bath.
+    { id: 'en-suite-wc', from: [6.6, 2], to: [6.6, 3.75], height: 'half' },
     { id: 'kitchen-west-screen', from: [0, 4], to: [0.42, 4], height: 'half', freeEnds: ['to'] },
     { id: 'bedroom-west-screen', from: [3, 6.45], to: [3, 8], height: 'half', freeEnds: ['from'] },
     { id: 'stairwell-west-guard', from: [0.50625, 3.45], to: [0.50625, 5.639375], height: 'half', treatment: 'railing', freeEnds: ['from', 'to'] },
@@ -53,9 +55,11 @@ export const aStoryRehearsedUpper: SceneSpec = {
     { id: 'bathroom-toilet-west', model: 'toilet', logic: 'toilet@2,2', at: [2.9, 2.4], facing: 'S' },
 
     { id: 'kitchen-fridge', model: 'kitchenFridge', logic: 'fridge@4,1', at: [1.9, 5.0], facing: 'S' },
-    { id: 'kitchen-stove', model: 'kitchenStove', logic: 'stove@5,0', at: [0.5, 6.1], facing: 'E' },
+    { id: 'kitchen-stove', model: 'kitchenStove', logic: 'stove@5,0', against: { wall: 'west', at: 6.1 } },
+    { id: 'kitchen-sink', model: 'kitchenSink', against: { wall: 'west', at: 6.75 } },
+    { id: 'kitchen-cabinet', model: 'kitchenCabinet', against: { wall: 'west', at: 7.35 } },
 
-    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@6,3', at: [4.6, 7.0], facing: 'E' },
+    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@6,3', against: { wall: 'bedroom-west-screen', side: 'E', at: 7.22 } },
     { id: 'bedroom-clock', model: 'speaker', logic: 'clock@5,3', at: [3.2, 5.0] },
     { id: 'bathroom-floor-lamp', model: 'lampRoundFloor', logic: 'lamp@4,3', at: [3.85, 4.95] },
     { id: 'bedroom-floor-lamp', model: 'lampRoundFloor', logic: 'lamp@6,7', at: [7.5, 6.5] },

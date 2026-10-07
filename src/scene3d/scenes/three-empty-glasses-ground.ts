@@ -35,12 +35,20 @@ export const threeEmptyGlassesGround: SceneSpec = {
   furniture: [
     { id: 'office-clock-table', model: 'sideTable', at: [3.45, 2.45] },
     { id: 'office-clock', model: 'radio', logic: 'clock@2,3', on: { parent: 'office-clock-table' } },
-    { id: 'office-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@3,5', at: [5.9, 3.275], facing: 'E' },
+    // Uma estante alta e outra baixa fazem de divisória entre o escritório e a sala de jantar, com passagem ao meio.
+    { id: 'office-bookshelf-west', model: 'bookcaseOpen', logic: 'bookshelf@3,5', at: [5.25, 3.78], facing: 'S' },
+    { id: 'office-bookshelf-west-books', model: 'books', on: { parent: 'office-bookshelf-west', surface: 'shelf2' } },
+    { id: 'office-bookshelf-east', model: 'bookcaseOpenLow', logic: 'bookshelf@3,5', at: [6.5, 3.78], facing: 'S' },
+    { id: 'office-bookshelf-east-books', model: 'books', on: { parent: 'office-bookshelf-east' } },
     { id: 'office-chair', model: 'chair', logic: 'chair@0,7', at: [7.45, 0.55], facing: 'W' },
-    { id: 'office-desk', model: 'desk', logic: 'desk@3,4', at: [4.1, 3.45], facing: 'S' },
+    { id: 'office-desk', model: 'desk', logic: 'desk@3,4', at: [4.1, 3.45], facing: 'N' },
+    { id: 'office-desk-chair', model: 'chairDesk', at: [4.1, 2.85], facing: 'S' },
 
     { id: 'dining-rug', model: 'rugRectangle', logic: 'rug@4,4', at: [5, 5], facing: 'E' },
     { id: 'dining-table', model: 'table', logic: 'table@7,6', at: [6.95, 7.45], facing: 'N' },
+    { id: 'dining-chair-north-west', model: 'chairCushion', at: [6.65, 6.85], facing: 'S' },
+    { id: 'dining-chair-north-east', model: 'chairCushion', at: [7.25, 6.85], facing: 'S' },
+    { id: 'dining-chair-west', model: 'chairCushion', at: [6.15, 7.45], facing: 'E' },
     { id: 'dining-lamp', model: 'lampRoundFloor', logic: 'lamp@5,3', at: [3.45, 5.1] },
 
     { id: 'pantry-box', model: 'cardboardBoxClosed', logic: 'box@0,2', at: [2.55, 0.55] },
