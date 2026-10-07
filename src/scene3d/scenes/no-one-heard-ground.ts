@@ -59,8 +59,14 @@ export const noOneHeardGround: SceneSpec = {
   furniture: [
     { id: 'dining-west-lamp', model: 'lampRoundFloor', logic: 'lamp@7,0', at: [0.5, 7.5], facing: 'N' },
     { id: 'dining-table', model: 'table', logic: 'table@5,6', at: [6.75, 5.7], facing: 'N' },
-    { id: 'dining-chair-west', model: 'chair', logic: 'chair@5,1', at: [1.5, 5.7], facing: 'N' },
     { id: 'dining-chair-table', model: 'chair', logic: 'chair@5,5', at: [5.8, 5.8], facing: 'E' },
+    { id: 'dining-chair-south-a', model: 'chair', at: [6.45, 6.35], facing: 'N' },
+    { id: 'dining-chair-south-b', model: 'chair', at: [7.05, 6.35], facing: 'N' },
+    { id: 'dining-chair-east', model: 'chair', at: [7.65, 5.7], facing: 'W' },
+    // Recanto de estar a poente: sofá entre os candeeiros, mesa de centro e cadeira.
+    { id: 'dining-sofa', model: 'loungeSofa', against: { wall: 'west', at: 6.5 }, facing: 'E' },
+    { id: 'dining-coffee-table', model: 'tableCoffeeSquare', at: [1.35, 6.55] },
+    { id: 'dining-chair-west', model: 'chair', logic: 'chair@5,1', at: [1.5, 5.75], facing: 'S' },
 
     { id: 'hallway-plant-southwest', model: 'pottedPlant', logic: 'plant@4,0', at: [0.85, 4.1] },
     { id: 'hallway-clock-table', model: 'sideTable', at: [2.5, 4.5] },
@@ -73,6 +79,8 @@ export const noOneHeardGround: SceneSpec = {
     { id: 'pantry-box-south', model: 'cardboardBoxClosed', logic: 'box@2,7', at: [7.5, 2.5] },
     { id: 'pantry-fridge-west', model: 'kitchenFridge', logic: 'fridge@0,5', at: [5.5, 0.5], facing: 'S' },
     { id: 'pantry-fridge-east', model: 'kitchenFridge', logic: 'fridge@0,7', at: [7.5, 0.5], facing: 'S' },
+    { id: 'pantry-cabinet', model: 'kitchenCabinet', against: { wall: 'north', at: 6.04 }, facing: 'S' },
+    { id: 'pantry-sink', model: 'kitchenSink', against: { wall: 'north', at: 6.58 }, facing: 'S' },
 
     { id: 'hallway-clock-table-southeast', model: 'sideTable', at: [6.5, 3.5] },
     { id: 'hallway-clock-southeast', model: 'radio', logic: 'clock@3,6', on: { parent: 'hallway-clock-table-southeast' } },

@@ -52,26 +52,40 @@ export const aQuietConfessionUpper: SceneSpec = {
     { id: 'study-kitchen', from: [3, 3], to: [5, 3], height: 'half', openings: [{ at: 3.5, width: 1, kind: 'door' }] },
     { id: 'bathroom-kitchen', from: [3, 3], to: [3, 8], height: 'half' },
     { id: 'bedroom-kitchen', from: [5, 3], to: [5, 8], height: 'half' },
+    // Guardas do vão da escada; a chegada fica aberta a norte.
+    { id: 'stairwell-west-guard', from: [stairwellBounds[0], stairwellBounds[1] + 0.12], to: [stairwellBounds[0], stairwellBounds[3]], height: 'half', treatment: 'railing', freeEnds: ['from'] },
+    { id: 'stairwell-east-guard', from: [stairwellBounds[2], stairwellBounds[1] + 0.12], to: [stairwellBounds[2], stairwellBounds[3]], height: 'half', treatment: 'railing', freeEnds: ['from'] },
+    { id: 'stairwell-south-guard', from: [stairwellBounds[0], stairwellBounds[3]], to: [stairwellBounds[2], stairwellBounds[3]], height: 'half', treatment: 'railing' },
   ],
   furniture: [
-    { id: 'bedroom-clock-carol', model: 'speaker', logic: 'clock@1,5', at: [5.5, 1.5] },
-    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@3,5', at: [6, 4.2], facing: 'E' },
+    // Quarto: cama de cabeceira contra a parede nascente, mesa de cabeceira, tapete e candeeiros.
+    { id: 'bedroom-clock-carol-table', model: 'sideTable', at: [5.5, 1.5], facing: 'E' },
+    { id: 'bedroom-clock-carol', model: 'radio', logic: 'clock@1,5', on: { parent: 'bedroom-clock-carol-table' } },
+    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@3,5', against: { wall: 'east', at: 4.0 }, facing: 'W' },
+    { id: 'bedroom-nightstand', model: 'tableCoffeeSquare', at: [7.7, 3.1] },
     { id: 'bedroom-rug', model: 'rugRectangle', logic: 'rug@5,5', at: [6, 6], facing: 'S' },
     { id: 'bedroom-lamp-north', model: 'lampRoundFloor', logic: 'lamp@5,7', at: [7.5, 5.5] },
-    { id: 'bedroom-clock-south', model: 'speaker', logic: 'clock@7,5', at: [5.5, 7.5] },
+    { id: 'bedroom-clock-south-table', model: 'sideTable', at: [5.5, 7.65] },
+    { id: 'bedroom-clock-south', model: 'radio', logic: 'clock@7,5', on: { parent: 'bedroom-clock-south-table' } },
     { id: 'bedroom-lamp-south', model: 'lampRoundFloor', logic: 'lamp@7,7', at: [7.5, 7.5] },
-
+    // Escritório: secretária com cadeira junto à estante.
     { id: 'study-box', model: 'cardboardBoxClosed', logic: 'box@0,0', at: [0.5, 0.5] },
     { id: 'study-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@1,0', against: { wall: 'west', at: 1.5 } },
+    { id: 'study-bookshelf-books', model: 'books', on: { parent: 'study-bookshelf' } },
     { id: 'study-desk', model: 'desk', logic: 'desk@2,0', at: [0.5, 2.5], facing: 'N' },
+    { id: 'study-chair', model: 'chairDesk', at: [0.6, 1.95], facing: 'S' },
     { id: 'study-lamp', model: 'lampRoundFloor', logic: 'lamp@2,4', at: [4.5, 2.5] },
-
-    { id: 'bathroom-toilet-north', model: 'toilet', logic: 'toilet@3,1', at: [1.5, 3.5], facing: 'N' },
+    // Casa de banho: sanitas e duches encostados às paredes, banheira e lavatório na parede poente.
+    { id: 'bathroom-toilet-north', model: 'toilet', logic: 'toilet@3,1', against: { wall: 'study-bathroom', side: 'S', at: 1.5 }, facing: 'S' },
+    { id: 'bathroom-sink', model: 'bathroomSink', against: { wall: 'west', at: 4.2 }, facing: 'E' },
+    { id: 'bathroom-tub', model: 'bathtub', against: { wall: 'south', at: 0.85 }, facing: 'N' },
     { id: 'bathroom-shower-south', model: 'shower', logic: 'shower@5,2', at: [2.35, 5.5], facing: 'S' },
     { id: 'bathroom-shower-north', model: 'shower', logic: 'shower@4,2', at: [2.35, 4.5], facing: 'S' },
     { id: 'bathroom-toilet-south', model: 'toilet', logic: 'toilet@7,2', at: [2.35, 7.5], facing: 'N' },
-
-    { id: 'kitchen-stove', model: 'kitchenStoveElectric', logic: 'stove@3,4', at: [4.5, 3.5], facing: 'S' },
-    { id: 'kitchen-counter', model: 'kitchenCabinet', logic: 'counter@5,4', at: [4.5, 6.2], facing: 'W' },
+    // Cozinha em linha contra a parede do quarto: placa, frigorífico baixo, lava-loiça e bancada.
+    { id: 'kitchen-stove', model: 'kitchenStoveElectric', logic: 'stove@3,4', against: { wall: 'bedroom-kitchen', side: 'W', at: 3.5 }, facing: 'W' },
+    { id: 'kitchen-fridge', model: 'kitchenFridgeSmall', against: { wall: 'bedroom-kitchen', side: 'W', at: 4.3 }, facing: 'W' },
+    { id: 'kitchen-sink', model: 'kitchenSink', logic: 'counter@5,4', against: { wall: 'bedroom-kitchen', side: 'W', at: 5.96 }, facing: 'W' },
+    { id: 'kitchen-counter', model: 'kitchenCabinet', logic: 'counter@5,4', against: { wall: 'bedroom-kitchen', side: 'W', at: 6.5 }, facing: 'W' },
   ],
 }

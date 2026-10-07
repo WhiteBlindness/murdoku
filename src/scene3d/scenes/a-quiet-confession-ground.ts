@@ -42,9 +42,13 @@ export const aQuietConfessionGround: SceneSpec = {
     { id: 'garden-shrub-south', model: 'plant_bushSmall', logic: 'shrub@7,3', at: [3.5, 7.5] },
 
     { id: 'office-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@0,4', against: { wall: 'north', at: 4.8 } },
-    { id: 'office-chair', model: 'chair', logic: 'chair@0,7', at: [7.5, 0.6], facing: 'W' },
-    { id: 'office-clock', model: 'speaker', logic: 'clock@4,5', at: [5.5, 4.2] },
-    { id: 'office-desk', model: 'desk', logic: 'desk@4,6', at: [6.5, 4.35], facing: 'N' },
+    { id: 'office-bookshelf-books', model: 'books', on: { parent: 'office-bookshelf' } },
+    { id: 'office-chair', model: 'chair', logic: 'chair@0,7', at: [7.5, 0.6], facing: 'S' },
+    // Posto de trabalho a sul da escada: secretária com cadeira e relógio de mesa ao lado.
+    { id: 'office-clock-table', model: 'sideTable', at: [5.5, 4.3], facing: 'E' },
+    { id: 'office-clock', model: 'radio', logic: 'clock@4,5', on: { parent: 'office-clock-table' } },
+    { id: 'office-desk', model: 'desk', logic: 'desk@4,6', at: [6.75, 4.5], facing: 'W' },
+    { id: 'office-desk-chair', model: 'chairDesk', at: [6.1, 4.5], facing: 'E' },
 
     { id: 'yard-shrub-west', model: 'plant_bushSmall', logic: 'shrub@5,4', at: [4.5, 5.8] },
     { id: 'yard-plant-east', model: 'pottedPlant', logic: 'plant@5,7', at: [7.5, 5.5] },

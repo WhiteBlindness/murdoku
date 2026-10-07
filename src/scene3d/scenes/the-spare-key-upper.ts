@@ -56,7 +56,6 @@ export const theSpareKeyUpper: SceneSpec = {
       from: [5, 0],
       to: [5, 3],
       height: 'half',
-      openings: [{ at: 1.5, width: 1.2, kind: 'door' }],
     },
     {
       id: 'study-bedroom-door-west',
@@ -102,17 +101,23 @@ export const theSpareKeyUpper: SceneSpec = {
 
     { id: 'bathroom-tub-west', model: 'bathtub', logic: 'bathtub@0,0', at: [1, 0.5], facing: 'S' },
     { id: 'bathroom-tub-east', model: 'bathtub', logic: 'bathtub@0,3', at: [4, 0.5], facing: 'S' },
-    { id: 'bathroom-toilet-west', model: 'toilet', logic: 'toilet@2,2', at: [2.5, 2.5], facing: 'E' },
-    { id: 'bathroom-toilet-east', model: 'toilet', logic: 'toilet@1,4', at: [4.05, 1.2], facing: 'N' },
+    { id: 'bathroom-toilet-west', model: 'toilet', logic: 'toilet@2,2', against: { wall: 'bathroom-study-door', side: 'N', at: 2.5 }, facing: 'N' },
+    { id: 'bathroom-toilet-east', model: 'toilet', logic: 'toilet@1,4', against: { wall: 'bathroom-office-door', side: 'W', at: 1.5 }, facing: 'W' },
+    { id: 'bathroom-sink', model: 'bathroomSink', against: { wall: 'west', at: 2.0 }, facing: 'E' },
     { id: 'bathroom-shower-east', model: 'shower', logic: 'shower@2,4', at: [4.5, 2.5], facing: 'S' },
 
     { id: 'office-desk', model: 'desk', logic: 'desk@0,6', at: [6.5, 0.65], facing: 'S' },
-    { id: 'office-chair', model: 'chair', logic: 'chair@2,7', at: [7.8, 2.15], facing: 'N' },
+    { id: 'office-chair', model: 'loungeChair', logic: 'chair@2,7', at: [7.55, 2.1], facing: 'W' },
+    { id: 'office-bookcase', model: 'bookcaseOpen', against: { wall: 'north', at: 5.4 } },
+    { id: 'office-bookcase-books', model: 'books', on: { parent: 'office-bookcase', surface: 'shelf2' } },
 
     { id: 'bedroom-clock-west', model: 'speaker', logic: 'clock@7,0', at: [0.5, 7.5] },
-    { id: 'bedroom-rug', model: 'rugDoormat', logic: 'rug@5,6', at: [7.5, 6.5], facing: 'S' },
+    { id: 'bedroom-rug', model: 'rugRectangle', logic: 'rug@5,6', at: [7, 6], facing: 'E' },
+    { id: 'bedroom-dresser', model: 'cabinetBedDrawer', against: { wall: 'study-bedroom-door-east', side: 'S', at: 7.2 }, facing: 'S' },
     { id: 'bedroom-lamp', model: 'lampRoundFloor', logic: 'lamp@7,7', at: [7.5, 7.5], facing: 'N' },
-    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@5,3', at: [4, 6], facing: 'S' },
-    { id: 'bedroom-clock-east', model: 'speaker', logic: 'clock@7,1', at: [1.5, 7.5] },
+    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@5,3', against: { wall: 'study-bedroom-door-west', side: 'S', at: 4.0 } },
+    { id: 'bedroom-nightstand', model: 'cabinetBedDrawerTable', at: [3.15, 5.25], facing: 'S' },
+    { id: 'bedroom-clock-east-table', model: 'sideTable', at: [1.5, 7.62] },
+    { id: 'bedroom-clock-east', model: 'radio', logic: 'clock@7,1', on: { parent: 'bedroom-clock-east-table' } },
   ],
 }

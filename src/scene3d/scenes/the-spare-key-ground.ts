@@ -81,6 +81,7 @@ export const theSpareKeyGround: SceneSpec = {
 
     { id: 'porch-chair-west', model: 'chair', logic: 'chair@0,4', at: [4.5, 0.5], facing: 'E' },
     { id: 'porch-chair-east', model: 'chair', logic: 'chair@0,6', at: [6.5, 0.5], facing: 'W' },
+    { id: 'porch-table', model: 'tableCoffeeSquare', at: [5.5, 0.55] },
     { id: 'porch-flower', model: 'flower_purpleA', logic: 'plant@0,7', at: [7.5, 0.5] },
     { id: 'porch-victim-chair', model: 'chair', logic: 'chair@2,4', at: [4.5, 2.5], facing: 'E' },
     { id: 'porch-culprit-flower', model: 'flower_redA', logic: 'plant@1,6', at: [6.5, 1.5] },
@@ -88,6 +89,12 @@ export const theSpareKeyGround: SceneSpec = {
     { id: 'dining-lamp-west', model: 'lampRoundFloor', logic: 'lamp@3,6', at: [6.7, 3.5], facing: 'N' },
     { id: 'dining-lamp-east', model: 'lampRoundFloor', logic: 'lamp@3,7', at: [7.5, 3.5], facing: 'N' },
     { id: 'dining-table', model: 'table', logic: 'table@5,4', at: [4.5, 5.5], facing: 'E' },
-    { id: 'dining-chair-south', model: 'chair', logic: 'chair@5,7', at: [7.5, 5.5], facing: 'N' },
+    // Mesa de refeições a nascente da escada; cozinha em linha na parede sul e frigorífico na fachada do jardim.
+    { id: 'dining-east-table', model: 'table', at: [6.6, 5.5], facing: 'E' },
+    { id: 'dining-chair-south', model: 'chair', logic: 'chair@5,7', at: [7.4, 5.5], facing: 'W' },
+    { id: 'kitchen-fridge', model: 'kitchenFridge', against: { wall: 'garden-dining-facade', side: 'E', at: 7.66 }, facing: 'E' },
+    { id: 'kitchen-sink', model: 'kitchenSink', against: { wall: 'south', at: 6.35 }, facing: 'N' },
+    { id: 'kitchen-stove', model: 'kitchenStove', against: { wall: 'south', at: 6.89 }, facing: 'N' },
+    { id: 'kitchen-cabinet-a', model: 'kitchenCabinet', against: { wall: 'south', at: 7.43 }, facing: 'N' },
   ],
 }
