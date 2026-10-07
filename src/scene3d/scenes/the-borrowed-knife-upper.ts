@@ -40,7 +40,7 @@ export const theBorrowedKnifeUpper: SceneSpec = {
       from: [0, 3],
       to: [4, 3],
       height: 'half',
-      openings: [{ at: 3.5, width: 1, kind: 'open' }],
+      openings: [{ at: 3.5, width: 1, kind: 'door' }],
     },
     {
       id: 'dining-study-divider',
@@ -54,7 +54,6 @@ export const theBorrowedKnifeUpper: SceneSpec = {
       from: [4, 0],
       to: [4, 3],
       height: 'half',
-      openings: [{ at: 1.5, width: 1.2, kind: 'open' }],
     },
     {
       id: 'study-bedroom-divider-west',
@@ -89,22 +88,34 @@ export const theBorrowedKnifeUpper: SceneSpec = {
     },
   ],
   furniture: [
-    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@5,4', at: [5, 6], facing: 'S' },
+    // Quarto: cama de cabeceira contra a divisória, com mesa de cabeceira.
+    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@5,4', against: { wall: 'study-bedroom-divider-east', side: 'S', at: 4.95 } },
+    { id: 'bedroom-nightstand', model: 'cabinetBedDrawerTable', at: [4.05, 5.25], facing: 'S' },
     { id: 'bedroom-lamp', model: 'lampRoundFloor', logic: 'lamp@7,1', at: [1.5, 7.5] },
     { id: 'bedroom-clock-west', model: 'speaker', logic: 'clock@6,0', at: [0.9, 6.5] },
     { id: 'bedroom-clock-east', model: 'speaker', logic: 'clock@7,6', at: [6.5, 7.5] },
-
     { id: 'study-desk-tomas', model: 'desk', logic: 'desk@3,6', at: [7.1, 3.95], facing: 'S' },
+    { id: 'study-chair-tomas', model: 'chairDesk', at: [7.3, 4.65], facing: 'N' },
     { id: 'study-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@3,4', at: [4.8, 4.12], facing: 'E' },
+    { id: 'study-bookshelf-books', model: 'books', on: { parent: 'study-bookshelf' } },
+    { id: 'study-desk-idris', model: 'desk', logic: 'desk@4,4', at: [4.8, 4.67], facing: 'S' },
+    { id: 'study-chair-idris', model: 'chairDesk', at: [4.05, 4.67], facing: 'E' },
     { id: 'study-box', model: 'cardboardBoxClosed', logic: 'box@4,2', at: [2.9, 4.79] },
-    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@2,0', at: [0.3, 2.35], facing: 'N' },
+    // Casa de banho fechada com porta: banheira e lavatório a norte, duches encostados à divisória.
+    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@2,0', against: { wall: 'west', at: 2.4 }, facing: 'E' },
     { id: 'bathroom-shower-east', model: 'shower', logic: 'shower@2,2', at: [2.5, 2.5], facing: 'S' },
     { id: 'bathroom-shower-west', model: 'shower', logic: 'shower@2,1', at: [1.5, 2.5], facing: 'S' },
-    { id: 'dining-chair', model: 'chair', logic: 'chair@1,7', at: [7.5, 1.5], facing: 'W' },
+    { id: 'bathroom-sink', model: 'bathroomSink', against: { wall: 'north', at: 0.6 }, facing: 'S' },
+    { id: 'bathroom-bathtub', model: 'bathtub', against: { wall: 'north', at: 2.6 }, facing: 'S' },
+    // Sala de jantar com cozinha: placa, lava-loiça e frigorífico na parede norte; mesa com cadeiras.
+    { id: 'dining-stove', model: 'kitchenStove', against: { wall: 'north', at: 6.48 }, facing: 'S' },
+    { id: 'dining-sink', model: 'kitchenSink', against: { wall: 'north', at: 7.02 }, facing: 'S' },
+    { id: 'dining-fridge', model: 'kitchenFridge', against: { wall: 'north', at: 7.6 }, facing: 'S' },
     { id: 'dining-table', model: 'table', logic: 'table@0,4', at: [5.3, 0.65], facing: 'S' },
+    { id: 'dining-table-chair-a', model: 'chairCushion', at: [5.0, 1.25], facing: 'N' },
+    { id: 'dining-table-chair-b', model: 'chairCushion', at: [5.6, 1.25], facing: 'N' },
+    { id: 'dining-table-chair-end', model: 'chairCushion', at: [4.45, 0.65], facing: 'E' },
+    { id: 'dining-chair', model: 'chair', logic: 'chair@1,7', at: [7.5, 1.5], facing: 'W' },
     { id: 'dining-lamp', model: 'lampRoundFloor', logic: 'lamp@2,5', at: [5.5, 2.5] },
-    { id: 'study-desk-idris', model: 'desk', logic: 'desk@4,4', at: [4.8, 4.67], facing: 'S' },
-    { id: 'study-chair-tomas', model: 'chairDesk', at: [7.3, 4.65], facing: 'N' },
-    { id: 'study-chair-idris', model: 'chairDesk', at: [4.05, 4.67], facing: 'E' },
   ],
 }

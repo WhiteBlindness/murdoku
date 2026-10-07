@@ -44,7 +44,6 @@ export const theSecondStudyUpper: SceneSpec = {
       from: [0, 2],
       to: [5, 2],
       height: 'half',
-      openings: [{ at: 3.5, width: 1, kind: 'door' }],
     },
     {
       id: 'pantry-study',
@@ -56,7 +55,7 @@ export const theSecondStudyUpper: SceneSpec = {
     {
       id: 'bathroom-study-north',
       from: [5, 2],
-      to: [5, 3],
+      to: [5, 3.13],
       height: 'half',
       openings: [{ at: 2.5, width: 1, kind: 'open' }],
       freeEnds: ['to'],
@@ -79,13 +78,12 @@ export const theSecondStudyUpper: SceneSpec = {
 
       ],
     },
+    // A casa de banho fecha-se sobre a escada: parede a norte do vão e a poente dele.
     {
-      id: 'stairwell-north',
+      id: 'bathroom-stair-north',
       from: [well[0] - guardOffset, well[1] - guardOffset],
-      to: [well[2], well[1] - guardOffset],
+      to: [5, well[1] - guardOffset],
       height: 'half',
-      treatment: 'railing',
-      freeEnds: ['to'],
     },
     {
       id: 'stairwell-south',
@@ -96,11 +94,10 @@ export const theSecondStudyUpper: SceneSpec = {
       freeEnds: ['to'],
     },
     {
-      id: 'stairwell-west',
+      id: 'bathroom-stair-west',
       from: [well[0] - guardOffset, well[1] - guardOffset],
-      to: [well[0] - guardOffset, well[3] + guardOffset],
+      to: [well[0] - guardOffset, 5],
       height: 'half',
-      treatment: 'railing',
     },
   ],
   furniture: [
@@ -114,13 +111,16 @@ export const theSecondStudyUpper: SceneSpec = {
     { id: 'study-desk', model: 'desk', logic: 'desk@4,5', at: [5.6, 4.48], facing: 'E' },
     { id: 'study-chair', model: 'chairDesk', at: [6.2, 4.48], facing: 'W' },
     { id: 'pantry-fridge', model: 'kitchenFridge', logic: 'fridge@1,4', at: [4.5, 1.5], facing: 'S' },
+    { id: 'pantry-stove', model: 'kitchenStove', against: { wall: 'north', at: 2.13 }, facing: 'S' },
     { id: 'pantry-box', model: 'cardboardBoxClosed', logic: 'box@0,1', at: [1.5, 0.5], facing: 'S' },
     { id: 'pantry-counter', model: 'kitchenCabinet', logic: 'counter@0,2', at: [2.7, 0.5], facing: 'S' },
     { id: 'pantry-sink-counter', model: 'kitchenSink', logic: 'counter@0,2', at: [3.3, 0.5], facing: 'S' },
-    { id: 'bathroom-shower', model: 'showerRound', logic: 'shower@4,1', at: [1.5, 4.5], facing: 'S' },
-    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@2,2', at: [2.5, 2.5], facing: 'S' },
+    { id: 'bathroom-shower', model: 'showerRound', logic: 'shower@4,1', at: [1.45, 4.5], facing: 'S' },
+    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@2,2', against: { wall: 'pantry-bathroom', side: 'S', at: 2.5 }, facing: 'S' },
+    { id: 'bathroom-sink', model: 'bathroomSink', against: { wall: 'west', at: 3.6 }, facing: 'E' },
     { id: 'nadia-bathtub', model: 'bathtub', logic: 'bathtub@2,0', at: [1, 2.5], facing: 'S' },
-    { id: 'yuki-clock', model: 'speaker', logic: 'clock@7,6', at: [6.5, 7.5], facing: 'S' },
+    { id: 'yuki-clock-table', model: 'sideTable', at: [6.5, 7.65] },
+    { id: 'yuki-clock', model: 'radio', logic: 'clock@7,6', on: { parent: 'yuki-clock-table' } },
     { id: 'carol-lamp', model: 'lampRoundFloor', logic: 'lamp@6,7', at: [7.5, 6.5], facing: 'S' },
     { id: 'bed', model: 'bedDouble', against: { wall: 'south', at: 2.5 } },
   ],

@@ -14,14 +14,14 @@ export const aClockStoppedUpper: SceneSpec = {
     halls: [
       { id: 'hallway-crossing', bounds: [0.1, 7, 5.8, 7.75] },
       { id: 'hallway-bedroom-turn', bounds: [3.35, 6.2, 4.2, 7] },
-      { id: 'bedroom-gallery', bounds: [3.05, 3.1, 4, 5.5] },
+      { id: 'bedroom-gallery', bounds: [3.05, 3.1, 4.25, 5.5] },
       { id: 'bedroom-cross-gallery', bounds: [3.2, 3.9, 6.3, 4.65] },
       { id: 'bedroom-bathroom-gallery', bounds: [5.9, 3.1, 6.8, 5.3] },
-      { id: 'study-gallery', bounds: [2.8, 0.1, 4.4, 2.9] },
+      { id: 'study-gallery', bounds: [3.45, 0.1, 4.4, 2.9] },
     ],
     roomAccessTargets: [
       { id: 'bedroom-entry', bounds: [3.2, 5.5, 4.4, 6.5] },
-      { id: 'study-entry', bounds: [2.6, 2.5, 3.8, 3.5] },
+      { id: 'study-entry', bounds: [3.45, 2.5, 4.35, 3.5] },
       { id: 'bathroom-entry', bounds: [5.9, 2.5, 7.1, 3.5] },
     ],
   },
@@ -33,7 +33,7 @@ export const aClockStoppedUpper: SceneSpec = {
   },
   walls: [
     { id: 'study-bathroom', from: [5, 0], to: [5, 3], height: 'half' },
-    { id: 'study-bedroom', from: [0, 3], to: [5, 3], height: 'cutaway', openings: [{ at: 3.2, width: 1.2, kind: 'door' }] },
+    { id: 'study-bedroom', from: [0, 3], to: [5, 3], height: 'cutaway', openings: [{ at: 3.9, width: 1.2, kind: 'door' }] },
     { id: 'bathroom-bedroom', from: [5, 3], to: [8, 3], height: 'cutaway', openings: [{ at: 6.5, width: 1.2, kind: 'door' }] },
     { id: 'bedroom-hallway-west', from: [0, 6], to: [well[0], 6], height: 'cutaway', openings: [{ at: 3.8, width: 1.2, kind: 'door' }] },
     { id: 'bedroom-hallway-east', from: [well[2], 6], to: [8, 6], height: 'cutaway' },
@@ -46,15 +46,22 @@ export const aClockStoppedUpper: SceneSpec = {
   ],
   furniture: [
     { id: 'study-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@0,0', against: { wall: 'north', at: 0.75 } },
-    { id: 'study-desk', model: 'desk', logic: 'desk@2,2', at: [2.2, 2.1], facing: 'S' },
+    { id: 'study-bookshelf-books', model: 'books', on: { parent: 'study-bookshelf' } },
+    // A secretária fica fora da passagem da porta, com a cadeira à frente.
+    { id: 'study-desk', model: 'desk', logic: 'desk@2,2', at: [2.2, 1.85], facing: 'S' },
+    { id: 'study-chair', model: 'chairDesk', at: [2.2, 2.45], facing: 'N' },
     { id: 'study-box', model: 'cardboardBoxClosed', logic: 'box@1,4', at: [4.8, 1.9] },
     { id: 'study-lamp', model: 'lampRoundFloor', logic: 'lamp@0,4', at: [4.85, 0.5], facing: 'S' },
 
     { id: 'bathroom-shower', model: 'shower', logic: 'shower@0,5', at: [5.5, 0.5], facing: 'E' },
-    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@2,5', at: [5.3, 2.1], facing: 'N' },
+    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@2,5', against: { wall: 'study-bathroom', side: 'E', at: 2.2 }, facing: 'E' },
+    { id: 'bathroom-sink', model: 'bathroomSink', against: { wall: 'north', at: 6.7 }, facing: 'S' },
     { id: 'bathroom-tub', model: 'bathtub', logic: 'bathtub@1,7', against: { wall: 'east', at: 2 } },
 
     { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@4,0', against: { wall: 'west', at: 5 } },
+    { id: 'bedroom-nightstand', model: 'sideTable', at: [0.3, 3.98], facing: 'E' },
+    { id: 'bedroom-foot-bench', model: 'bench', at: [1.75, 5.0], facing: 'E' },
+    { id: 'bedroom-dresser', model: 'cabinetBedDrawer', against: { wall: 'study-bedroom', side: 'S', at: 1.5 }, facing: 'S' },
     { id: 'bedroom-clock-4-stand', model: 'sideTable', at: [4.85, 3.65] },
     { id: 'bedroom-clock-4', model: 'radio', logic: 'clock@3,4', on: { parent: 'bedroom-clock-4-stand' } },
     { id: 'bedroom-clock-7-stand', model: 'sideTable', at: [7.55, 3.85] },

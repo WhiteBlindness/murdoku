@@ -48,18 +48,25 @@ export const aClockStoppedGround: SceneSpec = {
     { id: 'front-plant', model: 'plant_bushSmall', logic: 'plant@7,1', at: [1.5, 7.5] },
     { id: 'front-entry-shrub', model: 'plant_bushSmall', logic: 'shrub@6,0', at: [0.5, 6.5] },
 
-    { id: 'office-chair', model: 'chair', logic: 'chair@4,7', at: [7.5, 4.5], facing: 'W' },
+    { id: 'office-chair', model: 'chairDesk', logic: 'chair@4,7', at: [7.4, 4.1], facing: 'N' },
     { id: 'office-bookcase', model: 'bookcaseOpenLow', logic: 'bookshelf@7,4', against: { wall: 'south', at: 5 } },
+    { id: 'office-bookcase-books', model: 'books', on: { parent: 'office-bookcase' } },
     { id: 'office-clock-stand', model: 'sideTable', at: [6.5, 3.5] },
     { id: 'office-clock', model: 'radio', logic: 'clock@3,6', on: { parent: 'office-clock-stand' } },
     { id: 'office-desk', model: 'desk', logic: 'desk@5,4', at: [4.32, 5.9], facing: 'E' },
     { id: 'pantry-box-south', model: 'cardboardBoxClosed', logic: 'box@2,2', at: [2.35, 2.1] },
-    { id: 'pantry-fridge', model: 'kitchenFridge', logic: 'fridge@2,0', at: [0.5, 2.5], facing: 'S' },
+    // Copa de entrada: frigorífico na parede poente e bancada com lava-loiça e placa sob a janela norte.
+    { id: 'pantry-fridge', model: 'kitchenFridge', logic: 'fridge@2,0', against: { wall: 'west', at: 2.5 }, facing: 'E' },
+    { id: 'pantry-cabinet', model: 'kitchenCabinet', against: { wall: 'north', at: 0.4 }, facing: 'S' },
+    { id: 'pantry-sink', model: 'kitchenSink', against: { wall: 'north', at: 0.94 }, facing: 'S' },
+    { id: 'pantry-stove', model: 'kitchenStove', against: { wall: 'north', at: 1.48 }, facing: 'S' },
     { id: 'pantry-box-north', model: 'cardboardBoxClosed', logic: 'box@1,2', at: [2.1, 1.25] },
 
     { id: 'garden-plant-east', model: 'pottedPlant', logic: 'plant@0,7', at: [7.5, 0.5] },
     { id: 'garden-shrub', model: 'plant_bushSmall', logic: 'shrub@0,4', at: [4.5, 0.5] },
     { id: 'garden-plant-south-east', model: 'pottedPlant', logic: 'plant@1,7', at: [7.5, 1.5] },
-    { id: 'office-solution-desk', model: 'desk', logic: 'desk@3,7', against: { wall: 'east', at: 3.5 } },
+    // A secretária de trabalho fica contra a parede do jardim, com a cadeira à frente.
+    { id: 'office-solution-desk', model: 'desk', logic: 'desk@3,7', against: { wall: 'office-garden', side: 'S', at: 7.4 }, facing: 'S' },
+    { id: 'office-solution-laptop', model: 'laptop', on: { parent: 'office-solution-desk' } },
   ],
 }
