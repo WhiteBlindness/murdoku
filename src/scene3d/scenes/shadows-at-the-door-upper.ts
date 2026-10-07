@@ -23,6 +23,7 @@ export const shadowsAtTheDoorUpper: SceneSpec = {
       { id: 'bedroom-entry', bounds: [3.65, 2, 4.9, 2.85] },
       { id: 'study-entry', bounds: [3.5, 5.85, 4.8, 6.8] },
       { id: 'bathroom-entry', bounds: [5.2, 1.3, 6.8, 2.3] },
+      { id: 'bathroom-south-entry', bounds: [4.9, 5.85, 5.95, 6.75] },
     ],
   },
   shell: { features: [
@@ -39,13 +40,15 @@ export const shadowsAtTheDoorUpper: SceneSpec = {
     { id: 'bedroom-study-partition', from: [0, 4], to: [4, 4], height: 'half', openings: [{ at: 2.5, width: 1.2, kind: 'door' }] },
     { id: 'bedroom-hallway-partition', from: [4, 0], to: [4, 4], height: 'half', openings: [{ at: 2.5, width: 1.2, kind: 'door' }] },
     { id: 'study-hallway-partition', from: [4, 4], to: [4, 8], height: 'half', openings: [{ at: 6.3, width: 1.2, kind: 'door' }] },
-    { id: 'hallway-bathroom-partition', from: [6, 0], to: [6, 8], height: 'half', openings: [{ at: 1.8, width: 1, kind: 'door' }] },
+    { id: 'hallway-bathroom-partition', from: [6, 0], to: [6, 8], height: 'half', openings: [{ at: 1.8, width: 1, kind: 'door' }, { at: 6.3, width: 1, kind: 'door' }] },
+    // A faixa de serviço divide-se em duas casas de banho, cada uma com porta para o corredor.
+    { id: 'bathroom-split', from: [6, 4.6], to: [8, 4.6], height: 'half' },
     { id: 'stairwell-west-guard', from: [well[0] - guardOffset, well[1] - guardOffset], to: [well[0] - guardOffset, well[3]], height: 'half', treatment: 'railing', freeEnds: ['to'] },
     { id: 'stairwell-east-guard', from: [well[2] + guardOffset, well[1] - guardOffset], to: [well[2] + guardOffset, well[3]], height: 'half', treatment: 'railing', freeEnds: ['to'] },
     { id: 'stairwell-north-guard', from: [well[0] - guardOffset, well[1] - guardOffset], to: [well[2] + guardOffset, well[1] - guardOffset], height: 'half', treatment: 'railing' },
   ],
   furniture: [
-    { id: 'bedroom-bed', model: 'bedDouble', at: [1.75, 1.6], facing: 'S' },
+    { id: 'bedroom-bed', model: 'bedDouble', against: { wall: 'bedroom-hallway-partition', side: 'W', at: 1.3 }, facing: 'W' },
     { id: 'bedroom-clock-east', model: 'speaker', logic: 'clock@2,3', at: [3.15, 2.2], facing: 'S' },
     { id: 'bedroom-lamp', model: 'lampRoundFloor', logic: 'lamp@0,3', at: [3.5, 0.5], facing: 'S' },
     { id: 'bedroom-clock-south', model: 'speaker', logic: 'clock@3,1', at: [1.5, 3.5], facing: 'S' },
@@ -61,9 +64,11 @@ export const shadowsAtTheDoorUpper: SceneSpec = {
     { id: 'hallway-south-plant', model: 'pottedPlant', logic: 'plant@7,5', at: [5.5, 7.5], facing: 'S' },
 
     { id: 'bathroom-toilet-north', model: 'toilet', logic: 'toilet@0,7', at: [7.5, 0.5], facing: 'S' },
-    { id: 'bathroom-shower-north', model: 'showerRound', logic: 'shower@1,7', at: [7.58, 1.9], facing: 'E' },
+    { id: 'bathroom-shower-north', model: 'showerRound', logic: 'shower@1,7', at: [7.5, 1.6], facing: 'S' },
+    { id: 'bathroom-sink-north', model: 'bathroomSink', against: { wall: 'hallway-bathroom-partition', side: 'E', at: 0.6 }, facing: 'E' },
     { id: 'bathroom-toilet-clue', model: 'toilet', logic: 'toilet@5,7', at: [7.5, 5.5], facing: 'W' },
     { id: 'bathroom-shower-south', model: 'showerRound', logic: 'shower@7,7', at: [7.5, 7.5], facing: 'S' },
+    { id: 'bathroom-sink-south', model: 'bathroomSink', against: { wall: 'south', at: 6.5 }, facing: 'N' },
     { id: 'bathroom-bathtub-west', model: 'bathtub', logic: 'bathtub@3,6', at: [6.5, 3.2], facing: 'E' },
     { id: 'bathroom-bathtub-east', model: 'bathtub', logic: 'bathtub@3,7', at: [7.5, 3.2], facing: 'W' },
   ],

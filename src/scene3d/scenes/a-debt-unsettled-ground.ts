@@ -42,7 +42,7 @@ export const aDebtUnsettledGround: SceneSpec = {
     { id: 'living-garden-opening', from: [4, 0], to: [4, 5], height: 'half', openings: [{ at: 3.5, width: 1.2, kind: 'door' }] },
     { id: 'living-porch-opening', from: [0, 5], to: [4, 5], height: 'half', openings: [{ at: 1.3, width: 1.2, kind: 'door' }] },
     { id: 'garden-dining-boundary', from: [4, 5], to: [8, 5], height: 'half' },
-    { id: 'porch-dining-opening', from: [4, 5], to: [4, 8], height: 'half', openings: [{ at: 7.25, width: 1, kind: 'door' }] },
+    { id: 'porch-dining-opening', from: [4, 5], to: [4, 8], height: 'half', openings: [{ at: 6.3, width: 1, kind: 'door' }] },
   ],
   furniture: [
     { id: 'living-clock', model: 'speaker', logic: 'clock@0,3', at: [3.5, 0.55], facing: 'S' },
@@ -51,7 +51,7 @@ export const aDebtUnsettledGround: SceneSpec = {
     { id: 'living-tv-north', model: 'televisionVintage', on: { parent: 'living-tv-cabinet-north' } },
     { id: 'living-tv-cabinet-south', model: 'cabinetTelevision', logic: 'tv@4,3', at: [3.0, 4.45], facing: 'N' },
     { id: 'living-tv-south', model: 'televisionVintage', on: { parent: 'living-tv-cabinet-south' } },
-    { id: 'living-rug', model: 'rugRectangle', at: [1.9, 2.75], facing: 'E' },
+    { id: 'living-armchair', model: 'loungeChair', at: [1.1, 2.3], facing: 'E' },
 
     { id: 'garden-plant-north', model: 'pottedPlant', logic: 'plant@0,5', at: [5.5, 0.5], facing: 'S' },
     { id: 'garden-plant-west', model: 'pottedPlant', logic: 'plant@1,4', at: [4.5, 1.5], facing: 'S' },
@@ -63,10 +63,12 @@ export const aDebtUnsettledGround: SceneSpec = {
     { id: 'porch-plant-yuki', model: 'pottedPlant', logic: 'plant@5,3', at: [3.5, 5.55], facing: 'S' },
     { id: 'porch-chair-south', model: 'chair', logic: 'chair@7,1', at: [1.5, 7.45], facing: 'N' },
 
-    { id: 'dining-table-north', model: 'table', logic: 'table@5,5', at: [5.75, 5.75], facing: 'E' },
+    // Duas mesas de refeição, cada uma com as suas cadeiras.
+    { id: 'dining-table-north', model: 'table', logic: 'table@5,5', at: [6.0, 5.6], facing: 'N' },
+    { id: 'dining-chair-north-east', model: 'chair', at: [6.75, 5.6], facing: 'W' },
     { id: 'dining-lamp', model: 'lampRoundFloor', logic: 'lamp@5,4', at: [4.55, 5.55], facing: 'N' },
-    { id: 'dining-chair', model: 'chair', logic: 'chair@6,4', at: [4.92, 6.12], facing: 'N' },
-    { id: 'dining-table-alexander', model: 'table', logic: 'table@7,4', at: [4.92, 7.2], facing: 'E' },
-    { id: 'dining-chair-south', model: 'chair', at: [6.5, 7.35], facing: 'W' },
+    { id: 'dining-table-alexander', model: 'table', logic: 'table@7,4', at: [5.0, 7.45], facing: 'N' },
+    { id: 'dining-chair', model: 'chair', logic: 'chair@6,4', at: [4.75, 6.85], facing: 'S' },
+    { id: 'dining-chair-south', model: 'chair', at: [5.75, 7.45], facing: 'W' },
   ],
 }

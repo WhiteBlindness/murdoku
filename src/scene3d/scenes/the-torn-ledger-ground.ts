@@ -8,12 +8,12 @@ export const theTornLedgerGround: SceneSpec = {
   puzzleId: 'master-1',
   floor: 0,
   storeyFootprint: { kind: 'full' },
-  entry: { wall: 'west', at: 4 },
+  entry: { wall: 'west', at: 1.0 },
   shell: {
     features: [
       { wall: 'north', at: 1.35, kind: 'window' },
       { wall: 'north', at: 3.05, kind: 'window' },
-      { wall: 'west', at: 1.8, kind: 'window' },
+      { wall: 'west', at: 2.3, kind: 'window' },
 
     ],
   },
@@ -35,16 +35,16 @@ export const theTornLedgerGround: SceneSpec = {
     { id: 'garden-living-facade', from: [4, 0], to: [4, 3], height: 'half', openings: [
       { at: 1.55, width: 1.2, kind: 'door' },
     ] },
-    { id: 'kitchen-garden-facade', from: [4, 3], to: [8, 3], height: 'half', openings: [
-      { at: 7.15, width: 1.4, kind: 'door' },
-    ] },
+    { id: 'kitchen-garden-facade', from: [4, 3], to: [8, 3], height: 'half' },
     { id: 'living-kitchen', from: [4, 3], to: [4, 5], openings: [
       { at: 3.6, width: 1, kind: 'door' },
     ] },
   ],
   furniture: [
-    { id: 'living-television', model: 'cabinetTelevision', logic: 'tv@4,1', at: [1.7, 3.6], facing: 'W' },
-    { id: 'living-sofa', model: 'loungeSofa', logic: 'sofa@3,0', against: { wall: 'west', at: 2.8 } },
+    // Sala: o sofá encosta à parede poente e encara o televisor.
+    { id: 'living-television', model: 'cabinetTelevision', logic: 'tv@4,1', at: [1.6, 3.9], facing: 'W' },
+    { id: 'living-television-set', model: 'televisionModern', on: { parent: 'living-television' } },
+    { id: 'living-sofa', model: 'loungeSofa', logic: 'sofa@3,0', against: { wall: 'west', at: 3.9 } },
     { id: 'living-clock-table', model: 'sideTable', at: [3.45, 2.45] },
     { id: 'living-clock', model: 'radio', logic: 'clock@2,3', on: { parent: 'living-clock-table' } },
     { id: 'living-area-rug', model: 'rugRectangle', logic: 'rug@0,2', at: [3, 1], facing: 'E' },
@@ -59,8 +59,13 @@ export const theTornLedgerGround: SceneSpec = {
     { id: 'kitchen-dining-table', model: 'table', logic: 'table@3,4', at: [5.3, 3.6], facing: 'S' },
     { id: 'kitchen-stove', model: 'kitchenStove', logic: 'stove@6,4', at: [4.15, 6.5], facing: 'S' },
     { id: 'kitchen-fridge', model: 'kitchenFridge', logic: 'fridge@6,7', at: [7.65, 6.8], facing: 'S' },
-    { id: 'kitchen-counter', model: 'kitchenCabinet', logic: 'counter@3,6', at: [7, 4], facing: 'S' },
-    { id: 'kitchen-sink', model: 'kitchenSink', at: [7.65, 4], facing: 'S' },
+    // Cozinha em L: bancada contra a fachada do jardim, a continuar pela parede nascente com o lava-loiça até ao frigorífico.
+    { id: 'kitchen-counter', model: 'kitchenCabinet', logic: 'counter@3,6', against: { wall: 'kitchen-garden-facade', side: 'S', at: 6.27 }, facing: 'S' },
+    { id: 'kitchen-counter-b', model: 'kitchenCabinetDrawer', logic: 'counter@3,6', against: { wall: 'kitchen-garden-facade', side: 'S', at: 6.81 }, facing: 'S' },
+    { id: 'kitchen-corner', model: 'kitchenCabinet', against: { wall: 'kitchen-garden-facade', side: 'S', at: 7.35 }, facing: 'S' },
+    { id: 'kitchen-run-east-a', model: 'kitchenCabinetDrawer', against: { wall: 'east', at: 4.0 }, facing: 'W' },
+    { id: 'kitchen-sink', model: 'kitchenSink', against: { wall: 'east', at: 4.54 }, facing: 'W' },
+    { id: 'kitchen-run-east-c', model: 'kitchenCabinetDrawer', against: { wall: 'east', at: 5.08 }, facing: 'W' },
     { id: 'kitchen-table-lena', model: 'table', logic: 'table@7,4', at: [5, 7.5], facing: 'S' },
   ],
 }

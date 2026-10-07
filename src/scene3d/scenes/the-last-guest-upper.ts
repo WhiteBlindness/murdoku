@@ -62,7 +62,8 @@ export const theLastGuestUpper: SceneSpec = {
   ],
   furniture: [
     { id: 'bedroom-lamp-southwest', model: 'lampRoundFloor', logic: 'lamp@6,0', at: [0.5, 6.5] },
-    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@2,0', at: [0.75, 2.5], facing: 'E' },
+    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@2,0', against: { wall: 'west', at: 3.0 }, facing: 'E' },
+    { id: 'bedroom-nightstand', model: 'tableCoffeeSquare', at: [0.32, 2.05] },
     { id: 'bedroom-clock-table', model: 'sideTable', at: [2.5, 6.5], facing: 'S' },
     { id: 'bedroom-clock', model: 'radio', logic: 'clock@6,2', on: { parent: 'bedroom-clock-table' } },
     { id: 'bedroom-lamp-northwest', model: 'lampRoundFloor', logic: 'lamp@5,0', at: [0.5, 5.5] },
@@ -75,6 +76,7 @@ export const theLastGuestUpper: SceneSpec = {
     { id: 'bathroom-shower', model: 'showerRound', logic: 'shower@0,5', at: [5.5, 0.5], facing: 'S' },
     { id: 'bathroom-alcove-tub', model: 'bathtub', logic: 'bathtub@2,5', at: [5.8, 2.05], facing: 'N' },
     { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@0,7', at: [7.5, 0.5], facing: 'S' },
+    { id: 'bathroom-sink', model: 'bathroomSink', against: { wall: 'north', at: 6.5 }, facing: 'S' },
     { id: 'bathroom-second-tub', model: 'bathtub', logic: 'bathtub@4,6', at: [6.95, 4.2], facing: 'E' },
 
     { id: 'office-chair', model: 'chair', logic: 'chair@6,5', at: [5.8, 6.5], facing: 'E' },

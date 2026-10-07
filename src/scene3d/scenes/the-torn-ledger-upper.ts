@@ -23,7 +23,7 @@ export const theTornLedgerUpper: SceneSpec = {
     landing: [well[0], well[1] - 0.9, well[2], well[1]],
     halls: [
       { id: 'west-hall-spine', bounds: [0.12, 0.12, 1.06, 7.88] },
-      { id: 'cross-gallery', bounds: [0.1, 3.3, 7.9, well[1] - 0.05] },
+      { id: 'cross-gallery', bounds: [0.1, 3.3, 6.6, well[1] - 0.05] },
     ],
     roomAccessTargets: [
       { id: 'bedroom-door', bounds: [1.4, 3.3, 2.6, well[1] - 0.05] },
@@ -82,6 +82,7 @@ export const theTornLedgerUpper: SceneSpec = {
 
     { id: 'bathroom-shower-nadia', model: 'showerRound', logic: 'shower@0,6', at: [6.5, 0.5], facing: 'S' },
     { id: 'bathroom-tub', model: 'bathtub', logic: 'bathtub@1,7', at: [7.3, 2.3], facing: 'W' },
-    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@7,7', at: [7.5, 7.5], facing: 'S' },
+    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@7,7', against: { wall: 'east', at: 7.45 }, facing: 'W' },
+    { id: 'bathroom-sink', model: 'bathroomSink', against: { wall: 'study-bathroom', side: 'E', at: 6.5 }, facing: 'E' },
   ],
 }

@@ -38,7 +38,7 @@ export const shadowsAtTheDoorGround: SceneSpec = {
     { id: 'garden-ground', cells: [4, 4, 7, 7], material: 'grass', kind: 'exterior' },
   ],
   walls: [
-    { id: 'kitchen-dining-partition', from: [4, 0], to: [4, 4], height: 'half', openings: [{ at: 2.4, width: 1.2, kind: 'door' }] },
+    { id: 'kitchen-dining-partition', from: [4, 0], to: [4, 4], height: 'half', openings: [{ at: 2.5, width: 1.0, kind: 'door' }] },
     { id: 'kitchen-living-partition', from: [0, 4], to: [4, 4], height: 'half', openings: [{ at: 3.35, width: 1, kind: 'door' }] },
     { id: 'dining-garden-facade', from: [4, 4], to: [8, 4], height: 'half', openings: [{ at: 6.35, width: 1.2, kind: 'door' }] },
     { id: 'living-garden-facade', from: [4, 4], to: [4, 8], height: 'half', openings: [{ at: 6.2, width: 1.2, kind: 'door' }] },
@@ -48,7 +48,8 @@ export const shadowsAtTheDoorGround: SceneSpec = {
     { id: 'kitchen-fridge-north', model: 'kitchenFridge', logic: 'fridge@0,1', at: [1.5, 0.5], facing: 'S' },
     { id: 'kitchen-counter-upper-run', model: 'kitchenCabinet', logic: 'counter@1,0', at: [0.45, 1.15], facing: 'E' },
     { id: 'kitchen-counter-lower-run', model: 'kitchenCabinet', logic: 'counter@1,0', at: [0.45, 2.05], facing: 'E' },
-    { id: 'kitchen-fridge-clue', model: 'kitchenFridgeSmall', logic: 'fridge@1,3', at: [3.5, 1.5], facing: 'W' },
+    { id: 'kitchen-sink', model: 'kitchenSink', at: [0.45, 2.59], facing: 'E' },
+    { id: 'kitchen-fridge-clue', model: 'kitchenFridgeSmall', logic: 'fridge@1,3', at: [3.5, 1.3], facing: 'W' },
 
     { id: 'dining-table', model: 'table', logic: 'table@3,6', at: [5.6, 2.8], facing: 'S' },
     { id: 'dining-chair-anchor', model: 'chair', logic: 'chair@0,7', at: [7.5, 0.5], facing: 'S' },

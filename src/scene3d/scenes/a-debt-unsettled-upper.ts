@@ -54,15 +54,18 @@ export const aDebtUnsettledUpper: SceneSpec = {
     { id: 'hallway-plant-east', model: 'pottedPlant', logic: 'plant@1,4', at: [4.5, 1.72], facing: 'S' },
 
     { id: 'bedroom-rug-bella', model: 'rugRectangle', logic: 'rug@2,2', at: [2.45, 3.1], facing: 'E' },
-    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@2,4', at: [4.5, 2.9], facing: 'E' },
+    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@2,4', against: { wall: 'hallway-bedroom-door', side: 'S', at: 5.0 } },
     { id: 'bedroom-clock', model: 'speaker', logic: 'clock@4,1', at: [1.5, 4.75], facing: 'S' },
     { id: 'bedroom-lamp', model: 'lampRoundFloor', logic: 'lamp@4,4', at: [4.5, 4.75], facing: 'S' },
 
     { id: 'bathroom-shower', model: 'showerRound', logic: 'shower@5,1', at: [1.85, 5.55], facing: 'E' },
     { id: 'bathroom-bathtub', model: 'bathtub', logic: 'bathtub@7,0', at: [0.55, 7.0], facing: 'E' },
+    { id: 'bathroom-toilet', model: 'toilet', against: { wall: 'bathroom-study-wall', side: 'W', at: 6.6 }, facing: 'W' },
+    { id: 'bathroom-sink', model: 'bathroomSink', against: { wall: 'bedroom-bathroom-door', side: 'S', at: 2.6 }, facing: 'S' },
 
     { id: 'study-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@5,4', at: [4.35, 5.55], facing: 'S' },
     { id: 'study-desk', model: 'desk', logic: 'desk@6,7', at: [7.35, 6.45], facing: 'W' },
+    { id: 'study-chair', model: 'chairDesk', at: [6.9, 6.42], facing: 'E' },
     { id: 'study-box', model: 'cardboardBoxClosed', logic: 'box@7,7', at: [7.5, 7.5], facing: 'S' },
     { id: 'study-lamp', model: 'lampRoundFloor', logic: 'lamp@7,5', at: [5.5, 7.4], facing: 'S' },
   ],

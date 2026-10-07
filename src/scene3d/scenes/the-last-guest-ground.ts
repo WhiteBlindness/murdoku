@@ -39,6 +39,7 @@ export const theLastGuestGround: SceneSpec = {
   furniture: [
     { id: 'living-area-rug', model: 'rugRectangle', logic: 'rug@2,0', at: [1.05, 2.5], facing: 'E' },
     { id: 'living-television', model: 'cabinetTelevision', logic: 'tv@2,2', at: [2.4, 2.45], facing: 'N' },
+    { id: 'living-television-set', model: 'televisionModern', on: { parent: 'living-television' } },
     { id: 'living-north-clock-table', model: 'sideTable', at: [2.35, 0.55], facing: 'S' },
     { id: 'living-north-clock', model: 'radio', logic: 'clock@0,2', on: { parent: 'living-north-clock-table' } },
     { id: 'living-sofa', model: 'loungeSofa', logic: 'sofa@1,0', at: [1.0, 1.5], facing: 'S' },
@@ -55,6 +56,7 @@ export const theLastGuestGround: SceneSpec = {
     { id: 'dining-lamp-idris', model: 'lampRoundFloor', logic: 'lamp@5,3', at: [3.17, 5.5] },
     { id: 'dining-chair-yuki', model: 'chair', logic: 'chair@5,4', at: [5.08, 5.55], facing: 'N' },
     { id: 'dining-chair-south', model: 'chair', logic: 'chair@7,5', at: [5.5, 7.5], facing: 'N' },
+    { id: 'dining-sideboard', model: 'bookcaseOpenLow', against: { wall: 'south', at: 4.4 }, facing: 'N' },
 
     { id: 'hallway-stair-clock-table', model: 'sideTable', at: [6.5, 3.9], facing: 'E' },
     { id: 'hallway-stair-clock', model: 'radio', logic: 'clock@3,6', on: { parent: 'hallway-stair-clock-table' } },
