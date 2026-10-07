@@ -1091,7 +1091,7 @@ export default function GameScreen(props: Props) {
             <div className="relative p-3 lg:p-4 flex flex-col gap-3">
 
               {/* Suspects label */}
-              <p className="text-[10px] text-text-muted font-mono uppercase tracking-[0.2em]">
+              <p className="text-[10px] text-text-muted font-mono uppercase tracking-[0.2em] [text-wrap:balance]">
                 {detective
                   ? 'Suspects · select · draft · check off solved clues'
                   : 'Suspects · select · place · use hints to nudge'}

@@ -123,10 +123,10 @@ export default function CaseProgressStrip({
                   <span className="block truncate font-display text-[13px] font-semibold uppercase tracking-[0.08em]">
                     {person.name}
                   </span>
-                  <span className="mt-0.5 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.13em]" style={{ color: '#4B4232' }}>
+                  <span className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 font-mono text-[10px] uppercase tracking-[0.13em]" style={{ color: '#4B4232' }}>
                     {conflicted ? <AlertTriangle size={12} aria-hidden="true" /> : placed ? <Check size={12} aria-hidden="true" /> : suggested ? <CircleDashed size={12} aria-hidden="true" /> : <UserRound size={12} aria-hidden="true" />}
                     <span>{stateLabel}</span>
-                    {person.isVictim && <span className="text-danger-text">· victim</span>}
+                    {person.isVictim && <span style={{ color: '#7A1F1A' }}>· victim</span>}
                   </span>
                 </span>
               </button>
