@@ -28,7 +28,8 @@ export const theSecondShot: SceneSpec = {
     ] },
   ],
   furniture: [
-    { id: 'office-desk', model: 'desk', logic: 'desk@0,2', at: [2.5, 0.4], facing: 'N' },
+    { id: 'office-desk', model: 'desk', logic: 'desk@0,2', at: [2.35, 0.4], facing: 'S' },
+    { id: 'office-desk-chair', model: 'chairDesk', at: [2.2, 1.0], facing: 'N' },
     { id: 'office-chair', model: 'chairDesk', logic: 'chair@2,2', at: [2.3, 2.35], facing: 'W' },
 
     { id: 'dining-lamp-west', model: 'lampRoundFloor', logic: 'lamp@5,0', at: [0.5, 5.5] },
@@ -42,7 +43,7 @@ export const theSecondShot: SceneSpec = {
     { id: 'hall-plant', model: 'pottedPlant', logic: 'plant@7,4', at: [4.5, 7.45] },
 
     { id: 'kitchen-counter-run-a', model: 'kitchenCabinet', logic: 'counter@0,5', at: [5.45, 0.65], facing: 'E' },
-    { id: 'kitchen-counter-run-b', model: 'kitchenCabinetDrawer', logic: 'counter@0,5', at: [6.35, 0.65], facing: 'E' },
+    { id: 'kitchen-counter-run-b', model: 'kitchenSink', logic: 'counter@0,5', at: [6.35, 0.65], facing: 'E' },
     { id: 'kitchen-fridge', model: 'kitchenFridge', logic: 'fridge@0,7', at: [7.45, 0.6], facing: 'S' },
     { id: 'kitchen-stove', model: 'kitchenStove', logic: 'stove@1,5', at: [5.7, 1.3], facing: 'E' },
     { id: 'kitchen-island-counter', model: 'kitchenCabinet', logic: 'counter@3,7', at: [7.5, 3.75], facing: 'W' },

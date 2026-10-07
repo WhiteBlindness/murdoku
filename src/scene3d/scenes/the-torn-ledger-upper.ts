@@ -68,8 +68,8 @@ export const theTornLedgerUpper: SceneSpec = {
     { id: 'hall-rug-middle', model: 'rugRectangle', logic: 'rug@4,0', at: [1, 5], facing: 'E' },
     { id: 'hall-rug-south', model: 'rugRectangle', logic: 'rug@6,0', at: [1, 7], facing: 'E' },
 
-    { id: 'bedroom-bed-north', model: 'bedDouble', logic: 'bed@2,2', at: [2.8, 2.5], facing: 'E' },
-    { id: 'bedroom-bed-south-bella', model: 'bedDouble', logic: 'bed@4,2', at: [2.8, 5.9], facing: 'E' },
+    { id: 'bedroom-bed-north', model: 'bedDouble', logic: 'bed@2,2', against: { wall: 'hallway-bedroom', side: 'E', at: 2.5 }, facing: 'E' },
+    { id: 'bedroom-bed-south-bella', model: 'bedDouble', logic: 'bed@4,2', against: { wall: 'hallway-bedroom', side: 'E', at: 5.9 }, facing: 'E' },
     { id: 'bedroom-clock-table', model: 'sideTable', at: [2.45, 6.85] },
     { id: 'bedroom-clock', model: 'radio', logic: 'clock@6,2', on: { parent: 'bedroom-clock-table' } },
     { id: 'bedroom-lamp-south', model: 'lampRoundFloor', logic: 'lamp@7,3', at: [3.7, 7.45] },

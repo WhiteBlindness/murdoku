@@ -39,6 +39,8 @@ export const roomWithoutADoorGround: SceneSpec = {
     { id: 'living-clock-east-table', model: 'sideTable', at: [7.5, 0.55] },
     { id: 'living-clock-east', model: 'radio', logic: 'clock@0,7', on: { parent: 'living-clock-east-table' } },
     { id: 'living-television', model: 'cabinetTelevision', logic: 'tv@2,5', at: [5.5, 2.0], facing: 'W' },
+    { id: 'living-television-set', model: 'televisionModern', on: { parent: 'living-television' } },
+    { id: 'living-coffee-table', model: 'tableCoffee', at: [2.4, 1.6], facing: 'E' },
     { id: 'living-clock-south-table', model: 'sideTable', at: [7.5, 2.45] },
     { id: 'living-clock-south', model: 'radio', logic: 'clock@2,7', on: { parent: 'living-clock-south-table' } },
     { id: 'living-chair', model: 'loungeChair', at: [3.8, 1.2], facing: 'S' },

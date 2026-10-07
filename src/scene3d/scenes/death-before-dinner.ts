@@ -56,6 +56,7 @@ export const deathBeforeDinner: SceneSpec = {
     // Office: the desk has a usable chair, while the clue-linked chair makes a
     // separate reading corner rather than floating beside the work position.
     { id: 'office-desk', model: 'desk', logic: 'desk@6,4', against: { wall: 'south', at: 4.5 } },
+    { id: 'office-desk-chair', model: 'chairDesk', at: [4.5, 6.1], facing: 'S' },
     { id: 'laptop', model: 'laptop', on: { parent: 'office-desk' } },
     // The chair remains at the desk, clear of the standee centre at (5,4).
     { id: 'desk-chair', model: 'chairDesk', at: [4.55, 5.2], facing: 'S' },

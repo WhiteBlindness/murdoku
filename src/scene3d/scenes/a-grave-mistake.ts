@@ -50,6 +50,7 @@ export const aGraveMistake: SceneSpec = {
     { id: 'dining-lamp', model: 'lampRoundFloor', logic: 'lamp@5,2', at: [2.2, 5.25] },
 
     { id: 'kitchen-stove', model: 'kitchenStove', logic: 'stove@4,5', at: [5.8, 4.1], facing: 'E' },
+    { id: 'kitchen-sink', model: 'kitchenSink', against: { wall: 'east', at: 3.4 }, facing: 'W' },
     { id: 'kitchen-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@4,6', at: [6.5, 4.5], facing: 'S' },
   ],
 }

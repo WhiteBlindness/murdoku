@@ -40,6 +40,7 @@ export const whispersUpstairs: SceneSpec = {
 
     { id: 'kitchen-stove', model: 'kitchenStoveElectric', logic: 'stove@6,3', at: [3.5, 6.5], facing: 'E' },
     { id: 'kitchen-counter', model: 'kitchenCabinet', logic: 'counter@5,5', at: [6.0, 5.5], facing: 'S' },
+    { id: 'kitchen-sink', model: 'kitchenSink', at: [6.54, 5.5], facing: 'S' },
     { id: 'kitchen-fridge-west', model: 'kitchenFridgeSmall', logic: 'fridge@7,4', at: [4.5, 7.5], facing: 'E' },
     { id: 'kitchen-fridge-east', model: 'kitchenFridgeSmall', logic: 'fridge@7,6', at: [6.5, 7.5], facing: 'W' },
   ],

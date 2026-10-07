@@ -34,6 +34,7 @@ export const theTornLetter: SceneSpec = {
     { id: 'kitchen-idris-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@2,7', at: [7.5, 2.5], facing: 'W' },
     { id: 'kitchen-fridge-south', model: 'kitchenFridgeSmall', logic: 'fridge@3,7', at: [7.5, 3.5], facing: 'W' },
     { id: 'kitchen-stove', model: 'kitchenStoveElectric', logic: 'stove@2,0', at: [0.5, 2.5], facing: 'E' },
+    { id: 'kitchen-sink', model: 'kitchenSink', against: { wall: 'west', at: 3.04 }, facing: 'E' },
 
     { id: 'dining-table-bella', model: 'table', logic: 'table@5,0', at: [1.0, 5.5], facing: 'E' },
     { id: 'dining-chair-carol', model: 'chair', logic: 'chair@6,0', at: [0.5, 6.5], facing: 'E' },

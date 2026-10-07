@@ -30,6 +30,7 @@ export const theSilentGuest: SceneSpec = {
     { id: 'office-bookcase', model: 'bookcaseOpen', logic: 'bookshelf@0,3', against: { wall: 'north', at: 3.55 } },
     { id: 'office-books', model: 'books', on: { parent: 'office-bookcase', surface: 'shelf1' } },
     { id: 'office-desk', model: 'desk', logic: 'desk@0,5', against: { wall: 'north', at: 5.5 } },
+    { id: 'office-desk-chair', model: 'chairDesk', at: [5.2, 0.92], facing: 'N' },
     { id: 'office-laptop', model: 'laptop', on: { parent: 'office-desk' } },
     { id: 'office-chair', model: 'chairDesk', logic: 'chair@1,3', at: [3.45, 1.55], facing: 'E' },
     { id: 'office-clock', model: 'speaker', logic: 'clock@1,6', against: { wall: 'east', at: 1.2 } },

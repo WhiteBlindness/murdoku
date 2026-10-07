@@ -27,6 +27,7 @@ export const theSeventhGuest: SceneSpec = {
     { id: 'pantry-box', model: 'cardboardBoxClosed', logic: 'box@1,4', at: [4.55, 1.5] },
     { id: 'pantry-counter', model: 'kitchenBar', logic: 'counter@1,6', at: [6.55, 1.5], facing: 'W' },
 
+    { id: 'kitchen-sink', model: 'kitchenSink', against: { wall: 'west', at: 4.5 }, facing: 'E' },
     { id: 'kitchen-stove-north', model: 'kitchenStoveElectric', logic: 'stove@4,3', at: [3.25, 4.45], facing: 'E' },
     { id: 'kitchen-fridge-east', model: 'kitchenFridgeSmall', logic: 'fridge@5,3', at: [3.65, 5.5], facing: 'W' },
     { id: 'kitchen-stove-south', model: 'kitchenStove', logic: 'stove@6,3', at: [3.25, 6.55], facing: 'E' },

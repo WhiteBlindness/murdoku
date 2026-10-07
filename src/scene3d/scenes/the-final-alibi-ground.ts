@@ -38,7 +38,7 @@ export const theFinalAlibiGround: SceneSpec = {
   furniture: [
     // Bancada em península de costas para a escada, com a placa no topo nascente.
     { id: 'kitchen-stove', model: 'kitchenStoveElectric', logic: 'stove@2,7', at: [7.43, 2.3], facing: 'S' },
-    { id: 'kitchen-run-gap', model: 'kitchenCabinetDrawer', at: [6.89, 2.3], facing: 'S' },
+    { id: 'kitchen-sink', model: 'kitchenSink', logic: 'counter@2,5', at: [6.89, 2.3], facing: 'S' },
     { id: 'kitchen-table-west', model: 'table', logic: 'table@3,3', at: [4.1, 3.125], facing: 'N' },
     { id: 'kitchen-fridge', model: 'kitchenFridge', logic: 'fridge@3,5', at: [5.5, 3.2], facing: 'S' },
     { id: 'garden-plant-north', model: 'pottedPlant', logic: 'plant@4,4', at: [4.0, 4.5] },

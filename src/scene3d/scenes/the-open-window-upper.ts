@@ -65,6 +65,7 @@ export const theOpenWindowUpper: SceneSpec = {
     { id: 'bedroom-lamp-east', model: 'lampRoundFloor', logic: 'lamp@0,3', at: [3.5, 0.5], facing: 'S' },
     { id: 'bedroom-lamp-west', model: 'lampRoundFloor', logic: 'lamp@2,0', at: [0.5, 2.5], facing: 'S' },
     { id: 'bedroom-sofa', model: 'loungeSofa', against: { wall: 'north', at: 6.4 } },
+    { id: 'bedroom-sofa-table', model: 'tableCoffeeSquare', at: [6.4, 1.25] },
     { id: 'bedroom-clock-east', model: 'speaker', logic: 'clock@0,7', at: [7.5, 0.5], facing: 'S' },
     { id: 'bedroom-clock-spine', model: 'speaker', logic: 'clock@2,5', at: [5.5, 2.5], facing: 'S' },
     // Escritório: secretária com cadeira em cada canto de trabalho e estantes na parede nascente.

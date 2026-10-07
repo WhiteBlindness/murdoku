@@ -37,6 +37,7 @@ export const theUnlitLampGround: SceneSpec = {
     { id: 'kitchen-stove-north', model: 'kitchenStove', logic: 'stove@0,5', at: [5.5, 0.5], facing: 'S' },
     { id: 'kitchen-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@5,5', at: [5.5, 5.5], facing: 'W' },
     { id: 'kitchen-counter', model: 'kitchenCabinet', logic: 'counter@5,7', at: [7.5, 5.5], facing: 'W' },
+    { id: 'kitchen-sink', model: 'kitchenSink', against: { wall: 'east', at: 6.04 }, facing: 'W' },
     { id: 'kitchen-stove-south', model: 'kitchenStove', logic: 'stove@4,7', at: [7.5, 4.5], facing: 'W' },
 
     { id: 'vestibule-chair', model: 'chair', logic: 'chair@5,0', at: [0.7, 5.5], facing: 'E' },

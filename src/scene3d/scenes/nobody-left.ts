@@ -39,6 +39,7 @@ export const nobodyLeft: SceneSpec = {
     { id: 'office-clock-table', model: 'sideTable', at: [6.45, 4.5], facing: 'W' },
     { id: 'office-clock', model: 'radio', logic: 'clock@4,6', on: { parent: 'office-clock-table' } },
     { id: 'office-desk', model: 'desk', logic: 'desk@5,5', at: [5.5, 5.55], facing: 'N' },
+    { id: 'office-desk-chair', model: 'chairDesk', at: [5.5, 4.95], facing: 'S' },
     { id: 'office-visitor-chair', model: 'chair', logic: 'chair@5,7', at: [7.4, 5.5], facing: 'W' },
   ],
 }

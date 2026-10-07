@@ -37,6 +37,8 @@ export const aQuietAlibi: SceneSpec = {
     { id: 'office-bookcase-east', model: 'bookcaseOpenLow', logic: 'bookshelf@6,2', at: [2.05, 6.45], facing: 'W' },
     { id: 'office-desk-lena', model: 'desk', logic: 'desk@7,0', at: [0.5, 7.45], facing: 'N' },
     { id: 'office-desk-idris', model: 'desk', logic: 'desk@7,1', at: [1.5, 7.45], facing: 'N' },
+    { id: 'office-desk-lena-chair', model: 'chairDesk', at: [0.3, 6.85], facing: 'S' },
+    { id: 'office-desk-idris-chair', model: 'chairDesk', at: [1.3, 6.85], facing: 'S' },
 
     { id: 'hall-clock-table-north', model: 'sideTable', at: [4.35, 0.55] },
     { id: 'hall-clock-north', model: 'radio', logic: 'clock@0,4', on: { parent: 'hall-clock-table-north' } },

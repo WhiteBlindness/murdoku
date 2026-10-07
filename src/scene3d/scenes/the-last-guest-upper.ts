@@ -71,7 +71,7 @@ export const theLastGuestUpper: SceneSpec = {
     { id: 'study-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@1,3', at: [3.5, 1.8], facing: 'E' },
     { id: 'study-box', model: 'cardboardBoxClosed', logic: 'box@2,4', at: [4.6, 2.15] },
     { id: 'study-desk', model: 'desk', logic: 'desk@5,3', at: [3.4, 5.5], facing: 'E' },
-    { id: 'study-chair', model: 'chairDesk', at: [3.4, 6.2], facing: 'W' },
+    { id: 'study-chair', model: 'chairDesk', at: [3.4, 6.25], facing: 'N' },
 
     { id: 'bathroom-shower', model: 'showerRound', logic: 'shower@0,5', at: [5.5, 0.5], facing: 'S' },
     { id: 'bathroom-alcove-tub', model: 'bathtub', logic: 'bathtub@2,5', at: [5.8, 2.05], facing: 'N' },

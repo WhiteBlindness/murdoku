@@ -21,6 +21,7 @@ export const ashesInTheStudy: SceneSpec = {
     { id: 'study-bookshelf', model: 'bookcaseOpen', logic: 'bookshelf@0,3', against: { wall: 'north', at: 3.9 } },
     { id: 'study-bookshelf-books', model: 'books', on: { parent: 'study-bookshelf', surface: 'shelf2' } },
     { id: 'study-desk', model: 'desk', logic: 'desk@1,6', at: [6.35, 1.45], facing: 'W' },
+    { id: 'study-desk-chair', model: 'chairDesk', at: [5.75, 1.25], facing: 'E' },
     { id: 'study-chair', model: 'chair', logic: 'chair@1,3', at: [3.75, 1.5], facing: 'E' },
     { id: 'study-clock', model: 'speaker', logic: 'clock@3,3', at: [3.45, 3.45] },
 
@@ -28,6 +29,7 @@ export const ashesInTheStudy: SceneSpec = {
     { id: 'yard-flower', model: 'flower_yellowA', logic: 'plant@0,1', at: [1.5, 0.5] },
     { id: 'yard-flower-south', model: 'flower_purpleA', logic: 'plant@3,2', at: [2.5, 3.5] },
 
+    { id: 'kitchen-sink', model: 'kitchenSink', against: { wall: 'west', at: 5.0 }, facing: 'E' },
     { id: 'kitchen-stove-south', model: 'kitchenStoveElectric', logic: 'stove@5,1', at: [1.55, 5.5], facing: 'E' },
     { id: 'kitchen-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@4,2', at: [2.45, 4.5], facing: 'W' },
     { id: 'kitchen-stove-east', model: 'kitchenStove', logic: 'stove@4,3', at: [3.0, 4.45], facing: 'E' },
