@@ -97,18 +97,24 @@ export const theSilentKitchenUpper: SceneSpec = {
     { id: 'hallway-clock-east', model: 'speaker', logic: 'clock@4,1', at: [1.05, 4.2] },
     { id: 'hallway-rug-lena', model: 'rugRectangle', logic: 'rug@1,0', at: [1, 1.7], facing: 'S' },
 
+    // Quarto: cama de cabeceira contra a parede norte, a norte da escada, com mesa de cabeceira.
+    { id: 'bedroom-bed', model: 'bedDouble', against: { wall: 'north', at: 3.1 } },
+    { id: 'bedroom-nightstand', model: 'cabinetBedDrawerTable', at: [2.26, 0.3], facing: 'S' },
     { id: 'bedroom-lamp-north', model: 'lampRoundFloor', logic: 'lamp@4,3', at: [3, 4.3], facing: 'W' },
     { id: 'bedroom-clock-east', model: 'speaker', logic: 'clock@6,3', at: [3.5, 6.5] },
     { id: 'bedroom-lamp-south', model: 'lampRoundFloor', logic: 'lamp@5,2', at: [2.15, 5.8] },
     { id: 'bedroom-clock-priya', model: 'speaker', logic: 'clock@7,2', at: [2.5, 7.5] },
 
     { id: 'study-desk-idris', model: 'desk', logic: 'desk@0,4', at: [4.5, 0.5], facing: 'S' },
+    { id: 'study-desk-idris-chair', model: 'chairDesk', at: [4.5, 1.1], facing: 'N' },
     { id: 'study-box', model: 'cardboardBoxClosed', logic: 'box@0,5', at: [5.5, 0.5] },
     { id: 'study-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@4,4', at: [4.5, 5], facing: 'E' },
     { id: 'study-lamp', model: 'lampRoundFloor', logic: 'lamp@7,5', at: [5.5, 7.5] },
-    { id: 'study-desk-extra', model: 'desk', logic: 'desk@6,4', at: [4.5, 6.5], facing: 'W' },
+    { id: 'study-desk-extra', model: 'desk', logic: 'desk@6,4', at: [4.5, 6.5], facing: 'E' },
+    { id: 'study-desk-extra-chair', model: 'chairDesk', at: [5.1, 6.5], facing: 'W' },
 
     { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@3,6', at: [6.75, 3.85], facing: 'W' },
+    { id: 'bathroom-sink', model: 'bathroomSink', against: { wall: 'study-bathroom-divider', side: 'E', at: 1.5 }, facing: 'E' },
     { id: 'bathroom-bathtub', model: 'bathtub', logic: 'bathtub@6,6', at: [7, 6.5], facing: 'S' },
     { id: 'bathroom-shower', model: 'showerRound', logic: 'shower@7,6', at: [6.5, 7.5], facing: 'S' },
   ],

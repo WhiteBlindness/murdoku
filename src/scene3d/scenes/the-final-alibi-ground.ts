@@ -36,7 +36,9 @@ export const theFinalAlibiGround: SceneSpec = {
     { id: 'pantry-garden', from: [3, 5], to: [3, 8], height: 'half', openings: [{ at: 6.3, width: 1.2, kind: 'door' }] },
   ],
   furniture: [
-    { id: 'kitchen-stove', model: 'kitchenStoveElectric', logic: 'stove@2,7', at: [7.5, 2.5] },
+    // Bancada em península de costas para a escada, com a placa no topo nascente.
+    { id: 'kitchen-stove', model: 'kitchenStoveElectric', logic: 'stove@2,7', at: [7.43, 2.3], facing: 'S' },
+    { id: 'kitchen-run-gap', model: 'kitchenCabinetDrawer', at: [6.89, 2.3], facing: 'S' },
     { id: 'kitchen-table-west', model: 'table', logic: 'table@3,3', at: [4.1, 3.125], facing: 'N' },
     { id: 'kitchen-fridge', model: 'kitchenFridge', logic: 'fridge@3,5', at: [5.5, 3.2], facing: 'S' },
     { id: 'garden-plant-north', model: 'pottedPlant', logic: 'plant@4,4', at: [4.0, 4.5] },
@@ -47,11 +49,13 @@ export const theFinalAlibiGround: SceneSpec = {
     { id: 'office-chair', model: 'chair', logic: 'chair@4,0', at: [0.5, 4.5], facing: 'E' },
     { id: 'office-clock', model: 'speaker', logic: 'clock@2,2', at: [2.1, 2.1] },
     { id: 'office-desk', model: 'desk', logic: 'desk@2,0', at: [0.55, 2.5], facing: 'E' },
+    { id: 'office-desk-chair', model: 'chairDesk', at: [1.15, 2.5], facing: 'W' },
     { id: 'pantry-box', model: 'cardboardBoxClosed', logic: 'box@6,0', at: [0.5, 6.5] },
     { id: 'pantry-counter', model: 'kitchenCabinet', logic: 'counter@5,0', at: [0.7, 5.55] },
     { id: 'pantry-fridge-bella', model: 'kitchenFridge', logic: 'fridge@6,2', at: [2.1, 6.5], facing: 'E' },
     { id: 'kitchen-table-nadia', model: 'table', logic: 'table@3,6', at: [6.5, 3.5], facing: 'N' },
     { id: 'garden-plant-evangeline', model: 'pottedPlant', logic: 'plant@5,7', at: [7.5, 5.5] },
-    { id: 'kitchen-counter-lena', model: 'kitchenCabinet', logic: 'counter@2,5', at: [5.5, 2.5], facing: 'W' },
+    { id: 'kitchen-counter-lena', model: 'kitchenCabinet', logic: 'counter@2,5', at: [5.81, 2.3], facing: 'S' },
+    { id: 'kitchen-counter-lena-b', model: 'kitchenCabinet', logic: 'counter@2,5', at: [6.35, 2.3], facing: 'S' },
   ],
 }
