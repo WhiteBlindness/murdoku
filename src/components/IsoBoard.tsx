@@ -462,7 +462,8 @@ export default function IsoBoard({
       </div>
       {!envOnly && <>
         <span id={descriptionId} className="sr-only">Use arrow keys to move between cells. Enter or Space applies the selected tool. Rows and columns are shared across floors.</span>
-        <div role="status" aria-live="polite" aria-atomic="true" style={{ position: 'absolute', bottom: 3, left: 8, right: 8, pointerEvents: 'none', textAlign: 'center', fontSize: 12, lineHeight: 1.4, color: SKIN.draftPlate }}>
+        {/* Below the board on narrow screens so it never covers the south tip; inside it on desktop. */}
+        <div role="status" aria-live="polite" aria-atomic="true" className="absolute inset-x-2 top-full mt-1 lg:top-auto lg:mt-0 lg:bottom-[3px]" style={{ pointerEvents: 'none', textAlign: 'center', fontSize: 12, lineHeight: 1.4, color: SKIN.draftPlate }}>
           {active && <span style={{ display: 'inline-block', padding: '4px 8px', background: SKIN.markInk }}>
             {`R${active.row + 1} · C${active.col + 1} · ${roomName(active.row, active.col)} — ${guidanceFor(active.row, active.col)}`}
           </span>}
