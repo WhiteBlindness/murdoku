@@ -77,7 +77,6 @@ Legenda:
 | Hard | hard-3 a hard-12 | pendente | |
 | Expert | expert-1 a expert-5 | commit | Revisto, sem nenhuma nova célula de solução escondida. Casas de banho fechadas com porta, segunda televisão num recanto próprio, quarto do expert-5 encostado a uma parede. Exceções: o WC do expert-2 é acedido pela casa de banho principal, e há bancos estofados onde `chair` é vocabulário de pista |
 | Expert | expert-6 a expert-10 | em curso | Agente Expert B |
-| Master | master-1, master-2 | em curso | |
-| Master | master-3 a master-8 | pendente | |
+| Master | master-1 a master-8 | commit | Revisto, sem nenhuma nova célula de solução escondida. Casas de banho e WC fechados; corredores evitam quartos de passagem; a escada de master-4 e master-7 foi reposicionada. **Decisão a confirmar:** em master-4 o alpendre e em master-7 o jardim passaram a zonas interiores (alpendre envidraçado, jardim de inverno) para eliminar as vigas sobre células de pista; as divisões lógicas mantêm-se |
 
 Atualizado em 08/10/2026.

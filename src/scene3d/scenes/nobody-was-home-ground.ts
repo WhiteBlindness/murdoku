@@ -19,11 +19,11 @@ export const nobodyWasHomeGround: SceneSpec = {
   puzzleId: 'master-8',
   floor: 0,
   storeyFootprint: { kind: 'full' },
-  entry: { wall: 'west', at: 1.5 },
+  entry: { wall: 'north', at: 7.4 },
   shell: {
     features: [
-      { wall: 'north', at: 4.2, kind: 'window' },
-      { wall: 'north', at: 7.1, kind: 'window' },
+      { wall: 'north', at: 4.6, kind: 'window' },
+      { wall: 'west', at: 1.2, kind: 'window' },
     ],
   },
   stairs: { model: 'stairsOpen', at: stairAt, facing: 'N' },
@@ -69,7 +69,8 @@ export const nobodyWasHomeGround: SceneSpec = {
     },
   ],
   furniture: [
-    // Sala: sofá sobre o tapete virado para o televisor norte e poltrona virada para o televisor sul.
+    // Sala: televisor norte com o sofá em frente sobre o tapete; poltrona virada para o
+    // segundo televisor; a sul, mesa de refeições com quatro cadeiras.
     { id: 'living-clock-north', model: 'speaker', logic: 'clock@0,5', at: [5.5, 0.5], facing: 'S' },
     { id: 'living-tv-north', model: 'cabinetTelevision', logic: 'tv@0,3', at: [3.65, 0.4], facing: 'S' },
     { id: 'living-tv-north-set', model: 'televisionModern', on: { parent: 'living-tv-north' } },
@@ -79,7 +80,15 @@ export const nobodyWasHomeGround: SceneSpec = {
     { id: 'living-armchair', model: 'loungeChair', at: [5.3, 4.45], facing: 'S' },
     { id: 'living-tv-south', model: 'cabinetTelevision', logic: 'tv@5,5', at: [5.5, 5.35], facing: 'N' },
     { id: 'living-tv-south-set', model: 'televisionVintage', on: { parent: 'living-tv-south' } },
-    // Corredor: relógios de mesa sobre mesas de apoio encostadas à parede nascente.
+    { id: 'dining-table', model: 'table', at: [4.5, 6.9], facing: 'S' },
+    { id: 'dining-chair-nw', model: 'chair', at: [4.2, 6.3], facing: 'S' },
+    { id: 'dining-chair-ne', model: 'chair', at: [4.8, 6.3], facing: 'S' },
+    { id: 'dining-chair-west', model: 'chair', at: [3.75, 6.9], facing: 'E' },
+    { id: 'dining-chair-east', model: 'chair', at: [5.25, 6.9], facing: 'W' },
+    { id: 'dining-rug', model: 'rugRectangle', at: [4.5, 6.85] },
+    // Átrio: a porta de entrada abre a norte, junto ao topo da escada; banco, planta,
+    // tapete ao pé da escada e mesas de apoio com relógios a sul.
+    { id: 'hallway-bench', model: 'bench', against: { wall: 'east', at: 1.6 }, facing: 'W' },
     { id: 'hallway-plant-north', model: 'pottedPlant', logic: 'plant@1,6', at: [6.99, 1.5], facing: 'E' },
     { id: 'hallway-rug', model: 'rugRectangle', logic: 'rug@3,6', at: [7.425, 4.0], facing: 'E' },
     { id: 'hallway-clock-south-table', model: 'sideTable', at: [7.72, 6.5], facing: 'W' },
@@ -87,15 +96,20 @@ export const nobodyWasHomeGround: SceneSpec = {
     { id: 'hallway-plant-south', model: 'pottedPlant', logic: 'plant@7,6', at: [6.5, 7.5], facing: 'S' },
     { id: 'hallway-clock-corner-table', model: 'sideTable', at: [7.72, 7.5], facing: 'W' },
     { id: 'hallway-clock-corner', model: 'radio', logic: 'clock@7,7', on: { parent: 'hallway-clock-corner-table' } },
-    // Copa: bancada e placa sob a parede norte, lava-loiça no canto e frigorífico ao lado.
+    // Copa: bancada com placa a norte, lava-loiça a poente e frigorífico de bancada junto à porta.
     { id: 'pantry-counter', model: 'kitchenCabinet', logic: 'counter@0,1', against: { wall: 'north', at: 1.27 }, facing: 'S' },
     { id: 'pantry-counter-b', model: 'kitchenCabinetDrawer', logic: 'counter@0,1', against: { wall: 'north', at: 1.81 }, facing: 'S' },
     { id: 'pantry-stove', model: 'kitchenStove', against: { wall: 'north', at: 2.35 }, facing: 'S' },
-    { id: 'pantry-sink', model: 'kitchenSink', against: { wall: 'west', at: 0.75 }, facing: 'E' },
-    { id: 'pantry-fridge', model: 'kitchenFridge', logic: 'fridge@1,2', at: [2.65, 1.6], facing: 'S' },
+    { id: 'pantry-corner', model: 'kitchenCabinet', against: { wall: 'west', at: 0.75 }, facing: 'E' },
+    { id: 'pantry-sink', model: 'kitchenSink', against: { wall: 'west', at: 1.29 }, facing: 'E' },
+    { id: 'pantry-west-drawer', model: 'kitchenCabinetDrawer', against: { wall: 'west', at: 1.83 }, facing: 'E' },
+    { id: 'pantry-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@1,2', against: { wall: 'pantry-living-room', side: 'W', at: 1.1 }, facing: 'W' },
+    // Jardim: arbustos e plantas em grupos soltos.
     { id: 'garden-shrub-west', model: 'plant_bushSmall', logic: 'shrub@7,0', at: [0.5, 7.5], facing: 'S' },
     { id: 'garden-plant-south', model: 'pottedPlant', logic: 'plant@7,1', at: [1.5, 7.5], facing: 'S' },
     { id: 'garden-shrub-east', model: 'plant_bushSmall', logic: 'shrub@5,2', at: [2.5, 5.5], facing: 'S' },
     { id: 'garden-shrub-oscar', model: 'plant_bushSmall', logic: 'shrub@4,1', at: [1.5, 4.5], facing: 'S' },
+    { id: 'garden-path-a', model: 'path_stone', at: [1.5, 3.5], facing: 'S' },
+    { id: 'garden-rock', model: 'rock_smallA', at: [0.5, 5.6] },
   ],
 }

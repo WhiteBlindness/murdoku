@@ -3,71 +3,92 @@ import { twoSetsOfPrintsStairwellBounds } from './two-sets-of-prints-ground'
 
 const well = twoSetsOfPrintsStairwellBounds
 
+// A escada chega a um corredor transversal: a norte o escritório e a sala de estar,
+// a sul o quarto (com recanto de secretária atrás da escada); a nascente, portas
+// separadas para a casa de banho e para a sala de refeições com copa.
 export const twoSetsOfPrintsUpper: SceneSpec = {
   puzzleId: 'master-6',
   floor: 1,
   storeyFootprint: { kind: 'full' },
   stairwellBounds: well,
   circulation: {
-    landing: [well[0], well[1] - 0.75, well[2], well[1]],
+    landing: [well[0], well[1] - 0.76, well[2], well[1]],
     halls: [
-      { id: 'study-gallery', bounds: [0.2, 3.4, 4.0, well[1]] },
-      { id: 'bedroom-connector', bounds: [3.2, 3.4, 4.2, 5.9] },
-      { id: 'dining-entry-run', bounds: [3.4, 5.1, 5.55, 5.9] },
+      { id: 'cross-corridor', bounds: [well[0], 3.4, 4.95, well[1]] },
+      { id: 'dining-stub', bounds: [4.15, well[1], 4.95, 5.05] },
     ],
     roomAccessTargets: [
-      { id: 'study-entry', bounds: [0.2, 3.45, 1.8, 4.05] },
-      { id: 'bedroom-entry', bounds: [2.3, 3.45, 3.1, 4.1] },
-      { id: 'dining-entry', bounds: [4.0, 5.1, 5.55, 5.9] },
+      { id: 'sitting-entry', bounds: [3.15, 3.4, 3.85, 4.2] },
+      { id: 'bedroom-entry', bounds: [2.65, 3.4, 3.35, 4.2] },
+      { id: 'bathroom-entry', bounds: [4.3, 3.4, 4.95, 4.2] },
+      { id: 'dining-entry', bounds: [4.15, 4.3, 4.95, 5.05] },
     ],
   },
   shell: { features: [
     { wall: 'north', at: 1.4, kind: 'window' },
     { wall: 'north', at: 6.6, kind: 'window' },
-    { wall: 'west', at: 6.4, kind: 'window' },
+    { wall: 'west', at: 7.4, kind: 'window' },
   ] },
   floors: [
-    { id: 'study', cells: [0, 0, 7, 1], material: 'wood' },
-    { id: 'bedroom', cells: [0, 2, 7, 4], material: 'wood' },
-    { id: 'bathroom', cells: [0, 5, 3, 7], material: 'tile' },
-    { id: 'dining-room', cells: [4, 5, 7, 7], material: 'wood' },
+    { id: 'study', cells: [0, 0, 1, 7], material: 'wood' },
+    { id: 'bedroom', cells: [2, 0, 4, 7], material: 'wood' },
+    { id: 'bathroom', cells: [5, 0, 7, 3], material: 'tile' },
+    { id: 'dining-room', cells: [5, 4, 7, 7], material: 'wood' },
   ],
   walls: [
-    { id: 'study-bedroom', from: [2, 0], to: [2, 8], height: 'half', openings: [{ at: 4.0, width: 1.8, kind: 'door' }] },
+    { id: 'study-sitting', from: [2, 0], to: [2, 3.35], height: 'half' },
+    { id: 'sitting-south', from: [2, 3.35], to: [5, 3.35], height: 'half', openings: [{ at: 3.5, width: 0.7, kind: 'door' }] },
+    { id: 'bedroom-north', from: [well[2] + 0.06, 4.25], to: [4.1, 4.25], height: 'half', openings: [{ at: 3.0, width: 0.7, kind: 'door' }] },
+    { id: 'stub-west', from: [4.1, 4.25], to: [4.1, 5.1], height: 'half' },
+    { id: 'stub-south', from: [4.1, 5.1], to: [5, 5.1], height: 'half' },
     { id: 'bedroom-east-suite', from: [5, 0], to: [5, 8], height: 'half', openings: [
-      { at: 0.6, width: 1, kind: 'door' },
-      { at: 5.5, width: 1.8, kind: 'door' },
+      { at: 3.78, width: 0.6, kind: 'door' },
+      { at: 4.65, width: 0.6, kind: 'door' },
     ] },
     { id: 'bathroom-dining-open', from: [5, 4], to: [8, 4], height: 'half' },
-    { id: 'stairwell-west-guard', from: [well[0], well[1] + 0.12], to: [well[0], well[3]], height: 'half', treatment: 'railing', freeEnds: ['from'] },
-    { id: 'stairwell-east-guard', from: [well[2], well[1] + 0.12], to: [well[2], well[3]], height: 'half', treatment: 'railing', freeEnds: ['from'] },
-    { id: 'stairwell-south-guard', from: [well[0], well[3]], to: [well[2], well[3]], height: 'half', treatment: 'railing' },
+    { id: 'stairwell-west-guard', from: [well[0], well[1] + 0.12], to: [well[0], well[3] + 0.06], height: 'half', treatment: 'railing', freeEnds: ['from'] },
+    { id: 'stairwell-east-guard', from: [well[2] + 0.06, 4.25], to: [well[2] + 0.06, well[3] + 0.06], height: 'half', treatment: 'railing' },
+    { id: 'stairwell-south-guard', from: [well[0], well[3] + 0.06], to: [well[2] + 0.06, well[3] + 0.06], height: 'half', treatment: 'railing' },
   ],
   furniture: [
-    { id: 'study-desk-tomas', model: 'desk', logic: 'desk@2,0', at: [0.5, 2.5], facing: 'E' },
+    // Escritório norte: secretária do Tomas na parede poente, estante baixa, caixa e candeeiro.
+    { id: 'study-desk-tomas', model: 'desk', logic: 'desk@2,0', against: { wall: 'west', at: 2.5 }, facing: 'E' },
+    { id: 'study-laptop', model: 'laptop', on: { parent: 'study-desk-tomas' } },
     { id: 'study-box', model: 'cardboardBoxClosed', logic: 'box@1,1', at: [1.5, 1.25] },
-    { id: 'study-box-priya', model: 'cardboardBoxClosed', logic: 'box@6,1', at: [1.65, 6.5] },
-    { id: 'study-bookcase', model: 'bookcaseOpenLow', logic: 'bookshelf@2,1', against: { wall: 'study-bedroom', side: 'W', at: 2.5 }, facing: 'W' },
-    { id: 'study-desk-bella', model: 'desk', logic: 'desk@6,0', at: [0.5, 6.9], facing: 'N' },
-    { id: 'study-lamp-south', model: 'lampRoundFloor', logic: 'lamp@7,0', at: [1.0, 7.65] },
-
-    { id: 'bedroom-clock-table-north', model: 'sideTable', at: [4.1, 1.5], facing: 'E' },
-    { id: 'bedroom-clock-north', model: 'radio', logic: 'clock@1,4', on: { parent: 'bedroom-clock-table-north' } },
+    { id: 'study-bookcase', model: 'bookcaseOpenLow', logic: 'bookshelf@2,1', against: { wall: 'study-sitting', side: 'W', at: 2.5 }, facing: 'W' },
+    { id: 'study-lamp-north', model: 'lampRoundFloor', at: [0.3, 0.3] },
+    // Sala de estar: sofá sob a janela sobre o tapete, televisor em frente, rádio e candeeiro.
     { id: 'bedroom-rug', model: 'rugSquare', logic: 'rug@0,2', at: [3, 1], facing: 'E' },
-    { id: 'bedroom-lamp-west', model: 'lampRoundFloor', logic: 'lamp@4,2', at: [2.9, 4.65] },
-    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@6,2', against: { wall: 'study-bedroom', side: 'E', at: 7.0 }, facing: 'E' },
-    { id: 'bedroom-nightstand', model: 'sideTable', at: [2.3, 6.0], facing: 'E' },
-    { id: 'bedroom-lamp-east', model: 'lampRoundFloor', logic: 'lamp@3,4', at: [4.35, 3.45] },
-
-    // Casa de banho fechada, com porta para o quarto; a sala de jantar já não abre para ela.
-    { id: 'bathroom-shower-south', model: 'shower', logic: 'shower@3,5', against: { wall: 'bedroom-east-suite', side: 'E', at: 3.5 }, facing: 'E' },
-    { id: 'bathroom-shower-north', model: 'shower', logic: 'shower@0,7', at: [7.5, 0.5], facing: 'S' },
-    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@3,7', against: { wall: 'east', at: 3.5 }, facing: 'W' },
+    { id: 'sitting-sofa', model: 'loungeSofa', against: { wall: 'north', at: 3.0 } },
+    { id: 'sitting-tv', model: 'cabinetTelevision', at: [3.0, 2.3], facing: 'N' },
+    { id: 'sitting-tv-set', model: 'televisionModern', on: { parent: 'sitting-tv' } },
+    { id: 'bedroom-clock-table-north', model: 'sideTable', at: [4.5, 1.5], facing: 'E' },
+    { id: 'bedroom-clock-north', model: 'radio', logic: 'clock@1,4', on: { parent: 'bedroom-clock-table-north' } },
+    { id: 'bedroom-lamp-east', model: 'lampRoundFloor', logic: 'lamp@3,4', at: [4.6, 3.1] },
+    // Quarto: cama com a cabeceira na parede sul, mesa de cabeceira, tapete, candeeiros;
+    // recanto de secretária atrás da escada com a caixa e o candeeiro.
+    { id: 'bedroom-lamp-west', model: 'lampRoundFloor', logic: 'lamp@4,2', at: [2.25, 4.75] },
+    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@6,2', against: { wall: 'south', at: 3.3 }, facing: 'N' },
+    { id: 'bedroom-nightstand', model: 'sideTable', at: [2.35, 7.7], facing: 'N' },
+    { id: 'study-desk-bella', model: 'desk', logic: 'desk@6,0', at: [0.5, 6.85], facing: 'S' },
+    { id: 'study-box-priya', model: 'cardboardBoxClosed', logic: 'box@6,1', at: [1.65, 6.6] },
+    { id: 'study-lamp-south', model: 'lampRoundFloor', logic: 'lamp@7,0', at: [0.3, 7.7] },
+    // Casa de banho: banheira na parede poente, lavatório e móvel a norte, dois duches e sanita.
+    { id: 'bathroom-bathtub', model: 'bathtub', against: { wall: 'bedroom-east-suite', side: 'E', at: 1.6 }, facing: 'E' },
     { id: 'bathroom-sink', model: 'bathroomSink', against: { wall: 'north', at: 6.3 }, facing: 'S' },
-
-    // Sala de jantar: mesa com banco estofado.
-    { id: 'dining-table', model: 'table', logic: 'table@4,5', at: [6.2, 4.65], facing: 'N' },
-    { id: 'dining-banquette', model: 'loungeSofa', at: [6.2, 5.42], facing: 'N' },
-    { id: 'dining-chair', model: 'chair', logic: 'chair@6,7', at: [7.5, 6.5], facing: 'W' },
+    { id: 'bathroom-cabinet', model: 'bathroomCabinetDrawer', against: { wall: 'north', at: 6.85 }, facing: 'S' },
+    { id: 'bathroom-shower-north', model: 'shower', logic: 'shower@0,7', at: [7.55, 0.45], facing: 'S' },
+    { id: 'bathroom-shower-south', model: 'shower', logic: 'shower@3,5', at: [5.4, 3.12], facing: 'S' },
+    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@3,7', against: { wall: 'east', at: 3.5 }, facing: 'W' },
+    // Sala de refeições com copa: mesa com banco estofado, copa na parede sul e poltrona.
+    { id: 'dining-table', model: 'table', logic: 'table@4,5', at: [6.2, 4.55], facing: 'N' },
+    { id: 'dining-banquette', model: 'loungeSofa', at: [6.2, 5.35], facing: 'N' },
+    { id: 'dining-chair', model: 'loungeChair', logic: 'chair@6,7', at: [7.45, 6.5], facing: 'W' },
+    { id: 'pantry-cabinet', model: 'kitchenCabinet', against: { wall: 'south', at: 5.5 }, facing: 'N' },
+    { id: 'pantry-sink', model: 'kitchenSink', against: { wall: 'south', at: 6.04 }, facing: 'N' },
+    { id: 'pantry-drawer', model: 'kitchenCabinetDrawer', against: { wall: 'south', at: 6.58 }, facing: 'N' },
+  ],
+  rugs: [
+    { id: 'bedroom-bed-rug', model: 'rugRectangle', at: [3.3, 6.4] },
   ],
 }
