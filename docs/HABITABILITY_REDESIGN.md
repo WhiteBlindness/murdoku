@@ -71,9 +71,7 @@ Legenda:
 | --- | --- | --- | --- |
 | Very Easy | very-easy-1 a very-easy-8 | commit | Revisto. Exceções de vocabulário: very-easy-6 e very-easy-8 (`chair`). very-easy-1 e very-easy-2 são referências douradas; as imagens de referência têm de ser refeitas na captura final |
 | Easy | easy-1 a easy-10 | commit | Revisto. Exceções de vocabulário: easy-1 sem mesa de pequeno-almoço, easy-10 com banco estofado. easy-1 é referência dourada |
-| Medium | medium-1, medium-2 | feito | Revisto; medium-1: sala de jantar escassa porque `chair` é vocabulário de pista |
-| Medium | medium-3 | em curso | |
-| Medium | medium-4 a medium-12 | pendente | |
+| Medium | medium-1 a medium-12 | commit | Revisto. Exceções de vocabulário (`chair`): mesas de jantar com 1 ou 2 cadeiras em medium-1, 3, 6 e 7; secretárias sem cadeira em medium-1, 2 e 8. medium-12: a televisão do recanto mostra a traseira porque as duas células de televisão são adjacentes |
 | Hard | hard-1 | feito | Revisto; a sanita encosta à parede sul, rebaixada pela câmara |
 | Hard | hard-2 | em curso | |
 | Hard | hard-3 a hard-12 | pendente | |
