@@ -30,7 +30,7 @@ export const nothingWasTakenUpper: SceneSpec = {
       { id: 'study-entry-approach', bounds: [7.1, 0.05, 7.9, 0.85] },
       { id: 'bedroom-entry-approach', bounds: [7.1, 2.2, 7.9, 3] },
       { id: 'bathroom-entry-approach', bounds: [3.6, 4.05, 4.6, 4.86] },
-      { id: 'kitchen-entry-approach', bounds: [5.6, 4.4, 6.4, 5.3] },
+      { id: 'kitchen-entry-approach', bounds: [6.5, 4.4, 7.3, 5.3] },
     ],
   },
   shell: { features: [
@@ -49,7 +49,7 @@ export const nothingWasTakenUpper: SceneSpec = {
     { id: 'study-bedroom', from: [0, 1.9], to: [stairwellBounds[0], 1.9], height: 'half' },
     { id: 'bedroom-service', from: [0, 4], to: [8, 4], height: 'half', openings: [{ at: 7.5, width: 0.9, kind: 'door' }] },
     { id: 'bathroom-kitchen', from: [4, 4], to: [4, 8], height: 'half', openings: [{ at: 4.47, width: 0.84, kind: 'door' }] },
-    { id: 'hall-kitchen', from: [4, 4.9], to: [8, 4.9], height: 'half', openings: [{ at: 6.0, width: 0.8, kind: 'door' }] },
+    { id: 'hall-kitchen', from: [4, 4.9], to: [8, 4.9], height: 'half', openings: [{ at: 6.9, width: 0.8, kind: 'door' }] },
     { id: 'east-gallery-wall', from: [7, 0], to: [7, 4], openings: [
       { at: 0.46, width: 0.82, kind: 'open' },
       { at: 2.65, width: 1, kind: 'door' },
@@ -91,12 +91,12 @@ export const nothingWasTakenUpper: SceneSpec = {
     { id: 'bathroom-bathtub', model: 'bathtub', logic: 'bathtub@6,3', against: { wall: 'bathroom-kitchen', side: 'W', at: 6.9 }, facing: 'W' },
     { id: 'bathroom-washer', model: 'washer', against: { wall: 'south', at: 1.6 }, facing: 'N' },
     { id: 'bathroom-bin', model: 'trashcan', at: [2.3, 7.7] },
-    // Cozinha: bancada com lava-loiça, fogão e armário na parede poente, frigorífico na
-    // parede nascente e mesa de refeições a sul.
-    { id: 'kitchen-counter-sink', model: 'kitchenSink', logic: 'counter@5,4', against: { wall: 'bathroom-kitchen', at: 5.25, side: 'E' } },
-    { id: 'kitchen-stove', model: 'kitchenStove', against: { wall: 'bathroom-kitchen', at: 5.79, side: 'E' } },
-    { id: 'kitchen-counter-prep', model: 'kitchenCabinet', logic: 'counter@5,4', against: { wall: 'bathroom-kitchen', at: 6.33, side: 'E' } },
+    // Cozinha: bancada em linha na meia parede do corredor, com o fogão afastado e
+    // sem nada encostado à parede da casa de banho; frigorífico na parede nascente e mesa de refeições a sul.
+    { id: 'kitchen-counter-prep', model: 'kitchenCabinet', logic: 'counter@5,4', against: { wall: 'hall-kitchen', at: 4.38, side: 'S' }, facing: 'S' },
     { id: 'kitchen-microwave', model: 'kitchenMicrowave', on: { parent: 'kitchen-counter-prep' } },
+    { id: 'kitchen-counter-sink', model: 'kitchenSink', logic: 'counter@5,4', against: { wall: 'hall-kitchen', at: 4.93, side: 'S' }, facing: 'S' },
+    { id: 'kitchen-stove', model: 'kitchenStove', against: { wall: 'hall-kitchen', at: 5.48, side: 'S' }, facing: 'S' },
     { id: 'kitchen-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@6,7', against: { wall: 'east', at: 6.25 }, facing: 'W' },
     { id: 'kitchen-table', model: 'table', logic: 'table@7,5', at: [6, 7.45], facing: 'S' },
     { id: 'kitchen-bench', model: 'loungeDesignSofa', at: [6, 6.85], facing: 'S' },

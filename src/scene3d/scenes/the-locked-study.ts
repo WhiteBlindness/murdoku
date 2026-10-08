@@ -1,10 +1,10 @@
 import type { SceneSpec } from '../schema'
 
-// Casa formal com pátio interior e uma alcova de estudo na sala de jantar.
+// Casa formal com jardim da frente exterior e uma alcova de estudo na sala de jantar.
 export const theLockedStudy: SceneSpec = {
   puzzleId: 'very-easy-6',
   floor: 0,
-  entry: { wall: 'west', at: 1.25 },
+  entry: { wall: 'north', at: 5.45 },
   shell: {
     features: [
       { wall: 'north', at: 4.7, kind: 'window' },
@@ -12,7 +12,7 @@ export const theLockedStudy: SceneSpec = {
     ],
   },
   floors: [
-    { id: 'front-courtyard', cells: [0, 0, 2, 3], material: 'grass', kind: 'courtyard' },
+    { id: 'front-yard', cells: [0, 0, 2, 3], material: 'grass', kind: 'exterior' },
     { id: 'dining-study', cells: [3, 0, 5, 5], material: 'wood', kind: 'interior' },
     { id: 'pantry', cells: [0, 4, 2, 5], material: 'tile', kind: 'interior' },
   ],
@@ -26,7 +26,7 @@ export const theLockedStudy: SceneSpec = {
     { id: 'study-desk', model: 'desk', against: { wall: 'north', at: 3.9 } },
     { id: 'study-laptop', model: 'laptop', on: { parent: 'study-desk' } },
     { id: 'study-chair', model: 'chairDesk', logic: 'chair@1,3', at: [3.85, 1.1], facing: 'N' },
-    { id: 'study-bookcase', model: 'bookcaseOpenLow', against: { wall: 'north', at: 5.25 } },
+    { id: 'study-bookcase', model: 'bookcaseOpenLow', against: { wall: 'east', at: 1.4 }, facing: 'W' },
     { id: 'study-books', model: 'books', on: { parent: 'study-bookcase', surface: 'top' } },
     // Sala de jantar: mesa com toalha e cadeira à cabeceira, consola com candeeiro e aparador
     // na parede este; o candeeiro de pé marca o canto de Idris.
@@ -52,7 +52,7 @@ export const theLockedStudy: SceneSpec = {
     { id: 'courtyard-stump', model: 'stump_round', at: [0.45, 3.55] },
   ],
   rugs: [
-    { id: 'entry-mat', model: 'rugDoormat', at: [0.3, 1.25], facing: 'E' },
+    { id: 'entry-mat', model: 'rugDoormat', at: [5.45, 0.3] },
     { id: 'courtyard-path-a', model: 'path_stone', at: [1.5, 2.35], facing: 'E' },
     { id: 'courtyard-path-b', model: 'path_stone', at: [2.25, 3.2], facing: 'S' },
     { id: 'dining-rug', model: 'rugRectangle', at: [4.5, 3.45] },
