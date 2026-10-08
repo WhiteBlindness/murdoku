@@ -75,9 +75,8 @@ Legenda:
 | Hard | hard-1 | feito | Revisto; a sanita encosta à parede sul, rebaixada pela câmara |
 | Hard | hard-2 | em curso | |
 | Hard | hard-3 a hard-12 | pendente | |
-| Expert | expert-1 | feito | Revisão do responsável pendente |
-| Expert | expert-2, expert-3 | em curso | |
-| Expert | expert-4 a expert-10 | pendente | |
+| Expert | expert-1 a expert-5 | commit | Revisto, sem nenhuma nova célula de solução escondida. Casas de banho fechadas com porta, segunda televisão num recanto próprio, quarto do expert-5 encostado a uma parede. Exceções: o WC do expert-2 é acedido pela casa de banho principal, e há bancos estofados onde `chair` é vocabulário de pista |
+| Expert | expert-6 a expert-10 | em curso | Agente Expert B |
 | Master | master-1, master-2 | em curso | |
 | Master | master-3 a master-8 | pendente | |
 

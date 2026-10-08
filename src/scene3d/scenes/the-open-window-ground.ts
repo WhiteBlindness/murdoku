@@ -47,7 +47,7 @@ export const theOpenWindowGround: SceneSpec = {
       height: 'half',
       openings: [
         { at: 1.5, width: 1.4, kind: 'open' },
-        { at: 5.5, width: 1.0, kind: 'open' },
+        { at: 4.6, width: 0.9, kind: 'open' },
       ],
     },
     {
@@ -74,7 +74,10 @@ export const theOpenWindowGround: SceneSpec = {
     { id: 'kitchen-stove', model: 'kitchenStove', logic: 'stove@3,2', against: { wall: 'hall-kitchen', side: 'E', at: 3.5 }, facing: 'E' },
     { id: 'kitchen-run-a', model: 'kitchenCabinet', against: { wall: 'hall-kitchen', side: 'E', at: 4.04 }, facing: 'E' },
     { id: 'kitchen-run-b', model: 'kitchenCabinetDrawer', against: { wall: 'hall-kitchen', side: 'E', at: 4.58 }, facing: 'E' },
-    { id: 'kitchen-fridge', model: 'kitchenFridge', logic: 'fridge@5,3', at: [3.4, 6.2], facing: 'S' },
+    // Frigorífico e armário na parede do jardim, em frente à placa: cozinha de galé.
+    { id: 'kitchen-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@5,3', against: { wall: 'kitchen-spine-facade', side: 'W', at: 5.4 }, facing: 'W' },
+    { id: 'kitchen-run-c', model: 'kitchenCabinet', against: { wall: 'kitchen-spine-facade', side: 'W', at: 5.95 }, facing: 'W' },
+    { id: 'kitchen-microwave', model: 'kitchenMicrowave', on: { parent: 'kitchen-run-c' }, facing: 'W' },
 
     { id: 'spine-shrub-north', model: 'plant_bushSmall', logic: 'shrub@0,4', at: [4.9, 0.5], facing: 'E' },
     { id: 'spine-shrub-centre-west', model: 'plant_bushSmall', logic: 'shrub@3,4', at: [4.5, 3.5], facing: 'S' },
@@ -82,12 +85,19 @@ export const theOpenWindowGround: SceneSpec = {
     { id: 'spine-shrub-south', model: 'plant_bushSmall', logic: 'shrub@5,4', at: [4.9, 5.5], facing: 'S' },
     { id: 'spine-plant-south', model: 'pottedPlant', logic: 'plant@6,4', at: [4.5, 6.5], facing: 'E' },
 
-    // Canto de trabalho a sul: uma estante alta separa-o do pé da escada.
+    // Escritório: banco sob a janela junto ao pé da escada; a sul, secretária com cadeira,
+    // estantes baixas na parede nascente e poltrona de leitura sobre o tapete.
+    { id: 'office-bench', model: 'bench', against: { wall: 'north', at: 7.25 } },
+    { id: 'office-armchair', model: 'loungeChair', at: [7.45, 7.45], facing: 'W' },
     { id: 'office-chair', model: 'chairDesk', logic: 'chair@6,6', at: [6.5, 6.95], facing: 'S' },
     { id: 'office-desk', model: 'desk', logic: 'desk@7,6', at: [6.5, 7.6], facing: 'N' },
-    { id: 'office-bookcase', model: 'bookcaseOpen', logic: 'bookshelf@5,7', at: [7.5, 6.42], facing: 'S' },
-    { id: 'office-bookcase-books', model: 'books', on: { parent: 'office-bookcase', surface: 'shelf2' } },
+    { id: 'office-bookcase', model: 'bookcaseOpenLow', logic: 'bookshelf@5,7', against: { wall: 'east', at: 6.35 }, facing: 'W' },
+    { id: 'office-bookcase-books', model: 'books', on: { parent: 'office-bookcase' } },
     { id: 'office-bookcase-low', model: 'bookcaseOpenLow', logic: 'bookshelf@5,7', against: { wall: 'east', at: 5.5 }, facing: 'W' },
     { id: 'office-bookcase-low-books', model: 'books', on: { parent: 'office-bookcase-low' } },
+  ],
+  rugs: [
+    { id: 'office-rug', model: 'rugRectangle', at: [6.8, 6.55] },
+    { id: 'entry-mat', model: 'rugDoormat', at: [0.3, 6.4], facing: 'E' },
   ],
 }
