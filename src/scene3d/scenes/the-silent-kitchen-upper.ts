@@ -40,7 +40,11 @@ export const theSilentKitchenUpper: SceneSpec = {
     { id: 'bathroom-tile', cells: [6, 0, 7, 7], material: 'tile', kind: 'interior' },
   ],
   walls: [
-    { id: 'bedroom-north', from: [0, 3.62], to: [4, 3.62], height: 'half', openings: [{ at: 3.55, width: 0.65, kind: 'door' }] },
+    { id: 'bedroom-north', from: [0, 3.62], to: [4, 3.62], height: 'half', openings: [
+      { at: 1.0, width: 0.65, kind: 'door' },
+      { at: 3.55, width: 0.65, kind: 'door' },
+    ] },
+    { id: 'hall-bedroom', from: [2, 3.62], to: [2, 8], height: 'half' },
     { id: 'gallery-north', from: [4, 2.55], to: [8, 2.55], height: 'half', openings: [
       { at: 5.3, width: 0.7, kind: 'door' },
       { at: 7.3, width: 0.7, kind: 'door' },
@@ -67,20 +71,19 @@ export const theSilentKitchenUpper: SceneSpec = {
     { id: 'lounge-armchair', model: 'loungeChair', at: [0.4, 1.4], facing: 'E' },
     { id: 'lounge-lamp', model: 'lampRoundFloor', at: [0.25, 0.3] },
     { id: 'hallway-plant', model: 'pottedPlant', logic: 'plant@3,0', at: [0.4, 3.3] },
-    // Quarto: cama na parede poente entre duas mesas de cabeceira (rádio a sul),
-    // cómoda a sul, canto de leitura com poltrona entre os dois candeeiros a nascente.
-    { id: 'bedroom-bed', model: 'bedDouble', against: { wall: 'west', at: 5.6 } },
-    { id: 'bedroom-nightstand', model: 'cabinetBedDrawerTable', at: [0.2, 4.8], facing: 'E' },
-    { id: 'bedroom-bedside-lamp', model: 'lampRoundTable', on: { parent: 'bedroom-nightstand' } },
-    { id: 'bedroom-nightstand-south', model: 'cabinetBedDrawerTable', at: [0.2, 6.45], facing: 'E' },
-    { id: 'hallway-clock-south', model: 'radio', logic: 'clock@6,0', on: { parent: 'bedroom-nightstand-south' } },
+    // Corredor sul (faixa do Hallway): consola com o rádio, relógio de pé, banco e aparador.
+    { id: 'hallway-console', model: 'cabinetBedDrawerTable', at: [0.2, 6.45], facing: 'E' },
+    { id: 'hallway-clock-south', model: 'radio', logic: 'clock@6,0', on: { parent: 'hallway-console' } },
     { id: 'hallway-clock-east', model: 'speaker', logic: 'clock@4,1', at: [1.75, 4.25] },
+    { id: 'hallway-bench', model: 'bench', against: { wall: 'west', at: 5.0 } },
+    { id: 'hallway-sideboard', model: 'cabinetTelevisionDoors', against: { wall: 'south', at: 1.0 }, facing: 'N' },
+    // Quarto (faixa do Bedroom): cama com a cabeceira na parede do escritório, ladeada pelos
+    // dois candeeiros de pé; relógios nos cantos a sul.
+    { id: 'bedroom-bed', model: 'bedDouble', against: { wall: 'bedroom-study', side: 'W', at: 5.45 } },
     { id: 'bedroom-lamp-south', model: 'lampRoundFloor', logic: 'lamp@5,2', at: [2.25, 5.25] },
     { id: 'bedroom-lamp-north', model: 'lampRoundFloor', logic: 'lamp@4,3', at: [3.75, 4.3], facing: 'W' },
-    { id: 'bedroom-armchair', model: 'loungeChair', at: [3.45, 5.3], facing: 'W' },
     { id: 'bedroom-clock-east', model: 'speaker', logic: 'clock@6,3', at: [3.75, 6.25] },
     { id: 'bedroom-clock-priya', model: 'speaker', logic: 'clock@7,2', at: [2.75, 7.25] },
-    { id: 'bedroom-dresser', model: 'cabinetTelevisionDoors', against: { wall: 'south', at: 1.0 }, facing: 'N' },
     // Escritório norte: secretária do Idris sob a janela com cadeira, caixa e poltrona.
     { id: 'study-desk-idris', model: 'desk', logic: 'desk@0,4', against: { wall: 'north', at: 4.5 } },
     { id: 'study-desk-idris-chair', model: 'chairDesk', at: [4.5, 1.1], facing: 'N' },
