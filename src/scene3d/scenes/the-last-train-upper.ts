@@ -1,6 +1,7 @@
 import type { SceneSpec } from '../schema'
 
-// O piso superior reúne um quarto compacto, uma galeria central e duas divisões de serviço.
+// O piso superior reúne o quarto a oeste, um átrio central, o escritório com
+// a escada a nordeste e a casa de banho fechada a sudeste, com porta para o átrio.
 export const theLastTrainUpper: SceneSpec = {
   puzzleId: 'hard-3',
   floor: 1,
@@ -51,29 +52,44 @@ export const theLastTrainUpper: SceneSpec = {
     { id: 'stairwell-north-guard', from: [6.1, 0.780625], to: [6.24375, 0.780625], height: 'half', treatment: 'railing', freeEnds: ['from', 'to'] },
   ],
   furniture: [
-    { id: 'bedroom-bed', model: 'bedDouble', against: { wall: 'west', at: 4.45 } },
-    { id: 'bedroom-nightstand', model: 'cabinetBedDrawerTable', against: { wall: 'west', at: 3.4 } },
+    // Quarto: roupeiro e candeeiro a norte, cama encostada a oeste sobre o
+    // tapete com duas mesas de cabeceira, recanto de leitura sob a janela oeste
+    // e, a sul, relógio de pé, candeeiro e cómoda com rádio.
+    { id: 'bedroom-wardrobe', model: 'bookcaseClosedWide', against: { wall: 'west', at: 1.0 }, facing: 'E' },
+    { id: 'bedroom-lamp', model: 'lampRoundFloor', logic: 'lamp@0,0', at: [0.75, 0.3] },
+    { id: 'bedroom-bed', model: 'bedDouble', against: { wall: 'west', at: 3.0 } },
+    { id: 'bedroom-nightstand', model: 'cabinetBedDrawerTable', against: { wall: 'west', at: 2.05 } },
     { id: 'bedroom-bedside-lamp', model: 'lampRoundTable', on: { parent: 'bedroom-nightstand' } },
-    { id: 'bedroom-rug', model: 'rugRectangle', logic: 'rug@2,0', at: [0.65, 2.5], facing: 'E' },
-    { id: 'bedroom-lamp', model: 'lampRoundFloor', logic: 'lamp@0,0', at: [0.35, 0.45] },
-    { id: 'bedroom-clock-west-table', model: 'sideTable', at: [0.55, 7.35] },
-    { id: 'bedroom-clock-west', model: 'radio', logic: 'clock@7,0', on: { parent: 'bedroom-clock-west-table' } },
-    { id: 'bedroom-clock-east-table', model: 'sideTable', at: [2.45, 7.35] },
+    { id: 'bedroom-nightstand-south', model: 'cabinetBedDrawerTable', against: { wall: 'west', at: 3.95 } },
+    { id: 'bedroom-bedside-lamp-south', model: 'lampSquareTable', on: { parent: 'bedroom-nightstand-south' } },
+    { id: 'bedroom-rug', model: 'rugRectangle', logic: 'rug@2,0', at: [1.0, 3.0], facing: 'E' },
+    { id: 'bedroom-sofa', model: 'loungeSofa', against: { wall: 'west', at: 5.9 }, facing: 'E' },
+    { id: 'bedroom-coffee-table', model: 'tableCoffeeSquare', at: [1.25, 5.9] },
+    { id: 'bedroom-clock-west', model: 'speaker', logic: 'clock@7,0', at: [0.3, 7.65] },
+    { id: 'bedroom-lamp-south', model: 'lampRoundFloor', logic: 'lamp@7,1', at: [1.75, 7.25] },
+    { id: 'bedroom-clock-east-table', model: 'sideTable', against: { wall: 'bedroom-hall', at: 7.35, side: 'W' }, facing: 'W' },
     { id: 'bedroom-clock-east', model: 'radio', logic: 'clock@7,2', on: { parent: 'bedroom-clock-east-table' } },
-    { id: 'bedroom-lamp-south', model: 'lampRoundFloor', logic: 'lamp@7,1', at: [1.5, 7.35] },
-
-    { id: 'hall-plant-north', model: 'flower_yellowA', logic: 'plant@0,3', at: [3.2, 0.3] },
+    // Átrio: vasos e rádios ao longo das paredes, centro livre para circular.
+    { id: 'hall-plant-north', model: 'pottedPlant', logic: 'plant@0,3', at: [3.2, 0.3] },
     { id: 'hall-plant-east', model: 'flower_purpleA', logic: 'plant@1,4', at: [4.65, 1.6] },
     { id: 'hall-clock-west-table', model: 'sideTable', at: [3.4, 2.05] },
     { id: 'hall-clock-west', model: 'radio', logic: 'clock@2,3', on: { parent: 'hall-clock-west-table' } },
-    { id: 'hall-clock-east-table', model: 'sideTable', at: [4.8, 2.2], facing: 'E' },
-    { id: 'hall-clock-east', model: 'radio', logic: 'clock@2,4', on: { parent: 'hall-clock-east-table' } },
-    { id: 'hall-plant-south', model: 'flower_redA', logic: 'plant@6,4', at: [4.25, 6.6] },
-
-    { id: 'study-desk', model: 'desk', logic: 'desk@0,7', at: [7.4, 0.5], facing: 'W' },
+    { id: 'hall-clock-east', model: 'speaker', logic: 'clock@2,4', at: [4.8, 2.6] },
+    { id: 'hall-plant-south', model: 'pottedPlant', logic: 'plant@6,4', at: [4.3, 6.6] },
+    // Escritório: secretária no canto nordeste com portátil e candeeiro,
+    // estante baixa sob a janela, sofá de leitura na parede este e caixa.
+    { id: 'study-desk', model: 'desk', logic: 'desk@0,7', at: [7.45, 0.5], facing: 'W' },
+    { id: 'study-laptop', model: 'laptop', on: { parent: 'study-desk' } },
+    { id: 'study-shelf', model: 'bookcaseOpenLow', against: { wall: 'north', at: 6.65 } },
+    { id: 'study-shelf-books', model: 'books', on: { parent: 'study-shelf' } },
+    { id: 'study-sofa', model: 'loungeSofa', against: { wall: 'east', at: 2.25 }, facing: 'W' },
     { id: 'study-box', model: 'cardboardBoxClosed', logic: 'box@3,7', at: [7.35, 3.5] },
-    { id: 'bathroom-bathtub', model: 'bathtub', logic: 'bathtub@7,6', at: [6.4, 7.35], facing: 'N' },
+    // Casa de banho: máquina no canto nordeste, sanita a este, banheira a sul,
+    // lavatório a norte e cesto junto à parede do átrio.
+    { id: 'bathroom-bathtub', model: 'bathtub', logic: 'bathtub@7,6', against: { wall: 'south', at: 7.0 }, facing: 'N' },
     { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@5,7', at: [7.35, 5.45], facing: 'W' },
     { id: 'bathroom-washbasin', model: 'bathroomSink', against: { wall: 'study-bathroom', side: 'S', at: 6.2 } },
+    { id: 'bathroom-washer', model: 'washer', against: { wall: 'study-bathroom', side: 'S', at: 7.5 } },
+    { id: 'bathroom-bin', model: 'trashcan', at: [5.3, 7.0] },
   ],
 }

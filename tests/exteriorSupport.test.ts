@@ -6,7 +6,7 @@ import type { SceneSpec } from '../src/scene3d/schema'
 import { CELL, TERRAIN_DROP } from '../src/scene3d/units'
 import { validateScene, validateStoreyPair } from '../src/scene3d/validate'
 import { multistoreyGardenLower, multistoreyGardenUpper } from './fixtures/multistoreyGarden'
-import { theColdKettleGround } from '../src/scene3d/scenes/the-cold-kettle-ground'
+import { aNameInPencilGround } from '../src/scene3d/scenes/a-name-in-pencil-ground'
 import { aStoryRehearsedGround } from '../src/scene3d/scenes/a-story-rehearsed-ground'
 import { AUTHORED_SCENES } from '../src/scene3d/scenes'
 
@@ -181,14 +181,14 @@ describe('exterior structural support', () => {
   })
 
   it('includes grounded support columns in cell visibility checks', () => {
-    const hard5 = validateScene(resolveScene(theColdKettleGround, 8))
+    const hard6 = validateScene(resolveScene(aNameInPencilGround, 8))
       .filter(issue => issue.code === 'cell-hidden')
       .map(issue => issue.subject)
     const hard10 = validateScene(resolveScene(aStoryRehearsedGround, 8))
       .filter(issue => issue.code === 'cell-hidden')
       .map(issue => issue.subject)
 
-    expect(hard5).toContain('4,4')
+    expect(hard6).toContain('4,2')
     expect(hard10).toContain('5,7')
   })
 

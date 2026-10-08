@@ -74,10 +74,10 @@ Legenda:
 | Medium | medium-1 a medium-12 | commit | Revisto. Exceções de vocabulário (`chair`): mesas de jantar com 1 ou 2 cadeiras em medium-1, 3, 6 e 7; secretárias sem cadeira em medium-1, 2 e 8. medium-12: a televisão do recanto mostra a traseira porque as duas células de televisão são adjacentes |
 | Hard | hard-1 | feito | Revisto; a sanita encosta à parede sul, rebaixada pela câmara |
 | Hard | hard-2, hard-4, hard-6 | commit | Revistos. hard-4: Office com mesa de trabalho porque `desk` é vocabulário de pista; os duches de hard-4 e hard-6 continuam a esconder as mesmas células de antes |
-| Hard | hard-3, hard-5 | feito, a aguardar decisão | Jardim ou pátio convertido em jardim de inverno interior. No hard-5, o teste `exteriorSupport` depende das colunas desta cena |
+| Hard | hard-3, hard-5 | commit | Jardim ou pátio convertido em jardim de inverno interior, aprovado pelo responsável a 08/10/2026 (tal como master-4 e master-7). A verificação de colunas do teste `exteriorSupport` passou a usar o hard-6 |
 | Hard | hard-7 a hard-12 | em curso | Agente Hard B |
 | Expert | expert-1 a expert-5 | commit | Revisto, sem nenhuma nova célula de solução escondida. Casas de banho fechadas com porta, segunda televisão num recanto próprio, quarto do expert-5 encostado a uma parede. Exceções: o WC do expert-2 é acedido pela casa de banho principal, e há bancos estofados onde `chair` é vocabulário de pista |
 | Expert | expert-6 a expert-10 | em curso | Agente Expert B |
-| Master | master-1 a master-8 | commit | Revisto, sem nenhuma nova célula de solução escondida. Casas de banho e WC fechados; corredores evitam quartos de passagem; a escada de master-4 e master-7 foi reposicionada. **Decisão a confirmar:** em master-4 o alpendre e em master-7 o jardim passaram a zonas interiores (alpendre envidraçado, jardim de inverno) para eliminar as vigas sobre células de pista; as divisões lógicas mantêm-se |
+| Master | master-1 a master-8 | commit | Revisto, sem nenhuma nova célula de solução escondida. Casas de banho e WC fechados; corredores evitam quartos de passagem; a escada de master-4 e master-7 foi reposicionada. **Decisão aprovada a 08/10/2026:** em master-4 o alpendre e em master-7 o jardim passaram a zonas interiores (alpendre envidraçado, jardim de inverno) para eliminar as vigas sobre células de pista; as divisões lógicas mantêm-se |
 
 Atualizado em 08/10/2026.
