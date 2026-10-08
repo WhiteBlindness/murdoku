@@ -314,6 +314,44 @@ export const reviewedCatalogueSightlines: Record<string, string[]> = {
   'hard-5#0@ghost': [
     "2,5|cell (2,5) has a blocked 3D sightline at standee height: object:stairs",
   ],
+  'hard-8#0@exploded': [
+    "0,6|cell (0,6) has a blocked 3D sightline at standee height: object:stairs",
+    "1,6|cell (1,6) has a blocked 3D sightline at standee height: object:stairs",
+    "2,2|cell (2,2) has a blocked 3D sightline at standee height: support:column:3,3",
+    "4,2|cell (4,2) has a blocked 3D sightline at standee height: support:column:3,5",
+    "7,2|cell (7,2) has a blocked 3D sightline at standee height: support:column:3,8",
+  ],
+  'hard-8#0@ghost': [
+    "0,6|cell (0,6) has a blocked 3D sightline at standee height: object:stairs",
+    "1,6|cell (1,6) has a blocked 3D sightline at standee height: object:stairs",
+    "2,2|cell (2,2) has a blocked 3D sightline at standee height: support:column:3,3",
+    "4,2|cell (4,2) has a blocked 3D sightline at standee height: support:column:3,5",
+    "7,2|cell (7,2) has a blocked 3D sightline at standee height: support:column:3,8",
+  ],
+  'hard-9#0@exploded': [
+    "3,3|cell (3,3) has a blocked 3D sightline at standee height: object:stairs",
+    "4,2|cell (4,2) has a blocked 3D sightline at standee height: support:column:3,5",
+    "4,4|cell (4,4) has a blocked 3D sightline at standee height: object:dining-lamp-west, support:column:5,5",
+    "4,7|cell (4,7) has a blocked 3D sightline at standee height: object:dining-lamp-east, support:column:8,5",
+    "7,2|cell (7,2) has a blocked 3D sightline at standee height: support:column:3,8",
+    "7,4|cell (7,4) has a blocked 3D sightline at standee height: support:column:5,8",
+    "7,7|cell (7,7) has a blocked 3D sightline at standee height: support:column:8,8",
+  ],
+  'hard-9#0@ghost': [
+    "3,3|cell (3,3) has a blocked 3D sightline at standee height: object:stairs",
+    "4,2|cell (4,2) has a blocked 3D sightline at standee height: support:column:3,5",
+    "4,4|cell (4,4) has a blocked 3D sightline at standee height: object:dining-lamp-west, support:column:5,5",
+    "4,7|cell (4,7) has a blocked 3D sightline at standee height: object:dining-lamp-east, support:column:8,5",
+    "7,2|cell (7,2) has a blocked 3D sightline at standee height: support:column:3,8",
+    "7,4|cell (7,4) has a blocked 3D sightline at standee height: support:column:5,8",
+    "7,7|cell (7,7) has a blocked 3D sightline at standee height: support:column:8,8",
+  ],
+  'hard-10#1@exploded': [
+    "1,2|cell (1,2) has a blocked 3D sightline at standee height: object:bathroom-shower",
+  ],
+  'hard-10#1@ghost': [
+    "1,2|cell (1,2) has a blocked 3D sightline at standee height: object:bathroom-shower",
+  ],
   'hard-11#0@normal': [
     "4,3|cell (4,3) has a blocked 3D sightline at standee height: object:stairs",
   ],

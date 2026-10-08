@@ -75,9 +75,9 @@ Legenda:
 | Hard | hard-1 | feito | Revisto; a sanita encosta à parede sul, rebaixada pela câmara |
 | Hard | hard-2, hard-4, hard-6 | commit | Revistos. hard-4: Office com mesa de trabalho porque `desk` é vocabulário de pista; os duches de hard-4 e hard-6 continuam a esconder as mesmas células de antes |
 | Hard | hard-3, hard-5 | commit | Jardim ou pátio convertido em jardim de inverno interior, aprovado pelo responsável a 08/10/2026 (tal como master-4 e master-7). A verificação de colunas do teste `exteriorSupport` passou a usar o hard-6 |
-| Hard | hard-7 a hard-12 | em curso | Agente Hard B |
+| Hard | hard-7 a hard-12 | commit | Revistos, sem nenhuma nova célula de solução escondida; as zonas exteriores mantêm-se exteriores. Duas casas de banho fechadas em hard-7; cozinha fechada e separada da casa de banho em hard-12 (a confirmar na revisão final). Exceções: secretária do estúdio do hard-10 sem cadeira; bancos estofados no hard-12 (`chair`, `table`, `counter` e `lamp` são vocabulário de pista) |
 | Expert | expert-1 a expert-5 | commit | Revisto, sem nenhuma nova célula de solução escondida. Casas de banho fechadas com porta, segunda televisão num recanto próprio, quarto do expert-5 encostado a uma parede. Exceções: o WC do expert-2 é acedido pela casa de banho principal, e há bancos estofados onde `chair` é vocabulário de pista |
 | Expert | expert-6 a expert-10 | commit | Revistos, sem nenhuma nova célula de solução escondida. Corredores e galerias evitam quartos de passagem; a casa de banho do expert-7 está fechada. Exceções: as secretárias do expert-9 não têm cadeira (`chair`), a secretária do expert-6 junto à escada funciona como prateleira de escrita, e as peças sanitárias duplicadas vêm do puzzle |
 | Master | master-1 a master-8 | commit | Revisto, sem nenhuma nova célula de solução escondida. Casas de banho e WC fechados; corredores evitam quartos de passagem; a escada de master-4 e master-7 foi reposicionada. **Decisão aprovada a 08/10/2026:** em master-4 o alpendre e em master-7 o jardim passaram a zonas interiores (alpendre envidraçado, jardim de inverno) para eliminar as vigas sobre células de pista; as divisões lógicas mantêm-se |
 
-Atualizado em 08/10/2026.
+Atualizado em 08/10/2026. Redesenho concluído nos 60 casos (90 pisos). Próximo passo: porta de validação completa.

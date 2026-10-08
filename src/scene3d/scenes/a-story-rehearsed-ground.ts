@@ -20,7 +20,7 @@ export const aStoryRehearsedGround: SceneSpec = {
   storeyFootprint: { kind: 'full' },
   entry: { wall: 'west', at: 6.5 },
   shell: { features: [
-    { wall: 'north', at: 1.1, kind: 'window' },
+    { wall: 'north', at: 1.3, kind: 'window' },
     { wall: 'west', at: 2.7, kind: 'window' },
   ] },
   stairs: { model: 'stairsOpen', at: stairAt, facing: 'N' },
@@ -42,22 +42,42 @@ export const aStoryRehearsedGround: SceneSpec = {
     { id: 'hallway-garden-edge', from: [2, 0], to: [2, 8], openings: [{ at: 6.5, width: 1.3, kind: 'open' }] },
   ],
   furniture: [
+    // Átrio: estante e consola na parede norte, tapete, bengaleiro junto à porta da rua;
+    // a escada sobe a partir da entrada.
+    { id: 'hallway-bookcase', model: 'bookcaseClosedWide', against: { wall: 'north', at: 0.6 } },
+    { id: 'hallway-clock-north', model: 'speaker', logic: 'clock@0,1', at: [1.75, 0.3] },
+    { id: 'hallway-plant', model: 'pottedPlant', logic: 'plant@2,0', at: [0.25, 2.55] },
     { id: 'hallway-clock-south', model: 'speaker', logic: 'clock@3,0', at: [0.23, 3.5] },
-    { id: 'hallway-plant', model: 'pottedPlant', logic: 'plant@2,0', at: [0.23, 2.5] },
-    { id: 'hallway-clock-north', model: 'speaker', logic: 'clock@0,1', at: [1.5, 0.5] },
-
+    { id: 'hallway-console', model: 'cabinetTelevisionDoors', against: { wall: 'west', at: 1.45 }, facing: 'E' },
+    { id: 'hallway-coat-rack', model: 'coatRackStanding', at: [0.3, 7.65] },
+    // Jardim da frente e jardim: arbustos e flores em canteiros, pedras, cepos e um
+    // caminho de pedra da porta do átrio ao alpendre.
     { id: 'front-yard-shrub-north', model: 'plant_bushSmall', logic: 'shrub@1,3', at: [3.5, 1.5] },
-    { id: 'front-yard-plant-south', model: 'flower_yellowA', logic: 'plant@5,3', at: [3.5, 5.5] },
+    { id: 'front-yard-plant-south', model: 'flower_yellowA', logic: 'plant@5,3', at: [3.6, 5.6] },
     { id: 'garden-shrub-west', model: 'plant_bushSmall', logic: 'shrub@2,2', at: [2.5, 2.5] },
-    { id: 'front-yard-plant-east', model: 'flower_redA', logic: 'plant@4,2', at: [2.5, 4.5] },
+    { id: 'front-yard-plant-east', model: 'flower_redA', logic: 'plant@4,2', at: [2.6, 4.6] },
     { id: 'garden-shrub-northwest', model: 'plant_bushSmall', logic: 'shrub@0,4', at: [4.5, 0.5] },
-    { id: 'garden-alexander-plant', model: 'flower_purpleA', logic: 'plant@0,5', at: [5.5, 0.5] },
+    { id: 'garden-alexander-plant', model: 'flower_purpleA', logic: 'plant@0,5', at: [5.62, 0.62] },
     { id: 'garden-shrub-southwest', model: 'plant_bushSmall', logic: 'shrub@4,5', at: [5.5, 4.5] },
     { id: 'garden-shrub-southeast', model: 'plant_bushSmall', logic: 'shrub@4,7', at: [7.5, 4.5] },
-    { id: 'porch-chair-west', model: 'chair', logic: 'chair@5,4', at: [4.5, 5.5], facing: 'W' },
-    { id: 'porch-yuki-plant', model: 'flower_redA', logic: 'plant@6,7', at: [7.5, 6.5] },
-    { id: 'porch-chair-north', model: 'chair', logic: 'chair@7,5', at: [5.5, 7.5], facing: 'N' },
-    { id: 'porch-chair-east', model: 'chair', logic: 'chair@7,6', at: [6.5, 7.5], facing: 'S' },
-    { id: 'porch-tomas-chair', model: 'chair', logic: 'chair@5,7', at: [7.5, 5.5], facing: 'E' },
+    { id: 'garden-rock-north', model: 'rock_smallA', at: [6.6, 1.3] },
+    { id: 'garden-rock-flat', model: 'rock_smallFlatA', at: [7.2, 2.6] },
+    { id: 'garden-stump', model: 'stump_round', at: [4.6, 2.4] },
+    { id: 'garden-log', model: 'log', at: [6.3, 3.4] },
+    { id: 'garden-lantern', model: 'lampRoundFloor', at: [2.4, 7.6] },
+    // Alpendre: mesa comprida de exterior com as quatro cadeiras e um vaso de flores.
+    { id: 'porch-table-west', model: 'table', at: [5.48, 6.4] },
+    { id: 'porch-table-east', model: 'table', at: [6.53, 6.4] },
+    { id: 'porch-chair-west', model: 'chair', logic: 'chair@5,4', at: [4.6, 5.75], facing: 'S' },
+    { id: 'porch-tomas-chair', model: 'chair', logic: 'chair@5,7', at: [7.15, 5.85], facing: 'S' },
+    { id: 'porch-chair-north', model: 'chair', logic: 'chair@7,5', at: [5.5, 7.1], facing: 'N' },
+    { id: 'porch-chair-east', model: 'chair', logic: 'chair@7,6', at: [6.5, 7.1], facing: 'N' },
+    { id: 'porch-yuki-plant', model: 'flower_redA', logic: 'plant@6,7', at: [7.6, 6.65] },
+  ],
+  rugs: [
+    { id: 'hallway-rug', model: 'rugRectangle', at: [1.0, 1.9] },
+    { id: 'hallway-mat', model: 'rugDoormat', at: [0.35, 6.5], facing: 'E' },
+    { id: 'yard-path-door', model: 'path_stone', at: [2.6, 6.5] },
+    { id: 'yard-path-porch', model: 'path_stone', at: [3.6, 6.5] },
   ],
 }
