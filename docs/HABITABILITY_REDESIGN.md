@@ -69,17 +69,12 @@ Legenda:
 
 | Nível | Caso | Estado | Notas |
 | --- | --- | --- | --- |
-| Very Easy | very-easy-1 a very-easy-4 | feito | Revisão do responsável pendente |
-| Very Easy | very-easy-5 | em curso | |
-| Very Easy | very-easy-6 a very-easy-8 | pendente | |
-| Easy | easy-3 | commit | `db52ce4` |
-| Easy | easy-1, easy-2, easy-4, easy-5, easy-6 | feito | Revisão do responsável pendente |
-| Easy | easy-7 | em curso | Toco a bloquear a porta da despensa |
-| Easy | easy-8 a easy-10 | pendente | |
-| Medium | medium-1, medium-2 | feito | Revisão do responsável pendente |
+| Very Easy | very-easy-1 a very-easy-8 | commit | Revisto. Exceções de vocabulário: very-easy-6 e very-easy-8 (`chair`). very-easy-1 e very-easy-2 são referências douradas; as imagens de referência têm de ser refeitas na captura final |
+| Easy | easy-1 a easy-10 | commit | Revisto. Exceções de vocabulário: easy-1 sem mesa de pequeno-almoço, easy-10 com banco estofado. easy-1 é referência dourada |
+| Medium | medium-1, medium-2 | feito | Revisto; medium-1: sala de jantar escassa porque `chair` é vocabulário de pista |
 | Medium | medium-3 | em curso | |
 | Medium | medium-4 a medium-12 | pendente | |
-| Hard | hard-1 | feito | Revisão do responsável pendente |
+| Hard | hard-1 | feito | Revisto; a sanita encosta à parede sul, rebaixada pela câmara |
 | Hard | hard-2 | em curso | |
 | Hard | hard-3 a hard-12 | pendente | |
 | Expert | expert-1 | feito | Revisão do responsável pendente |
