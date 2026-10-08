@@ -77,7 +77,7 @@ Legenda:
 | Hard | hard-3, hard-5 | commit | Jardim ou pátio convertido em jardim de inverno interior, aprovado pelo responsável a 08/10/2026 (tal como master-4 e master-7). A verificação de colunas do teste `exteriorSupport` passou a usar o hard-6 |
 | Hard | hard-7 a hard-12 | em curso | Agente Hard B |
 | Expert | expert-1 a expert-5 | commit | Revisto, sem nenhuma nova célula de solução escondida. Casas de banho fechadas com porta, segunda televisão num recanto próprio, quarto do expert-5 encostado a uma parede. Exceções: o WC do expert-2 é acedido pela casa de banho principal, e há bancos estofados onde `chair` é vocabulário de pista |
-| Expert | expert-6 a expert-10 | em curso | Agente Expert B |
+| Expert | expert-6 a expert-10 | commit | Revistos, sem nenhuma nova célula de solução escondida. Corredores e galerias evitam quartos de passagem; a casa de banho do expert-7 está fechada. Exceções: as secretárias do expert-9 não têm cadeira (`chair`), a secretária do expert-6 junto à escada funciona como prateleira de escrita, e as peças sanitárias duplicadas vêm do puzzle |
 | Master | master-1 a master-8 | commit | Revisto, sem nenhuma nova célula de solução escondida. Casas de banho e WC fechados; corredores evitam quartos de passagem; a escada de master-4 e master-7 foi reposicionada. **Decisão aprovada a 08/10/2026:** em master-4 o alpendre e em master-7 o jardim passaram a zonas interiores (alpendre envidraçado, jardim de inverno) para eliminar as vigas sobre células de pista; as divisões lógicas mantêm-se |
 
 Atualizado em 08/10/2026.

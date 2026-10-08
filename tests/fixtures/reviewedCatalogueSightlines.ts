@@ -185,20 +185,17 @@ export const reviewedCatalogueSightlines: Record<string, string[]> = {
     "7,3|cell (7,3) has a blocked 3D sightline at standee height: support:column:4,8",
   ],
   'expert-7#0@exploded': [
-    "1,2|cell (1,2) has a blocked 3D sightline at standee height: object:viraj-desk-chair",
-    "2,3|cell (2,3) has a blocked 3D sightline at standee height: object:office-desk-south-chair, object:stairs, support:column:4,3",
+    "2,3|cell (2,3) has a blocked 3D sightline at standee height: object:stairs, support:column:4,3",
     "2,6|cell (2,6) has a blocked 3D sightline at standee height: support:column:7,3",
     "2,7|cell (2,7) has a blocked 3D sightline at standee height: support:column:8,3",
   ],
   'expert-7#0@ghost': [
-    "1,2|cell (1,2) has a blocked 3D sightline at standee height: object:viraj-desk-chair",
-    "2,3|cell (2,3) has a blocked 3D sightline at standee height: object:office-desk-south-chair, object:stairs, support:column:4,3",
+    "2,3|cell (2,3) has a blocked 3D sightline at standee height: object:stairs, support:column:4,3",
     "2,6|cell (2,6) has a blocked 3D sightline at standee height: support:column:7,3",
     "2,7|cell (2,7) has a blocked 3D sightline at standee height: support:column:8,3",
   ],
   'expert-7#0@normal': [
-    "1,2|cell (1,2) has a blocked 3D sightline at standee height: object:viraj-desk-chair",
-    "2,3|cell (2,3) has a blocked 3D sightline at standee height: object:office-desk-south-chair, object:stairs, support:column:4,3",
+    "2,3|cell (2,3) has a blocked 3D sightline at standee height: object:stairs, support:column:4,3",
     "2,6|cell (2,6) has a blocked 3D sightline at standee height: support:column:7,3",
     "2,7|cell (2,7) has a blocked 3D sightline at standee height: support:column:8,3",
   ],
@@ -218,7 +215,7 @@ export const reviewedCatalogueSightlines: Record<string, string[]> = {
   'expert-8#0@normal': [
     "2,2|cell (2,2) has a blocked 3D sightline at standee height: support:column:3,3",
     "2,4|cell (2,4) has a blocked 3D sightline at standee height: support:column:5,3",
-    "5,2|cell (5,2) has a blocked 3D sightline at standee height: object:stairs",
+    "5,2|cell (5,2) has a blocked 3D sightline at standee height: object:living-plant, object:stairs",
   ],
   'expert-9#0@exploded': [
     "2,1|cell (2,1) has a blocked 3D sightline at standee height: support:column:2,3",
