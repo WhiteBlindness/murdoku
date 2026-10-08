@@ -62,15 +62,24 @@ export const twoStoreyReferenceUpper: SceneSpec = {
     { id: 'bed', model: 'bedDouble', logic: 'bed@2,0', against: { wall: 'west', at: 2.05 } },
     { id: 'nightstand', model: 'cabinetBedDrawerTable', logic: 'lamp@1,0', against: { wall: 'west', at: 1.1 } },
     { id: 'bedside-lamp', model: 'lampRoundTable', logic: 'lamp@1,0', on: { parent: 'nightstand' } },
+    // Quarto: cómoda baixa na parede norte, ao lado da mesa de cabeceira.
+    { id: 'bedroom-dresser', model: 'sideTableDrawers', against: { wall: 'north', at: 0.95 } },
+    { id: 'bedroom-dresser-books', model: 'books', on: { parent: 'bedroom-dresser' } },
 
     { id: 'study-desk', model: 'desk', logic: 'desk@1,5', against: { wall: 'office-west', at: 2.05, side: 'E' } },
     { id: 'study-laptop', model: 'laptop', on: { parent: 'study-desk' } },
     { id: 'study-chair', model: 'chairDesk', logic: 'chair@2,6', at: [6.95, 2.05], facing: 'W' },
     { id: 'office-bookcase', model: 'bookcaseOpenLow', against: { wall: 'north', at: 7.5 } },
+    // Estudo: sofá de leitura na parede este, sobre tapete redondo.
+    { id: 'study-sofa', model: 'loungeSofa', against: { wall: 'east', at: 1.05 }, facing: 'W' },
+    { id: 'study-shelf-plant', model: 'plantSmall1', on: { parent: 'office-bookcase' } },
 
     { id: 'bath', model: 'bathtub', logic: 'bathtub@6,0', against: { wall: 'west', at: 6.75 } },
     { id: 'bathroom-basin', model: 'bathroomSink', against: { wall: 'bathroom-north', at: 2.2, side: 'S' } },
     { id: 'toilet', model: 'toilet', logic: 'toilet@7,2', against: { wall: 'south', at: 2.08 } },
+    // Banho: máquina de lavar e cesto na parede norte, entre a banheira e o lavatório.
+    { id: 'bathroom-washer', model: 'washer', against: { wall: 'bathroom-north', at: 1.15, side: 'S' } },
+    { id: 'bathroom-bin', model: 'trashcan', at: [1.65, 5.62] },
 
     { id: 'landing-bookcase', model: 'bookcaseOpenLow', logic: 'bookshelf@5,7', against: { wall: 'east', at: 5.5 } },
     { id: 'landing-books', model: 'books', on: { parent: 'landing-bookcase' } },
@@ -83,6 +92,7 @@ export const twoStoreyReferenceUpper: SceneSpec = {
   ],
   rugs: [
     { id: 'bedroom-rug', model: 'rugRectangle', at: [1.05, 2.55], facing: 'E' },
+    { id: 'study-rug', model: 'rugRound', at: [6.95, 1.1] },
     { id: 'landing-reading-rug', model: 'rugRectangle', at: [5.7, 6.05], facing: 'S' },
   ],
 }
