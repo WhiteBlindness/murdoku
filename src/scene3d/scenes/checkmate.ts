@@ -1,13 +1,13 @@
 import type { SceneSpec } from '../schema'
 
-// Uma cozinha de demonstração ocupa a ala este, com dois pátios distintos.
+// Uma cozinha-copa ocupa a ala este, com dois pátios distintos a oeste.
 export const checkmate: SceneSpec = {
   puzzleId: 'very-easy-4',
   floor: 0,
   entry: { wall: 'north', at: 4.65 },
   shell: {
     features: [
-      { wall: 'north', at: 3.55, kind: 'window' },
+      { wall: 'north', at: 3.75, kind: 'window' },
       { wall: 'north', at: 5.45, kind: 'window' },
     ],
   },
@@ -27,33 +27,36 @@ export const checkmate: SceneSpec = {
         { at: 5.35, width: 1, kind: 'open' },
       ],
     },
-    {
-      id: 'kitchen-island',
-      from: [3, 3],
-      to: [6, 3],
-      height: 'half',
-      openings: [{ at: 4.65, width: 1.25, kind: 'open' }],
-    },
   ],
   furniture: [
-    { id: 'north-stove', model: 'kitchenStove', logic: 'stove@0,5', against: { wall: 'east', at: 0.55 } },
-    { id: 'north-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@2,4', at: [4.65, 2], facing: 'S' },
-    { id: 'west-stove', model: 'kitchenStoveElectric', logic: 'stove@1,3', against: { wall: 'west-facade', side: 'E', at: 2 } },
-    { id: 'south-fridge', model: 'kitchenFridge', logic: 'fridge@3,3', at: [3.45, 3.6], facing: 'S' },
-
-    { id: 'counter-a', model: 'kitchenCabinet', logic: 'counter@3,5', against: { wall: 'east', at: 3.35 } },
-    { id: 'counter-sink', model: 'kitchenSink', logic: 'counter@3,5', against: { wall: 'east', at: 3.95 } },
-    { id: 'counter-b', model: 'kitchenCabinetDrawer', logic: 'counter@3,5', against: { wall: 'east', at: 4.55 } },
+    // Cozinha-copa em galeria: bancada contínua na parede este (fogão a norte, lava-loiça
+    // e armários), segunda bancada na fachada oeste (placa, armários e frigorífico no topo),
+    // ilha central rematada pelo frigorífico pequeno; a mesa de refeições fica a sul.
+    { id: 'north-stove', model: 'kitchenStove', logic: 'stove@0,5', against: { wall: 'east', at: 0.4 } },
+    { id: 'east-cabinet-a', model: 'kitchenCabinet', against: { wall: 'east', at: 0.94 } },
+    { id: 'east-coffee', model: 'kitchenCoffeeMachine', on: { parent: 'east-cabinet-a' } },
+    { id: 'east-cabinet-b', model: 'kitchenCabinetDrawer', against: { wall: 'east', at: 1.48 } },
+    { id: 'east-cabinet-c', model: 'kitchenCabinet', against: { wall: 'east', at: 2.02 } },
+    { id: 'east-cabinet-d', model: 'kitchenCabinetDrawer', against: { wall: 'east', at: 2.56 } },
+    { id: 'counter-a', model: 'kitchenCabinet', logic: 'counter@3,5', against: { wall: 'east', at: 3.1 } },
+    { id: 'counter-sink', model: 'kitchenSink', logic: 'counter@3,5', against: { wall: 'east', at: 3.64 } },
+    { id: 'counter-b', model: 'kitchenCabinetDrawer', logic: 'counter@3,5', against: { wall: 'east', at: 4.18 } },
     { id: 'counter-microwave', model: 'kitchenMicrowave', on: { parent: 'counter-b' } },
-
-    { id: 'dining-table', model: 'table', at: [4.2, 4.65], facing: 'E' },
-    { id: 'dining-chair-west', model: 'chair', at: [3.35, 4.65], facing: 'E' },
-    { id: 'dining-chair-east', model: 'chair', at: [4.9, 4.65], facing: 'W' },
-    { id: 'dining-lamp', model: 'lampRoundFloor', at: [5.55, 5.35] },
-    { id: 'sideboard', model: 'cabinetTelevision', against: { wall: 'south', at: 4.55 } },
+    { id: 'west-stove', model: 'kitchenStoveElectric', logic: 'stove@1,3', against: { wall: 'west-facade', side: 'E', at: 1.95 } },
+    { id: 'west-cabinet', model: 'kitchenCabinet', against: { wall: 'west-facade', side: 'E', at: 2.49 } },
+    { id: 'west-toaster', model: 'toaster', on: { parent: 'west-cabinet' } },
+    { id: 'west-drawer', model: 'kitchenCabinetDrawer', against: { wall: 'west-facade', side: 'E', at: 3.03 } },
+    { id: 'south-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@3,3', against: { wall: 'west-facade', side: 'E', at: 3.57 } },
+    { id: 'island-cabinet-a', model: 'kitchenCabinet', at: [4.5, 1.3], facing: 'W' },
+    { id: 'island-cabinet-b', model: 'kitchenCabinetDrawer', at: [4.5, 1.84], facing: 'W' },
+    { id: 'north-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@2,4', at: [4.5, 2.4], facing: 'S' },
+    { id: 'dining-table', model: 'table', at: [4.55, 4.9], facing: 'E' },
+    { id: 'dining-chair-west', model: 'chair', at: [3.75, 4.9], facing: 'E' },
+    { id: 'dining-chair-east', model: 'chair', at: [5.3, 4.9], facing: 'W' },
+    { id: 'dining-chair-north', model: 'chair', at: [4.55, 4.25], facing: 'S' },
+    { id: 'dining-lamp', model: 'lampRoundFloor', at: [5.55, 5.4] },
+    { id: 'sideboard', model: 'cabinetTelevision', against: { wall: 'south', at: 4.4 } },
     { id: 'sideboard-radio', model: 'radio', on: { parent: 'sideboard' } },
-    { id: 'dining-rug', model: 'rugRectangle', at: [4.4, 4.7], facing: 'E' },
-
     { id: 'front-tree', model: 'tree_small', logic: 'plant@0,0', at: [0.65, 0.55] },
     { id: 'front-shrub', model: 'plant_bushDetailed', logic: 'shrub@2,0', at: [0.55, 2.55], yaw: 12 },
     { id: 'front-bench', model: 'bench', at: [1.55, 1.55], facing: 'E' },
@@ -65,10 +68,11 @@ export const checkmate: SceneSpec = {
     { id: 'garden-flower-tree', model: 'flower_yellowA', logic: 'plant@4,2', at: [2.38, 4.45] },
     { id: 'garden-shrub-south', model: 'plant_bushDetailed', logic: 'shrub@5,0', at: [0.6, 5.45], yaw: 15 },
     { id: 'garden-bench', model: 'benchCushion', at: [1.55, 5.35], facing: 'E' },
-    { id: 'garden-fence-a', model: 'fence_simple', at: [0.8, 5.9], facing: 'S' },
+    { id: 'garden-fence-a', model: 'fence_simpleLow', at: [0.8, 5.9], facing: 'S' },
     { id: 'garden-fence-b', model: 'fence_simple', at: [2.2, 5.9], facing: 'S' },
   ],
   rugs: [
+    { id: 'dining-rug', model: 'rugRectangle', at: [4.55, 4.95], facing: 'E' },
     { id: 'front-path-a', model: 'path_stone', at: [1, 0.5], facing: 'S' },
     { id: 'front-path-b', model: 'path_stone', at: [1.8, 0.55], facing: 'S' },
     { id: 'front-path-c', model: 'path_stone', at: [2.6, 0.75], facing: 'S' },
