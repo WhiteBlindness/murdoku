@@ -25,12 +25,14 @@ export const aStoryRehearsedGround: SceneSpec = {
   ] },
   stairs: { model: 'stairsOpen', at: stairAt, facing: 'N' },
   exteriorSupportBays: [
+    // Vãos de 3 linhas no alpendre (linhas 6-8): a fila de pilares fica na linha 5|6
+    // em vez de 6|7, fora da linha de vista da cadeira de Tomas (R6C8).
     { id: 'northwest-garden-bay', cells: [2, 0, 4, 2] },
     { id: 'northeast-garden-bay', cells: [5, 0, 7, 2] },
-    { id: 'middlewest-garden-bay', cells: [2, 3, 4, 5] },
-    { id: 'middleeast-garden-bay', cells: [5, 3, 7, 5] },
-    { id: 'southwest-porch-bay', cells: [2, 6, 4, 7] },
-    { id: 'southeast-porch-bay', cells: [5, 6, 7, 7] },
+    { id: 'middlewest-garden-bay', cells: [2, 3, 4, 4] },
+    { id: 'middleeast-garden-bay', cells: [5, 3, 7, 4] },
+    { id: 'southwest-porch-bay', cells: [2, 5, 4, 7] },
+    { id: 'southeast-porch-bay', cells: [5, 5, 7, 7] },
   ],
   floors: [
     { id: 'hallway', cells: [0, 0, 1, 7], material: 'wood', kind: 'interior' },
@@ -46,7 +48,8 @@ export const aStoryRehearsedGround: SceneSpec = {
     // a escada sobe a partir da entrada.
     { id: 'hallway-bookcase', model: 'bookcaseClosedWide', against: { wall: 'north', at: 0.6 } },
     { id: 'hallway-clock-north', model: 'speaker', logic: 'clock@0,1', at: [1.75, 0.3] },
-    { id: 'hallway-plant', model: 'pottedPlant', logic: 'plant@2,0', at: [0.25, 2.55] },
+    // O vaso de Carol (R3C1) fica no canto nordeste da célula, à frente do topo da escada.
+    { id: 'hallway-plant', model: 'pottedPlant', logic: 'plant@2,0', at: [0.85, 2.25] },
     { id: 'hallway-clock-south', model: 'speaker', logic: 'clock@3,0', at: [0.23, 3.5] },
     { id: 'hallway-console', model: 'cabinetTelevisionDoors', against: { wall: 'west', at: 1.45 }, facing: 'E' },
     { id: 'hallway-coat-rack', model: 'coatRackStanding', at: [0.3, 7.65] },

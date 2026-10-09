@@ -28,7 +28,9 @@ export const aDebtUnsettledGround: SceneSpec = {
   shell: { features: [
     { wall: 'north', at: 0.7, kind: 'window' },
     { wall: 'north', at: 3.4, kind: 'window' },
-    { wall: 'west', at: 6.4, kind: 'window' },
+    // Alpendre envidraçado: duas janelas seguidas na parede poente.
+    { wall: 'west', at: 5.6, kind: 'window' },
+    { wall: 'west', at: 7.2, kind: 'window' },
   ] },
   floors: [
     { id: 'living-room-floor', cells: [0, 0, 3, 4], material: 'wood', kind: 'interior' },
@@ -46,9 +48,12 @@ export const aDebtUnsettledGround: SceneSpec = {
     // Sala: televisor principal na meia parede do jardim, com o sofá em frente e a
     // poltrona larga ao lado; segundo televisor num recanto junto à entrada.
     { id: 'living-clock', model: 'speaker', logic: 'clock@0,3', at: [3.4, 0.3], facing: 'S' },
-    { id: 'living-sofa', model: 'loungeDesignChair', logic: 'sofa@1,3', at: [3.5, 2.95], facing: 'S' },
-    { id: 'living-tv-cabinet-south', model: 'cabinetTelevision', logic: 'tv@4,3', against: { wall: 'living-garden-opening', side: 'W', at: 4.4 }, facing: 'W' },
-    { id: 'living-tv-south', model: 'televisionVintage', on: { parent: 'living-tv-cabinet-south' } },
+    // Sofá de dois lugares encostado à meia parede do jardim (o antigo cadeirão azul lia-se
+    // como uma laje deitada).
+    { id: 'living-sofa', model: 'loungeSofa', logic: 'sofa@1,3', against: { wall: 'living-garden-opening', side: 'W', at: 2.25 }, facing: 'W' },
+    // Televisor de ecrã plano de pé sobre o móvel, virado para o sofá principal.
+    { id: 'living-tv-cabinet-south', model: 'cabinetTelevisionDoors', logic: 'tv@4,3', against: { wall: 'living-garden-opening', side: 'W', at: 4.4 }, facing: 'W' },
+    { id: 'living-tv-south', model: 'televisionModern', on: { parent: 'living-tv-cabinet-south' } },
     { id: 'living-main-sofa', model: 'loungeSofa', at: [2.0, 4.3], facing: 'E' },
     { id: 'living-tv-cabinet-north', model: 'cabinetTelevision', logic: 'tv@0,1', against: { wall: 'north', at: 1.5 } },
     { id: 'living-tv-north', model: 'televisionVintage', on: { parent: 'living-tv-cabinet-north' } },

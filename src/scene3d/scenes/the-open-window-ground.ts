@@ -57,6 +57,9 @@ export const theOpenWindowGround: SceneSpec = {
       height: 'half',
       openings: [{ at: 1.5, width: 1.0, kind: 'door' }],
     },
+    // Meia parede de estante no escritório: a estante alta de Marco (R7C8) encosta-lhe
+    // pelo lado sul e mostra a frente à câmara.
+    { id: 'office-book-wall', from: [8, 6], to: [6.9, 6], height: 'half', freeEnds: ['to'] },
   ],
   furniture: [
     { id: 'hall-clock', model: 'speaker', logic: 'clock@3,0', at: [0.5, 3.5] },
@@ -91,7 +94,7 @@ export const theOpenWindowGround: SceneSpec = {
     { id: 'office-armchair', model: 'loungeChair', at: [7.45, 7.45], facing: 'W' },
     { id: 'office-chair', model: 'chairDesk', logic: 'chair@6,6', at: [6.5, 6.95], facing: 'S' },
     { id: 'office-desk', model: 'desk', logic: 'desk@7,6', at: [6.5, 7.6], facing: 'N' },
-    { id: 'office-bookcase', model: 'bookcaseOpenLow', logic: 'bookshelf@5,7', against: { wall: 'east', at: 6.35 }, facing: 'W' },
+    { id: 'office-bookcase', model: 'bookcaseClosedWide', logic: 'bookshelf@5,7', against: { wall: 'office-book-wall', side: 'S', at: 7.42 }, facing: 'S' },
     { id: 'office-bookcase-books', model: 'books', on: { parent: 'office-bookcase' } },
     { id: 'office-bookcase-low', model: 'bookcaseOpenLow', logic: 'bookshelf@5,7', against: { wall: 'east', at: 5.5 }, facing: 'W' },
     { id: 'office-bookcase-low-books', model: 'books', on: { parent: 'office-bookcase-low' } },

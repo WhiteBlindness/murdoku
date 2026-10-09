@@ -27,8 +27,9 @@ export const theBorrowedKnifeGround: SceneSpec = {
   },
   stairs: { model: 'stairsOpen', at: stairAt, facing: 'N' },
   exteriorSupportBays: [
-    { id: 'front-yard-west-bay', cells: [3, 3, 5, 5] },
-    { id: 'front-yard-east-bay', cells: [6, 3, 7, 5] },
+    // Pilares nas linhas x = 3, 5 e 8: nenhum fica à frente do arbusto de Priya (R6C6).
+    { id: 'front-yard-west-bay', cells: [3, 3, 4, 5] },
+    { id: 'front-yard-east-bay', cells: [5, 3, 7, 5] },
   ],
   floors: [
     { id: 'living-room', cells: [0, 0, 7, 2], material: 'wood', kind: 'interior' },
@@ -108,14 +109,15 @@ export const theBorrowedKnifeGround: SceneSpec = {
     { id: 'yard-shrub-east-north', model: 'plant_bushSmall', logic: 'shrub@3,7', at: [7.5, 3.5] },
     { id: 'yard-shrub-west-north', model: 'plant_bushSmall', logic: 'shrub@3,3', at: [3.7, 3.5] },
     { id: 'yard-plant-east', model: 'flower_redA', logic: 'plant@5,7', at: [7.5, 5.5] },
-    { id: 'yard-shrub-clue', model: 'plant_bushSmall', logic: 'shrub@5,5', at: [5.5, 5.5] },
+    // Arbusto de Priya (R6C6): maior e no canto nordeste da célula, ao lado da figura.
+    { id: 'yard-shrub-clue', model: 'plant_bushDetailed', logic: 'shrub@5,5', at: [5.65, 5.35] },
     { id: 'yard-rock', model: 'rock_smallA', at: [4.2, 4.0] },
     { id: 'yard-flower-purple', model: 'flower_purpleA', at: [6.9, 3.4] },
     { id: 'yard-stump', model: 'stump_round', at: [4.9, 4.4] },
     // Átrio: relógios e vaso encostados à parede sul.
     { id: 'hallway-clock-west', model: 'speaker', logic: 'clock@7,5', at: [5.5, 7.5] },
     { id: 'hallway-plant', model: 'pottedPlant', logic: 'plant@7,6', at: [6.5, 7.55] },
-    { id: 'hallway-clock-east', model: 'speaker', logic: 'clock@7,7', at: [7.5, 7.5] },
+    { id: 'hallway-clock-east', model: 'speaker', logic: 'clock@7,7', at: [7.78, 7.22] },
   ],
   rugs: [
     { id: 'living-tv-rug', model: 'rugSquare', at: [1.5, 1.6] },
