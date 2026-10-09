@@ -42,10 +42,12 @@ export const shadowsAtTheDoorGround: SceneSpec = {
     { id: 'kitchen-living-partition', from: [0, 4], to: [4, 4], height: 'half', openings: [{ at: 3.35, width: 1, kind: 'door' }] },
     { id: 'dining-garden-facade', from: [4, 4], to: [8, 4], height: 'half', openings: [{ at: 4.95, width: 1.0, kind: 'door' }] },
     { id: 'living-garden-facade', from: [4, 4], to: [4, 8], height: 'half', openings: [{ at: 5.0, width: 1.0, kind: 'door' }] },
+    // Retorno baixo da coluna do frigorífico: o segundo frigorífico fica de pé, virado a sul.
+    { id: 'kitchen-fridge-return', from: [3.1, 1], to: [4, 1], height: 'half', freeEnds: ['from'] },
   ],
   furniture: [
     // Cozinha em U: fogão e frigorífico na parede norte, lava-loiça na parede poente,
-    // armários com o frigorífico de bancada junto à porta da sala de jantar; mesa de pequeno-almoço.
+    // armário no recanto norte e segundo frigorífico de pé contra o retorno junto à porta da sala de jantar; mesa de pequeno-almoço.
     { id: 'kitchen-corner-cabinet', model: 'kitchenCabinet', against: { wall: 'north', at: 0.33 } },
     { id: 'kitchen-stove', model: 'kitchenStove', logic: 'stove@0,0', against: { wall: 'north', at: 0.87 } },
     { id: 'kitchen-north-cabinet', model: 'kitchenCabinetDrawer', against: { wall: 'north', at: 1.41 } },
@@ -55,7 +57,7 @@ export const shadowsAtTheDoorGround: SceneSpec = {
     { id: 'kitchen-sink', model: 'kitchenSink', against: { wall: 'west', at: 1.98 } },
     { id: 'kitchen-counter-lower-run', model: 'kitchenCabinet', logic: 'counter@1,0', against: { wall: 'west', at: 2.52 } },
     { id: 'kitchen-east-cabinet', model: 'kitchenCabinet', against: { wall: 'kitchen-dining-partition', side: 'W', at: 0.35 }, facing: 'W' },
-    { id: 'kitchen-fridge-clue', model: 'kitchenFridgeSmall', logic: 'fridge@1,3', against: { wall: 'kitchen-dining-partition', side: 'W', at: 1.03 }, facing: 'W' },
+    { id: 'kitchen-fridge-clue', model: 'kitchenFridge', logic: 'fridge@1,3', against: { wall: 'kitchen-fridge-return', side: 'S', at: 3.55 }, facing: 'S' },
     { id: 'kitchen-table', model: 'tableRound', at: [2.1, 2.45] },
     { id: 'kitchen-chair-north', model: 'chair', at: [2.1, 1.75], facing: 'S' },
     { id: 'kitchen-chair-south', model: 'chair', at: [2.1, 3.15], facing: 'N' },

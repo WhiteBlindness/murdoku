@@ -4,7 +4,7 @@ import { theSilentKitchenStairwellBounds } from './the-silent-kitchen-ground'
 const well = theSilentKitchenStairwellBounds
 const guardOffset = 0.08
 
-// A escada chega a um patamar entre a sala de estar (norte) e o quarto (sul);
+// A escada chega a um patamar entre o átrio do corredor (norte) e o quarto (sul);
 // uma galeria transversal serve o escritório, a lavandaria e a casa de banho.
 export const theSilentKitchenUpper: SceneSpec = {
   puzzleId: 'master-5',
@@ -61,14 +61,12 @@ export const theSilentKitchenUpper: SceneSpec = {
     { id: 'stairwell-west-guard', from: [well[0] - guardOffset, well[1] - guardOffset], to: [well[0] - guardOffset, 3.62], height: 'half', treatment: 'railing', freeEnds: ['from'] },
   ],
   furniture: [
-    // Sala de estar do piso: sofá sob a janela e televisor de costas para a guarda,
-    // poltrona sobre o tapete da Lena e candeeiro; planta no recanto junto à escada.
-    { id: 'lounge-sofa', model: 'loungeSofa', against: { wall: 'north', at: 3.0 } },
-    { id: 'lounge-coffee-table', model: 'tableCoffee', at: [2.7, 1.2] },
-    { id: 'lounge-tv-cabinet', model: 'cabinetTelevision', at: [2.7, 2.2], facing: 'N' },
-    { id: 'lounge-tv', model: 'televisionModern', on: { parent: 'lounge-tv-cabinet' } },
+    // Átrio de chegada (faixa norte do Hallway): banco sob a janela, consola com candeeiro
+    // passadeira da Lena e candeeiro de pé; sem conjunto de sala de estar.
+    { id: 'landing-bench', model: 'bench', against: { wall: 'north', at: 2.0 } },
+    { id: 'landing-console', model: 'cabinetTelevisionDoors', against: { wall: 'north', at: 3.3 } },
+    { id: 'landing-console-lamp', model: 'lampSquareTable', on: { parent: 'landing-console' } },
     { id: 'hallway-rug-lena', model: 'rugSquare', logic: 'rug@1,0', at: [1.0, 1.75] },
-    { id: 'lounge-armchair', model: 'loungeChair', at: [0.4, 1.4], facing: 'E' },
     { id: 'lounge-lamp', model: 'lampRoundFloor', at: [0.25, 0.3] },
     { id: 'hallway-plant', model: 'pottedPlant', logic: 'plant@3,0', at: [0.4, 3.3] },
     // Corredor sul (faixa do Hallway): consola com o rádio, relógio de pé, banco e aparador.

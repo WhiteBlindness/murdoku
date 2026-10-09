@@ -72,9 +72,10 @@ export const shadowsAtTheDoorUpper: SceneSpec = {
     { id: 'study-sofa', model: 'loungeSofa', against: { wall: 'bedroom-study-partition', side: 'S', at: 3.0 }, facing: 'S' },
     { id: 'study-coffee-table', model: 'tableCoffee', at: [3.0, 5.2] },
     { id: 'study-lamp', model: 'lampRoundFloor', logic: 'lamp@7,3', at: [3.75, 7.25], facing: 'S' },
-    // Corredor: passadeira e sofá a norte, plantas e coluna junto às paredes.
+    // Corredor: passadeira e consola baixa a norte, plantas e coluna junto às paredes.
     { id: 'hallway-rug', model: 'rugRectangle', logic: 'rug@0,4', at: [5, 0.8], facing: 'S' },
-    { id: 'hallway-sofa', model: 'loungeSofa', against: { wall: 'north', at: 5.0 } },
+    { id: 'hallway-console', model: 'bookcaseOpenLow', against: { wall: 'north', at: 4.7 } },
+    { id: 'hallway-console-plant', model: 'plantSmall1', on: { parent: 'hallway-console' } },
     { id: 'hallway-clock', model: 'speaker', logic: 'clock@5,5', at: [5.8, 5.2], facing: 'S' },
     { id: 'hallway-plant', model: 'pottedPlant', logic: 'plant@3,4', at: [4.3, 3.85], facing: 'S' },
     { id: 'hallway-south-plant', model: 'pottedPlant', logic: 'plant@7,5', at: [5.6, 7.55], facing: 'S' },

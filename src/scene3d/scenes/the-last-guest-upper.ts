@@ -100,13 +100,16 @@ export const theLastGuestUpper: SceneSpec = {
     { id: 'bathroom-washer', model: 'washer', against: { wall: 'east', at: 3.4 }, facing: 'W' },
     // Casa de banho privativa da sala de trabalho: sanita e banheira.
     { id: 'ensuite-toilet', model: 'toilet', at: [5.25, 4.3], facing: 'S' },
-    { id: 'bathroom-second-tub', model: 'bathtub', logic: 'bathtub@4,6', against: { wall: 'bathroom-office', side: 'N', at: 7.0 }, facing: 'N' },
-    // Sala de trabalho: secretária com cadeira, cadeira de visita, mesa com rádio e sofá-cama.
+    { id: 'bathroom-second-tub', model: 'bathtub', logic: 'bathtub@4,6', against: { wall: 'bath-ensuite', side: 'S', at: 7.0 }, facing: 'S' },
+    // Sala de trabalho: secretária com cadeira, cadeira de visita, mesa com rádio e
+    // arquivo baixo com planta na parede nascente (sem cama: é um escritório).
     { id: 'office-desk', model: 'desk', logic: 'desk@7,7', against: { wall: 'south', at: 7.5 }, facing: 'N' },
     { id: 'office-desk-chair', model: 'chairDesk', at: [7.5, 7.05], facing: 'S' },
     { id: 'office-chair', model: 'chair', logic: 'chair@6,5', at: [5.75, 6.85], facing: 'E' },
     { id: 'office-clock-table', model: 'sideTable', against: { wall: 'south', at: 5.6 }, facing: 'N' },
     { id: 'office-clock', model: 'radio', logic: 'clock@7,5', on: { parent: 'office-clock-table' } },
-    { id: 'office-daybed', model: 'bedSingle', against: { wall: 'east', at: 5.75 }, facing: 'W' },
+    { id: 'office-files', model: 'bookcaseOpenLow', against: { wall: 'east', at: 5.6 }, facing: 'W' },
+    { id: 'office-files-b', model: 'bookcaseOpenLow', against: { wall: 'east', at: 6.15 }, facing: 'W' },
+    { id: 'office-files-plant', model: 'plantSmall2', on: { parent: 'office-files' } },
   ],
 }
