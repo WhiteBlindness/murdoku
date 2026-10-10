@@ -5,7 +5,7 @@ const well = twoSetsOfPrintsStairwellBounds
 
 // A escada chega a um corredor transversal: a norte o escritório e a sala de estar,
 // a sul o quarto (com recanto de secretária atrás da escada); a nascente, portas
-// separadas para a casa de banho e para a sala de refeições com copa.
+// separadas para a casa de banho e para a sala de refeições.
 export const twoSetsOfPrintsUpper: SceneSpec = {
   puzzleId: 'master-6',
   floor: 1,
@@ -79,14 +79,18 @@ export const twoSetsOfPrintsUpper: SceneSpec = {
     { id: 'bathroom-cabinet', model: 'bathroomCabinetDrawer', against: { wall: 'north', at: 6.85 }, facing: 'S' },
     { id: 'bathroom-shower-north', model: 'shower', logic: 'shower@0,7', at: [7.55, 0.45], facing: 'S' },
     { id: 'bathroom-shower-south', model: 'shower', logic: 'shower@3,5', at: [5.4, 3.12], facing: 'S' },
-    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@3,7', against: { wall: 'east', at: 3.5 }, facing: 'W' },
-    // Sala de refeições com copa: mesa com banco estofado, copa na parede sul e poltrona.
-    { id: 'dining-table', model: 'table', logic: 'table@4,5', at: [6.2, 4.55], facing: 'N' },
-    { id: 'dining-banquette', model: 'loungeSofa', at: [6.2, 5.35], facing: 'N' },
-    { id: 'dining-chair', model: 'loungeChair', logic: 'chair@6,7', at: [7.45, 6.5], facing: 'W' },
-    { id: 'pantry-cabinet', model: 'kitchenCabinet', against: { wall: 'south', at: 5.5 }, facing: 'N' },
-    { id: 'pantry-sink', model: 'kitchenSink', against: { wall: 'south', at: 6.04 }, facing: 'N' },
-    { id: 'pantry-drawer', model: 'kitchenCabinetDrawer', against: { wall: 'south', at: 6.58 }, facing: 'N' },
+    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@3,7', against: { wall: 'east', at: 3.72 }, facing: 'W' },
+    // Sala de refeições: aparador baixo (a mesa lógica) na parede da casa de banho, com
+    // candeeiro; recanto de refeições com mesa de madeira, banco estofado corrido a norte e a
+    // cadeira de cabeceira (a cadeira lógica) puxada para a ponta nascente da mesa.
+    // `chair` é vocabulário de pista: os assentos acrescentados são sofás de banco corrido.
+    { id: 'dining-sideboard', model: 'cabinetTelevisionDoors', logic: 'table@4,5', against: { wall: 'bathroom-dining-open', side: 'S', at: 6.3 }, facing: 'S' },
+    { id: 'dining-sideboard-east', model: 'cabinetTelevisionDoors', against: { wall: 'bathroom-dining-open', side: 'S', at: 7.3 }, facing: 'S' },
+    { id: 'dining-sideboard-lamp', model: 'lampSquareTable', on: { parent: 'dining-sideboard-east', offset: [0.2, 0] } },
+    { id: 'dining-sideboard-radio', model: 'radio', on: { parent: 'dining-sideboard', offset: [-0.1, 0] } },
+    { id: 'dining-table', model: 'tableCross', at: [6.42, 6.55], facing: 'N' },
+    { id: 'dining-banquette-north', model: 'loungeSofa', at: [6.42, 5.9], facing: 'S' },
+    { id: 'dining-chair', model: 'chair', logic: 'chair@6,7', at: [7.17, 6.5], facing: 'W' },
   ],
   rugs: [
     { id: 'bedroom-bed-rug', model: 'rugRectangle', at: [3.3, 6.4] },
