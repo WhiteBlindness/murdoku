@@ -68,19 +68,18 @@ export const theSpareKeyGround: SceneSpec = {
     { id: 'porch-victim-chair', model: 'chair', logic: 'chair@2,4', at: [4.7, 2.35], facing: 'E' },
     { id: 'porch-side-table', model: 'tableCoffeeSquare', at: [5.2, 1.9] },
     { id: 'porch-culprit-flower', model: 'pottedPlant', logic: 'plant@1,6', at: [6.75, 1.25] },
-    // Sala de jantar e cozinha: candeeiros junto à entrada do alpendre, consola contra a
-    // fachada, mesa com cadeira e banco estofado, cozinha na parede sul com frigorífico a poente do arranque da escada.
+    // Sala de jantar e cozinha: candeeiros junto à entrada do alpendre; cozinha em linha
+    // contra a fachada poente (placa, lava-loiça, frigorífico) seguida da mesa de apoio;
+    // mesa com cadeira e banco estofado a nascente da escada.
     { id: 'dining-lamp-west', model: 'lampRoundFloor', logic: 'lamp@3,6', at: [6.7, 3.5], facing: 'N' },
     { id: 'dining-lamp-east', model: 'lampRoundFloor', logic: 'lamp@3,7', at: [7.5, 3.5], facing: 'N' },
     { id: 'dining-table', model: 'table', logic: 'table@5,4', against: { wall: 'garden-dining-facade', side: 'E', at: 5.45 }, facing: 'E' },
     { id: 'dining-east-table', model: 'table', at: [6.85, 5.35], facing: 'N' },
     { id: 'dining-chair-south', model: 'chair', logic: 'chair@5,7', at: [7.65, 5.35], facing: 'W' },
     { id: 'dining-banquette', model: 'loungeSofa', at: [6.85, 6.15], facing: 'N' },
-    { id: 'kitchen-fridge', model: 'kitchenFridge', against: { wall: 'garden-dining-facade', side: 'E', at: 7.66 }, facing: 'E' },
-    { id: 'kitchen-sink', model: 'kitchenSink', against: { wall: 'south', at: 6.35 }, facing: 'N' },
-    { id: 'kitchen-stove', model: 'kitchenStove', against: { wall: 'south', at: 6.89 }, facing: 'N' },
-    { id: 'kitchen-cabinet-a', model: 'kitchenCabinet', against: { wall: 'south', at: 7.43 }, facing: 'N' },
-    { id: 'kitchen-counter-east', model: 'kitchenCabinetDrawer', against: { wall: 'east', at: 7.1 }, facing: 'W' },
+    { id: 'kitchen-fridge', model: 'kitchenFridgeSmall', against: { wall: 'garden-dining-facade', side: 'E', at: 4.41 }, facing: 'E' },
+    { id: 'kitchen-sink', model: 'kitchenSink', against: { wall: 'garden-dining-facade', side: 'E', at: 3.87 }, facing: 'E' },
+    { id: 'kitchen-stove', model: 'kitchenStove', against: { wall: 'garden-dining-facade', side: 'E', at: 3.33 }, facing: 'E' },
   ],
   rugs: [
     { id: 'garden-path-a', model: 'path_stone', at: [2.65, 6.4], facing: 'E' },

@@ -62,9 +62,11 @@ export const theTornLedgerUpper: SceneSpec = {
     { id: 'corridor-south', from: [2, 4.15], to: [4.4, 4.15], height: 'half', openings: [
       { at: 3.85, width: 0.65, kind: 'door' },
     ] },
-    { id: 'study-bathroom', from: [6, 0], to: [6, 8], height: 'half', openings: [
+    { id: 'study-bathroom', from: [6, 0], to: [6, 4.6], height: 'half', openings: [
       { at: 3.72, width: 0.75, kind: 'door' },
     ] },
+    // O WC fecha-se com uma divisória mais alta a poente, do lado do canto de leitura.
+    { id: 'wc-west', from: [6, 4.6], to: [6, 8] },
     { id: 'bathroom-wc', from: [6, 4.6], to: [8, 4.6], height: 'half', openings: [
       { at: 7.15, width: 0.7, kind: 'door' },
     ] },
@@ -85,14 +87,15 @@ export const theTornLedgerUpper: SceneSpec = {
     { id: 'bedroom-bed-north', model: 'bedDouble', logic: 'bed@2,2', against: { wall: 'hallway-bedroom', side: 'E', at: 2.65 }, facing: 'E' },
     { id: 'bedroom-north-lamp', model: 'lampRoundFloor', at: [2.2, 1.8] },
     { id: 'bedroom-north-wardrobe', model: 'bookcaseClosedWide', against: { wall: 'north', at: 3.4 } },
-    // Quarto sul: cama, estante de cabeceira com rádio, roupeiro e canto de leitura atrás da escada.
+    // Quarto sul: cama, estante de cabeceira com rádio, roupeiro e canto de leitura atrás da
+    // escada, com o sofá contra a fachada sul virado para a estante.
     { id: 'bedroom-bed-south-bella', model: 'bedDouble', logic: 'bed@4,2', against: { wall: 'hallway-bedroom', side: 'E', at: 4.85 }, facing: 'E' },
     { id: 'bedroom-clock-table', model: 'bookcaseOpenLow', against: { wall: 'hallway-bedroom', side: 'E', at: 6.3 }, facing: 'E' },
     { id: 'bedroom-clock', model: 'radio', logic: 'clock@6,2', on: { parent: 'bedroom-clock-table', surface: 'top' } },
     { id: 'bedroom-wardrobe', model: 'bookcaseClosedDoors', against: { wall: 'hallway-bedroom', side: 'E', at: 7.45 }, facing: 'E' },
     { id: 'bedroom-lamp-east', model: 'lampRoundFloor', logic: 'lamp@6,3', at: [3.75, 6.25] },
     { id: 'bedroom-lamp-south', model: 'lampRoundFloor', logic: 'lamp@7,3', at: [3.75, 7.25] },
-    { id: 'bedroom-reading-sofa', model: 'loungeSofa', against: { wall: 'study-bathroom', side: 'W', at: 7.3 }, facing: 'W' },
+    { id: 'bedroom-reading-sofa', model: 'loungeSofa', against: { wall: 'south', at: 5.2 }, facing: 'N' },
     { id: 'study-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@6,5', against: { wall: 'stairwell-south-guard', side: 'S', at: 5.15 }, facing: 'S' },
     { id: 'study-bookshelf-books', model: 'books', on: { parent: 'study-bookshelf', surface: 'top' } },
     // Escritório: secretária de costas para o corredor com a cadeira virada para ela,
@@ -105,16 +108,15 @@ export const theTornLedgerUpper: SceneSpec = {
     { id: 'study-reading-sofa', model: 'loungeSofa', against: { wall: 'study-bathroom', side: 'W', at: 1.65 }, facing: 'W' },
     { id: 'study-lamp', model: 'lampSquareFloor', at: [5.75, 2.55] },
     // Casa de banho: duche, lavatório e móvel a poente, banheira na parede nascente;
-    // a sul, compartimento com sanita, lavatório e máquinas de lavar e secar.
+    // a sul, compartimento fechado com sanita, lavatório e máquina de lavar.
     { id: 'bathroom-shower-nadia', model: 'showerRound', logic: 'shower@0,6', at: [6.4, 0.4], facing: 'S' },
     { id: 'bathroom-sink', model: 'bathroomSink', against: { wall: 'study-bathroom', side: 'E', at: 1.55 }, facing: 'E' },
     { id: 'bathroom-cabinet', model: 'bathroomCabinetDrawer', against: { wall: 'study-bathroom', side: 'E', at: 2.2 }, facing: 'E' },
     { id: 'bathroom-tub', model: 'bathtub', logic: 'bathtub@1,7', against: { wall: 'east', at: 2.0 }, facing: 'W' },
     { id: 'bathroom-trash', model: 'trashcan', at: [7.75, 4.3] },
-    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@7,7', against: { wall: 'east', at: 7.45 }, facing: 'W' },
-    { id: 'wc-sink', model: 'bathroomSink', against: { wall: 'east', at: 6.1 }, facing: 'W' },
-    { id: 'wc-washer', model: 'washer', against: { wall: 'study-bathroom', side: 'E', at: 6.6 }, facing: 'E' },
-    { id: 'wc-dryer', model: 'dryer', against: { wall: 'study-bathroom', side: 'E', at: 7.1 }, facing: 'E' },
+    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@7,7', against: { wall: 'south', at: 7.45 }, facing: 'N' },
+    { id: 'wc-sink', model: 'bathroomSink', against: { wall: 'wc-west', side: 'E', at: 6.4 }, facing: 'E' },
+    { id: 'wc-washer', model: 'washer', against: { wall: 'bathroom-wc', side: 'S', at: 6.35 }, facing: 'S' },
   ],
   rugs: [
     { id: 'bedroom-north-rug', model: 'rugSquare', at: [3.05, 2.0] },

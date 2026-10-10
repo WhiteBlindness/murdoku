@@ -67,14 +67,12 @@ export const aQuietConfessionUpper: SceneSpec = {
     // Galeria da escada: mesa com o rádio de Carol junto à porta do escritório.
     { id: 'bedroom-clock-carol-table', model: 'sideTable', at: [5.75, 1.25], facing: 'E' },
     { id: 'bedroom-clock-carol', model: 'radio', logic: 'clock@1,5', on: { parent: 'bedroom-clock-carol-table' } },
-    // Quarto: cama com cabeceira na parede da cozinha entre duas mesas baixas, televisão
-    // aos pés, cómodas baixas e recanto com sofá no tapete entre os candeeiros.
-    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@3,5', against: { wall: 'bedroom-kitchen', side: 'E', at: 4.4 }, facing: 'E' },
-    { id: 'bedroom-nightstand', model: 'tableCoffeeSquare', at: [5.31, 3.56] },
-    { id: 'bedroom-nightstand-south', model: 'tableCoffeeSquare', at: [5.31, 5.25] },
-    { id: 'bedroom-nightstand-books', model: 'books', on: { parent: 'bedroom-nightstand-south' } },
-    { id: 'bedroom-tv-console', model: 'cabinetTelevision', against: { wall: 'east', at: 4.4 }, facing: 'W' },
-    { id: 'bedroom-tv', model: 'televisionVintage', on: { parent: 'bedroom-tv-console' }, facing: 'W' },
+    // Quarto: cama com a cabeceira na parede da galeria, com mesa de cabeceira baixa,
+    // e só o flanco ao longo da divisória da cozinha; cómodas baixas e recanto com sofá
+    // no tapete entre os candeeiros.
+    { id: 'bedroom-bed', model: 'bedDouble', logic: 'bed@3,5', against: { wall: 'landing-bedroom', side: 'S', at: 6.3 }, facing: 'S' },
+    { id: 'bedroom-nightstand', model: 'bookcaseOpenLow', against: { wall: 'landing-bedroom', side: 'S', at: 5.38 }, facing: 'S' },
+    { id: 'bedroom-nightstand-books', model: 'books', on: { parent: 'bedroom-nightstand' } },
     { id: 'bedroom-chest', model: 'bookcaseOpenLow', against: { wall: 'bedroom-kitchen', side: 'E', at: 6.05 }, facing: 'E' },
     { id: 'bedroom-chest-2', model: 'bookcaseOpenLow', against: { wall: 'bedroom-kitchen', side: 'E', at: 6.6 }, facing: 'E' },
     { id: 'bedroom-chest-books', model: 'books', on: { parent: 'bedroom-chest' } },
@@ -108,12 +106,13 @@ export const aQuietConfessionUpper: SceneSpec = {
     { id: 'bathroom-shower-north', model: 'shower', logic: 'shower@4,2', at: [2.35, 4.5], facing: 'S' },
     { id: 'bathroom-toilet-south', model: 'toilet', logic: 'toilet@7,2', at: [2.35, 7.5], facing: 'N' },
     { id: 'bathroom-bin', model: 'trashcan', at: [2.6, 6.55] },
-    // Cozinha em linha contra a parede do quarto: placa, frigorífico baixo, lava-loiça e
-    // bancada com micro-ondas; mesa de pequeno-almoço com cadeira ao fundo.
-    { id: 'kitchen-stove', model: 'kitchenStoveElectric', logic: 'stove@3,4', against: { wall: 'bedroom-kitchen', side: 'W', at: 3.5 }, facing: 'W' },
+    // Cozinha em L: placa no canto nordeste contra a divisória do escritório; frigorífico
+    // baixo, lava-loiça e bancada com micro-ondas em linha contra a divisória do quarto;
+    // mesa de pequeno-almoço com cadeira ao fundo.
+    { id: 'kitchen-stove', model: 'kitchenStoveElectric', logic: 'stove@3,4', against: { wall: 'study-kitchen', side: 'S', at: 4.6 }, facing: 'S' },
     { id: 'kitchen-fridge', model: 'kitchenFridgeSmall', against: { wall: 'bedroom-kitchen', side: 'W', at: 4.3 }, facing: 'W' },
-    { id: 'kitchen-sink', model: 'kitchenSink', logic: 'counter@5,4', against: { wall: 'bedroom-kitchen', side: 'W', at: 5.96 }, facing: 'W' },
-    { id: 'kitchen-counter', model: 'kitchenCabinet', logic: 'counter@5,4', against: { wall: 'bedroom-kitchen', side: 'W', at: 6.5 }, facing: 'W' },
+    { id: 'kitchen-sink', model: 'kitchenSink', logic: 'counter@5,4', against: { wall: 'bedroom-kitchen', side: 'W', at: 5.3 }, facing: 'W' },
+    { id: 'kitchen-counter', model: 'kitchenCabinet', logic: 'counter@5,4', against: { wall: 'bedroom-kitchen', side: 'W', at: 5.84 }, facing: 'W' },
     { id: 'kitchen-microwave', model: 'kitchenMicrowave', on: { parent: 'kitchen-counter' } },
     { id: 'kitchen-table', model: 'tableRound', at: [3.65, 7.3] },
     { id: 'kitchen-chair-east', model: 'chair', at: [4.3, 7.3], facing: 'W' },

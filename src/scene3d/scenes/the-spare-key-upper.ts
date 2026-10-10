@@ -35,9 +35,9 @@ export const theSpareKeyUpper: SceneSpec = {
     { id: 'bedroom', cells: [0, 5, 7, 7], material: 'wood', kind: 'interior' },
   ],
   walls: [
-    { id: 'bathroom-study-door', from: [0, 3], to: [5, 3], height: 'half', openings: [{ at: 1.3, width: 1.0, kind: 'door' }] },
+    { id: 'bathroom-study-door', from: [0, 3], to: [5, 3], openings: [{ at: 1.3, width: 1.0, kind: 'door' }] },
     { id: 'office-study-door', from: [5, 3], to: [8, 3], height: 'half', openings: [{ at: 7.0, width: 0.9, kind: 'door' }] },
-    { id: 'bathroom-office-door', from: [5, 0], to: [5, 3], height: 'half' },
+    { id: 'bathroom-office-door', from: [5, 0], to: [5, 3] },
     // A casa de banho divide-se em duas alas: banho a poente, duche e sanita a nascente.
     { id: 'bathroom-bay-partition', from: [3, 0], to: [3, 1.95], height: 'half', freeEnds: ['to'] },
     { id: 'study-bedroom-door-west', from: [0, 5], to: [well[0], 5], height: 'half', openings: [{ at: 2.2, width: 1.2, kind: 'door' }] },
@@ -64,7 +64,7 @@ export const theSpareKeyUpper: SceneSpec = {
     { id: 'bathroom-cabinet', model: 'bathroomCabinetDrawer', against: { wall: 'west', at: 2.45 }, facing: 'E' },
     { id: 'bathroom-tub-east', model: 'bathtub', logic: 'bathtub@0,3', against: { wall: 'north', at: 4.0 } },
     { id: 'bathroom-toilet-east', model: 'toilet', logic: 'toilet@1,4', against: { wall: 'bathroom-office-door', side: 'W', at: 1.5 }, facing: 'W' },
-    { id: 'bathroom-shower-east', model: 'shower', logic: 'shower@2,4', at: [4.5, 2.5], facing: 'S' },
+    { id: 'bathroom-shower-east', model: 'shower', logic: 'shower@2,4', at: [4.57, 2.57], facing: 'S' },
     { id: 'bathroom-sink-east', model: 'bathroomSink', against: { wall: 'bathroom-bay-partition', side: 'E', at: 1.3 }, facing: 'E' },
     // Gabinete: secretária sob a janela, estante, sofá de leitura e poltrona à volta de
     // uma mesa baixa.
@@ -72,7 +72,7 @@ export const theSpareKeyUpper: SceneSpec = {
     { id: 'office-desk-books', model: 'books', on: { parent: 'office-desk' } },
     { id: 'office-bookcase', model: 'bookcaseOpen', against: { wall: 'north', at: 5.4 } },
     { id: 'office-bookcase-books', model: 'books', on: { parent: 'office-bookcase', surface: 'shelf2' } },
-    { id: 'office-sofa', model: 'loungeSofa', against: { wall: 'bathroom-office-door', side: 'E', at: 1.85 }, facing: 'E' },
+    { id: 'office-sofa', model: 'loungeSofa', against: { wall: 'office-study-door', side: 'N', at: 5.95 }, facing: 'N' },
     { id: 'office-table', model: 'tableCoffeeSquare', at: [6.45, 1.95] },
     { id: 'office-chair', model: 'loungeChair', logic: 'chair@2,7', at: [7.55, 2.0], facing: 'W' },
     // Quarto: cama com cabeceira na divisória e duas mesas de cabeceira, roupeiro a poente,
