@@ -37,7 +37,10 @@ export const theSecondStudyUpper: SceneSpec = {
     { id: 'bedroom-wood', cells: [0, 5, 7, 7], material: 'wood' },
   ],
   walls: [
-    { id: 'pantry-bathroom', from: [0, 2], to: [5.25, 2], height: 'half', openings: [{ at: 4.7, width: 0.9, kind: 'door' }] },
+    // A copa e a casa de banho partilham uma parede de divisão (não uma meia-parede):
+    // as peças sanitárias encostam-lhe do lado sul, a bancada fica do lado norte.
+    { id: 'pantry-bathroom', from: [0, 2], to: [well[2], 2], height: 'low' },
+    { id: 'pantry-corridor', from: [well[2], 2], to: [5.25, 2], height: 'half', openings: [{ at: 4.78, width: 0.8, kind: 'door' }] },
     { id: 'pantry-study', from: [5.25, 0], to: [5.25, 2], height: 'cutaway' },
     // Corredor fechado entre a casa de banho e o escritório, cada um com a sua porta.
     { id: 'corridor-bathroom', from: [well[2], 2], to: [well[2], well[1] - guardOffset], height: 'half', openings: [{ at: 2.6, width: 0.9, kind: 'door' }] },
@@ -53,7 +56,7 @@ export const theSecondStudyUpper: SceneSpec = {
     // e estante de despensa a poente.
     { id: 'pantry-shelves', model: 'bookcaseClosed', against: { wall: 'west', at: 1.0 }, facing: 'E' },
     { id: 'pantry-box', model: 'cardboardBoxClosed', logic: 'box@0,1', at: [1.4, 0.78] },
-    { id: 'pantry-box-open', model: 'cardboardBoxOpen', at: [0.75, 1.75] },
+    { id: 'pantry-box-open', model: 'cardboardBoxOpen', at: [0.85, 1.35] },
     { id: 'pantry-stove', model: 'kitchenStove', against: { wall: 'north', at: 2.13 }, facing: 'S' },
     { id: 'pantry-counter', model: 'kitchenCabinet', logic: 'counter@0,2', against: { wall: 'north', at: 2.67 }, facing: 'S' },
     { id: 'pantry-sink-counter', model: 'kitchenSink', logic: 'counter@0,2', against: { wall: 'north', at: 3.21 }, facing: 'S' },

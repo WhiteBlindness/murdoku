@@ -94,17 +94,19 @@ export const dustOnTheSillUpper: SceneSpec = {
     { id: 'study-lamp', model: 'lampRoundFloor', logic: 'lamp@2,3', at: [3.4, 2.5] },
     // Casa de banho: duche, sanita e lavatório; lavandaria com o segundo duche e a máquina.
     { id: 'bathroom-shower-north', model: 'shower', logic: 'shower@3,5', against: { wall: 'study-bathroom', at: 5.4, side: 'S' } },
-    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@5,5', against: { wall: 'bathroom-pantry', at: 5.5, side: 'W' } },
+    // A sanita encosta à parede da lavandaria, não à parede partilhada com a copa.
+    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@5,5', against: { wall: 'bath-laundry', side: 'N', at: 5.56 }, facing: 'N' },
     { id: 'bathroom-sink', model: 'bathroomSink', against: { wall: 'bath-laundry', side: 'N', at: 5.1 }, facing: 'N' },
     { id: 'bathroom-shower-south', model: 'shower', logic: 'shower@6,5', against: { wall: 'bathroom-gallery', at: 6.5, side: 'E' } },
     { id: 'laundry-washer', model: 'washer', against: { wall: 'south', at: 5.65 }, facing: 'N' },
-    // Copa: bancada com lava-loiça e armários na parede da casa de banho, prateleira e frigorífico baixo a nascente.
+    // Copa: bancada com lava-loiça e armários na parede da lavandaria (longe da sanita),
+    // prateleira e frigorífico baixo a nascente.
     { id: 'pantry-box-clue', model: 'cardboardBoxClosed', logic: 'box@3,6', at: [6.35, 3.35] },
-    { id: 'pantry-counter-sink', model: 'kitchenSink', logic: 'counter@5,6', against: { wall: 'bathroom-pantry', at: 5.46, side: 'E' } },
-    { id: 'pantry-stove', model: 'kitchenCabinetDrawer', against: { wall: 'bathroom-pantry', at: 6.0, side: 'E' } },
-    { id: 'pantry-counter-prep', model: 'kitchenCabinet', logic: 'counter@5,6', against: { wall: 'bathroom-pantry', at: 6.54, side: 'E' } },
+    { id: 'pantry-counter-prep', model: 'kitchenCabinet', logic: 'counter@5,6', against: { wall: 'bathroom-pantry', at: 6.55, side: 'E' } },
+    { id: 'pantry-counter-sink', model: 'kitchenSink', logic: 'counter@5,6', against: { wall: 'bathroom-pantry', at: 7.09, side: 'E' } },
+    { id: 'pantry-stove', model: 'kitchenCabinetDrawer', against: { wall: 'bathroom-pantry', at: 7.63, side: 'E' } },
     { id: 'pantry-coffee', model: 'kitchenCoffeeMachine', on: { parent: 'pantry-counter-prep' } },
-    { id: 'pantry-shelf', model: 'bookcaseOpenLow', against: { wall: 'east', at: 4.6 }, facing: 'W' },
+    { id: 'pantry-shelf', model: 'bookcaseOpenLow', against: { wall: 'bathroom-pantry', side: 'E', at: 5.45 }, facing: 'E' },
     { id: 'pantry-fridge', model: 'kitchenFridgeSmall', logic: 'fridge@7,7', against: { wall: 'east', at: 7.3 }, facing: 'W' },
   ],
 }

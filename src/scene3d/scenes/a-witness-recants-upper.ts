@@ -59,9 +59,12 @@ export const aWitnessRecantsUpper: SceneSpec = {
     // segunda casa de banho a sudoeste do quadrante.
     { id: 'bath-main-south', from: [4, 1.85], to: [8, 1.85], height: 'half', openings: [{ at: 6.95, width: 0.7, kind: 'door' }] },
     { id: 'bath-guest-east', from: [6, 1.85], to: [6, 4], height: 'half' },
+    // A segunda casa de banho fica separada do escritório por uma divisória
+    // mais alta do que as meias-paredes, para não se ler como parte dele.
+    { id: 'bath-guest-south', from: [4, 4], to: [6, 4], height: 'low' },
     {
       id: 'bathroom-office-divider',
-      from: [4, 4],
+      from: [6, 4],
       to: [8, 4],
       height: 'half',
     },
@@ -127,10 +130,10 @@ export const aWitnessRecantsUpper: SceneSpec = {
     // Segunda casa de banho: sanita, lavatório e banheira.
     { id: 'bathroom-toilet-west', model: 'toilet', logic: 'toilet@2,4', against: { wall: 'bath-main-south', side: 'S', at: 4.55 }, facing: 'S' },
     { id: 'bathroom-guest-sink', model: 'bathroomSink', against: { wall: 'bath-guest-east', side: 'W', at: 2.5 }, facing: 'W' },
-    { id: 'bathroom-tub-evangeline', model: 'bathtub', logic: 'bathtub@3,4', against: { wall: 'bathroom-office-divider', side: 'N', at: 5.0 }, facing: 'N' },
+    { id: 'bathroom-tub-evangeline', model: 'bathtub', logic: 'bathtub@3,4', against: { wall: 'bath-guest-south', side: 'N', at: 5.0 }, facing: 'N' },
     // Escritório: secretária com pufe junto à divisória, estante larga a poente,
     // poltronas de leitura nos cantos e coluna de som a nascente.
-    { id: 'office-desk', model: 'desk', logic: 'desk@4,5', against: { wall: 'bathroom-office-divider', side: 'S', at: 5.4 }, facing: 'S' },
+    { id: 'office-desk', model: 'desk', logic: 'desk@4,5', against: { wall: 'bath-guest-south', side: 'S', at: 5.4 }, facing: 'S' },
     { id: 'office-desk-seat', model: 'loungeSofaOttoman', at: [5.4, 4.95] },
     { id: 'office-desk-laptop', model: 'laptop', on: { parent: 'office-desk' } },
     { id: 'office-bookshelf', model: 'bookcaseClosedWide', logic: 'bookshelf@5,4', against: { wall: 'west-east-wings', side: 'E', at: 5.75 }, facing: 'E' },
