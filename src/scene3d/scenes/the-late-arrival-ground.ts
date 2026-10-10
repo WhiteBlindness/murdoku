@@ -78,10 +78,10 @@ export const theLateArrivalGround: SceneSpec = {
     { id: 'dining-lamp-west', model: 'lampRoundFloor', logic: 'lamp@4,4', at: [4.85, 4.8] },
     // Jardim frontal: arbustos e flores em canteiros, caminho de pedra e banco.
     { id: 'yard-shrub-north', model: 'plant_bushDetailed', logic: 'shrub@5,6', at: [6.55, 5.6] },
-    { id: 'yard-plant-south-west', model: 'pottedPlant', logic: 'plant@7,5', at: [5.33, 7.62] },
+    { id: 'yard-plant-south-west', model: 'pottedPlant', logic: 'plant@7,5', at: [5.62, 7.4] },
     { id: 'yard-shrub-south-east', model: 'plant_bushSmall', logic: 'shrub@7,7', at: [7.35, 7.4] },
     { id: 'yard-plant-north-east', model: 'flower_yellowA', logic: 'plant@5,7', at: [7.55, 5.45] },
-    { id: 'yard-shrub-murder-clue', model: 'plant_bushDetailed', logic: 'shrub@6,3', at: [3.6, 6.7] },
+    { id: 'yard-shrub-murder-clue', model: 'plant_bushDetailed', logic: 'shrub@6,3', at: [3.62, 6.45] },
     { id: 'yard-bench', model: 'bench', at: [5.7, 5.3], facing: 'S' },
     { id: 'yard-rock', model: 'rock_smallFlatA', at: [6.7, 7.3] },
   ],

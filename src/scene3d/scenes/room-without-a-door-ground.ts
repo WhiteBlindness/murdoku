@@ -1,24 +1,28 @@
 import type { SceneSpec } from '../schema'
 
 // Moradia de dois pisos: sala comum a norte (conversa a oeste, televisão ao
-// centro, refeições a este), átrio de distribuição, pátio de entrada coberto com
-// a escada a sudoeste e escritório a sudeste.
+// centro, refeições a este), átrio de entrada com a escada encostada à fachada
+// sul, jardim frontal exterior sob o piso superior (apoiado em pórticos) e
+// escritório a sudeste.
 export const roomWithoutADoorGround: SceneSpec = {
   puzzleId: 'hard-4',
   floor: 0,
   storeyFootprint: { kind: 'full' },
-  entry: { wall: 'west', at: 7.0 },
+  entry: { wall: 'west', at: 4.0 },
   shell: { features: [
     { wall: 'north', at: 1.5, kind: 'window' },
     { wall: 'north', at: 4.6, kind: 'window' },
     { wall: 'north', at: 6.6, kind: 'window' },
-    { wall: 'west', at: 5.6, kind: 'window' },
   ] },
-  stairs: { model: 'stairsOpen', at: [2.8, 6.6], facing: 'E' },
+  stairs: { model: 'stairsOpen', at: [4.35, 4.36], facing: 'W' },
+  exteriorSupportBays: [
+    { id: 'yard-bay-west', cells: [0, 5, 2, 7] },
+    { id: 'yard-bay-east', cells: [3, 5, 4, 7] },
+  ],
   floors: [
     { id: 'living-room', cells: [0, 0, 7, 2], material: 'wood' },
     { id: 'central-hall', cells: [0, 3, 7, 4], material: 'wood' },
-    { id: 'planted-arrival-court', cells: [0, 5, 4, 7], material: 'stone' },
+    { id: 'front-yard', cells: [0, 5, 4, 7], material: 'grass', kind: 'exterior' },
     { id: 'ground-office', cells: [5, 5, 7, 7], material: 'wood' },
   ],
   walls: [
@@ -26,7 +30,7 @@ export const roomWithoutADoorGround: SceneSpec = {
       { at: 2.6, width: 1.6, kind: 'open' },
     ] },
     { id: 'hall-south', from: [0, 5], to: [8, 5], height: 'half', openings: [
-      { at: 1.0, width: 1.0, kind: 'open' },
+      { at: 1.0, kind: 'door' },
       { at: 7.4, kind: 'door' },
     ] },
     { id: 'court-office', from: [5, 5], to: [5, 8], height: 'half' },
@@ -51,20 +55,24 @@ export const roomWithoutADoorGround: SceneSpec = {
     { id: 'living-clock-east', model: 'speaker', logic: 'clock@0,7', at: [7.75, 0.25] },
     { id: 'living-clock-south-table', model: 'sideTable', against: { wall: 'east', at: 2.55 }, facing: 'W' },
     { id: 'living-clock-south', model: 'radio', logic: 'clock@2,7', on: { parent: 'living-clock-south-table' } },
-    // Átrio: tapete, vasos nas extremidades e consola com rádio junto à porta do escritório.
+    // Átrio: tapete, vasos nas extremidades e mesa de apoio com rádio junto à porta do escritório.
     { id: 'living-rug-south', model: 'rugRectangle', logic: 'rug@3,1', at: [2.0, 4.0], facing: 'S' },
     { id: 'hall-plant-west', model: 'pottedPlant', logic: 'plant@3,3', at: [3.7, 3.3] },
     { id: 'hall-plant-east', model: 'pottedPlant', logic: 'plant@3,7', at: [7.75, 3.3] },
-    { id: 'hall-clock-table', model: 'sideTableDrawers', against: { wall: 'hall-south', at: 6.3, side: 'N' }, facing: 'N' },
+    { id: 'hall-clock-table', model: 'sideTable', against: { wall: 'hall-south', at: 6.62, side: 'N' }, facing: 'N' },
     { id: 'hall-clock', model: 'radio', logic: 'clock@4,6', on: { parent: 'hall-clock-table' } },
-    // Pátio de entrada coberto: cabide junto à porta, vasos de arbustos nos
-    // cantos, banco encostado à parede do escritório.
-    { id: 'court-coat-stand', model: 'coatRackStanding', at: [0.3, 7.75] },
-    { id: 'court-plant', model: 'pottedPlant', logic: 'plant@5,1', at: [1.75, 5.3] },
-    { id: 'court-shrub-west', model: 'pottedPlant', logic: 'shrub@6,0', at: [0.3, 6.25] },
-    { id: 'court-shrub-middle', model: 'plant_bushSmall', logic: 'shrub@7,2', at: [2.5, 7.6] },
-    { id: 'court-shrub-east', model: 'pottedPlant', logic: 'shrub@7,3', at: [3.75, 7.3] },
-    { id: 'court-bench', model: 'benchCushion', against: { wall: 'court-office', at: 6.0, side: 'W' }, facing: 'W' },
+    // Átrio: cabide junto à porta da rua.
+    { id: 'hall-coat-stand', model: 'coatRackStanding', at: [0.3, 3.3] },
+    // Jardim frontal: canteiro de arbustos junto à fachada oeste, vaso de
+    // flores, banco de jardim encostado ao escritório, flores e pedras soltas.
+    { id: 'court-plant', model: 'pottedPlant', logic: 'plant@5,1', at: [1.75, 5.4] },
+    { id: 'court-shrub-west', model: 'plant_bushDetailed', logic: 'shrub@6,0', at: [0.45, 6.4] },
+    { id: 'court-shrub-middle', model: 'plant_bushDetailed', logic: 'shrub@7,2', at: [2.4, 7.55] },
+    { id: 'court-shrub-east', model: 'plant_bushDetailed', logic: 'shrub@7,3', at: [3.5, 7.45] },
+    { id: 'court-bench', model: 'bench', against: { wall: 'court-office', at: 6.3, side: 'W' }, facing: 'W' },
+    { id: 'yard-flowers-a', model: 'flower_redA', at: [0.35, 7.3] },
+    { id: 'yard-flowers-b', model: 'flower_yellowA', at: [0.7, 7.65] },
+    { id: 'yard-flowers-c', model: 'flower_purpleA', at: [4.55, 5.35] },
     // Escritório: estante larga na parede norte, mesa de trabalho com portátil e
     // a cadeira virada para ela, cadeirão de leitura com candeeiro.
     { id: 'office-bookcase', model: 'bookcaseClosedWide', logic: 'bookshelf@5,5', against: { wall: 'hall-south', at: 6.0, side: 'S' } },
@@ -75,7 +83,9 @@ export const roomWithoutADoorGround: SceneSpec = {
     { id: 'office-lamp', model: 'lampSquareFloor', at: [5.2, 7.8] },
   ],
   rugs: [
-    { id: 'entry-mat', model: 'rugDoormat', at: [0.35, 7.0], facing: 'E' },
+    { id: 'entry-mat', model: 'rugDoormat', at: [0.35, 4.0], facing: 'E' },
+    { id: 'yard-path-a', model: 'path_stone', at: [1.0, 5.55], facing: 'S' },
+    { id: 'yard-path-b', model: 'path_stone', at: [1.2, 6.4], facing: 'S' },
     { id: 'office-rug', model: 'rugSquare', at: [6.85, 6.9] },
   ],
 }

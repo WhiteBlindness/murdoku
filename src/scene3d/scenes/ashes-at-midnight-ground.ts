@@ -1,7 +1,7 @@
 import type { SceneSpec } from '../schema'
 
 // Moradia de dois pisos: alpendre fechado de entrada a noroeste, sala de estar
-// e de jantar a nordeste com a escada, cozinha em U a sudoeste e jardim frontal
+// de jantar a nordeste com a escada, cozinha em U a sudoeste e jardim frontal
 // com caminho de pedra a partir da sala.
 export const ashesAtMidnightGround: SceneSpec = {
   puzzleId: 'hard-2',
@@ -36,19 +36,18 @@ export const ashesAtMidnightGround: SceneSpec = {
     { id: 'porch-chair', model: 'chair', logic: 'chair@2,2', at: [2.3, 2.3], facing: 'W' },
     { id: 'porch-plant-west', model: 'pottedPlant', logic: 'plant@3,0', at: [0.3, 3.65] },
     { id: 'porch-plant-east', model: 'pottedPlant', logic: 'plant@3,2', at: [2.7, 3.3] },
-    // Sala: móvel de televisão na parede norte, sofá de costas para a escada,
-    // cadeirão virado para a mesa de centro sobre o tapete.
-    { id: 'living-tv-unit', model: 'cabinetTelevision', against: { wall: 'north', at: 5.0 } },
-    { id: 'living-tv', model: 'televisionVintage', on: { parent: 'living-tv-unit' } },
+    // Sala de jantar: mesa comprida com toalha sobre o tapete, banco estofado
+    // encostado à parede norte e cadeira na cabeceira oeste; aparador a todo o
+    // comprimento sob a janela norte a servir de mesa de apoio.
     { id: 'dining-rug', model: 'rugRectangle', logic: 'rug@0,4', at: [5.0, 1.05], facing: 'S' },
-    { id: 'living-coffee-table', model: 'tableCoffee', at: [5.0, 1.05] },
-    { id: 'living-sofa', model: 'loungeSofa', at: [5.0, 1.78], facing: 'N' },
-    { id: 'dining-chair', model: 'loungeChair', logic: 'chair@1,3', at: [3.72, 1.2], facing: 'E' },
-    // Recanto de refeições: mesa com banco estofado encostado à parede este.
-    { id: 'dining-table', model: 'tableCloth', logic: 'table@0,6', at: [6.95, 0.75], facing: 'E' },
-    { id: 'dining-banquette', model: 'loungeSofa', against: { wall: 'east', at: 0.75 }, facing: 'W' },
-    { id: 'dining-sideboard', model: 'sideTableDrawers', against: { wall: 'east', at: 2.6 }, facing: 'W' },
-    { id: 'dining-sideboard-plant', model: 'plantSmall2', on: { parent: 'dining-sideboard' } },
+    { id: 'dining-table-west', model: 'tableCloth', at: [4.55, 1.1] },
+    { id: 'dining-table-east', model: 'tableCloth', at: [5.6, 1.1] },
+    { id: 'dining-banquette', model: 'loungeSofa', against: { wall: 'north', at: 5.08 } },
+    { id: 'dining-chair', model: 'chair', logic: 'chair@1,3', at: [3.86, 1.1], facing: 'E' },
+    { id: 'dining-sideboard-west', model: 'sideTableDrawers', logic: 'table@0,6', against: { wall: 'north', at: 6.62 } },
+    { id: 'dining-sideboard-east', model: 'sideTableDrawers', against: { wall: 'north', at: 7.3 } },
+    { id: 'dining-sideboard-plant', model: 'plantSmall2', on: { parent: 'dining-sideboard-east' } },
+    { id: 'dining-dresser', model: 'sideTableDrawers', against: { wall: 'east', at: 2.6 }, facing: 'W' },
     { id: 'dining-lamp', model: 'lampRoundFloor', logic: 'lamp@3,6', at: [6.5, 3.6] },
     // Cozinha em U: bancada oeste, lava-loiça a sul, fogão na parede este e
     // frigorífico no canto; aparador junto à porta do alpendre.
