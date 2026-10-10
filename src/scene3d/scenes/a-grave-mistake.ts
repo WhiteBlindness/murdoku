@@ -64,10 +64,11 @@ export const aGraveMistake: SceneSpec = {
     { id: 'dining-chair-se', model: 'chair', at: [1.3, 5.27], facing: 'N' },
     { id: 'dining-rug', model: 'rugRectangle', logic: 'rug@4,0', at: [1, 5] },
     { id: 'dining-lamp', model: 'lampRoundFloor', logic: 'lamp@5,2', at: [2.25, 5.2] },
-    { id: 'dining-sideboard', model: 'cabinetTelevisionDoors', against: { wall: 'west', at: 6.3 } },
+    { id: 'dining-sideboard', model: 'cabinetTelevisionDoors', against: { wall: 'south', at: 2.1 } },
     { id: 'dining-shelf', model: 'bookcaseOpenLow', against: { wall: 'garden-dining-edge', side: 'S', at: 2.5 } },
     // Cozinha em galé: mesa de pequeno-almoço a norte; bancada com lava-loiça e frigorífico a leste,
-    // fogão entre armários na meia parede do corredor.
+    // fogão e armário com micro-ondas na meia parede do corredor, recuados a sul
+    // para deixar livre a célula do corredor R4C5.
     { id: 'kitchen-table', model: 'table', at: [6.0, 0.95], facing: 'E' },
     { id: 'kitchen-chair-west', model: 'chair', at: [5.45, 0.95], facing: 'E' },
     { id: 'kitchen-chair-east', model: 'chair', at: [6.55, 0.95], facing: 'W' },
@@ -81,9 +82,8 @@ export const aGraveMistake: SceneSpec = {
     { id: 'kitchen-cabinet-f', model: 'kitchenCabinet', against: { wall: 'east', at: 5.8 } },
     { id: 'kitchen-toaster', model: 'toaster', on: { parent: 'kitchen-cabinet-f' } },
     { id: 'kitchen-bin', model: 'trashcan', at: [6.7, 6.7] },
-    { id: 'kitchen-cabinet-c', model: 'kitchenCabinet', against: { wall: 'hall-kitchen', side: 'E', at: 3.95 } },
-    { id: 'kitchen-stove', model: 'kitchenStove', logic: 'stove@4,5', against: { wall: 'hall-kitchen', side: 'E', at: 4.5 } },
-    { id: 'kitchen-cabinet-d', model: 'kitchenCabinetDrawer', against: { wall: 'hall-kitchen', side: 'E', at: 5.05 } },
+    { id: 'kitchen-stove', model: 'kitchenStove', logic: 'stove@4,5', against: { wall: 'hall-kitchen', side: 'E', at: 4.72 } },
+    { id: 'kitchen-cabinet-d', model: 'kitchenCabinetDrawer', against: { wall: 'hall-kitchen', side: 'E', at: 5.27 } },
     { id: 'kitchen-microwave', model: 'kitchenMicrowave', on: { parent: 'kitchen-cabinet-d' } },
   ],
   rugs: [

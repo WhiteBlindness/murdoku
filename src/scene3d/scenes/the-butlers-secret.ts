@@ -31,19 +31,23 @@ export const theButlersSecret: SceneSpec = {
     { id: 'court-plant-north', model: 'flower_yellowA', logic: 'plant@0,2', at: [2.6, 0.4] },
     { id: 'garden-rock', model: 'rock_smallA', at: [0.6, 0.5] },
     { id: 'garden-stump', model: 'stump_round', at: [1.3, 2.5] },
-    // Escritório: zona de receção junto à entrada (sofá, mesa baixa, televisão) e posto de trabalho
+    // Escritório: zona de receção junto à entrada (sofá, mesa baixa, aparador com arquivo) e posto de trabalho
     // a sul: secretária na divisória com a cadeira, relógio de pé e estantes baixas na parede este.
     { id: 'office-sofa', model: 'loungeSofa', against: { wall: 'garden-office', at: 0.85, side: 'E' }, facing: 'E' },
     { id: 'office-coffee-table', model: 'tableCoffee', at: [5.25, 0.85], facing: 'E' },
-    { id: 'office-media', model: 'cabinetTelevision', against: { wall: 'east', at: 1.2 }, facing: 'W' },
-    { id: 'office-tv', model: 'televisionVintage', on: { parent: 'office-media' } },
+    { id: 'office-credenza', model: 'cabinetTelevisionDoors', against: { wall: 'east', at: 1.2 }, facing: 'W' },
+    { id: 'office-credenza-speaker', model: 'speakerSmall', on: { parent: 'office-credenza' } },
+    { id: 'office-coffee-books', model: 'books', on: { parent: 'office-coffee-table' } },
     { id: 'office-desk', model: 'desk', logic: 'desk@3,4', against: { wall: 'dining-court', at: 3.9, side: 'E' }, facing: 'E' },
     { id: 'office-desk-laptop', model: 'laptop', on: { parent: 'office-desk' } },
     { id: 'office-chair', model: 'chairDesk', logic: 'chair@4,4', at: [4.78, 4.25], facing: 'W' },
     { id: 'office-clock', model: 'speaker', logic: 'clock@4,5', against: { wall: 'office-court', at: 5.6, side: 'N' } },
-    { id: 'office-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@3,7', against: { wall: 'east', at: 3.5 }, facing: 'W' },
-    { id: 'office-bookshelf-b', model: 'bookcaseOpenLow', logic: 'bookshelf@3,7', against: { wall: 'east', at: 4.0 }, facing: 'W' },
-    { id: 'office-bookshelf-books', model: 'books', on: { parent: 'office-bookshelf' } },
+    // Estante lógica 1×2: estante alta virada a sul (frente legível pela câmara) e estante baixa
+    // à frente, ambas na coluna 8, linhas 4–5. Encostadas à parede este mostrariam o tardoz.
+    { id: 'office-bookshelf', model: 'bookcaseOpen', logic: 'bookshelf@3,7', at: [7.5, 3.3], facing: 'S' },
+    { id: 'office-bookshelf-b', model: 'bookcaseOpenLow', logic: 'bookshelf@3,7', at: [7.5, 3.95], facing: 'S' },
+    { id: 'office-bookshelf-books', model: 'books', on: { parent: 'office-bookshelf', surface: 'shelf2' } },
+    { id: 'office-bookshelf-books-top', model: 'books', on: { parent: 'office-bookshelf', surface: 'top' } },
     { id: 'office-bookshelf-books-b', model: 'books', on: { parent: 'office-bookshelf-b' } },
     { id: 'office-filing', model: 'kitchenCabinetDrawer', against: { wall: 'office-court', at: 6.4, side: 'N' } },
     { id: 'office-filing-radio', model: 'radio', on: { parent: 'office-filing' } },

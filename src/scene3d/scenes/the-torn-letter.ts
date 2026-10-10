@@ -57,11 +57,17 @@ export const theTornLetter: SceneSpec = {
     { id: 'dining-sideboard-b', model: 'bookcaseOpenLow', against: { wall: 'south', at: 3.7 }, facing: 'N' },
     { id: 'dining-sideboard-books', model: 'books', on: { parent: 'dining-sideboard-b', surface: 'top' } },
     { id: 'dining-sideboard-lamp', model: 'lampSquareTable', on: { parent: 'dining-sideboard', surface: 'top' } },
-    // Escritório: estante alta na divisória, secretária na parede sul e sofá de leitura a este.
+    // Escritório: estante alta na divisória, secretária de trabalho (portátil, candeeiro, livros)
+    // com arquivo baixo na parede sul, e canto de leitura com sofá e estante baixa a este.
     { id: 'study-bookshelf', model: 'bookcaseClosedWide', logic: 'bookshelf@5,5', against: { wall: 'dining-study', at: 5.75, side: 'E' }, facing: 'E' },
     { id: 'study-desk', model: 'desk', logic: 'desk@7,6', against: { wall: 'south', at: 6.5 }, facing: 'N' },
-    { id: 'study-desk-screen', model: 'computerScreen', on: { parent: 'study-desk' } },
+    { id: 'study-desk-laptop', model: 'laptop', on: { parent: 'study-desk', offset: [0.08, 0] } },
+    { id: 'study-desk-lamp', model: 'lampSquareTable', on: { parent: 'study-desk', offset: [-0.24, 0.05] } },
+    { id: 'study-files', model: 'bookcaseOpenLow', against: { wall: 'south', at: 7.45 }, facing: 'N' },
+    { id: 'study-files-books', model: 'books', on: { parent: 'study-files', surface: 'top' } },
     { id: 'study-sofa', model: 'loungeSofa', against: { wall: 'east', at: 5.6 }, facing: 'W' },
+    { id: 'study-reading-shelf', model: 'bookcaseOpenLow', against: { wall: 'east', at: 4.5 }, facing: 'W' },
+    { id: 'study-reading-lamp', model: 'lampRoundTable', on: { parent: 'study-reading-shelf', surface: 'top' } },
   ],
   rugs: [
     { id: 'hall-doormat', model: 'rugDoormat', at: [3.4, 0.35] },

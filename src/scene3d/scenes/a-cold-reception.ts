@@ -35,14 +35,14 @@ export const aColdReception: SceneSpec = {
     { id: 'office-bookcase-tall', model: 'bookcaseOpen', against: { wall: 'north', at: 3.45 } },
     { id: 'office-desk', model: 'desk', logic: 'desk@2,3', against: { wall: 'porch-office', side: 'E', at: 2.3 } },
     { id: 'office-laptop', model: 'laptop', on: { parent: 'office-desk' } },
-    { id: 'office-clock-table', model: 'sideTable', against: { wall: 'office-dining', side: 'N', at: 4.45 } },
+    { id: 'office-clock-table', model: 'sideTable', against: { wall: 'office-dining', side: 'N', at: 4.5 } },
     { id: 'office-clock', model: 'radio', logic: 'clock@2,4', on: { parent: 'office-clock-table' } },
     { id: 'office-bookcase', model: 'bookcaseOpenLow', against: { wall: 'north', at: 5.6 } },
     { id: 'office-books', model: 'books', on: { parent: 'office-bookcase', surface: 'top' } },
     { id: 'office-plant', model: 'pottedPlant', at: [5.7, 1.4] },
     // Sala de jantar: mesa sobre o tapete lógico com cadeira à cabeceira, candeeiro e aparador
     // a sul; recanto de estar a oeste junto à porta de entrada.
-    { id: 'dining-table', model: 'tableRound', at: [4.5, 3.95], facing: 'E' },
+    { id: 'dining-table', model: 'table', at: [4.65, 3.95], facing: 'E' },
     { id: 'dining-chair-east', model: 'chair', logic: 'chair@3,5', at: [5.4, 3.95], facing: 'W' },
     { id: 'dining-rug', model: 'rugRectangle', logic: 'rug@3,3', at: [4, 4] },
     { id: 'dining-lamp-table', model: 'sideTable', logic: 'lamp@5,3', against: { wall: 'south', at: 3.45 } },

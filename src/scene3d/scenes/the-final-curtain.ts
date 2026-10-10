@@ -42,12 +42,11 @@ export const theFinalCurtain: SceneSpec = {
     { id: 'hall-console', model: 'sideTable', against: { wall: 'north', at: 5.8 } },
     { id: 'hall-lamp', model: 'lampSquareTable', on: { parent: 'hall-console' } },
     // Pátio: arbustos baixos mantêm visíveis as duas células com pistas; caminho de lajes entre as aberturas.
-    { id: 'garden-shrub-west', model: 'plant_bushSmall', logic: 'shrub@3,0', at: [0.32, 3.45] },
+    { id: 'garden-shrub-west', model: 'plant_bushDetailed', logic: 'shrub@3,0', at: [0.45, 3.4] },
     { id: 'garden-flowers', model: 'flower_yellowA', logic: 'plant@3,2', at: [2.55, 3.3] },
-    { id: 'garden-shrub-centre', model: 'plant_bushSmall', logic: 'shrub@2,3', at: [3.76, 2.28] },
+    { id: 'garden-shrub-centre', model: 'plant_bushDetailed', logic: 'shrub@2,3', at: [3.55, 2.5] },
     { id: 'garden-bench', model: 'bench', against: { wall: 'courtyard-wings', side: 'N', at: 4.1 } },
     { id: 'garden-flower-ne', model: 'flower_redA', at: [6.55, 2.35], yaw: 15 },
-    { id: 'garden-flower-nw', model: 'flower_purpleA', at: [0.75, 2.3], yaw: -10 },
     { id: 'garden-flower-se', model: 'flower_redA', at: [6.6, 3.65], yaw: -20 },
     // Despensa: bancada contra a meia parede norte, estante alta a oeste,
     // frigorífico e caixa encostados à parede sul.
