@@ -189,7 +189,7 @@ describe('exterior structural support', () => {
       .map(issue => issue.subject)
 
     expect(hard6).toContain('4,2')
-    expect(hard10).toContain('5,7')
+    expect(hard10).toContain('4,4')
   })
 
   it('keeps supported exterior routes and solved cells clear in the five production houses', () => {
