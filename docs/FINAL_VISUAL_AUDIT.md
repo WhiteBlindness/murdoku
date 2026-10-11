@@ -161,11 +161,19 @@ Estas casas de banho têm paredes divisórias e porta, mas na vista em corte lee
 
 O master-6 constava da pergunta, mas deixou de precisar da exceção: a parede de 0,6 resolveu a constatação, e o RR6 confirmou 0 MAJOR nesse caso.
 
-**Por decidir:** a constatação do RR6 sobre o **expert-5** («casa de banho do piso de cima aberta para o patamar da escada») surgiu depois da decisão e não está coberta por ela. Não foi registada nenhuma aprovação presumida. Fica pendente de decisão do responsável: incluí-la na exceção ou corrigi-la na cena.
+**expert-5 (RR6), corrigido localmente a 11/10/2026 (`0294395`).** A geometria foi verificada:
+- a casa de banho (colunas 1 a 4, linhas 1 a 3) já estava delimitada pelas paredes norte e poente, por uma divisória a sul com porta e por uma divisória a nascente;
+- a divisória a sul, voltada para o estúdio e o patamar, tinha só 0,35 de altura e lia-se como aberta;
+- o banco e o guarda-fatos que o revisor viu na mesma faixa estão fora da casa de banho (no estúdio, junto à parede poente, e no quarto);
+- a «faixa azul» ao longo da parede poente é o realce de coluna da pista da Lena na vista da solução, e não pavimento.
+
+A divisória a sul passou para a altura normal (0,6), com a porta mantida. O validador não dá erros nem avisos novos, e a semântica passa. Na vista sem pessoas, a casa de banho lê-se como divisão fechada.
+
+Na vista da solução, o realce de coluna e o esbatimento das paredes à frente das pessoas são comportamentos da interface e do renderizador. Ficam fora deste caso. Este caso não entra na exceção.
 
 Estas exceções ficam documentadas para uma eventual melhoria futura do renderizador. Uma correção de fundo exige alterar o renderizador ou o validador, por exemplo com paredes de casa de banho mais altas e tolerância nas linhas de visão. Fica registada como «SYSTEM ESCALATION».
 
-**Resultado:** 0 BLOCKER. Há 1 MAJOR por decidir (expert-5, RR6), fora das 9 constatações aceites explicitamente.
+**Resultado:** 0 BLOCKER e 0 MAJOR por resolver, fora das 9 constatações aceites explicitamente.
 
 ## MINOR e POLISH
 
@@ -184,16 +192,26 @@ Temas recorrentes nas MINOR:
 
 Trocar o frigorífico baixo pelo alto em todo o catálogo foi testado e revertido. Os frigoríficos encostados às paredes nascente e norte ficariam de costas para a câmara, o que viola a regra `tall-back-exposed` em 33 casos. Por isso, o frigorífico só passou a alto onde pode ficar virado a sul ou a nascente, como no master-2.
 
-### Telemóvel: pontos de legibilidade e usabilidade para decisão
+### Telemóvel: legibilidade e usabilidade
 
-Das 401 MINOR, 17 referem o telemóvel. Destacam-se aqui para o responsável decidir se são aceitáveis. Nenhuma foi corrigida.
+Das 401 MINOR, 17 referem o telemóvel.
 
-1. **Texto de estado cortado (real).** Na faixa «Continuity / Sequence» (`src/components/CaseProgressStrip.tsx`), a 390 px de largura:
-   - a mensagem «All people placed — review the account before accusing.» fica cortada com reticências em «All people placed — review the a…»;
-   - a instrução que diz ao jogador o que fazer a seguir deixa de se ler por completo;
-   - na mesma faixa, o cartão da terceira pessoa aparece cortado à direita, o que é próprio da lista com deslocamento horizontal.
+1. **Texto de estado cortado: corrigido (`33b00fc`).**
+   - **Problema:** na faixa «Continuity / Sequence» (`src/components/CaseProgressStrip.tsx`), a 390 px, a mensagem «All people placed — review the account before accusing.» ficava cortada em «All people placed — review the a…». Foi assinalado em 12 casos (very-easy-7, very-easy-8, easy-1 a easy-4, medium-7, hard-1, hard-2, hard-4, expert-5 e expert-8), mas o componente é o mesmo em todo o catálogo.
+   - **Correção:** a instrução passa a quebrar linha em vez de ser truncada. O contador «N / N placed» fica numa só linha, alinhado ao topo no telemóvel e centrado a partir de `sm`.
+   - **Medição em Chromium, caso easy-1 resolvido:**
 
-   Assinalado em 12 casos: very-easy-7, very-easy-8, easy-1, easy-2, easy-3, easy-4, medium-7, hard-1, hard-2, hard-4, expert-5 e expert-8. É o mesmo componente em todo o catálogo, por isso deve afetar todos os ecrãs resolvidos. Corrigi-lo é uma alteração de interface, fora do âmbito das cenas.
+     | Largura | Linhas da instrução | Excesso horizontal | Contador | Transbordo da página |
+     | --- | ---: | ---: | --- | ---: |
+     | 390 px | 2 | 0 | 1 linha | 0 |
+     | 360 px | 2 | 0 | 1 linha | 0 |
+     | 320 px | 3 | 0 | 1 linha | 0 |
+     | 1 600 px | 1 | 0 | 1 linha | 0 |
+
+   - **Computador:** a geometria fica idêntica. A faixa mantém 121 px de altura, e o tabuleiro fica na mesma posição.
+   - **Acessibilidade:** o texto completo está no DOM e é lido pelos leitores de ecrã. O contraste do texto é de 5,99:1 sobre o papel (AA). O contador mantém `aria-live="polite"`.
+   - **Testes:** `tests/CaseProgressStrip.test.tsx` cobre o texto completo, a ausência de truncagem, o contador numa linha e a mensagem «Next suggested».
+   - **Na lista horizontal de pessoas:** o cartão seguinte continua cortado à direita. É o indício normal de deslocamento horizontal, e por isso fica como está.
 
 2. **Pessoas «cortadas» no fundo do tabuleiro (não reproduzido na aplicação).**
    - Casos assinalados: hard-1, hard-2, expert-5 e expert-8.
