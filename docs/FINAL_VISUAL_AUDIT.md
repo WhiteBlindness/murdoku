@@ -1,6 +1,6 @@
 # Auditoria visual final do catálogo
 
-Data: 11/10/2026. Estado: **a aguardar a aprovação do responsável.**
+Data: 11/10/2026. Estado: **pronta para a aprovação do responsável.**
 
 O catálogo tem 60 casos com cenas 3D escritas à mão, num total de 90 pisos. A auditoria confirmou que nenhuma correção alterou o culpado, a vítima, as pistas, a solução, as divisões lógicas ou as peças `logic` de qualquer caso. Esta auditoria substitui a auditoria visual do PR #1, de 05/10/2026.
 
@@ -272,12 +272,14 @@ As heurísticas automáticas comparam a base anterior ao redesenho (v5) com o es
 
 ## Validação final
 
-Validação sobre a cabeça `d3b5d40`, com os testes temporários fora do conjunto de testes:
+Validação sobre a cabeça `0294395`, com os testes temporários fora do conjunto de testes:
 
 | Controlo | Resultado |
 | --- | --- |
-| `npm test` | 43 ficheiros; 554 aprovados, 5 ignorados, 559 no total |
+| `npm test` | 44 ficheiros; 557 aprovados, 5 ignorados, 562 no total |
 | `npm run lint` | Aprovado |
+| Verificador de semântica | 60 de 60 casos |
+| Validador de cenas | 90 pisos, 0 erros, 0 erros entre pisos |
 | `npm run build` | Aprovado |
 | `npm run validate:production` | 7/7 |
 | `npm run verify` | 64/64 |
@@ -293,25 +295,30 @@ O teste `exteriorSupport` verifica que os pilares entram nas linhas de visão. P
 
 ## Arquivo
 
-O arquivo final está preparado para carregamento: `Murdoku_Final_Visual_Audit_4dc05e1.zip`, com 360 MB. Tem esta estrutura:
-- **Capturas:** as 342 capturas PNG, organizadas por nível.
-- **`manifest.csv` e `manifest.json`:** uma linha por captura, com estas colunas:
-  - `case_id`, `floor`, `viewport`, `view`, `state`, `filename`, `capture_result`;
-  - `sha256` e `capture_utc`;
-  - `scene_commit` e `scene_files`.
-- **`SHA256SUMS`:** as somas de verificação.
-- **`LEIA-ME.md`:** a origem do arquivo.
+### Arquivo original (prova histórica, imutável)
 
-**Correspondência com `4dc05e1`, verificada.**
-- **Cenas:** em cada um dos 60 casos, o último commit que alterou as cenas é anterior à captura do caso. Nenhum ficheiro de cena mudou entre essa captura e `4dc05e1`.
-- **Renderização:** desde a primeira captura (08/10/2026, 14:05 UTC), nenhum commit alterou código ou recursos de renderização fora das cenas.
-- **Somas de verificação:** as 342 conferem.
-- **Limite:** o Git não regista alterações por commitar no momento de cada captura. Segundo as notas da sessão, a árvore de trabalho estava limpa em cada captura.
+- **Ficheiro:** `Murdoku_Final_Visual_Audit_4dc05e1.zip`, com 360 MB.
+- **Conteúdo:** as 342 capturas, `manifest.csv`, `manifest.json`, `SHA256SUMS` e `LEIA-ME.md`.
+- **SHA-256:** `8e9646de0f29ad856b0527e54897289fbfb0192e9f2462aabbd7b88e4f28ef58`.
+- **Correspondência com `4dc05e1`:** verificada.
+  - Em cada caso, o último commit que alterou as cenas é anterior à captura.
+  - Nenhum commit alterou código ou recursos de renderização fora das cenas desde a primeira captura.
+  - As 342 somas conferem.
 
-**Onde estão os ficheiros.** O arquivo e o manifesto existem só no armazenamento temporário da sessão de trabalho. Não fazem parte do repositório e não foram publicados.
+### Suplemento (HEAD `0294395`)
 
-**Google Drive.** A sessão não tinha nenhum conector para o Google Drive, por isso o arquivo não foi carregado. O carregamento fica pendente:
-- por um conector autorizado pelo responsável;
-- ou por transferência manual do ZIP, antes de a sessão terminar.
+- **Ficheiro:** `Murdoku_Final_Visual_Audit_0294395_supplement.zip`, com 149 MB.
+- **SHA-256:** `dbf66bcb9538c449e95acc15e5ec9b5427a8dfc36f449f8e51b7c0aa5e074cd4`.
+- **Capturas novas:** 154.
+  - As 150 vistas de telemóvel dos 60 casos, por causa da correção da instrução de estado.
+  - As 4 vistas de computador do expert-5, por causa da divisória da casa de banho.
+- **Vistas não recapturadas:** as restantes 188 capturas são idênticas, byte a byte, às do arquivo original.
+- **Manifesto:** descreve as 342 capturas do conjunto final. A coluna `supplement_status` distingue «recaptured» e «unchanged».
+- **Verificação:** o original extraído com o suplemento por cima confere 342/342 com o `SHA256SUMS` do suplemento.
 
-Depois do carregamento, verificar o ZIP com a soma SHA-256 `8e9646de0f29ad856b0527e54897289fbfb0192e9f2462aabbd7b88e4f28ef58`.
+### Onde estão guardados
+
+- **Entregues ao responsável a 11/10/2026:** os dois ZIP, divididos em partes de 28 MiB, com as somas das partes e as instruções de reconstituição (`RECONSTITUIR.txt` e `RECONSTITUIR-SUPLEMENTO.txt`). O envio direto tem um limite de 30 MiB por ficheiro.
+- **Google Drive:** nenhum conector estava disponível na sessão de trabalho, por isso a cópia no Drive fica a cargo do responsável.
+- **Repositório:** nenhum dos arquivos está no repositório.
+- **Verificação depois de guardar:** reconstituir cada ZIP e confirmar as somas SHA-256 acima.
