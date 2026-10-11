@@ -45,7 +45,7 @@ export const twoSetsOfPrintsUpper: SceneSpec = {
       { at: 3.78, width: 0.6, kind: 'door' },
       { at: 4.65, width: 0.6, kind: 'door' },
     ] },
-    { id: 'bathroom-dining-open', from: [5, 4], to: [8, 4], height: 'half' },
+    { id: 'bathroom-dining', from: [5, 4], to: [8, 4] },
     { id: 'stairwell-west-guard', from: [well[0], well[1] + 0.12], to: [well[0], well[3] + 0.06], height: 'half', treatment: 'railing', freeEnds: ['from'] },
     { id: 'stairwell-east-guard', from: [well[2] + 0.06, 4.25], to: [well[2] + 0.06, well[3] + 0.06], height: 'half', treatment: 'railing' },
     { id: 'stairwell-south-guard', from: [well[0], well[3] + 0.06], to: [well[2] + 0.06, well[3] + 0.06], height: 'half', treatment: 'railing' },
@@ -79,20 +79,20 @@ export const twoSetsOfPrintsUpper: SceneSpec = {
     { id: 'bathroom-cabinet', model: 'bathroomCabinetDrawer', against: { wall: 'north', at: 6.85 }, facing: 'S' },
     { id: 'bathroom-shower-north', model: 'shower', logic: 'shower@0,7', at: [7.55, 0.45], facing: 'S' },
     { id: 'bathroom-shower-south', model: 'shower', logic: 'shower@3,5', at: [5.4, 3.12], facing: 'S' },
-    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@3,7', against: { wall: 'east', at: 3.72 }, facing: 'W' },
+    { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@3,7', against: { wall: 'east', at: 3.3 }, facing: 'W' },
     // Sala de refeições: aparador baixo (a mesa lógica) na parede da casa de banho, com
-    // candeeiro; recanto de refeições com mesa de madeira, banco estofado corrido a norte e a
-    // cadeira de cabeceira (a cadeira lógica) puxada para a ponta nascente da mesa.
-    // `chair` é vocabulário de pista: os assentos acrescentados são sofás de banco corrido.
-    { id: 'dining-sideboard', model: 'cabinetTelevisionDoors', logic: 'table@4,5', against: { wall: 'bathroom-dining-open', side: 'S', at: 6.3 }, facing: 'S' },
-    { id: 'dining-sideboard-east', model: 'cabinetTelevisionDoors', against: { wall: 'bathroom-dining-open', side: 'S', at: 7.3 }, facing: 'S' },
+    // candeeiro; mesa de jantar de madeira sobre um tapete, com a cadeira (lógica) na cabeceira
+    // nascente. `chair` é vocabulário de pista: não há outros assentos nem sofás nesta divisão.
+    { id: 'dining-sideboard', model: 'cabinetTelevisionDoors', logic: 'table@4,5', against: { wall: 'bathroom-dining', side: 'S', at: 6.3 }, facing: 'S' },
+    { id: 'dining-sideboard-east', model: 'cabinetTelevisionDoors', against: { wall: 'bathroom-dining', side: 'S', at: 7.3 }, facing: 'S' },
     { id: 'dining-sideboard-lamp', model: 'lampSquareTable', on: { parent: 'dining-sideboard-east', offset: [0.2, 0] } },
     { id: 'dining-sideboard-radio', model: 'radio', on: { parent: 'dining-sideboard', offset: [-0.1, 0] } },
-    { id: 'dining-table', model: 'tableCross', at: [6.42, 6.55], facing: 'N' },
-    { id: 'dining-banquette-north', model: 'loungeSofa', at: [6.42, 5.9], facing: 'S' },
+    { id: 'dining-table', model: 'table', at: [6.42, 6.5], facing: 'N' },
+    { id: 'dining-centrepiece', model: 'plantSmall1', on: { parent: 'dining-table' } },
     { id: 'dining-chair', model: 'chair', logic: 'chair@6,7', at: [7.17, 6.5], facing: 'W' },
   ],
   rugs: [
     { id: 'bedroom-bed-rug', model: 'rugRectangle', at: [3.3, 6.4] },
+    { id: 'dining-rug', model: 'rugRectangle', at: [6.5, 6.5] },
   ],
 }

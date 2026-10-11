@@ -104,11 +104,9 @@ export const reviewedCatalogueSightlines: Record<string, string[]> = {
     "5,2|cell (5,2) has a blocked 3D sightline at standee height: object:stairs",
   ],
   'expert-4#1@exploded': [
-    "2,4|cell (2,4) has a blocked 3D sightline at standee height: object:bathroom-shower-north",
     "6,4|cell (6,4) has a blocked 3D sightline at standee height: object:bathroom-shower-south",
   ],
   'expert-4#1@ghost': [
-    "2,4|cell (2,4) has a blocked 3D sightline at standee height: object:bathroom-shower-north",
     "6,4|cell (6,4) has a blocked 3D sightline at standee height: object:bathroom-shower-south",
   ],
   'expert-4#1@normal': [

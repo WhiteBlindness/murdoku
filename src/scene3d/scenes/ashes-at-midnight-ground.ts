@@ -1,7 +1,7 @@
 import type { SceneSpec } from '../schema'
 
-// Moradia de dois pisos: alpendre fechado de entrada a noroeste, sala de estar
-// de jantar a nordeste com a escada, cozinha em U a sudoeste e jardim frontal
+// Moradia de dois pisos: alpendre fechado de entrada a noroeste, sala de jantar
+// a nordeste com a escada, cozinha em U a sudoeste e jardim frontal
 // com caminho de pedra a partir da sala.
 export const ashesAtMidnightGround: SceneSpec = {
   puzzleId: 'hard-2',
@@ -36,13 +36,15 @@ export const ashesAtMidnightGround: SceneSpec = {
     { id: 'porch-chair', model: 'chair', logic: 'chair@2,2', at: [2.3, 2.3], facing: 'W' },
     { id: 'porch-plant-west', model: 'pottedPlant', logic: 'plant@3,0', at: [0.3, 3.65] },
     { id: 'porch-plant-east', model: 'pottedPlant', logic: 'plant@3,2', at: [2.7, 3.3] },
-    // Sala de jantar: mesa comprida com toalha sobre o tapete, banco estofado
-    // encostado à parede norte e cadeira na cabeceira oeste; aparador a todo o
-    // comprimento sob a janela norte a servir de mesa de apoio.
+    // Sala de jantar: mesa comprida de madeira sobre o tapete, com a cadeira (lógica) na
+    // cabeceira oeste e um guarda-loiça na parede norte atrás da mesa; aparador sob a janela
+    // norte a servir de mesa de apoio. `chair` é vocabulário de pista: não há mais cadeiras,
+    // nem sofás ou mesas baixas de sala de estar nesta divisão.
     { id: 'dining-rug', model: 'rugRectangle', logic: 'rug@0,4', at: [5.0, 1.05], facing: 'S' },
-    { id: 'dining-table-west', model: 'tableCloth', at: [4.55, 1.1] },
-    { id: 'dining-table-east', model: 'tableCloth', at: [5.6, 1.1] },
-    { id: 'dining-banquette', model: 'loungeSofa', against: { wall: 'north', at: 5.08 } },
+    { id: 'dining-table-west', model: 'table', at: [4.55, 1.1] },
+    { id: 'dining-table-east', model: 'table', at: [5.6, 1.1] },
+    { id: 'dining-centrepiece', model: 'plantSmall1', on: { parent: 'dining-table-east', offset: [-0.3, 0] } },
+    { id: 'dining-hutch', model: 'bookcaseClosedWide', against: { wall: 'north', at: 5.1 } },
     { id: 'dining-chair', model: 'chair', logic: 'chair@1,3', at: [3.86, 1.1], facing: 'E' },
     { id: 'dining-sideboard-west', model: 'sideTableDrawers', logic: 'table@0,6', against: { wall: 'north', at: 6.62 } },
     { id: 'dining-sideboard-east', model: 'sideTableDrawers', against: { wall: 'north', at: 7.3 } },

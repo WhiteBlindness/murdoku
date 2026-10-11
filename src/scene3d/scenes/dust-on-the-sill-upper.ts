@@ -48,7 +48,9 @@ export const dustOnTheSillUpper: SceneSpec = {
   walls: [
     { id: 'bedroom-study', from: [3, 0], to: [3, 3], height: 'half', openings: [{ at: 0.8, width: 1, kind: 'door' }] },
     { id: 'bedroom-gallery', from: [3, 3], to: [3, stairwellBounds[1] - 0.08], height: 'half' },
-    { id: 'study-bathroom', from: [3, 3], to: [6, 3], height: 'half', openings: [{ at: 4.4, width: 0.8, kind: 'open' }] },
+    { id: 'study-gallery', from: [3, 3], to: [3.95, 3], height: 'half', freeEnds: ['to'] },
+    // Divisória à altura normal entre o escritório e a casa de banho: o duche do Idris encosta-lhe.
+    { id: 'study-bathroom', from: [4.85, 3], to: [6, 3] },
     { id: 'study-pantry', from: [6, 3], to: [8, 3], height: 'half', openings: [{ at: 7.55, width: 0.9, kind: 'door' }] },
     // Casa de banho e lavandaria com duche: duas divisões fechadas, cada uma com porta para a galeria.
     { id: 'bathroom-gallery', from: [4.8, 3], to: [4.8, 8], height: 'half', openings: [
@@ -81,19 +83,18 @@ export const dustOnTheSillUpper: SceneSpec = {
     // Galeria: banco encostado à parede do quarto.
     { id: 'gallery-bench', model: 'bench', against: { wall: 'bedroom-gallery', side: 'E', at: 4.5 }, facing: 'E' },
     // Escritório: estantes na parede norte, secretária com cadeira junto à copa,
-    // mesa redonda de trabalho, caixa e candeeiro junto à porta do quarto.
+    // mesa redonda de leitura afastada da divisória da casa de banho, caixa e candeeiro junto à porta do quarto.
     { id: 'study-bookshelf', model: 'bookcaseClosedWide', logic: 'bookshelf@0,5', against: { wall: 'north', at: 6.4 } },
     { id: 'study-bookshelf-east', model: 'bookcaseClosedWide', against: { wall: 'north', at: 7.42 } },
     { id: 'study-desk', model: 'desk', logic: 'desk@2,6', against: { wall: 'study-pantry', side: 'N', at: 6.5 }, facing: 'N' },
     { id: 'study-desk-laptop', model: 'laptop', on: { parent: 'study-desk' }, facing: 'N' },
     { id: 'study-chair', model: 'chairDesk', at: [6.5, 2.05], facing: 'S' },
-    { id: 'study-table', model: 'tableRound', at: [5.3, 2.2] },
+    { id: 'study-table', model: 'tableRound', at: [5.3, 2.15] },
     { id: 'study-table-chair-north', model: 'chair', at: [5.3, 1.42], facing: 'S' },
-    { id: 'study-table-chair-east', model: 'chair', at: [5.95, 2.2], facing: 'W' },
     { id: 'study-box', model: 'cardboardBoxClosed', logic: 'box@1,3', at: [3.6, 1.7] },
     { id: 'study-lamp', model: 'lampRoundFloor', logic: 'lamp@2,3', at: [3.4, 2.5] },
     // Casa de banho: duche, sanita e lavatório; lavandaria com o segundo duche e a máquina.
-    { id: 'bathroom-shower-north', model: 'shower', logic: 'shower@3,5', against: { wall: 'study-bathroom', at: 5.4, side: 'S' } },
+    { id: 'bathroom-shower-north', model: 'shower', logic: 'shower@3,5', against: { wall: 'study-bathroom', at: 5.6, side: 'S' } },
     // A sanita encosta à parede da lavandaria, não à parede partilhada com a copa.
     { id: 'bathroom-toilet', model: 'toilet', logic: 'toilet@5,5', against: { wall: 'bath-laundry', side: 'N', at: 5.56 }, facing: 'N' },
     { id: 'bathroom-sink', model: 'bathroomSink', against: { wall: 'bath-laundry', side: 'N', at: 5.1 }, facing: 'N' },

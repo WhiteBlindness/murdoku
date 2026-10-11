@@ -94,14 +94,15 @@ export const theBorrowedKnifeGround: SceneSpec = {
     { id: 'living-tv-east-set', model: 'televisionVintage', on: { parent: 'living-tv-east' } },
     { id: 'living-sofa-east', model: 'loungeSofa', at: [7.2, 2.15], facing: 'N' },
     // Escritório de entrada: secretária com cadeira contra a divisória da sala, estante na parede
-    // do pátio, poltrona com candeeiro a poente; banco e cabide junto ao pé da escada e à porta.
+    // do pátio; banco e cabide junto ao pé da escada e à porta.
     { id: 'office-desk', model: 'desk', logic: 'desk@3,2', against: { wall: 'living-office-divider', side: 'S', at: 2.5 }, facing: 'S' },
     { id: 'office-desk-chair', model: 'chairDesk', at: [2.45, 4.12], facing: 'N' },
     { id: 'office-desk-laptop', model: 'laptop', on: { parent: 'office-desk' } },
     { id: 'office-bookshelf', model: 'bookcaseOpenLow', logic: 'bookshelf@4,2', against: { wall: 'office-yard-facade', side: 'W', at: 4.75 }, facing: 'W' },
     { id: 'office-bookshelf-books', model: 'books', on: { parent: 'office-bookshelf' } },
-    { id: 'office-armchair', model: 'loungeChair', at: [0.45, 4.0], facing: 'E' },
-    { id: 'office-lamp', model: 'lampRoundFloor', at: [0.3, 4.7] },
+    // Candeeiro junto à secretária; a faixa a poente da escada fica livre como passagem
+    // da sala para o escritório e a entrada (sem poltrona virada para o lanço).
+    { id: 'office-lamp', model: 'lampRoundFloor', at: [1.75, 3.3] },
     { id: 'office-chair', model: 'bench', logic: 'chair@7,1', against: { wall: 'south', at: 1.5 }, facing: 'N' },
     { id: 'office-coat-rack', model: 'coatRackStanding', at: [0.35, 6.55] },
     // Pátio: arbustos e flores em grupos, pedras soltas.
