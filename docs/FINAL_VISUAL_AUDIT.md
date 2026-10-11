@@ -138,21 +138,34 @@ Das 15 constatações MAJOR da re-revisão, cinco ficaram resolvidas:
 - **expert-5, escada à frente do sofá:** saiu o cadeirão que estava entalado (`d3b5d40`).
 - **master-6, sanita junto à sala de jantar:** foi levantada uma parede de 0,6 (`d3b5d40`). O RR6 confirmou 0 MAJOR.
 
-### Exceção do sistema aprovada pelo responsável (11/10/2026)
+### Exceção do sistema: casas de banho em corte
 
-As restantes 10 constatações têm a mesma causa: casas de banho e WC do piso de cima que «não parecem fechados». Abrangem 9 casos:
-- expert-1, expert-2, expert-4, expert-5, expert-7 e expert-9;
-- master-1;
-- hard-4, com fogão junto à sanita;
-- hard-12.
-
-A causa é do sistema e não das cenas:
+As restantes 10 constatações têm a mesma causa: casas de banho e WC do piso de cima que «não parecem fechados». A causa é do sistema e não das cenas:
 - o renderizador corta as paredes interiores a 0,35 ou 0,6 de altura, para que se veja o tabuleiro;
 - o validador recusa paredes mais altas sempre que escondem células ou peças.
 
-Todas estas casas de banho têm paredes divisórias e porta, mas na vista em corte leem-se como abertas. O responsável aceitou que esta é a linguagem visual da casa de bonecas em corte, e as 10 constatações ficam como exceção documentada, sem contar como MAJOR por resolver. Uma correção de fundo exige alterar o renderizador ou o validador, o que fica registado como «SYSTEM ESCALATION».
+Estas casas de banho têm paredes divisórias e porta, mas na vista em corte leem-se como abertas.
 
-**Resultado:** 0 BLOCKER e 0 MAJOR por resolver, fora da exceção aprovada.
+**Decisão explícita do responsável (11/10/2026).** A pergunta foi feita depois dos lotes RR1 a RR5 e nomeava estes casos: expert-1, 2, 4, 7 e 9; master-1 e 6; hard-4; hard-12. A resposta escolhida foi «Aceitar e documentar (Recomendado)». Esta decisão cobre 9 das 10 constatações, em 8 casos:
+
+| Caso | Constatação aceite | Revisão |
+| --- | --- | --- |
+| expert-1 | WC do piso de cima entre divisórias baixas, junto à zona de jantar | RR3 |
+| expert-2 | Banheira com uma só divisória baixa, virada para o escritório | RR3 |
+| expert-4 | Sanita sem divisória face à bancada da despensa (assinalada duas vezes) | RR3, RR6 |
+| expert-7 | WC à frente da bancada da despensa, só com parede baixa | RR3 |
+| expert-9 | Sanita e duche sem paredes de casa de banho | RR3 |
+| master-1 | WC aberto para o patamar da escada | RR4 |
+| hard-4 | Fogão do piso de cima junto à sanita | RR2 |
+| hard-12 | Sanita e banheira junto à bancada e ao fogão, separadas por meia parede | RR2 |
+
+O master-6 constava da pergunta, mas deixou de precisar da exceção: a parede de 0,6 resolveu a constatação, e o RR6 confirmou 0 MAJOR nesse caso.
+
+**Por decidir:** a constatação do RR6 sobre o **expert-5** («casa de banho do piso de cima aberta para o patamar da escada») surgiu depois da decisão e não está coberta por ela. Não foi registada nenhuma aprovação presumida. Fica pendente de decisão do responsável: incluí-la na exceção ou corrigi-la na cena.
+
+Estas exceções ficam documentadas para uma eventual melhoria futura do renderizador. Uma correção de fundo exige alterar o renderizador ou o validador, por exemplo com paredes de casa de banho mais altas e tolerância nas linhas de visão. Fica registada como «SYSTEM ESCALATION».
+
+**Resultado:** 0 BLOCKER. Há 1 MAJOR por decidir (expert-5, RR6), fora das 9 constatações aceites explicitamente.
 
 ## MINOR e POLISH
 
@@ -166,10 +179,28 @@ Temas recorrentes nas MINOR:
   - algumas sanitas são pouco nítidas.
 - Escadas que chegam a divisões sem patamar próprio.
 - Divisões funcionais com mobília escassa, sem chegarem a parecer abandonadas.
-- O texto de estado no fundo do ecrã do telemóvel fica cortado em vários casos.
+- O texto de estado no fundo do ecrã do telemóvel fica cortado em vários casos (ver a secção seguinte).
 - Peças que o vocabulário de pistas proíbe como decoração. Quando `chair`, `table`, `plant` ou `lamp` são vocabulário de pista, não se acrescentam peças desse tipo; daí mesas com uma só cadeira, bancos estofados e secretárias sem cadeira.
 
 Trocar o frigorífico baixo pelo alto em todo o catálogo foi testado e revertido. Os frigoríficos encostados às paredes nascente e norte ficariam de costas para a câmara, o que viola a regra `tall-back-exposed` em 33 casos. Por isso, o frigorífico só passou a alto onde pode ficar virado a sul ou a nascente, como no master-2.
+
+### Telemóvel: pontos de legibilidade e usabilidade para decisão
+
+Das 401 MINOR, 17 referem o telemóvel. Destacam-se aqui para o responsável decidir se são aceitáveis. Nenhuma foi corrigida.
+
+1. **Texto de estado cortado (real).** Na faixa «Continuity / Sequence» (`src/components/CaseProgressStrip.tsx`), a 390 px de largura:
+   - a mensagem «All people placed — review the account before accusing.» fica cortada com reticências em «All people placed — review the a…»;
+   - a instrução que diz ao jogador o que fazer a seguir deixa de se ler por completo;
+   - na mesma faixa, o cartão da terceira pessoa aparece cortado à direita, o que é próprio da lista com deslocamento horizontal.
+
+   Assinalado em 12 casos: very-easy-7, very-easy-8, easy-1, easy-2, easy-3, easy-4, medium-7, hard-1, hard-2, hard-4, expert-5 e expert-8. É o mesmo componente em todo o catálogo, por isso deve afetar todos os ecrãs resolvidos. Corrigi-lo é uma alteração de interface, fora do âmbito das cenas.
+
+2. **Pessoas «cortadas» no fundo do tabuleiro (não reproduzido na aplicação).**
+   - Casos assinalados: hard-1, hard-2, expert-5 e expert-8.
+   - Causa: o recorte de revisão do telemóvel mostra só os primeiros 860 px da captura. Nos casos de dois pisos, o tabuleiro desce abaixo desse limite.
+   - Verificação: na captura completa do hard-1, o tabuleiro e as pessoas aparecem inteiros.
+
+3. **Pérgula sobre metade do tabuleiro no telemóvel (master-4, RR5).** É a mesma questão de oclusão já tratada no master-4. A célula da solução lê-se.
 
 ## Semântica e visibilidade
 
@@ -240,9 +271,29 @@ O teste `exteriorSupport` verifica que os pilares entram nas linhas de visão. P
 ## Implementação
 
 - **Caminho de publicação canónico:** a Vercel. A demonstração pública está em `murdoku-seven.vercel.app` e a pré-visualização deste ramo foi construída sem erros.
-- **Cloudflare:** a verificação **Workers Builds: murdoku** falha em todos os commits deste PR e também na cabeça do PR #1. O repositório não tem configuração da Cloudflare nem do Wrangler, e o resultado da verificação não inclui o registo de erro. Este bloqueio é separado da auditoria e precisa do registo no painel da Cloudflare. Uma pré-visualização da Vercel pronta não prova que a Cloudflare está saudável.
+- **Cloudflare:** a verificação **Workers Builds: murdoku** falha em todos os commits deste PR e também na cabeça do PR #1. O repositório não tem configuração da Cloudflare nem do Wrangler, e o resultado da verificação não inclui o registo de erro. Este bloqueio é separado da auditoria e continua por diagnosticar: sem o registo do painel da Cloudflare, não pode ser declarado resolvido. Uma pré-visualização da Vercel pronta não prova que a Cloudflare está saudável.
 
 ## Arquivo
 
-- **Repositório:** o arquivo de capturas e o manifesto (`manifest.csv` e `manifest.json`, com caso, piso, vista, estado, ficheiro e resultado) não fazem parte do repositório.
-- **Google Drive:** esta sessão não tinha nenhum conector ativo para o Google Drive, por isso o arquivo não foi carregado. O carregamento fica pendente de um conector autorizado pelo responsável.
+O arquivo final está preparado para carregamento: `Murdoku_Final_Visual_Audit_4dc05e1.zip`, com 360 MB. Tem esta estrutura:
+- **Capturas:** as 342 capturas PNG, organizadas por nível.
+- **`manifest.csv` e `manifest.json`:** uma linha por captura, com estas colunas:
+  - `case_id`, `floor`, `viewport`, `view`, `state`, `filename`, `capture_result`;
+  - `sha256` e `capture_utc`;
+  - `scene_commit` e `scene_files`.
+- **`SHA256SUMS`:** as somas de verificação.
+- **`LEIA-ME.md`:** a origem do arquivo.
+
+**Correspondência com `4dc05e1`, verificada.**
+- **Cenas:** em cada um dos 60 casos, o último commit que alterou as cenas é anterior à captura do caso. Nenhum ficheiro de cena mudou entre essa captura e `4dc05e1`.
+- **Renderização:** desde a primeira captura (08/10/2026, 14:05 UTC), nenhum commit alterou código ou recursos de renderização fora das cenas.
+- **Somas de verificação:** as 342 conferem.
+- **Limite:** o Git não regista alterações por commitar no momento de cada captura. Segundo as notas da sessão, a árvore de trabalho estava limpa em cada captura.
+
+**Onde estão os ficheiros.** O arquivo e o manifesto existem só no armazenamento temporário da sessão de trabalho. Não fazem parte do repositório e não foram publicados.
+
+**Google Drive.** A sessão não tinha nenhum conector para o Google Drive, por isso o arquivo não foi carregado. O carregamento fica pendente:
+- por um conector autorizado pelo responsável;
+- ou por transferência manual do ZIP, antes de a sessão terminar.
+
+Depois do carregamento, verificar o ZIP com a soma SHA-256 `8e9646de0f29ad856b0527e54897289fbfb0192e9f2462aabbd7b88e4f28ef58`.
