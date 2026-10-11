@@ -40,16 +40,17 @@ export default function CaseProgressStrip({
         boxShadow: 'var(--shadow-cut)',
       }}
     >
-      <div className="flex items-center justify-between gap-3 border-b px-3 py-2 sm:px-4" style={{ borderColor: 'var(--color-border-subtle)' }}>
+      <div className="flex items-start justify-between gap-3 border-b px-3 py-2 sm:items-center sm:px-4" style={{ borderColor: 'var(--color-border-subtle)' }}>
         <div className="min-w-0">
           <h2 id="case-progress-heading" className="font-display text-[11px] font-semibold uppercase tracking-[0.2em]" style={{ color: '#18150F' }}>
             Continuity / sequence
           </h2>
-          <p className="mt-0.5 truncate font-mono text-[10px] tracking-wide" style={{ color: '#4B4232' }}>
+          {/* A instrução quebra linha em ecrãs estreitos: é o passo seguinte do jogador e não pode ficar cortada. */}
+          <p data-testid="case-progress-status" className="mt-0.5 break-words font-mono text-[10px] tracking-wide" style={{ color: '#4B4232' }}>
             {nextPerson ? `Next suggested: ${nextPerson.name}` : 'All people placed — review the account before accusing.'}
           </p>
         </div>
-        <div className="flex flex-shrink-0 items-center gap-2">
+        <div className="flex flex-shrink-0 items-center gap-2 whitespace-nowrap">
           <p className="font-mono text-[11px] tabular-nums tracking-widest" style={{ color: '#62400B' }} aria-live="polite">
             {placedCount} / {puzzle.people.length} placed
           </p>
