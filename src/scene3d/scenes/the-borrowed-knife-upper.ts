@@ -37,10 +37,10 @@ export const theBorrowedKnifeUpper: SceneSpec = {
   ],
   walls: [
     {
+      // Divisória completa (0,6) entre a casa de banho e o patamar/estúdio, com porta.
       id: 'bathroom-study-divider',
       from: [0, 3],
       to: [4, 3],
-      height: 'half',
       openings: [{ at: 3.5, width: 0.9, kind: 'door' }],
     },
     {
