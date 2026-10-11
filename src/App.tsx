@@ -1,4 +1,4 @@
-import { Suspense, lazy, useState, useEffect } from 'react'
+import { Suspense, lazy, useState, useEffect, useRef } from 'react'
 import { MotionConfig } from 'framer-motion'
 import { useGame } from './hooks/useGame'
 import { useTheme } from './hooks/useTheme'
@@ -36,6 +36,18 @@ function AppInner() {
   const [aux, setAux] = useState<'none' | 'releases'>('none')
 
   useEffect(() => { window.scrollTo(0, 0) }, [game.screen, aux])
+
+  // Dev deep link: `?case=<id>` opens a case directly so the scene QA loop
+  // (screenshots, diagnostics) does not have to click through the catalog.
+  // Only honoured once, on the home screen, and never in production builds.
+  const deepLinked = useRef(false)
+  useEffect(() => {
+    if (!import.meta.env.DEV || deepLinked.current) return
+    const id = new URLSearchParams(window.location.search).get('case')
+    if (!id || game.screen !== 'home' || !game.puzzles.some(p => p.id === id)) return
+    deepLinked.current = true
+    game.start(id, game.mode)
+  }, [game])
 
   // Warm the split chunks on idle so the win / releases transition never
   // stalls on a mid-animation fetch (which caused a visible repaint hiccup).

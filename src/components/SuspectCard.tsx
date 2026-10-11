@@ -106,13 +106,13 @@ export default function SuspectCard({
               /* Stamped-ink VICTIM marker: rectangular (no rounding), danger-text
                  on a muted danger wash. Same rubber-stamp aesthetic as CLOSED on
                  the case cards. Slight rotation to read as physically stamped.
-                 Uses danger-text for both the text and border so it reads in
-                 light (parchment) as well as dark (obsidian). */
+                 The card is always parchment, so the ink is a fixed deep red
+                 rather than the theme's danger-text (pale pink in dark mode). */
               <span
                 className="text-[10px] font-display font-bold uppercase tracking-[0.14em] px-1 py-[2px] leading-none flex-shrink-0"
                 style={{
-                  color: 'var(--color-danger-text)',
-                  border: '1px solid color-mix(in srgb, var(--color-danger-text) 55%, transparent)',
+                  color: '#7A1F1A',
+                  border: '1px solid color-mix(in srgb, #7A1F1A 55%, transparent)',
                   background: 'color-mix(in srgb, var(--color-danger) 12%, transparent)',
                   transform: 'rotate(-1deg)',
                   display: 'inline-block',

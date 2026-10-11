@@ -278,8 +278,8 @@ function rectIsEdge(rect: Rect, size: number): boolean {
  * Rules (hard):
  *   1. Outdoor names (Front Yard, Garden, Porch) are only assignable on floor 0
  *      AND to a rect touching a board edge. Never upstairs.
- *   2. Names are unique within a floor call. (Cross-floor duplication is fine —
- *      a house can have a Bedroom on each storey.)
+ *   2. Names are unique across the whole case. Room names appear verbatim in
+ *      clues, so repeating “Bedroom” on two storeys makes the clue ambiguous.
  *
  * Rules (soft, scored):
  *   3. Names carry a preferred floor (0 = ground, 1 = upper). A name used on
@@ -294,8 +294,13 @@ function rectIsEdge(rect: Rect, size: number): boolean {
  * best soft score among the full remaining pool (ignoring hard bans), then as
  * a last resort picks any remaining name at random.
  */
-function assignRoomNames(rects: Rect[], size: number, floorNum: number): string[] {
-  const available = shuffle([...ROOM_NAMES])
+function assignRoomNames(
+  rects: Rect[],
+  size: number,
+  floorNum: number,
+  excludedNames: ReadonlySet<string> = new Set(),
+): string[] {
+  const available = shuffle(ROOM_NAMES.filter(name => !excludedNames.has(name)))
   const result: string[] = new Array(rects.length).fill('')
 
   // Sort rects largest-first so big rooms get first pick of well-fitting names.
@@ -355,7 +360,12 @@ function assignRoomNames(rects: Rect[], size: number, floorNum: number): string[
   return result
 }
 
-function buildRooms(size: number, targetRooms?: number, floorNum = 0): { rooms: Room[]; roomOf: string[][] } {
+function buildRooms(
+  size: number,
+  targetRooms?: number,
+  floorNum = 0,
+  excludedNames: ReadonlySet<string> = new Set(),
+): { rooms: Room[]; roomOf: string[][] } {
   // Room count tracks area: an 8x8 split into 4 rooms gives 16-cell rooms, which
   // makes "In the Kitchen" nearly free information.
   // Target room counts tuned to keep typical room size at 6–12 cells.
@@ -377,7 +387,7 @@ function buildRooms(size: number, targetRooms?: number, floorNum = 0): { rooms: 
   )
   const rects = splitRects(size, target)
   // Assign names by fit: size band + floor preference + outdoor-edge rule
-  const names = assignRoomNames(rects, size, floorNum)
+  const names = assignRoomNames(rects, size, floorNum, excludedNames)
   const roomOf: string[][] = Array.from({ length: size }, () => new Array(size).fill(''))
   const rooms: Room[] = rects.map((rect, i) => {
     const id = `room${i}`
@@ -402,7 +412,8 @@ function buildTwoFloorRooms(size: number, targetRooms?: number): {
 } {
   const { rooms: rooms0, roomOf: roomOf0 } = buildRooms(size, targetRooms, 0)
   const offset = rooms0.length
-  const { rooms: rooms1, roomOf: roomOf1 } = buildRooms(size, targetRooms, 1)
+  const usedNames = new Set(rooms0.map(room => room.name))
+  const { rooms: rooms1, roomOf: roomOf1 } = buildRooms(size, targetRooms, 1, usedNames)
 
   // Re-id floor-1 rooms to avoid collisions with floor-0 room ids
   const roomOf1remapped: string[][] = Array.from({ length: size }, () => new Array(size).fill(''))
@@ -845,7 +856,9 @@ export function candidateClues(p: Puzzle): Clue[] {
       if (other.id === person.id) continue
       const oc = p.solution[other.id]
       if (cellsAdjacent(cell, oc)) out.push({ kind: 'besidePerson', person: person.id, other: other.id })
-      if (roomIdAt(p, cell) === roomIdAt(p, oc) && other.id !== p.victimId)
+      // never pair anyone with the victim's room in either direction: "the victim
+      // was in the same room as X" names the murderer outright
+      if (roomIdAt(p, cell) === roomIdAt(p, oc) && other.id !== p.victimId && person.id !== p.victimId)
         out.push({ kind: 'sameRoomAs', person: person.id, other: other.id })
       // negation: not in the same room — skip when other is the victim (would leak murderer identity)
       if (roomIdAt(p, cell) !== roomIdAt(p, oc) && other.id !== p.victimId && person.id !== p.victimId)
@@ -1421,10 +1434,21 @@ function toClueText(p: Puzzle, clues: Clue[]): ClueText[] {
   return clues.map(clue => ({ clue, text: clueToText(p, clue) }))
 }
 
-/** Remove redundant clues while keeping a unique solution and ≥1 clue/person. */
-export function pruneClues(p: Puzzle, clues: Clue[]): Clue[] {
+/** Remove redundant clues while keeping a unique solution and ≥1 clue/person.
+ * Authored required clues carry deliberate narrative/spatial information and
+ * are never candidates for removal. */
+export function pruneClues(
+  p: Puzzle,
+  clues: Clue[],
+  required: readonly Clue[] = [],
+  order: 'seeded' | 'stable' = 'seeded',
+): Clue[] {
   let cur = [...clues]
-  for (const c of shuffle([...cur])) {
+  const keyOf = (clue: Clue) => JSON.stringify(Object.entries(clue).sort(([a], [b]) => a.localeCompare(b)))
+  const requiredKeys = new Set(required.map(keyOf))
+  const candidates = order === 'stable' ? [...cur].sort((a, b) => keyOf(a).localeCompare(keyOf(b))) : shuffle([...cur])
+  for (const c of candidates) {
+    if (requiredKeys.has(keyOf(c))) continue
     const trial = cur.filter(x => x !== c)
     if (!trial.some(x => x.person === c.person)) continue // keep ≥1 per suspect
     p.clues = toClueText(p, trial)
